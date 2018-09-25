@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="openjmlivil">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/openjml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jmlruntime.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jmlspecs.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
