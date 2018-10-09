@@ -7,6 +7,7 @@ import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.*;
 import org.jmlspecs.openjml.*;
+import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 
 /**
@@ -24,13 +25,20 @@ public class Main {
 
         for (JmlTree.JmlCompilationUnit it : cu) {
 
-            System.out.println(api.prettyPrint(rewrite(it, ctx)));
+            //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
+            System.out.println(api.prettyPrint(rewriteAssert(it, ctx)));
         }
     }
 
-    static JCTree rewrite(JmlTree.JmlCompilationUnit cu, Context context) {
+    static JCTree rewriteRAC(JmlTree.JmlCompilationUnit cu, Context context) {
+        JmlAssertionAdder jaa = new JmlAssertionAdder(context, false, true);
         context.dump();
-        return cu.accept(new DefaultReplaceVisitor(context, JmlTree.Maker.instance(context)), null);
+        return jaa.convert(cu);
+    }
+
+    static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
+        context.dump();
+        return cu.accept(new JmlToAssertVisitor(context, JmlTree.Maker.instance(context)), null);
     }
 }
 
@@ -107,79 +115,5 @@ class RewriteVisitor extends JmlTreeScanner {
             it.accept(this);
             cur = cur.tail;
         }
-    }
-
-    @Override
-    public void visitJmlMethodSig(JmlTree.JmlMethodSig that) {
-        System.out.println("mtsig = " + that);
-        super.visitJmlMethodSig(that);
-    }
-
-    @Override
-    public void visitJmlMethodSpecs(JmlTree.JmlMethodSpecs tree) {
-        System.out.println("ms = " + tree);
-        for (JmlTree.JmlSpecificationCase s : tree.forExampleCases) {
-            s.accept(this);
-        }
-        for (JmlTree.JmlSpecificationCase s : tree.impliesThatCases) {
-            s.accept(this);
-        }
-        for (JmlTree.JmlSpecificationCase s : tree.cases) {
-            s.accept(this);
-        }
-        super.visitJmlMethodSpecs(tree);
-    }
-
-    @Override
-    public void visitJmlSpecificationCase(JmlTree.JmlSpecificationCase tree) {
-        super.visitJmlSpecificationCase(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseCallable(JmlTree.JmlMethodClauseCallable tree) {
-        System.out.println("mccl = " + tree);
-        super.visitJmlMethodClauseCallable(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseConditional(JmlTree.JmlMethodClauseConditional tree) {
-        System.out.println("mcc = " + tree);
-        super.visitJmlMethodClauseConditional(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseDecl(JmlTree.JmlMethodClauseDecl tree) {
-        System.out.println("mcd = " + tree);
-        super.visitJmlMethodClauseDecl(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseExpr(JmlTree.JmlMethodClauseExpr tree) {
-        System.out.println("mce = " + tree);
-        super.visitJmlMethodClauseExpr(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseGroup(JmlTree.JmlMethodClauseGroup tree) {
-        System.out.println("mcg = " + tree);
-        super.visitJmlMethodClauseGroup(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseSignals(JmlTree.JmlMethodClauseSignals tree) {
-        System.out.println("mcs = " + tree);
-        super.visitJmlMethodClauseSignals(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly tree) {
-        System.out.println("mcso = " + tree);
-        super.visitJmlMethodClauseSigOnly(tree);
-    }
-
-    @Override
-    public void visitJmlMethodClauseStoreRef(JmlTree.JmlMethodClauseStoreRef tree) {
-        System.out.println("mcsr = " + tree);
-        super.visitJmlMethodClauseStoreRef(tree);
     }
 }
