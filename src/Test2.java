@@ -10,10 +10,34 @@ public class Test2 {
     private void test() {
         int locInt = 0;
         locInt++;
+        privInt = 0;
         System.out.println("This is just a test." + locInt);
     }
 
     public void test1() {
         test();
+    }
+
+    public void test2() {
+        for(int i = 0; i < 1; ++i) {
+            System.out.println("empty");
+        }
+    }
+
+    //@ requires (\forall int i; i > 0 && i < 10; i > 0);
+    //@ requires (\exists int i; i > 0 && i < 10; i == 5);
+    public void quantTest() {
+        System.out.println("this is basically a lemma.");
+    }
+
+    //@ requires (\forall int i; i > 0 && i < 10; \forall int j; j > 10 && j < 20; j > i);
+    //@ requires (\exists int i; i > 0 && i < 10; i == 5 && \forall int j; j > 10 && i < 20; j > i);
+    public void quantTest2() {
+        System.out.println("this is basically a lemma.");
+    }
+
+    //@ requires (\forall int i; i > 0 && i < 10; 3 + 10 > i);
+    public void quantTest3() {
+        System.out.println("this is basically a lemma.");
     }
 }
