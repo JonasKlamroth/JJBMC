@@ -11,6 +11,7 @@ public class Test2 {
         int locInt = 0;
         locInt++;
         privInt = 0;
+        Exception e = new Exception();
         System.out.println("This is just a test." + locInt);
     }
 
@@ -37,6 +38,9 @@ public class Test2 {
     }
 
     //@ requires (\forall int i; i > 0 && i < 10; 3 + 10 > i);
+    //@ requires (\exists int i; i > 0 && i < 10; 3 + 10 > i);
+    //@ ensures (\forall int i; i > 0 && i < 10; 3 + 10 > i);
+    //@ ensures (\exists int i; i > 0 && i < 10; 3 + 10 > i);
     public void quantTest3() {
         System.out.println("this is basically a lemma.");
     }

@@ -1,10 +1,7 @@
 import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -13,7 +10,6 @@ import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.comp.JmlAttr;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.TreeMaker;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
@@ -25,7 +21,6 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
-import org.jmlspecs.openjml.JmlTreeVisitor;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
@@ -62,10 +57,15 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     private JmlTree.JmlMethodDecl currentMethod;
     private int boolVarCounter = 0;
     private LinkedList<JCTree.JCStatement> newStatements = new LinkedList<>();
-    private LinkedList<JCTree.JCStatement> combinedNewStatements = new LinkedList<>();
+    private LinkedList<JCTree.JCStatement> combinedNewReqStatements = new LinkedList<>();
+    private LinkedList<JCTree.JCStatement> combinedNewEnsStatements = new LinkedList<>();
     private Symbol returnBool = null;
+    private Symbol returnVar = null;
+    private JCTree.JCClassDecl returnExcClass;
     private List<Object> visited = new ArrayList<>();
-    private boolean translationMode = false;
+    private TranslationMode translationMode = TranslationMode.JAVA;
+
+    public enum TranslationMode { REQUIRES, ENSURES, JAVA}
 
     public JmlToAssertVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -94,14 +94,18 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlTree.JmlMethodClauseExpr that, Void p) {
         returnBool = null;
-        translationMode = true;
-        JCTree copy = super.visitJmlMethodClauseExpr(that, p);
-        translationMode = false;
         if(that.token == JmlTokenKind.ENSURES) {
+            translationMode = TranslationMode.ENSURES;
+        } else if(that.token == JmlTokenKind.REQUIRES) {
+            translationMode = TranslationMode.REQUIRES;
+        }
+        JCTree copy = super.visitJmlMethodClauseExpr(that, p);
+        if(translationMode == TranslationMode.ENSURES) {
             if(returnBool != null) {
                 newStatements.add(M.at(currentMethod.body.pos).Assert(M.Ident(returnBool), null));
             }
-        } else {
+            combinedNewEnsStatements.addAll(newStatements);
+        } else if(translationMode == TranslationMode.REQUIRES){
             if(returnBool != null) {
                 JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
                 JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
@@ -110,9 +114,10 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
                 newStatements.add(M.Exec(
                         M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs)));
             }
+            combinedNewReqStatements.addAll(newStatements);
         }
-        combinedNewStatements.addAll(newStatements);
         newStatements.clear();
+        translationMode = TranslationMode.JAVA;
         return copy;
     }
 
@@ -121,10 +126,55 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         requiresList.clear();
         ensuresList.clear();
         currentMethod = that;
-        super.visitJmlMethodDecl(that, p);
-//        currentMethod.body = M.Block(0L, currentMethod.body.getStatements().appendList(com.sun.tools.javac.util.List.from(ensStmts)).prependList(com.sun.tools.javac.util.List.from(reqStmts)));
-        currentMethod.body = M.Block(0L, currentMethod.body.getStatements().appendList(com.sun.tools.javac.util.List.from(combinedNewStatements)));
-        combinedNewStatements.clear();
+        JCTree.JCVariableDecl returnVar = null;
+        Type t = ((JmlTree.JmlMethodDecl) that).sym.getReturnType();
+        if(!(t instanceof Type.JCVoidType)) {
+            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, Position.NOPOS);
+            this.returnVar = returnVar.sym;
+        } else {
+            this.returnVar = null;
+        }
+        JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
+        JCTree.JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
+        JCTree.JCExpression ty = M.at(that).Type(syms.exceptionType);
+        JCTree.JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
+        JCTree.JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, com.sun.tools.javac.util.List.of(msg), null));
+        JCTree.JCTry reqTry = M.Try(M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewReqStatements)),
+                com.sun.tools.javac.util.List.of(M.Catch(catchVar, M.Block(0L, com.sun.tools.javac.util.List.of(throwStmt)))), null);
+        JCTree.JCTry ensTry = M.Try(M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewEnsStatements)),
+                com.sun.tools.javac.util.List.of(M.Catch(catchVar, M.Block(0L, com.sun.tools.javac.util.List.of(throwStmt)))), null);
+
+        JCTree.JCVariableDecl catchVarb = treeutils.makeVarDef(returnExcClass.type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
+
+        if(!(t instanceof Type.JCVoidType)) {
+            JCTree.JCReturn returnStmt = M.Return(M.Ident(returnVar));
+            JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements().
+                        appendList(com.sun.tools.javac.util.List.from(combinedNewEnsStatements))),
+                    com.sun.tools.javac.util.List.of(
+                            M.Catch(catchVarb, M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewEnsStatements).append(returnStmt)))
+                    ),
+                    null);
+            com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.of(reqTry);
+            currentMethod.body = M.Block(0L, l.append(returnVar)
+                    .appendList(com.sun.tools.javac.util.List.of(bodyTry))
+                    );
+        } else {
+            JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements().
+                            appendList(com.sun.tools.javac.util.List.from(combinedNewEnsStatements))),
+                    com.sun.tools.javac.util.List.of(
+                            M.Catch(catchVarb, M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewEnsStatements)))
+                    ),
+                    null);
+            com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.of(reqTry);
+            currentMethod.body = M.Block(0L, l
+                    .appendList(com.sun.tools.javac.util.List.of(bodyTry))
+            );
+        }
+
+        currentMethod.methodSpecsCombined = null;
+        currentMethod.cases = null;
+        combinedNewReqStatements.clear();
+        combinedNewEnsStatements.clear();
         return currentMethod;
     }
 
@@ -136,32 +186,71 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
+        Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
+        classSymbol.sourcefile = that.sourcefile;
+        classSymbol.completer = null;
+        classSymbol.flatname = M.Name("ReturnException");
+        returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), com.sun.tools.javac.util.List.nil(), M.Type(syms.exceptionType),
+                com.sun.tools.javac.util.List.nil(),
+                com.sun.tools.javac.util.List.nil());
+        returnExcClass.sym = classSymbol;
+        returnExcClass.type = classSymbol.type;
+        JmlTree.JmlClassDecl copy = (JmlTree.JmlClassDecl)super.visitJmlClassDecl(that, p);
+        copy.defs = copy.defs.append(returnExcClass);
+        return copy;
+    }
+
+    @Override
     public JCTree visitJmlQuantifiedExpr(JmlTree.JmlQuantifiedExpr that, Void p) {
         if(!visited.contains(that)) {
             JmlTree.JmlQuantifiedExpr copy = that;
             visited.add(that);
-            super.copy(copy.value);
-            if(copy.op == JmlTokenKind.BSFORALL) {
-                JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
-                JCTree.JCBinary b = M.Binary(JCTree.Tag.AND, M.Ident(boolVar), M.Ident(returnBool));
-                newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
-                LinkedList<JCTree.JCStatement> l = new LinkedList<>();
-                l.add(boolVar);
-                l.add(makeStandardLoop(copy.range, newStatements));
-                newStatements = l;
-                returnBool = boolVar.sym;
-                return M.Ident(boolVar);
-            } else if(copy.op == JmlTokenKind.BSEXISTS) {
-                JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
-                JCTree.JCBinary b = M.Binary(JCTree.Tag.OR, M.Ident(boolVar), M.Ident(returnBool));
-                newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
-                LinkedList<JCTree.JCStatement> l = new LinkedList<>();
-                l.add(boolVar);
-                l.add(makeStandardLoop(copy.range, newStatements));
-                newStatements = l;
-                returnBool = boolVar.sym;
-                return M.Ident(boolVar);
+
+            if(translationMode == TranslationMode.ENSURES) {
+                if(copy.op == JmlTokenKind.BSFORALL) {
+                    JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+                    JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
+                    com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.nil();
+                    JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(com.sun.tools.javac.util.List.nil(), nondetFunc, largs));
+                    newStatements.addLast(quantVar);
+                    super.copy(copy.value);
+                    return M.Ident(returnBool);
+                } else if(copy.op == JmlTokenKind.BSEXISTS) {
+                    super.copy(copy.value);
+                    JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
+                    JCTree.JCBinary b = M.Binary(JCTree.Tag.OR, M.Ident(boolVar), M.Ident(returnBool));
+                    newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
+                    LinkedList<JCTree.JCStatement> l = new LinkedList<>();
+                    l.add(boolVar);
+                    l.add(makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString()));
+                    newStatements = l;
+                    returnBool = boolVar.sym;
+                    return M.Ident(boolVar);
+                }
+            } else if(translationMode == TranslationMode.REQUIRES) {
+                if(copy.op == JmlTokenKind.BSFORALL) {
+                    super.copy(copy.value);
+                    JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
+                    JCTree.JCBinary b = M.Binary(JCTree.Tag.AND, M.Ident(boolVar), M.Ident(returnBool));
+                    newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
+                    LinkedList<JCTree.JCStatement> l = new LinkedList<>();
+                    l.add(boolVar);
+                    l.add(makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString()));
+                    newStatements = l;
+                    returnBool = boolVar.sym;
+                    return M.Ident(boolVar);
+                } else if(copy.op == JmlTokenKind.BSEXISTS) {
+                    JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+                    JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
+                    com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.nil();
+                    JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(com.sun.tools.javac.util.List.nil(), nondetFunc, largs));
+                    newStatements.addLast(quantVar);
+                    super.copy(copy.value);
+                    return M.Ident(returnBool);
+                }
             }
+
             return copy;
         }
         return that;
@@ -169,7 +258,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitBinary(BinaryTree node, Void p) {
-        if(!visited.contains(node) && translationMode) {
+        if(!visited.contains(node) && translationMode != TranslationMode.JAVA) {
             visited.add(node);
             JCTree.JCBinary copy = (JCTree.JCBinary) super.visitBinary(node, p);
             if(copy.operator.asType().getReturnType() == syms.booleanType) {
@@ -184,7 +273,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitLiteral(LiteralTree node, Void p) {
-        if(!visited.contains(node) && translationMode) {
+        if(!visited.contains(node) && translationMode != TranslationMode.JAVA) {
             visited.add(node);
             JCTree.JCLiteral copy = (JCTree.JCLiteral) super.visitLiteral(node, p);
             if(copy.type.baseType() == syms.booleanType) {
@@ -197,14 +286,25 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         return super.visitLiteral(node, p);
     }
 
+    @Override
+    public JCTree visitReturn(ReturnTree node, Void p) {
+        JCTree.JCReturn copy = (JCTree.JCReturn)super.visitReturn(node, p);
+        if(returnVar == null) return copy;
+        JCTree.JCAssign assign = M.Assign(M.Ident(returnVar), copy.getExpression());
+        JCTree.JCExpression ty = M.at(copy).Type(returnExcClass.type);
+        JCTree.JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, com.sun.tools.javac.util.List.nil(), null));
+        JCTree.JCBlock block = M.Block(0L, com.sun.tools.javac.util.List.of(M.Exec(assign), throwStmt));
+        return block;
+    }
+
     private JCTree.JCExpression makeRangeCondition(int min, int max, Symbol loopVar) {
         JCTree.JCBinary lower = M.Binary(JCTree.Tag.LT, M.Literal(min), M.Ident(loopVar));
         JCTree.JCBinary upper = M.Binary(JCTree.Tag.GT, M.Literal(max), M.Ident(loopVar));
         return M.Binary(JCTree.Tag.AND, lower, upper);
     }
 
-    private JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body) {
-        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, names.fromString("i"), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.intType, 0));
+    private JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName) {
+        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, names.fromString(loopVarName), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.intType, 0));
         JCTree.JCExpression loopCond = range;
         JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
         com.sun.tools.javac.util.List<JCTree.JCExpressionStatement> loopStepl = com.sun.tools.javac.util.List.from(Collections.singletonList(loopStep));
