@@ -32,6 +32,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+/* Standard Java flags.
+     */
+//public static final int PUBLIC       = 1<<0;
+//public static final int PRIVATE      = 1<<1;
+//public static final int PROTECTED    = 1<<2;
+//public static final int STATIC       = 1<<3;
+//public static final int FINAL        = 1<<4;
+//public static final int SYNCHRONIZED = 1<<5;
+//public static final int VOLATILE     = 1<<6;
+//public static final int TRANSIENT    = 1<<7;
+//public static final int NATIVE       = 1<<8;
+//public static final int INTERFACE    = 1<<9;
+//public static final int ABSTRACT     = 1<<10;
+//public static final int STRICTFP     = 1<<11;
+
 public class JmlToAssertVisitor extends JmlTreeCopier {
     private final JmlTree.Maker M;
     private final Context context;
@@ -61,6 +76,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     private LinkedList<JCTree.JCStatement> combinedNewEnsStatements = new LinkedList<>();
     private Symbol returnBool = null;
     private Symbol returnVar = null;
+    private boolean hasReturn = false;
     private JCTree.JCClassDecl returnExcClass;
     private List<Object> visited = new ArrayList<>();
     private TranslationMode translationMode = TranslationMode.JAVA;
@@ -126,6 +142,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         requiresList.clear();
         ensuresList.clear();
         currentMethod = that;
+        hasReturn = false;
         JCTree.JCVariableDecl returnVar = null;
         Type t = ((JmlTree.JmlMethodDecl) that).sym.getReturnType();
         if(!(t instanceof Type.JCVoidType)) {
@@ -146,30 +163,46 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
 
         JCTree.JCVariableDecl catchVarb = treeutils.makeVarDef(returnExcClass.type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
 
-        if(!(t instanceof Type.JCVoidType)) {
-            JCTree.JCReturn returnStmt = M.Return(M.Ident(returnVar));
-            JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements().
-                        appendList(com.sun.tools.javac.util.List.from(combinedNewEnsStatements))),
-                    com.sun.tools.javac.util.List.of(
-                            M.Catch(catchVarb, M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewEnsStatements).append(returnStmt)))
-                    ),
-                    null);
-            com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.of(reqTry);
-            currentMethod.body = M.Block(0L, l.append(returnVar)
-                    .appendList(com.sun.tools.javac.util.List.of(bodyTry))
-                    );
+        com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.nil();
+        if(hasReturn) {
+            if(returnVar != null) {
+                com.sun.tools.javac.util.List< JCTree.JCStatement> l1 = com.sun.tools.javac.util.List.nil();
+                JCTree.JCReturn returnStmt = M.Return(M.Ident(returnVar));
+                if(combinedNewEnsStatements.size() > 0) {
+                    l1 = l1.append(ensTry);
+                }
+                l1 = l1.append(returnStmt);
+                JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements()),
+                        com.sun.tools.javac.util.List.of(
+                                M.Catch(catchVarb, M.Block(0L, l1))
+                        ),
+                        null);
+                if(combinedNewReqStatements.size() > 0) {
+                    l = l.append(reqTry);
+                }
+                l = l.append(returnVar).append(bodyTry);
+            } else {
+                if(combinedNewEnsStatements.size() > 0) {
+                    JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements()),
+                            com.sun.tools.javac.util.List.of(
+                                    M.Catch(catchVarb, M.Block(0L, com.sun.tools.javac.util.List.of(ensTry)))
+                            ),
+                            null);
+                    l = l.append(reqTry).append(bodyTry);
+                } else {
+                    l = copy.body.getStatements();
+                }
+            }
         } else {
-            JCTree.JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements().
-                            appendList(com.sun.tools.javac.util.List.from(combinedNewEnsStatements))),
-                    com.sun.tools.javac.util.List.of(
-                            M.Catch(catchVarb, M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewEnsStatements)))
-                    ),
-                    null);
-            com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.of(reqTry);
-            currentMethod.body = M.Block(0L, l
-                    .appendList(com.sun.tools.javac.util.List.of(bodyTry))
-            );
+            l = copy.body.getStatements();
+            if(combinedNewEnsStatements.size() > 0) {
+                l = l.append(ensTry);
+            }
+            if(combinedNewReqStatements.size() > 0) {
+                l = l.prepend(reqTry);
+            }
         }
+        currentMethod.body = M.Block(0L, l);
 
         currentMethod.methodSpecsCombined = null;
         currentMethod.cases = null;
@@ -191,7 +224,8 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         classSymbol.sourcefile = that.sourcefile;
         classSymbol.completer = null;
         classSymbol.flatname = M.Name("ReturnException");
-        returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), com.sun.tools.javac.util.List.nil(), M.Type(syms.exceptionType),
+        returnExcClass = M.ClassDef(M.Modifiers(8L), M.Name("ReturnException"), com.sun.tools.javac.util.List.nil(),
+                M.Type(syms.runtimeExceptionType),
                 com.sun.tools.javac.util.List.nil(),
                 com.sun.tools.javac.util.List.nil());
         returnExcClass.sym = classSymbol;
@@ -288,13 +322,21 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitReturn(ReturnTree node, Void p) {
+        hasReturn = true;
         JCTree.JCReturn copy = (JCTree.JCReturn)super.visitReturn(node, p);
-        if(returnVar == null) return copy;
-        JCTree.JCAssign assign = M.Assign(M.Ident(returnVar), copy.getExpression());
+        JCTree.JCAssign assign = null;
+        if(returnVar != null) {
+            assign = M.Assign(M.Ident(returnVar), copy.getExpression());
+        }
         JCTree.JCExpression ty = M.at(copy).Type(returnExcClass.type);
         JCTree.JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, com.sun.tools.javac.util.List.nil(), null));
-        JCTree.JCBlock block = M.Block(0L, com.sun.tools.javac.util.List.of(M.Exec(assign), throwStmt));
-        return block;
+        if(assign != null) {
+            JCTree.JCBlock block = M.Block(0L, com.sun.tools.javac.util.List.of(M.Exec(assign), throwStmt));
+            return block;
+        } else {
+            JCTree.JCBlock block = M.Block(0L, com.sun.tools.javac.util.List.of(throwStmt));
+            return block;
+        }
     }
 
     private JCTree.JCExpression makeRangeCondition(int min, int max, Symbol loopVar) {

@@ -7,7 +7,7 @@ class BubbleSort {
       @ ensures (\forall int i; i >= 0 && i <= arr.length - 1; (\forall int j; j >= 0 && j <= i - 1; arr[i] > arr[j]));
       @ assignable arr[*];
       @*/
-    private static int[] sort(int arr[]) {
+    static int[] sort(int arr[]) {
         boolean sorted = false;
         while(!sorted) {
             sorted = true;

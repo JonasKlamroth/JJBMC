@@ -19,7 +19,7 @@ public class Test2 {
         test();
     }
 
-    public void test2() {
+    static public void test2() {
         for(int i = 0; i < 1; ++i) {
             System.out.println("empty");
         }
@@ -43,5 +43,13 @@ public class Test2 {
     //@ ensures (\exists int i; i > 0 && i < 10; 3 + 10 > i);
     public void quantTest3() {
         System.out.println("this is basically a lemma.");
+    }
+
+    public void returnTest() {
+        if(privInt == 0) {
+            return;
+        } else {
+            privInt = 0;
+        }
     }
 }
