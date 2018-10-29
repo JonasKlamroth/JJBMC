@@ -38,11 +38,21 @@
       <file leaf-file-name="JmlToAssertVisitor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/JmlToAssertVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="258">
-              <caret line="202" column="13" lean-forward="true" selection-start-line="202" selection-start-column="13" selection-end-line="202" selection-end-column="13" />
+            <state relative-caret-position="361">
+              <caret line="289" column="47" lean-forward="true" selection-start-line="289" selection-start-column="47" selection-end-line="289" selection-end-column="47" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TreeMaker.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/TreeMaker.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-199">
+              <caret line="675" column="21" lean-forward="false" selection-start-line="675" selection-start-column="21" selection-end-line="675" selection-end-column="21" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -58,8 +68,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ic R visi</find>
-      <find>ic R visis</find>
       <find>ic R visit</find>
       <find>i</find>
       <find>ic</find>
@@ -88,6 +96,8 @@
       <find>visitReturn</find>
       <find>compi</find>
       <find>returnExc</find>
+      <find>makeVarDef</find>
+      <find>assume</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -329,7 +339,7 @@
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="Main" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="src/Test2.java" />
+      <option name="PROGRAM_PARAMETERS" value="src/BubbleSort.java" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -615,13 +625,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlToAssertVisitor.java</url>
-          <line>166</line>
-          <properties />
-          <option name="timeStamp" value="75" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/JmlToAssertVisitor.java</url>
-          <line>210</line>
+          <line>214</line>
           <properties />
           <option name="timeStamp" value="76" />
         </line-breakpoint>
@@ -968,29 +972,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/TreeMaker.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="493" column="38" lean-forward="false" selection-start-line="493" selection-start-column="38" selection-end-line="493" selection-end-column="38" />
-          <folding>
-            <element signature="e#18752#18753#0" expanded="true" />
-            <element signature="e#18808#18809#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/JCTree.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-5260">
           <caret line="1652" column="20" lean-forward="false" selection-start-line="1652" selection-start-column="20" selection-end-line="1652" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/BubbleSort.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="9" column="4" lean-forward="false" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -1003,10 +988,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/TreeMaker.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-199">
+          <caret line="675" column="21" lean-forward="false" selection-start-line="675" selection-start-column="21" selection-end-line="675" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/BubbleSort.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="9" column="4" lean-forward="false" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/JmlToAssertVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="258">
-          <caret line="202" column="13" lean-forward="true" selection-start-line="202" selection-start-column="13" selection-end-line="202" selection-end-column="13" />
+        <state relative-caret-position="361">
+          <caret line="289" column="47" lean-forward="true" selection-start-line="289" selection-start-column="47" selection-end-line="289" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
