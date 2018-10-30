@@ -118,15 +118,15 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         } else if(that.token == JmlTokenKind.REQUIRES) {
             translationMode = TranslationMode.REQUIRES;
         }
-        JCTree copy = super.visitJmlMethodClauseExpr(that, p);
+        JmlTree.JmlMethodClauseExpr copy = (JmlTree.JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         if(translationMode == TranslationMode.ENSURES) {
             if(returnBool != null) {
-                newStatements.add(M.at(currentMethod.body.pos).Assert(M.Ident(returnBool), null));
+                newStatements.add(M.at(currentMethod.body.pos).Assert(copy.expression, null));
             }
             combinedNewEnsStatements.addAll(newStatements);
         } else if(translationMode == TranslationMode.REQUIRES){
             if(returnBool != null) {
-                newStatements.add(makeAssumeStatement(M.Ident(returnBool)));
+                newStatements.add(makeAssumeStatement(copy.expression));
             }
             combinedNewReqStatements.addAll(newStatements);
         }
@@ -259,13 +259,13 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
                     com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.nil();
                     JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(com.sun.tools.javac.util.List.nil(), nondetFunc, largs));
                     newStatements.addLast(quantVar);
-                    newStatements.addLast(makeAssumeStatement(copy.range));
-                    super.copy(copy.value);
-                    return M.Ident(returnBool);
+                    newStatements.addLast(makeAssumeStatement(super.copy(copy.range)));
+                    JCTree.JCExpression value = (JCTree.JCExpression)super.copy(copy.value);
+                    return value;
                 } else if(copy.op == JmlTokenKind.BSEXISTS) {
-                    super.copy(copy.value);
+                    JCTree.JCExpression value = (JCTree.JCExpression)super.copy(copy.value);
                     JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
-                    JCTree.JCBinary b = M.Binary(JCTree.Tag.OR, M.Ident(boolVar), M.Ident(returnBool));
+                    JCTree.JCBinary b = M.Binary(JCTree.Tag.OR, M.Ident(boolVar), value);
                     newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
                     LinkedList<JCTree.JCStatement> l = new LinkedList<>();
                     l.add(boolVar);
@@ -276,9 +276,9 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
                 }
             } else if(translationMode == TranslationMode.REQUIRES) {
                 if(copy.op == JmlTokenKind.BSFORALL) {
-                    super.copy(copy.value);
+                    JCTree.JCExpression value = (JCTree.JCExpression)super.copy(copy.value);
                     JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
-                    JCTree.JCBinary b = M.Binary(JCTree.Tag.AND, M.Ident(boolVar), M.Ident(returnBool));
+                    JCTree.JCBinary b = M.Binary(JCTree.Tag.AND, M.Ident(boolVar), value);
                     newStatements.addLast(M.Exec(M.Assign(M.Ident(boolVar), b)));
                     LinkedList<JCTree.JCStatement> l = new LinkedList<>();
                     l.add(boolVar);
@@ -292,9 +292,9 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
                     com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.nil();
                     JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(com.sun.tools.javac.util.List.nil(), nondetFunc, largs));
                     newStatements.addLast(quantVar);
-                    newStatements.addLast(makeAssumeStatement(copy.range));
-                    super.copy(copy.value);
-                    return M.Ident(returnBool);
+                    newStatements.addLast(makeAssumeStatement(super.copy(copy.range)));
+                    JCTree.JCExpression value = (JCTree.JCExpression)super.copy(copy.value);
+                    return value;
                 }
             }
 
@@ -310,9 +310,9 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
             JCTree.JCBinary copy = (JCTree.JCBinary) super.visitBinary(node, p);
             if(copy.operator.asType().getReturnType() == syms.booleanType) {
                 JCTree.JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, copy);
-                newStatements.addLast(boolVar);
+                //newStatements.addLast(boolVar);
                 returnBool = boolVar.sym;
-                return M.Ident(boolVar);
+                return copy;
             }
         }
         return super.visitBinary(node, p);
@@ -359,9 +359,9 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
                 JCTree.JCExpression arg = that.getArguments().get(0);
                 JCTree.JCVariableDecl oldVar;
                 if(arg.type instanceof Type.JCPrimitiveType) {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf(arg.hashCode())), currentMethod.sym, arg);
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentMethod.sym, arg);
                 } else {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf(arg.hashCode())), currentMethod.sym,
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentMethod.sym,
                             M.Apply(com.sun.tools.javac.util.List.nil(),
                                     M.Select(arg, M.Name("clone")),
                                     com.sun.tools.javac.util.List.nil()));
@@ -379,7 +379,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
             case BSRESULT:
                 return M.Ident(returnVar);
             default:
-                throw new RuntimeException("JmlMethodInvocation with type " + that.token + " is not supported.");
+                throw new RuntimeException("JmlSingleton with type " + that.token + " is not supported.");
         }
     }
 
