@@ -160,7 +160,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         }
         JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
         JCTree.JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
-        JCTree.JCExpression ty = M.at(that).Type(syms.exceptionType);
+        JCTree.JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCTree.JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
         JCTree.JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, com.sun.tools.javac.util.List.of(msg), null));
         JCTree.JCTry reqTry = M.Try(M.Block(0L, com.sun.tools.javac.util.List.from(combinedNewReqStatements)),

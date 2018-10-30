@@ -47,8 +47,8 @@
       <file leaf-file-name="JmlToAssertVisitor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/JmlToAssertVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="353">
-              <caret line="267" column="87" lean-forward="false" selection-start-line="267" selection-start-column="87" selection-end-line="267" selection-end-column="87" />
+            <state relative-caret-position="213">
+              <caret line="163" column="80" lean-forward="false" selection-start-line="163" selection-start-column="73" selection-end-line="163" selection-end-column="80" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -77,7 +77,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>ic jc</find>
       <find>ic j</find>
       <find>ic JC</find>
       <find>ic JCT</find>
@@ -107,6 +106,7 @@
       <find>result</find>
       <find>functi</find>
       <find>assert</find>
+      <find>specifi</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -1006,8 +1006,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/JmlToAssertVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="267" column="87" lean-forward="false" selection-start-line="267" selection-start-column="87" selection-end-line="267" selection-end-column="87" />
+        <state relative-caret-position="213">
+          <caret line="163" column="80" lean-forward="false" selection-start-line="163" selection-start-column="73" selection-end-line="163" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
