@@ -27,9 +27,11 @@ import org.jmlspecs.openjml.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /* Standard Java flags.
@@ -80,6 +82,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     private JCTree.JCClassDecl returnExcClass;
     private List<Object> visited = new ArrayList<>();
     private TranslationMode translationMode = TranslationMode.JAVA;
+    private Map<Integer, JCTree.JCVariableDecl> oldVars = new HashMap<>();
 
     public enum TranslationMode { REQUIRES, ENSURES, JAVA}
 
@@ -168,6 +171,10 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         JCTree.JCVariableDecl catchVarb = treeutils.makeVarDef(returnExcClass.type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
 
         com.sun.tools.javac.util.List< JCTree.JCStatement> l = com.sun.tools.javac.util.List.nil();
+        for(JCTree.JCVariableDecl variableDecl : oldVars.values()) {
+            copy.body.stats = copy.body.getStatements().prepend(variableDecl);
+        }
+
         if(hasReturn) {
             if(returnVar != null) {
                 com.sun.tools.javac.util.List< JCTree.JCStatement> l1 = com.sun.tools.javac.util.List.nil();
@@ -342,6 +349,37 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
         } else {
             JCTree.JCBlock block = M.Block(0L, com.sun.tools.javac.util.List.of(throwStmt));
             return block;
+        }
+    }
+
+    @Override
+    public JCTree visitJmlMethodInvocation(JmlTree.JmlMethodInvocation that, Void p) {
+        switch (that.token) {
+            case BSOLD:
+                JCTree.JCExpression arg = that.getArguments().get(0);
+                JCTree.JCVariableDecl oldVar;
+                if(arg.type instanceof Type.JCPrimitiveType) {
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf(arg.hashCode())), currentMethod.sym, arg);
+                } else {
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf(arg.hashCode())), currentMethod.sym,
+                            M.Apply(com.sun.tools.javac.util.List.nil(),
+                                    M.Select(arg, M.Name("clone")),
+                                    com.sun.tools.javac.util.List.nil()));
+                }
+                oldVars.put(arg.hashCode(), oldVar);
+                return M.Ident(oldVar);
+            default:
+                throw new RuntimeException("JmlMethodInvocation with type " + that.token + " is not supported.");
+        }
+    }
+
+    @Override
+    public JCTree visitJmlSingleton(JmlTree.JmlSingleton that, Void p) {
+        switch (that.token) {
+            case BSRESULT:
+                return M.Ident(returnVar);
+            default:
+                throw new RuntimeException("JmlMethodInvocation with type " + that.token + " is not supported.");
         }
     }
 

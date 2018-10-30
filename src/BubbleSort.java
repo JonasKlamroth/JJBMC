@@ -4,7 +4,7 @@
 class BubbleSort {
     /*@
       @ requires arr != null;
-      @ ensures (\forall int i; i >= 0 && i <= arr.length - 1; (\forall int j; j >= 0 && j <= i - 1; arr[i] > arr[j]));
+      @ ensures (\forall int i; i >= 0 && i <= \result.length - 1; (\forall int j; j >= 0 && j <= i - 1; \result[i] > \result[j]));
       @ assignable arr[*];
       @*/
     static int[] sort(int arr[]) {
