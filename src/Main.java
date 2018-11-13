@@ -38,7 +38,8 @@ public class Main {
 
     static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
         context.dump();
-        return cu.accept(new JmlToAssertVisitor(context, JmlTree.Maker.instance(context)), null);
+        return cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
+//        return cu.accept(new JmlToAssertVisitor(context, JmlTree.Maker.instance(context)), null);
     }
 }
 
