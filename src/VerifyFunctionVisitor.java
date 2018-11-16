@@ -66,7 +66,6 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private Symbol returnBool = null;
     private Symbol returnVar = null;
     private boolean hasReturn = false;
-    private List<Object> visited = List.nil();
     private JmlToAssertVisitor.TranslationMode translationMode = JmlToAssertVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
@@ -106,7 +105,12 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         } else if(that.token == JmlTokenKind.REQUIRES) {
             translationMode = JmlToAssertVisitor.TranslationMode.REQUIRES;
         }
-        JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
+        //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
+        JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar);
+        JmlMethodClauseExpr copy = (JmlMethodClauseExpr)expressionVisitor.visitJmlMethodClauseExpr(that, p);
+        returnBool = expressionVisitor.getReturnBool();
+        newStatements = expressionVisitor.getNewStatements();
+        oldVars = expressionVisitor.getOldVars();
         if(translationMode == JmlToAssertVisitor.TranslationMode.ENSURES) {
             if(returnBool != null) {
                 newStatements = newStatements.append(M.at(currentMethod.body.pos).Assert(copy.expression, null));
@@ -121,103 +125,6 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         newStatements = List.nil();
         translationMode = JmlToAssertVisitor.TranslationMode.JAVA;
         return copy;
-    }
-
-    @Override
-    public JCTree visitJmlSingleton(JmlSingleton that, Void p) {
-        switch (that.token) {
-            case BSRESULT:
-                return M.Ident(returnVar);
-            default:
-                throw new RuntimeException("JmlSingleton with type " + that.token + " is not supported.");
-        }
-    }
-
-    @Override
-    public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
-        if(!visited.contains(that)) {
-            JmlQuantifiedExpr copy = that;
-            visited = visited.append(that);
-
-            if(translationMode == JmlToAssertVisitor.TranslationMode.ENSURES) {
-                if(copy.op == JmlTokenKind.BSFORALL) {
-                    JCIdent classCProver = M.Ident(M.Name("CProver"));
-                    JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
-                    List<JCExpression> largs = List.nil();
-                    JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(List.nil(), nondetFunc, largs));
-                    newStatements = newStatements.append(quantVar);
-                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(super.copy(copy.range), M));
-                    JCExpression value = super.copy(copy.value);
-                    return value;
-                } else if(copy.op == JmlTokenKind.BSEXISTS) {
-                    JCExpression value = super.copy(copy.value);
-                    JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
-                    JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
-                    newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
-                    List<JCStatement> l = List.nil();
-                    l.append(boolVar);
-                    l.append(makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString()));
-                    newStatements = l;
-                    returnBool = boolVar.sym;
-                    return M.Ident(boolVar);
-                }
-            } else if(translationMode == JmlToAssertVisitor.TranslationMode.REQUIRES) {
-                if(copy.op == JmlTokenKind.BSFORALL) {
-                    JCExpression value = super.copy(copy.value);
-                    JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
-                    JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
-                    newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
-                    List<JCStatement> l = List.nil();
-                    l.append(boolVar);
-                    l.append(makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString()));
-                    newStatements = l;
-                    returnBool = boolVar.sym;
-                    return M.Ident(boolVar);
-                } else if(copy.op == JmlTokenKind.BSEXISTS) {
-                    JCIdent classCProver = M.Ident(M.Name("CProver"));
-                    JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
-                    List<JCExpression> largs = List.nil();
-                    JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, names.fromString(that.decls.get(0).getName().toString()), currentMethod.sym, M.Apply(List.nil(), nondetFunc, largs));
-                    newStatements = newStatements.append(quantVar);
-                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(super.copy(copy.range), M));
-                    JCExpression value = super.copy(copy.value);
-                    return value;
-                }
-            }
-
-            return copy;
-        }
-        return that;
-    }
-
-    @Override
-    public JCTree visitBinary(BinaryTree node, Void p) {
-        if(!visited.contains(node) && translationMode != JmlToAssertVisitor.TranslationMode.JAVA) {
-            visited = visited.append(node);
-            JCBinary copy = (JCBinary) super.visitBinary(node, p);
-            if(copy.operator.asType().getReturnType() == syms.booleanType) {
-                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, copy);
-                //newStatements.append(boolVar);
-                returnBool = boolVar.sym;
-                return copy;
-            }
-        }
-        return super.visitBinary(node, p);
-    }
-
-    @Override
-    public JCTree visitLiteral(LiteralTree node, Void p) {
-        if(!visited.contains(node) && translationMode != JmlToAssertVisitor.TranslationMode.JAVA) {
-            visited = visited.append(node);
-            JCLiteral copy = (JCLiteral) super.visitLiteral(node, p);
-            if(copy.type.baseType() == syms.booleanType) {
-                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentMethod.sym, copy);
-                newStatements = newStatements.append(boolVar);
-                returnBool = boolVar.sym;
-                return M.Ident(boolVar);
-            }
-        }
-        return super.visitLiteral(node, p);
     }
 
     @Override
@@ -253,7 +160,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         } else {
             this.returnVar = null;
         }
-        JmlMethodDecl copy = (JmlMethodDecl)super.visitJmlMethodDecl(that, p);
+        JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
         JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
@@ -317,34 +224,16 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         return currentMethod;
     }
 
-    @Override
-    public JCTree visitJmlMethodInvocation(JmlMethodInvocation that, Void p) {
-        switch (that.token) {
-            case BSOLD:
-                JCExpression arg = that.getArguments().get(0);
-                JCVariableDecl oldVar;
-                if(arg.type instanceof Type.JCPrimitiveType) {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentMethod.sym, arg);
-                } else {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentMethod.sym,
-                            M.Apply(List.nil(),
-                                    M.Select(arg, M.Name("clone")),
-                                    List.nil()));
-                }
-                oldVars.put(arg.hashCode(), oldVar);
-                return M.Ident(oldVar);
-            default:
-                throw new RuntimeException("JmlMethodInvocation with type " + that.token + " is not supported.");
-        }
+    public JCTree visitJmlMethodDeclBugfix(JmlMethodDecl that, Void p) {
+        JmlMethodDecl copy = (JmlMethodDecl)super.visitMethod(that, p);
+        copy.sourcefile = that.sourcefile;
+        copy.specsDecl = that.specsDecl;
+        //copy.cases = (JmlMethodSpecs)this.copy((JCTree)that.cases, (Object)p);
+        copy.methodSpecsCombined = JmlSpecs.copy(that.methodSpecsCombined, p, this);
+        copy.cases = (JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
+        copy.type = that.type;
+        return copy;
     }
 
-    private JCStatement makeStandardLoop(JCExpression range, List<JCStatement> body, String loopVarName) {
-        JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, names.fromString(loopVarName), currentMethod.sym, treeutils.makeLit(Position.NOPOS, syms.intType, 0));
-        JCExpression loopCond = range;
-        JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
-        List<JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
-        JCBlock loopBodyBlock = M.Block(0L, List.from(body));
-        List<JCStatement> loopVarl = List.from(Collections.singletonList(loopVar));
-        return M.ForLoop(loopVarl, loopCond, loopStepl, loopBodyBlock);
-    }
+
 }
