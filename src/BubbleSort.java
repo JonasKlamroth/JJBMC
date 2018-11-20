@@ -12,7 +12,7 @@ class BubbleSort {
         //@ loop_modifies arr[*];
         for(int j = arr.length - 1; j >= 0; --j) {
             //Inv2: max(arr, 0, j) == max(arr, i, j)
-            //@ loop_invariant (\forall int m; m >= 0 && m < arr.length; (\exists int n; n >= i && n <= j; arr[n] >= arr[m]));
+            //@ loop_invariant (\forall int m; m >= 0 && m < i; arr[i] >= arr[m]);
             //@ loop_modifies arr[i], arr[i + 1];
             for (int i = 0; i < j; ++i) {
                 if (arr[i] > arr[i + 1]) {
