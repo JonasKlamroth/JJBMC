@@ -52,4 +52,26 @@ public class Test2 {
             privInt = 0;
         }
     }
+
+    //@ requires true;
+    //@ ensures false;
+    public void loopTest() {
+        int[] arr = new int[10];
+        //@ loop_invariant i >= 0;
+        //@ loop_invariant i > -1;
+        //@ loop_modifies arr[*], arr[2 .. 4];
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    public void loopTest1() {
+        int[] arr = new int[10];
+        //@ loop_invariant (\forall int j; j > 0 && j < 10; j > -1);
+        //@ loop_invariant i > -1;
+        //@ loop_modifies arr[*], arr[2 .. 4];
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
 }

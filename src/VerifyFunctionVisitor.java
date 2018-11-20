@@ -66,7 +66,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private Symbol returnBool = null;
     private Symbol returnVar = null;
     private boolean hasReturn = false;
-    private JmlToAssertVisitor.TranslationMode translationMode = JmlToAssertVisitor.TranslationMode.JAVA;
+    private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
 
@@ -101,29 +101,33 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         returnBool = null;
         if(that.token == JmlTokenKind.ENSURES) {
-            translationMode = JmlToAssertVisitor.TranslationMode.ENSURES;
+            translationMode = VerifyFunctionVisitor.TranslationMode.ENSURES;
         } else if(that.token == JmlTokenKind.REQUIRES) {
-            translationMode = JmlToAssertVisitor.TranslationMode.REQUIRES;
+            translationMode = VerifyFunctionVisitor.TranslationMode.REQUIRES;
         }
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar);
-        JmlMethodClauseExpr copy = (JmlMethodClauseExpr)expressionVisitor.visitJmlMethodClauseExpr(that, p);
+        JmlMethodClauseExpr copy = expressionVisitor.copy(that);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
-        if(translationMode == JmlToAssertVisitor.TranslationMode.ENSURES) {
+        if(translationMode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
             if(returnBool != null) {
-                newStatements = newStatements.append(M.at(currentMethod.body.pos).Assert(copy.expression, null));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+            } else {
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
             }
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
-        } else if(translationMode == JmlToAssertVisitor.TranslationMode.REQUIRES){
+        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.REQUIRES){
             if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(super.copy(copy.expression), M));
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
+            } else {
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy.expression, M));
             }
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
-        translationMode = JmlToAssertVisitor.TranslationMode.JAVA;
+        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         return copy;
     }
 
@@ -185,7 +189,8 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                     l1 = l1.append(ensTry);
                 }
                 l1 = l1.append(returnStmt);
-                JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements()),
+                List<JCStatement> body = transformBody(copy.body.getStatements());
+                JCTry bodyTry = M.Try(M.Block(0L, body),
                         List.of(
                                 M.Catch(catchVarb, M.Block(0L, l1))
                         ),
@@ -196,18 +201,21 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                 l = l.append(returnVar).append(bodyTry);
             } else {
                 if(combinedNewEnsStatements.size() > 0) {
-                    JCTry bodyTry = M.Try(M.Block(0L, copy.body.getStatements()),
+                    List<JCStatement> body = transformBody(copy.body.getStatements());
+                    JCTry bodyTry = M.Try(M.Block(0L, body),
                             List.of(
                                     M.Catch(catchVarb, M.Block(0L, List.of(ensTry)))
                             ),
                             null);
                     l = l.append(reqTry).append(bodyTry);
                 } else {
-                    l = copy.body.getStatements().prepend(reqTry);
+                    l = transformBody(copy.body.getStatements());
+                    l = l.prepend(reqTry);
                 }
             }
         } else {
-            l = copy.body.getStatements();
+            //l = copy.body.getStatements();
+            l = transformBody(copy.body.getStatements());
             if(combinedNewEnsStatements.size() > 0) {
                 l = l.append(ensTry);
             }
@@ -222,6 +230,20 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         combinedNewReqStatements = List.nil();
         combinedNewEnsStatements = List.nil();
         return currentMethod;
+    }
+
+    private List<JCStatement> transformBody(List<JCStatement> oBody) {
+        List<JCStatement> body = List.nil();
+        for(JCStatement st : oBody) {
+            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar);
+            JCStatement copy = ev.copy(st);
+            if(copy != null) {
+                body = body.append(copy);
+            } else {
+                body = body.appendList(ev.getNewStatements());
+            }
+        }
+        return body;
     }
 
     public JCTree visitJmlMethodDeclBugfix(JmlMethodDecl that, Void p) {

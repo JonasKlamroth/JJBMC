@@ -55,12 +55,65 @@ public class translationUtils {
                 M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
     }
 
-    public JCTree.JCVariableDecl makeNondetInt(Name name, Symbol currentSymbol) {
+    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
+        return M.at(Position.NOPOS).Assert(expr, null);
+    }
+
+    public JCTree.JCVariableDecl makeNondetIntVar(Name name, Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
         List<JCTree.JCExpression> largs = List.nil();
         JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, name, currentSymbol, M.Apply(List.nil(), nondetFunc, largs));
         return quantVar;
+    }
+
+    public JCTree.JCMethodInvocation makeNondetInt(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetFloat(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetFloat"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetDouble(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetDouble"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetLong(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetLong"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetChar(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetChar"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetShort(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetShort"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCMethodInvocation makeNondetWithNull(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithNull"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
     }
 
     public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol) {
