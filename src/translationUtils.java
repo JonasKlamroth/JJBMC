@@ -1,7 +1,9 @@
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
@@ -11,6 +13,7 @@ import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTree;
+import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Utils;
@@ -55,8 +58,19 @@ public class translationUtils {
                 M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
     }
 
-    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
+    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M, List<JCTree.JCExpression> assumptions) {
+        if(assumptions.size() > 0) {
+            JCTree.JCExpression ifexpr = assumptions.get(0);
+            for(int idx = 1; idx < assumptions.size(); ++idx) {
+                ifexpr = M.Binary(JCTree.Tag.AND, ifexpr, assumptions.get(idx));
+            }
+            return M.If(ifexpr, M.at(Position.NOPOS).Assert(expr, null), null);
+        }
         return M.at(Position.NOPOS).Assert(expr, null);
+    }
+
+    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
+        return makeAssertStatement(expr, M, List.nil());
     }
 
     public JCTree.JCVariableDecl makeNondetIntVar(Name name, Symbol currentSymbol) {
@@ -116,8 +130,17 @@ public class translationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol) {
-        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, names.fromString(loopVarName), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.intType, 0));
+    public JCTree.JCMethodInvocation makeNondetBoolean(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetBoolean"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
+        RangeExtractor re = new RangeExtractor(M, loopVarName.sym);
+        re.scan(range);
+        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, loopVarName.name, currentSymbol, re.getMin());
         JCTree.JCExpression loopCond = range;
         JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
         List<JCTree.JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
@@ -125,5 +148,61 @@ public class translationUtils {
         List<JCTree.JCStatement> loopVarl = List.from(Collections.singletonList(loopVar));
         return M.ForLoop(loopVarl, loopCond, loopStepl, loopBodyBlock);
     }
+}
 
+class RangeExtractor extends JmlTreeScanner {
+    private JCTree.JCExpression minResult;
+    private JCTree.JCExpression maxResult;
+    private Symbol ident;
+    private final JmlTree.Maker M;
+
+    public RangeExtractor(JmlTree.Maker maker, Symbol ident) {
+        this.ident = ident;
+        this.M = maker;
+    }
+
+    @Override
+    public void visitBinary(JCTree.JCBinary tree) {
+        if(tree.getKind() == Tree.Kind.GREATER_THAN) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+                minResult = M.Binary(JCTree.Tag.PLUS, tree.getRightOperand(), M.Literal(1));
+            }
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+                maxResult = M.Binary(JCTree.Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
+            }
+        }
+        if(tree.getKind() == Tree.Kind.LESS_THAN) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+                maxResult = M.Binary(JCTree.Tag.PLUS, tree.getRightOperand(), M.Literal(1));
+            }
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+                minResult = M.Binary(JCTree.Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
+            }
+        }
+        if(tree.getKind() == Tree.Kind.GREATER_THAN_EQUAL) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+                minResult = tree.getRightOperand();
+            }
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+                maxResult = tree.getLeftOperand();
+            }
+        }
+        if(tree.getKind() == Tree.Kind.LESS_THAN_EQUAL) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+                maxResult = tree.getRightOperand();
+            }
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+                minResult = tree.getLeftOperand();
+            }
+        }
+        super.visitBinary(tree);
+    }
+
+    public JCTree.JCExpression getMin() {
+        return minResult;
+    }
+
+    public JCTree.JCExpression getMax() {
+        return maxResult;
+    }
 }

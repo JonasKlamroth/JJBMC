@@ -1,6 +1,7 @@
 import com.sun.imageio.plugins.jpeg.JPEG;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -19,6 +20,7 @@ import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
+import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
@@ -64,6 +66,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
+    private List<JCExpression> assertAssumptions = List.nil();
 
 
 
@@ -109,7 +112,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if(copy.op == JmlTokenKind.BSFORALL) {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(that.decls.get(0).getName().toString()), currentSymbol);
                 newStatements = newStatements.append(quantVar);
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(super.copy(copy.range), M));
+                assertAssumptions = assertAssumptions.append(super.copy(copy.range));
                 JCExpression value = super.copy(copy.value);
                 return value;
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
@@ -121,7 +124,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString(), currentSymbol));
+                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 returnBool = boolVar.sym;
                 return M.Ident(boolVar);
@@ -136,7 +139,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0).getName().toString(), currentSymbol));
+                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 returnBool = boolVar.sym;
                 return M.Ident(boolVar);
@@ -290,13 +293,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression assertCopy = this.copy(((JmlStatementLoopExpr) spec).expression);
                 if(returnBool == null) {
                     if(mode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
-                        newStatements = newStatements.append(translationUtils.makeAssertStatement(assertCopy, M));
+                        newStatements = newStatements.append(translationUtils.makeAssertStatement(assertCopy, M, assertAssumptions));
+                        assertAssumptions = List.nil();
                     } else {
                         newStatements = newStatements.append(translationUtils.makeAssumeStatement(assertCopy, M));
                     }
                 } else {
                     if(mode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
-                        newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+                        newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, assertAssumptions));
+                        assertAssumptions = List.nil();
                     } else {
                         newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
                     }
@@ -318,8 +323,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(aexpr.hi == null && aexpr.lo == null) {
                     //TODO not always a valid translation
                     res = res.append(M.Exec(M.Assign(aexpr.expression, transUtils.makeNondetWithNull(currentSymbol))));
-                } else if(aexpr.hi != null && aexpr.lo.toString().equals(aexpr.hi
-                .toString())) {
+                } else if(aexpr.hi != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
                     Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                     JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
                     if(elemtype.isPrimitive()) {
@@ -342,6 +346,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                         throw new NotImplementedException();
                     }
                 }
+            } else {
+                throw new NotImplementedException();
             }
         }
         return res;
@@ -375,4 +381,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public Map<Integer, JCVariableDecl> getOldVars() {
         return oldVars;
     }
+
+    public List<JCExpression> getAssertionAssumptions() { return assertAssumptions; }
 }

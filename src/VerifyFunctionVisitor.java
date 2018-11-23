@@ -48,6 +48,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private final JmlTypes jmltypes;
     private final JmlSpecs specs;
     private final JmlTreeUtils treeutils;
+    private final translationUtils transUtils;
     private final JmlAttr attr;
     private final Name resultName;
     private final Name exceptionName;
@@ -86,6 +87,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         this.specs = JmlSpecs.instance(context);
         this.jmltypes = JmlTypes.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
+        this.transUtils = new translationUtils(context, M);
         this.attr = JmlAttr.instance(context);
         this.resultName = names.fromString(Strings.resultVarString);
         this.exceptionName = names.fromString(Strings.exceptionVarString);
@@ -113,9 +115,15 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
             if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, expressionVisitor.getAssertionAssumptions()));
+                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
+                newStatements = List.of(ifstmt);
+                //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M, expressionVisitor.getAssertionAssumptions()));
+                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
+                newStatements = List.of(ifstmt);
+                //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
             }
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.REQUIRES){
