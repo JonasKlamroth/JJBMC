@@ -27,6 +27,7 @@ import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,6 +68,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> assertAssumptions = List.nil();
+    private ArrayList<JmlForLoop> outerLoops = new ArrayList<>();
 
 
 
@@ -261,12 +263,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
         }
         assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.REQUIRES);
+        outerLoops.forEach(loop -> assumeOrAssertAllInvs(loop, VerifyFunctionVisitor.TranslationMode.REQUIRES));
         List<JCStatement> statements = newStatements;
         newStatements = List.nil();
         JCStatement assumefalse = translationUtils.makeAssumeStatement(treeutils.makeLit(Position.NOPOS, syms.booleanType, false), M);
         List<JCStatement> ifbodystatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
+            outerLoops.add(that);
             JCStatement stcopy = super.copy(st);
             if(!(st instanceof JmlForLoop)) {
                 ifbodystatements = ifbodystatements.append(stcopy);
@@ -282,10 +286,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         ifbodystatements = ifbodystatements.appendList(newStatements);
         JCBlock ifbody = M.Block(0L, ifbodystatements.append(assumefalse));
         newStatements = statements.append(M.If(that.cond, ifbody, null));
+        outerLoops.remove(outerLoops.size() - 1);
         return null;
     }
 
     private void assumeOrAssertAllInvs(JmlForLoop that, VerifyFunctionVisitor.TranslationMode mode) {
+        List<JCStatement> l = newStatements;
+        newStatements = List.nil();
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if(spec instanceof JmlStatementLoopExpr) {
                 translationMode = mode;
@@ -308,6 +315,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
             }
         }
+        newStatements = l.append(M.Block(0L, newStatements));
     }
 
     private List<JCStatement> havoc(List<JCExpression> storerefs) {
