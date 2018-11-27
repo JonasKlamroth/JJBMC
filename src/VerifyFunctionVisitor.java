@@ -5,6 +5,7 @@ import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.comp.JmlAttr;
 import com.sun.tools.javac.jvm.ClassReader;
@@ -15,6 +16,7 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Position;
+import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTreeCopier;
@@ -167,7 +169,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
         if(!(t instanceof Type.JCVoidType)) {
-            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, treeutils.makeNullLiteral(Position.NOPOS));
+            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, getLiteralForType(t));
             this.returnVar = returnVar.sym;
         } else {
             this.returnVar = null;
@@ -263,6 +265,25 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         copy.cases = (JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
         copy.type = that.type;
         return copy;
+    }
+
+    private JCLiteral getLiteralForType(Type t) {
+        if(t.getTag().equals(TypeTag.INT)) {
+            return M.Literal(0);
+        }
+        if(t.getTag().equals(TypeTag.LONG)) {
+            return M.Literal(0);
+        }
+        if(t.getTag().equals(TypeTag.DOUBLE)) {
+            return M.Literal(0.0);
+        }
+        if(t.getTag().equals(TypeTag.FLOAT)) {
+            return M.Literal(0.0f);
+        }
+        if(t.getTag().equals(TypeTag.SHORT)) {
+            return M.Literal(0);
+        }
+        return treeutils.nullLit;
     }
 
 

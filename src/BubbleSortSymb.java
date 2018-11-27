@@ -10,9 +10,11 @@ class BubbleSortSymb {
     static int[] sort(int arr[]) {
         //@ loop_invariant (\forall int k; k > j && k < arr.length; (\forall int k1; k1 >= 0 && k1 < k; arr[k1] <= arr[k]));
         //@ loop_modifies arr[*];
+        //@ loop_invariant j <= arr.length - 1 && j >= -1;
         for(int j = arr.length - 1; j >= 0; --j) {
             //Inv2: max(arr, 0, j) == max(arr, i, j)
             //@ loop_invariant (\forall int m; m >= 0 && m < i; arr[i] >= arr[m]);
+            //@ loop_invariant i >= 0 && i <= j;
             //@ loop_modifies arr[i], arr[i + 1];
             for (int i = 0; i < j; ++i) {
                 if (arr[i] > arr[i + 1]) {
