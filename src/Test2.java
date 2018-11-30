@@ -5,6 +5,7 @@ public class Test2 {
     private int privInt;
     public int pubInt;
     Test2 t2 = new Test2();
+    int[] arr;
 
     //@ requires 1 < 0;
     //@ ensures true;
@@ -76,11 +77,21 @@ public class Test2 {
         }
     }
 
-    /*@ assignable privInt, pubInt, t2;
+    /*@ assignable privInt, t2.t2, t2.arr[0];
       @ */
     private void assignalbeTest() {
         t2 = new Test2();
         t2.pubInt = 5;
+        t2.t2 = new Test2();
+        t2.t2.pubInt = 10;
+        t2.arr = new int[10];
+        t2.arr[5] = 10;
         privInt = 0;
+    }
+
+    /*@ assignable arr[0];
+      @*/
+    private void assignableTest2() {
+        arr[0] = 5;
     }
 }

@@ -14,6 +14,7 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import javafx.geometry.Pos;
 import jdk.nashorn.internal.codegen.CompilerConstants;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
@@ -26,6 +27,7 @@ import org.jmlspecs.openjml.Utils;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -373,44 +375,143 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         throw new NotImplementedException();
     }
 
-    /*@Override
+    @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
+        JCExpression cond = null;
         if(assign.getVariable() instanceof JCIdent) {
-            JCIdent lhs = (JCIdent) assign.getVariable();
-            if(lhs.type.isPrimitive()) {
-                if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                        .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
-                    System.out.println("Illegal assignment: " + assign.toString());
-                }
-            } else {
-                List<JCExpression> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                        .filter(as -> !((JCIdent)as).type.isPrimitive())
-                        .collect(Collectors.toList()));
-                if(pot.size() == 0) {
-                    //throw new RuntimeException("Illegal assignment: " + assign.toString());
-                }
-                JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
-                for(int i = 1; i < pot.size(); ++i) {
-                    expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs));
-                }
-                JCExpression ty = M.Type(syms.runtimeExceptionType);
-                JCTree.JCExpression msg = treeutils.makeStringLiteral(Position.NOPOS, "Illegal assignment " + assign.toString());
-                JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
-                newStatements = newStatements.append(M.If(expr, M.Block(0L, List.of(throwStmt)), null));
-                newStatements = newStatements.append(M.Exec(assign));
-                return null;
-            }
+            cond = editAssignable((JCIdent)assign.getVariable());
         } else if(assign.getVariable() instanceof JCArrayAccess) {
-            JCArrayAccess lhs = (JCArrayAccess) assign.getVariable();
+            cond = editAssignable((JCArrayAccess) assign.getVariable());
         } else if(assign.getVariable() instanceof JCFieldAccess) {
-            JCFieldAccess lhs = (JCFieldAccess) assign.getVariable();
+            cond = editAssignable((JCFieldAccess) assign.getVariable());
         } else {
             new Exception("Could not handle assignment " + node.toString());
         }
+        if(cond != null) {
+            JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
+            newStatements = newStatements.append(ifst);
+        }
+        newStatements = newStatements.append(M.Exec(assign));
+        return null;
+    }
 
-        return super.visitAssignment(node, p);
-    }*/
+    public JCExpression editAssignable(JCIdent e) {
+        JCIdent lhs = e;
+        if(lhs.type.isPrimitive()) {
+            if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                    .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
+                return M.Literal(true);
+            }
+            return null;
+        } else {
+            List<JCExpression> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                    .filter(as -> !((JCIdent)as).type.isPrimitive())
+                    .collect(Collectors.toList()));
+            if(pot.size() == 0) {
+                return M.Literal(true);
+            }
+            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
+            for(int i = 1; i < pot.size(); ++i) {
+                expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs));
+            }
+            return expr;
+        }
+    }
+
+    public JCThrow makeAssignmentException(String msg) {
+        JCExpression ty = M.Type(syms.runtimeExceptionType);
+        JCTree.JCExpression msgexpr = treeutils.makeStringLiteral(Position.NOPOS, msg);
+        JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msgexpr), null));
+        return throwStmt;
+    }
+
+    public JCExpression editAssignable(JCArrayAccess e) {
+        JCArrayAccess lhs = e;
+        List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
+                .map(arr -> ((JmlStoreRefArrayRange)arr))
+                .collect(Collectors.toList()));
+        if(pot.size() == 0) {
+            return M.Literal(true);
+        }
+        JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.indexed);
+        if(pot.get(0).lo != null || pot.get(0).hi != null) {
+            JCExpression hi = pot.get(0).hi;
+            JCExpression lo = pot.get(0).lo;
+            if(hi == null) {
+                hi = treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression);
+            }
+            if(lo == null) {
+                lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+            }
+            expr = treeutils.makeOr(Position.NOPOS, expr, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
+            expr = treeutils.makeOr(Position.NOPOS, expr, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
+        }
+        for(int i = 1; i < pot.size(); ++i) {
+            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, lhs.indexed);
+            if(pot.get(i).lo != null || pot.get(0).hi != null) {
+                JCExpression hi = pot.get(i).hi;
+                JCExpression lo = pot.get(i).lo;
+                if(hi == null) {
+                    hi = treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression);
+                }
+                if(lo == null) {
+                    lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                }
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LE, lhs.getIndex(), hi));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GE, lhs.getIndex(), lo));
+            }
+            expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+        }
+        return expr;
+    }
+
+    public JCExpression editAssignable(JCFieldAccess f) {
+        JCFieldAccess lhs = f;
+        List<JCFieldAccess> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
+                .map(arr -> ((JCFieldAccess)arr))
+                .collect(Collectors.toList()));
+        JCExpression selected = lhs.selected;
+        LinkedList<JCFieldAccess> accessList = new LinkedList();
+        while(selected instanceof JCFieldAccess) {
+            accessList.addFirst((JCFieldAccess) selected);
+            selected = ((JCFieldAccess) selected).selected;
+        }
+        JCExpression expr = null;
+        for(JCFieldAccess fa : pot) {
+            JCExpression selected1 = fa.selected;
+            LinkedList<JCFieldAccess> accessList1 = new LinkedList();
+            while(selected1 instanceof JCFieldAccess) {
+                accessList1.addFirst((JCFieldAccess) selected1);
+                selected1 = ((JCFieldAccess) selected1).selected;
+            }
+            boolean valid = true;
+            while (accessList1.size() > 0){
+                if(accessList.size() > 0) {
+                    if (!accessList1.get(0).equals(accessList.get(0))) {
+                        valid = false;
+                    } else {
+                        accessList.remove(0);
+                        accessList1.remove(0);
+                    }
+                } else {
+                    valid = false;
+                }
+            }
+            if(valid && (lhs.name.equals(fa.name) || fa.name == null || (accessList.size() > 0 && accessList.getFirst().name.equals(fa.name)))) {
+                if(expr == null) {
+                    expr = treeutils.makeNeqObject(Position.NOPOS, selected, selected1);
+                } else {
+                    expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, selected, selected1));
+                }
+            }
+        }
+        if(expr == null) {
+            return M.Literal(true);
+        } else {
+            return expr;
+        }
+    }
 
     public List<JCStatement> getNewStatements() {
         return newStatements;
