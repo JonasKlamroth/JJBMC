@@ -19,6 +19,7 @@ import com.sun.tools.javac.util.Position;
 import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
+import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
@@ -72,6 +73,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
+    private List<JCExpression> currentAssignable = List.nil();
 
     public enum TranslationMode { REQUIRES, ENSURES, JAVA}
 
@@ -161,9 +163,16 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
+        currentAssignable = currentAssignable.appendList(that.list);
+        return super.visitJmlMethodClauseStoreRef(that, p);
+    }
+
+    @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
         requiresList.clear();
         ensuresList.clear();
+        currentAssignable = List.nil();
         currentMethod = that;
         hasReturn = false;
         JCVariableDecl returnVar = null;
@@ -246,8 +255,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         List<JCStatement> body = List.nil();
         for(JCStatement st : oBody) {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar);
+            ev.setCurrentAssignable(currentAssignable);
             JCStatement copy = ev.copy(st);
-            if(copy != null) {
+            if(ev.getNewStatements().size() == 0) {
                 body = body.append(copy);
             } else {
                 body = body.appendList(ev.getNewStatements());

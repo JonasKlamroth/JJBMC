@@ -4,6 +4,7 @@
 public class Test2 {
     private int privInt;
     public int pubInt;
+    Test2 t2 = new Test2();
 
     //@ requires 1 < 0;
     //@ ensures true;
@@ -73,5 +74,13 @@ public class Test2 {
         for(int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
+    }
+
+    /*@ assignable privInt, pubInt, t2;
+      @ */
+    private void assignalbeTest() {
+        t2 = new Test2();
+        t2.pubInt = 5;
+        privInt = 0;
     }
 }

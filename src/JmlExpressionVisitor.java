@@ -1,7 +1,5 @@
-import com.sun.imageio.plugins.jpeg.JPEG;
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -16,18 +14,17 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import jdk.nashorn.internal.codegen.CompilerConstants;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
-import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,6 +65,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> assertAssumptions = List.nil();
+    private List<JCExpression> currentAssignable = List.nil();
 
 
 
@@ -125,7 +123,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0), currentSymbol));
+                l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 returnBool = boolVar.sym;
                 return M.Ident(boolVar);
@@ -140,7 +138,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoop(copy.range, newStatements, that.decls.get(0), currentSymbol));
+                l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 returnBool = boolVar.sym;
                 return M.Ident(boolVar);
@@ -254,7 +252,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.ENSURES);
         if(loopVar != null) {
             newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(loopVar), transUtils.makeNondetInt(currentSymbol))));
-            newStatements = newStatements.append(translationUtils.makeAssumeStatement(that.cond, M));
         }
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
@@ -325,7 +322,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JmlStoreRefArrayRange aexpr = (JmlStoreRefArrayRange)expr;
                 if(aexpr.hi == null && aexpr.lo == null) {
                     //TODO not always a valid translation
-                    res = res.append(M.Exec(M.Assign(aexpr.expression, transUtils.makeNondetWithNull(currentSymbol))));
+                    List<JCStatement> block = List.nil();
+                    JCVariableDecl arrLength = treeutils.makeVariableDecl(M.Name("arrLength"), syms.intType, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), Position.NOPOS);
+                    block = block.append(arrLength);
+                    block = block.append(M.Exec(M.Assign(aexpr.expression, transUtils.makeNondetWithoutNull(currentSymbol))));
+                    JCExpression assumeLength = treeutils.makeEquality(Position.NOPOS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Ident(arrLength));
+                    block = block.append(translationUtils.makeAssumeStatement(assumeLength, M));
+                    res = res.append(M.Block(0l, block));
                 } else if(aexpr.hi != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
                     Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                     JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
@@ -336,15 +339,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     }
                 } else {
                     try {
-                        for(int i = Integer.parseInt(aexpr.lo.toString()); i <= Integer.parseInt(aexpr.hi.toString()); ++i) {
-                            Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
-                            JCExpression elemExpr = M.Indexed(aexpr.expression, M.Literal(i));
-                            if(elemtype.isPrimitive()) {
-                                res = res.append(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype))));
-                            } else {
-                                res = res.append(M.Exec(M.Assign(elemExpr, transUtils.makeNondetWithNull(currentSymbol))));
-                            }
-                        }
+                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), aexpr.lo, currentSymbol);
+                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), aexpr.hi);
+                        JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
+                        Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
+                        List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype))));
+                        res = res.append(transUtils.makeStandardLoop(range, body, loopVar, currentSymbol));
                     } catch (NumberFormatException e) {
                         throw new NotImplementedException();
                     }
@@ -373,6 +373,45 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         throw new NotImplementedException();
     }
 
+    /*@Override
+    public JCTree visitAssignment(AssignmentTree node, Void p) {
+        JCAssign assign = (JCAssign) node;
+        if(assign.getVariable() instanceof JCIdent) {
+            JCIdent lhs = (JCIdent) assign.getVariable();
+            if(lhs.type.isPrimitive()) {
+                if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                        .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
+                    System.out.println("Illegal assignment: " + assign.toString());
+                }
+            } else {
+                List<JCExpression> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                        .filter(as -> !((JCIdent)as).type.isPrimitive())
+                        .collect(Collectors.toList()));
+                if(pot.size() == 0) {
+                    //throw new RuntimeException("Illegal assignment: " + assign.toString());
+                }
+                JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
+                for(int i = 1; i < pot.size(); ++i) {
+                    expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs));
+                }
+                JCExpression ty = M.Type(syms.runtimeExceptionType);
+                JCTree.JCExpression msg = treeutils.makeStringLiteral(Position.NOPOS, "Illegal assignment " + assign.toString());
+                JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
+                newStatements = newStatements.append(M.If(expr, M.Block(0L, List.of(throwStmt)), null));
+                newStatements = newStatements.append(M.Exec(assign));
+                return null;
+            }
+        } else if(assign.getVariable() instanceof JCArrayAccess) {
+            JCArrayAccess lhs = (JCArrayAccess) assign.getVariable();
+        } else if(assign.getVariable() instanceof JCFieldAccess) {
+            JCFieldAccess lhs = (JCFieldAccess) assign.getVariable();
+        } else {
+            new Exception("Could not handle assignment " + node.toString());
+        }
+
+        return super.visitAssignment(node, p);
+    }*/
+
     public List<JCStatement> getNewStatements() {
         return newStatements;
     }
@@ -386,4 +425,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     public List<JCExpression> getAssertionAssumptions() { return assertAssumptions; }
+
+    public void setCurrentAssignable(List<JCExpression> currentAssignable) {
+        this.currentAssignable = currentAssignable;
+    }
 }

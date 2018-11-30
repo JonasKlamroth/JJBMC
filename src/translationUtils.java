@@ -137,16 +137,27 @@ public class translationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
+    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
         RangeExtractor re = new RangeExtractor(M, loopVarName.sym);
         re.scan(range);
         JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, loopVarName.name, currentSymbol, re.getMin());
         JCTree.JCExpression loopCond = range;
-        JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
+        return makeStandardLoop(loopCond, body, loopVar, currentSymbol);
+    }
+
+    public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
+        JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVarName.sym)));
         List<JCTree.JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
         JCTree.JCBlock loopBodyBlock = M.Block(0L, List.from(body));
-        List<JCTree.JCStatement> loopVarl = List.from(Collections.singletonList(loopVar));
-        return M.ForLoop(loopVarl, loopCond, loopStepl, loopBodyBlock);
+        List<JCTree.JCStatement> loopVarl = List.from(Collections.singletonList(loopVarName));
+        return M.ForLoop(loopVarl, cond, loopStepl, loopBodyBlock);
+    }
+
+    public JCTree.JCExpression makeNondetWithoutNull(Symbol currentSymbol) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithoutNull"));
+        List<JCTree.JCExpression> largs = List.nil();
+        return M.Apply(List.nil(), nondetFunc, largs);
     }
 }
 
