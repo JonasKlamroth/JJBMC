@@ -7,6 +7,11 @@ public class Test2 {
     Test2 t2 = new Test2();
     int[] arr;
 
+    //@ requires true;
+    private void tmptest(int i ) {
+        return;
+    }
+
     //@ requires 1 < 0;
     //@ ensures true;
     private void test() {
@@ -140,5 +145,23 @@ public class Test2 {
       @ */
     private void assignalbeTest7(Test2 t3) {
         t3.arr[5] = 10;
+    }
+
+    /*@ assignable nothing;
+      @ */
+    private void assignalbeTest8() {
+        int i = 5;
+        i = 10;
+        if(i > 10) {
+            i = 20;
+        }
+    }
+
+    /*@ assignable nothing;
+      @ */
+    private void assignalbeTest9() {
+        if(privInt > 10) {
+            privInt = 20;
+        }
     }
 }

@@ -32,7 +32,7 @@ class BubbleSortSymb {
       @ requires second < array.length && second >= 0;
       @ requires first != second;
       @ ensures \old(array)[first] == array[second] && \old(array)[second] == array[first];
-      @ assignable array[first], array[second];
+      @ assignable array[first], array[0];
       @*/
     static void swap(int array[], int first, int second) {
         array[first] = array[first] ^ array[second];

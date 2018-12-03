@@ -112,7 +112,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             translationMode = VerifyFunctionVisitor.TranslationMode.REQUIRES;
         }
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
-        JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar);
+        JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         JmlMethodClauseExpr copy = expressionVisitor.copy(that);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
@@ -254,7 +254,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private List<JCStatement> transformBody(List<JCStatement> oBody) {
         List<JCStatement> body = List.nil();
         for(JCStatement st : oBody) {
-            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar);
+            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
             ev.setCurrentAssignable(currentAssignable);
             JCStatement copy = ev.copy(st);
             if(ev.getNewStatements().size() == 0) {

@@ -1,5 +1,7 @@
+import com.sun.imageio.plugins.jpeg.JPEG;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.IfTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -26,6 +28,7 @@ import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -59,6 +62,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private final Symbol.ClassSymbol utilsClass;
     private final JCIdent preLabel;
     private Symbol currentSymbol;
+    private JmlMethodDecl currentMethod;
     private int boolVarCounter = 0;
     private List<JCStatement> newStatements = List.nil();
     private Symbol returnBool = null;
@@ -75,7 +79,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                                 BaseVisitor base,
                                 VerifyFunctionVisitor.TranslationMode translationMode,
                                 Map<Integer, JCVariableDecl> oldVars,
-                                Symbol returnVar) {
+                                Symbol returnVar,
+                                JmlMethodDecl currentMethod) {
         super(context, maker);
         baseVisitor = base;
         this.context = context;
@@ -102,6 +107,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         this.translationMode = translationMode;
         this.oldVars = oldVars;
         this.returnVar = returnVar;
+        this.currentSymbol = currentMethod.sym;
+        this.currentMethod = currentMethod;
     }
 
     @Override
@@ -237,6 +244,16 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlWhileLoop(JmlWhileLoop that, Void p) {
+        throw new RuntimeException("While-Loops currently not supported.");
+    }
+
+    @Override
+    public JCTree visitJmlDoWhileLoop(JmlDoWhileLoop that, Void p) {
+        throw new RuntimeException("While-Loops currently not supported.");
+    }
+
+    @Override
     public JCTree visitJmlForLoop(JmlTree.JmlForLoop that, Void p) {
         if(that.loopSpecs == null) {
             return super.visitJmlForLoop(that, p);
@@ -268,7 +285,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
-            if(!(st instanceof JmlForLoop)) {
+            if(newStatements.size() == 0) {
                 ifbodystatements = ifbodystatements.append(stcopy);
             } else {
                 ifbodystatements = ifbodystatements.appendList(newStatements);
@@ -382,9 +399,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(cond != null) {
             JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
             newStatements = newStatements.append(ifst);
+            newStatements = newStatements.append(M.Exec(assign));
         }
-        newStatements = newStatements.append(M.Exec(assign));
-        return null;
+        return super.visitAssignment(node, p);
     }
 
     public JCExpression editAssignable(JCIdent e) {
@@ -418,11 +435,31 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCExpression e) {
+        ArrayList<Symbol> params = new ArrayList<>();
+        currentMethod.params.stream().map(vd -> vd.sym).forEach(s -> params.add(s));
         if(e instanceof JCIdent) {
+            if(((JCIdent) e).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) e).sym)) {
+                return null;
+            }
             return editAssignable((JCIdent)e);
         } else if(e instanceof JCArrayAccess) {
+            JCExpression expr =  ((JCArrayAccess) e).indexed;
+            if(expr instanceof JCIdent) {
+                if(((JCIdent) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) expr).sym)) {
+                    return null;
+                }
+            } else if(expr instanceof JCFieldAccess) {
+                if(((JCFieldAccess) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) expr).sym)) {
+                    return null;
+                }
+            } else {
+                throw new RuntimeException("Unexpected type.");
+            }
             return editAssignable((JCArrayAccess) e);
         } else if(e instanceof JCFieldAccess) {
+            if(((JCFieldAccess) e).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) e).sym)) {
+                return null;
+            }
             return editAssignable((JCFieldAccess) e);
         } else {
             throw new RuntimeException("Could not handle assignment to " + e.toString());
@@ -469,6 +506,45 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
         }
         return expr;
+    }
+
+    @Override
+    public JCTree visitJmlBlock(JmlBlock that, Void p) {
+        List<JCStatement> orig = newStatements;
+        List<JCStatement> l = newStatements;
+        for(JCStatement st : that.getStatements()) {
+            newStatements = List.nil();
+            JCStatement copy = super.copy(st);
+            if(newStatements.size() > 0) {
+                l = l.appendList(newStatements);
+            } else {
+                l = l.append(copy);
+            }
+        }
+        newStatements = orig.append(M.Block(0L, l));
+        return null;
+    }
+
+    @Override
+    public JCTree visitIf(IfTree node, Void p) {
+        List <JCStatement> l = newStatements;
+        newStatements = List.nil();
+        JCStatement then = super.copy((JCStatement) node.getThenStatement());
+        if(newStatements.size() > 1) {
+            then = M.Block(0L, newStatements);
+        } else if(newStatements.size() == 1) {
+            then = newStatements.get(0);
+        }
+        newStatements = List.nil();
+        JCStatement elseSt = super.copy((JCStatement) node.getElseStatement());
+        if(newStatements.size() > 1) {
+            elseSt = M.Block(0L, newStatements);
+        } else if(newStatements.size() == 1) {
+            then = newStatements.get(0);
+        }
+        JCExpression cond = super.copy((JCExpression)node.getCondition());
+        newStatements = l.append(M.If(cond, then, elseSt));
+        return null;
     }
 
     public JCExpression editAssignable(JCFieldAccess f) {
