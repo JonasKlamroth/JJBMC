@@ -77,21 +77,68 @@ public class Test2 {
         }
     }
 
-    /*@ assignable privInt, t2.t2, t2.arr[0];
+    /*@ assignable privInt;
       @ */
     private void assignalbeTest() {
-        t2 = new Test2();
-        t2.pubInt = 5;
-        t2.t2 = new Test2();
-        t2.t2.pubInt = 10;
-        t2.arr = new int[10];
-        t2.arr[5] = 10;
         privInt = 0;
     }
 
-    /*@ assignable arr[0];
-      @*/
-    private void assignableTest2() {
-        arr[0] = 5;
+    /*@ assignable t2;
+      @ */
+    private void assignalbeTest1(Test2 t3) {
+        t3 = new Test2();
+        t3.t2 = new Test2();
+        privInt = 0;
+    }
+
+    /*@ assignable arr[5];
+      @ */
+    private void assignalbeTest2() {
+        arr[1] = 5;
+        arr[5] = 3;
+    }
+
+    /*@ assignable arr[*];
+      @ */
+    private void assignalbeTest3() {
+        arr[3] = 5;
+    }
+
+    /*@ assignable arr[3..];
+      @ */
+    private void assignalbeTest4() {
+        arr[4] = 2;
+    }
+
+    /*@ assignable arr[1..3], arr[4..5];
+      @ */
+    private void assignalbeTest41(int arr1[]) {
+        arr1[4] = 2;
+    }
+
+    /*@ assignable t2.*;
+      @ */
+    private void assignalbeTest5(Test2 t3) {
+        t3 = new Test2();
+        t3.pubInt = 5;
+        t3.t2 = new Test2();
+        t3.t2.pubInt = 10;
+        t3.arr = new int[10];
+        t3.arr[5] = 10;
+    }
+
+    /*@ assignable t2.t2.pubInt;
+      @ */
+    private void assignalbeTest6(Test2 t3) {
+        t3 = new Test2();
+        t3.pubInt = 5;
+        t3.t2 = new Test2();
+        t3.t2.pubInt = 10;
+    }
+
+    /*@ assignable t2.arr[4];
+      @ */
+    private void assignalbeTest7(Test2 t3) {
+        t3.arr[5] = 10;
     }
 }

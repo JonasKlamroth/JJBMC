@@ -46,14 +46,15 @@ public class BaseVisitor extends JmlTreeCopier {
         returnExcClass.sym = classSymbol;
         returnExcClass.type = classSymbol.type;
         JmlClassDecl copy = (JmlClassDecl)super.visitJmlClassDecl(that, p);
-        List<JCTree> newDefs = List.of(returnExcClass);
+        List<JCTree> newDefs = List.nil();
         for(JCTree def : copy.defs) {
             if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
-                newDefs = newDefs.prepend(new VerifyFunctionVisitor(context, M, this).copy(def));
+                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
             } else {
-                newDefs = newDefs.prepend(def);
+                newDefs = newDefs.append(def);
             }
         }
+        newDefs = newDefs.append(returnExcClass);
         copy.defs = newDefs;
 
         return copy;

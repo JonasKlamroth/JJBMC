@@ -378,16 +378,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
-        JCExpression cond = null;
-        if(assign.getVariable() instanceof JCIdent) {
-            cond = editAssignable((JCIdent)assign.getVariable());
-        } else if(assign.getVariable() instanceof JCArrayAccess) {
-            cond = editAssignable((JCArrayAccess) assign.getVariable());
-        } else if(assign.getVariable() instanceof JCFieldAccess) {
-            cond = editAssignable((JCFieldAccess) assign.getVariable());
-        } else {
-            new Exception("Could not handle assignment " + node.toString());
-        }
+        JCExpression cond = editAssignable(assign.getVariable());
         if(cond != null) {
             JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
             newStatements = newStatements.append(ifst);
@@ -426,15 +417,28 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return throwStmt;
     }
 
+    public JCExpression editAssignable(JCExpression e) {
+        if(e instanceof JCIdent) {
+            return editAssignable((JCIdent)e);
+        } else if(e instanceof JCArrayAccess) {
+            return editAssignable((JCArrayAccess) e);
+        } else if(e instanceof JCFieldAccess) {
+            return editAssignable((JCFieldAccess) e);
+        } else {
+            throw new RuntimeException("Could not handle assignment to " + e.toString());
+        }
+    }
+
     public JCExpression editAssignable(JCArrayAccess e) {
         JCArrayAccess lhs = e;
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
                 .map(arr -> ((JmlStoreRefArrayRange)arr))
                 .collect(Collectors.toList()));
         if(pot.size() == 0) {
-            return M.Literal(true);
+            return editAssignable(lhs.indexed);
         }
-        JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.indexed);
+        JCExpression expr = editAssignable(lhs.indexed);
+        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.indexed);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
@@ -444,9 +448,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if(lo == null) {
                 lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
             }
-            expr = treeutils.makeOr(Position.NOPOS, expr, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
-            expr = treeutils.makeOr(Position.NOPOS, expr, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
         }
+        expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
         for(int i = 1; i < pot.size(); ++i) {
             JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, lhs.indexed);
             if(pot.get(i).lo != null || pot.get(0).hi != null) {
@@ -458,8 +463,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(lo == null) {
                     lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
                 }
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LE, lhs.getIndex(), hi));
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GE, lhs.getIndex(), lo));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
             }
             expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
         }
@@ -472,21 +477,22 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 .map(arr -> ((JCFieldAccess)arr))
                 .collect(Collectors.toList()));
         JCExpression selected = lhs.selected;
-        LinkedList<JCFieldAccess> accessList = new LinkedList();
+        LinkedList<Name> accessList = new LinkedList();
         while(selected instanceof JCFieldAccess) {
-            accessList.addFirst((JCFieldAccess) selected);
+            accessList.addFirst(((JCFieldAccess) selected).name);
             selected = ((JCFieldAccess) selected).selected;
         }
         JCExpression expr = null;
         for(JCFieldAccess fa : pot) {
             JCExpression selected1 = fa.selected;
-            LinkedList<JCFieldAccess> accessList1 = new LinkedList();
+            LinkedList<Name> accessList1 = new LinkedList();
             while(selected1 instanceof JCFieldAccess) {
-                accessList1.addFirst((JCFieldAccess) selected1);
+                accessList1.addFirst(((JCFieldAccess) selected1).name);
                 selected1 = ((JCFieldAccess) selected1).selected;
+
             }
             boolean valid = true;
-            while (accessList1.size() > 0){
+            while (accessList1.size() > 0 && valid){
                 if(accessList.size() > 0) {
                     if (!accessList1.get(0).equals(accessList.get(0))) {
                         valid = false;
@@ -498,12 +504,55 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     valid = false;
                 }
             }
-            if(valid && (lhs.name.equals(fa.name) || fa.name == null || (accessList.size() > 0 && accessList.getFirst().name.equals(fa.name)))) {
+            if(valid && (lhs.name.equals(fa.name) || fa.name == null)) {
                 if(expr == null) {
                     expr = treeutils.makeNeqObject(Position.NOPOS, selected, selected1);
                 } else {
                     expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, selected, selected1));
                 }
+            }
+        }
+        if(expr == null) {
+            return editAssignable(selected);
+        } else {
+            return treeutils.makeAnd(Position.NOPOS, editAssignable(selected), expr);
+        }
+    }
+
+    public JCExpression editAssignableSingleFieldAccess(JCFieldAccess f, JCFieldAccess fieldAccess) {
+        JCFieldAccess lhs = f;
+        JCExpression selected = lhs.selected;
+        LinkedList<JCFieldAccess> accessList = new LinkedList();
+        while(selected instanceof JCFieldAccess) {
+            accessList.addFirst((JCFieldAccess) selected);
+            selected = ((JCFieldAccess) selected).selected;
+        }
+        JCExpression expr = editAssignable((JCIdent)selected);
+        JCFieldAccess fa = fieldAccess;
+        JCExpression selected1 = fa.selected;
+        LinkedList<JCFieldAccess> accessList1 = new LinkedList();
+        while(selected1 instanceof JCFieldAccess) {
+            accessList1.addFirst((JCFieldAccess) selected1);
+            selected1 = ((JCFieldAccess) selected1).selected;
+        }
+        boolean valid = true;
+        while (accessList1.size() > 0 && valid){
+            if(accessList.size() > 0) {
+                if (!accessList1.get(0).equals(accessList.get(0))) {
+                    valid = false;
+                } else {
+                    accessList.remove(0);
+                    accessList1.remove(0);
+                }
+            } else {
+                valid = false;
+            }
+        }
+        if(valid && (lhs.name.equals(fa.name) || fa.name == null || (accessList.size() > 0 && accessList.getFirst().name.equals(fa.name)))) {
+            if(expr == null) {
+                expr = treeutils.makeNeqObject(Position.NOPOS, selected, selected1);
+            } else {
+                expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, selected, selected1));
             }
         }
         if(expr == null) {
