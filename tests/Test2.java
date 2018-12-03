@@ -2,9 +2,9 @@
  * Created by jklamroth on 9/18/18.
  */
 public class Test2 {
-    private int privInt;
+    private int privInt = 0;
     public int pubInt;
-    Test2 t2 = new Test2();
+    Test2 t2;
     int[] arr;
 
     //@ requires true;
@@ -18,12 +18,13 @@ public class Test2 {
         int locInt = 0;
         locInt++;
         privInt = 0;
-        Exception e = new Exception();
         System.out.println("This is just a test." + locInt);
     }
 
-    public void test1() {
-        test();
+    //@ requires  i > 0;
+    //@ ensures i > 1;
+    public int test1(int i) {
+        return i + 1;
     }
 
     static public void test2() {
@@ -40,7 +41,7 @@ public class Test2 {
 
     //@ requires (\forall int i; i > 0 && i < 10; \forall int j; j > 10 && j < 20; j > i);
     //@ requires (\exists int i; i > 0 && i < 10; i == 5 && \forall int j; j > 10 && i < 20; j > i);
-    public void quantTest2() {
+    public void quantTest3() {
         System.out.println("this is basically a lemma.");
     }
 
@@ -48,7 +49,7 @@ public class Test2 {
     //@ requires (\exists int i; i > 0 && i < 10; 3 + 10 > i);
     //@ ensures (\forall int i; i > 0 && i < 10; 3 + 10 > i);
     //@ ensures (\exists int i; i > 0 && i < 10; 3 + 10 > i);
-    public void quantTest3() {
+    public void quantTest4() {
         System.out.println("this is basically a lemma.");
     }
 
@@ -98,7 +99,7 @@ public class Test2 {
 
     /*@ assignable arr[5];
       @ */
-    private void assignalbeTest2() {
+    private void assignalbeTest10() {
         arr[1] = 5;
         arr[5] = 3;
     }
@@ -147,8 +148,6 @@ public class Test2 {
         t3.arr[5] = 10;
     }
 
-    /*@ assignable nothing;
-      @ */
     private void assignalbeTest8() {
         int i = 5;
         i = 10;
@@ -157,8 +156,6 @@ public class Test2 {
         }
     }
 
-    /*@ assignable nothing;
-      @ */
     private void assignalbeTest9() {
         if(privInt > 10) {
             privInt = 20;

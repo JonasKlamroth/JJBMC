@@ -225,7 +225,7 @@ public class JmlToAssertVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlCompilationUnit(JmlTree.JmlCompilationUnit that, Void p) {
         JmlTree.JmlCompilationUnit cu = (JmlTree.JmlCompilationUnit) super.visitJmlCompilationUnit(that, p);
-        cu.defs = cu.defs.prepend(M.Import(M.Ident(M.Name("org.cprover.CProver")), false));
+        cu.defs = cu.defs.prepend(M.Import(M.Ident(M.Name("CProver")), false));
         return cu;
     }
 
