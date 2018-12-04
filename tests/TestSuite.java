@@ -1,16 +1,13 @@
 /**
  * Created by jklamroth on 9/18/18.
  */
-public class Test2 {
+public class TestSuite {
     private int privInt = 0;
     public int pubInt;
-    Test2 t2;
+    TestSuite t2;
     int[] arr;
 
-    //@ requires true;
-    private void tmptest(int i ) {
-        return;
-    }
+
 
     //@ requires 1 < 0;
     //@ ensures true;
@@ -36,12 +33,6 @@ public class Test2 {
     //@ requires (\forall int i; i > 0 && i < 10; i > 0);
     //@ requires (\exists int i; i > 0 && i < 10; i == 5);
     public void quantTest() {
-        System.out.println("this is basically a lemma.");
-    }
-
-    //@ requires (\forall int i; i > 0 && i < 10; \forall int j; j > 10 && j < 20; j > i);
-    //@ requires (\exists int i; i > 0 && i < 10; i == 5 && \forall int j; j > 10 && i < 20; j > i);
-    public void quantTest3() {
         System.out.println("this is basically a lemma.");
     }
 
@@ -91,9 +82,9 @@ public class Test2 {
 
     /*@ assignable t2;
       @ */
-    private void assignalbeTest1(Test2 t3) {
-        t3 = new Test2();
-        t3.t2 = new Test2();
+    private void assignalbeTest1(TestSuite t3) {
+        t3 = new TestSuite();
+        t3.t2 = new TestSuite();
         privInt = 0;
     }
 
@@ -124,10 +115,10 @@ public class Test2 {
 
     /*@ assignable t2.*;
       @ */
-    private void assignalbeTest5(Test2 t3) {
-        t3 = new Test2();
+    private void assignalbeTest5(TestSuite t3) {
+        t3 = new TestSuite();
         t3.pubInt = 5;
-        t3.t2 = new Test2();
+        t3.t2 = new TestSuite();
         t3.t2.pubInt = 10;
         t3.arr = new int[10];
         t3.arr[5] = 10;
@@ -135,16 +126,16 @@ public class Test2 {
 
     /*@ assignable t2.t2.pubInt;
       @ */
-    private void assignalbeTest6(Test2 t3) {
-        t3 = new Test2();
+    private void assignalbeTest6(TestSuite t3) {
+        t3 = new TestSuite();
         t3.pubInt = 5;
-        t3.t2 = new Test2();
+        t3.t2 = new TestSuite();
         t3.t2.pubInt = 10;
     }
 
     /*@ assignable t2.arr[4];
       @ */
-    private void assignalbeTest7(Test2 t3) {
+    private void assignalbeTest7(TestSuite t3) {
         t3.arr[5] = 10;
     }
 
@@ -160,5 +151,22 @@ public class Test2 {
         if(privInt > 10) {
             privInt = 20;
         }
+    }
+
+    //@ requires t != null;
+    //@ assignable t2.*;
+    private void assignableTest10(TestSuite t) {
+        TestSuite testSuite = new TestSuite();
+        testSuite = t;
+        testSuite.arr = new int[10];
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.*;
+    @Fails
+    private void assignableTest11() {
+        TestSuite testSuite = new TestSuite();
+        testSuite = t2;
+        testSuite.arr = new int[10];
     }
 }

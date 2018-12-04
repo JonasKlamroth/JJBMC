@@ -1,3 +1,4 @@
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import org.jmlspecs.openjml.Factory;
 import org.jmlspecs.openjml.IAPI;
@@ -18,8 +19,10 @@ import java.util.List;
  * Created by jklamroth on 12/3/18.
  */
 public class TestExecutor {
-    static String[] fileNames = {"./tests/Test2.java"};
+
+    static String[] fileNames = {"./tests/TestSuite.java"};
     static private File tmpFile = new File("./tests/tmp.java");
+    static private boolean keepTmpFile = false;
 
     public static void main(String[] args) throws IOException {
         for(String fileName : fileNames) {
@@ -36,7 +39,7 @@ public class TestExecutor {
             }
 
             Runtime rt = Runtime.getRuntime();
-            String[] commands = {"javac", "-cp", "./tests/", tmpFile.toPath().toString()};
+            String[] commands = {"javac", "-cp", "." + File.separator + "tests" + File.separator, tmpFile.getPath()};
             Process proc = rt.exec(commands);
 
             BufferedReader stdInput = new BufferedReader(new
@@ -48,28 +51,30 @@ public class TestExecutor {
             // read the output from the command
             String s = stdInput.readLine();
             if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.toPath().toString());
+                System.out.println("Error compiling file: " + tmpFile.getPath());
                 while (s != null) {
                     System.out.println(s);
                     s = stdInput.readLine();
                 }
+                cleanup();
                 return;
             }
             s = stdError.readLine();
             if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.toPath().toString());
+                System.out.println("Error compiling file: " + tmpFile.getPath());
                 while (s != null) {
                     System.out.println(s);
                     s = stdError.readLine();
                 }
+                cleanup();
                 return;
             }
 
-            for(String function : FunctionNameVisitor.getFunctionNames(tmpFile.toPath().toString())) {
+            for(String function : FunctionNameVisitor.getFunctionNames(tmpFile.getPath())) {
 
                 //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
                 function = tmpFile.getName().replace(".java", ".") + function;
-                String classFile = tmpFile.toPath().toString().replace(".java", ".class");
+                String classFile = tmpFile.getPath().replace(".java", ".class");
                 commands = new String[]{"jbmc", classFile, "--function", function};
                 proc = rt.exec(commands);
 
@@ -78,7 +83,7 @@ public class TestExecutor {
 
                 s = stdInput.readLine();
                 if (s != null) {
-                    System.out.println("JBMC Output for file: " + tmpFile.toPath().toString().replace(".java", ".class") + " with fucntion " + function);
+                    System.out.println("JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with fucntion " + function);
                     while (s != null) {
                         if (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION")) {
                             System.out.println(s);
@@ -88,13 +93,25 @@ public class TestExecutor {
                 }
             }
 
-            commands = new String[]{"rm", tmpFile.toPath().toString().replace(".java", ".class")};
-            proc = rt.exec(commands);
+            cleanup();
+        }
+    }
 
-            commands = new String[]{"rm", tmpFile.toPath().toString().replace(".java", "$ReturnException.class")};
-            proc = rt.exec(commands);
+    private static void cleanup() throws IOException {
+        Runtime rt = Runtime.getRuntime();
+        String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
+        Process proc;
+        proc = rt.exec(commands);
 
-            commands = new String[]{"rm", tmpFile.toPath().toString()};
+
+        commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
+        proc = rt.exec(commands);
+
+        commands = new String[]{"rm", "./tests/Fails.class".replaceAll("/", File.separator)};
+        proc = rt.exec(commands);
+
+        if(!keepTmpFile) {
+            commands = new String[]{"rm", tmpFile.getPath()};
             proc = rt.exec(commands);
         }
     }
@@ -102,9 +119,32 @@ public class TestExecutor {
 
 class FunctionNameVisitor extends JmlTreeScanner {
     public List<String> functionNames = new ArrayList();
+    public List<TestBehaviour> functionBehaviours = new ArrayList<>();
+    public List<Integer> unwinds = new ArrayList<>();
+
+    public enum TestBehaviour {
+        Verifyable,
+        Fails,
+        Ignored
+    }
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
         functionNames.add(that.getName().toString());
+        super.visitJmlMethodDecl(that);
+    }
+
+    @Override
+    public void visitAnnotation(JCTree.JCAnnotation tree) {
+        if(tree.annotationType.toString().equals("Fails")) {
+            functionBehaviours.add(TestBehaviour.Fails);
+        } else if(tree.annotationType.toString().equals("Verifyable")) {
+            functionBehaviours.add(TestBehaviour.Verifyable);
+        } else if(tree.annotationType.toString().equals("Unwind")) {
+            //TODO
+        } else {
+            functionBehaviours.add(TestBehaviour.Ignored);
+        }
+        super.visitAnnotation(tree);
     }
 
     static List<String> getFunctionNames(String fileName) {

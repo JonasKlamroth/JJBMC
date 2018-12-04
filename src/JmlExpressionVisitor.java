@@ -72,6 +72,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> assertAssumptions = List.nil();
     private List<JCExpression> currentAssignable = List.nil();
+    private ArrayList<JCExpression> fakeLocals = new ArrayList<>();
 
 
 
@@ -395,6 +396,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
+        handleFakeLocals(assign);
         JCExpression cond = editAssignable(assign.getVariable());
         if(cond != null) {
             JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
@@ -404,6 +406,18 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return super.visitAssignment(node, p);
     }
 
+    private void handleFakeLocals(JCAssign assign) {
+        if(assign.getExpression() instanceof JCIdent
+                && !((JCIdent) assign.getExpression()).sym.owner.equals(currentSymbol)) {
+            fakeLocals.add(assign.getVariable());
+        } else if(assign.getExpression() instanceof JCFieldAccess
+                && ((JCIdent) assign.getExpression()).sym.owner.equals(currentSymbol)) {
+            fakeLocals.add(assign.getVariable());
+        } else {
+            fakeLocals.remove(assign.getVariable());
+        }
+    }
+
     public JCExpression editAssignable(JCIdent e) {
         JCIdent lhs = e;
         if(lhs.type.isPrimitive()) {
@@ -411,7 +425,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
                 return M.Literal(true);
             }
-            return null;
+            return M.Literal(false);
         } else {
             List<JCExpression> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                     .filter(as -> !((JCIdent)as).type.isPrimitive())
@@ -438,27 +452,27 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         ArrayList<Symbol> params = new ArrayList<>();
         currentMethod.params.stream().map(vd -> vd.sym).forEach(s -> params.add(s));
         if(e instanceof JCIdent) {
-            if(((JCIdent) e).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) e).sym)) {
-                return null;
+            if(((JCIdent) e).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) e).sym) && !fakeLocals.contains(e)) {
+                return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
         } else if(e instanceof JCArrayAccess) {
             JCExpression expr =  ((JCArrayAccess) e).indexed;
             if(expr instanceof JCIdent) {
                 if(((JCIdent) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) expr).sym)) {
-                    return null;
+                    return M.Literal(false);
                 }
             } else if(expr instanceof JCFieldAccess) {
                 if(((JCFieldAccess) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) expr).sym)) {
-                    return null;
+                    return M.Literal(false);
                 }
             } else {
                 throw new RuntimeException("Unexpected type.");
             }
             return editAssignable((JCArrayAccess) e);
         } else if(e instanceof JCFieldAccess) {
-            if(((JCFieldAccess) e).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) e).sym)) {
-                return null;
+            if(((JCFieldAccess) e).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) e).sym) && !fakeLocals.contains(e)) {
+                return M.Literal(false);
             }
             return editAssignable((JCFieldAccess) e);
         } else {
