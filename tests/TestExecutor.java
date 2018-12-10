@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -25,11 +26,19 @@ import static org.junit.Assert.assertTrue;
 public class TestExecutor {
 
     static String[] fileNames = {"./tests/TestSuite.java"};
-    static private File tmpFile = new File("./tests/tmp.java");
-    static private boolean keepTmpFile = true;
+    private File tmpFile = new File("./tests/tmp.java");
+    private boolean keepTmpFile = true;
+    private boolean filterOutput = false;
+    private boolean doCleanup = false;
 
     @org.junit.Test
-    public void testTranslation() throws IOException {
+    public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/BubbleSortSymb.java"};
+        testTranslation();
+    }
+
+    @org.junit.Test
+    public void testTranslation() throws IOException, InterruptedException {
         for(String fileName : fileNames) {
 
             try {
@@ -48,6 +57,8 @@ public class TestExecutor {
             Runtime rt = Runtime.getRuntime();
             String[] commands = {"javac", "-cp", "." + File.separator + "tests" + File.separator, tmpFile.getPath()};
             Process proc = rt.exec(commands);
+            proc.waitFor();
+
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(proc.getInputStream()));
@@ -98,19 +109,33 @@ public class TestExecutor {
                     }
 
                     proc = rt.exec(commands);
+                    proc.waitFor();
 
                     stdInput = new BufferedReader(new
                             InputStreamReader(proc.getInputStream()));
 
+                    stdError = new BufferedReader(new
+                            InputStreamReader(proc.getErrorStream()));
+
                     s = stdInput.readLine();
                     String out = "";
                     if (s != null) {
-                        out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with fucntion " + function + "\n";
+                        out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
                         while (s != null) {
-                            if (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION")) {
+                            if (filterOutput && (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
                                 out += s;
                             }
                             s = stdInput.readLine();
+                        }
+                        s = stdError.readLine();
+                        while (s != null) {
+                            if (filterOutput && (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
+                                out += s;
+                            }
+                            s = stdError.readLine();
+                        }
+                        if(!filterOutput) {
+                            System.out.println(out);
                         }
                         assertFalse(out, out.contains("FAILURE") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Verifyable);
                         assertFalse(out, out.contains("SUCCESSFUL") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Fails);
@@ -130,27 +155,29 @@ public class TestExecutor {
 
     @After
     public void cleanup() throws IOException {
-        Runtime rt = Runtime.getRuntime();
-        String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
-        Process proc;
-        proc = rt.exec(commands);
-
-
-        commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
-        proc = rt.exec(commands);
-
-        commands = new String[]{"rm", "./tests/TestAnnotations/Fails.class".replaceAll("/", File.separator)};
-        proc = rt.exec(commands);
-
-        commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
-        proc = rt.exec(commands);
-
-        commands = new String[]{"rm", "./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)};
-        proc = rt.exec(commands);
-
-        if(!keepTmpFile) {
-            commands = new String[]{"rm", tmpFile.getPath()};
+        if(doCleanup) {
+            Runtime rt = Runtime.getRuntime();
+            String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
+            Process proc;
             proc = rt.exec(commands);
+
+
+            commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
+            proc = rt.exec(commands);
+
+            commands = new String[]{"rm", "./tests/TestAnnotations/Fails.class".replaceAll("/", File.separator)};
+            proc = rt.exec(commands);
+
+            commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
+            proc = rt.exec(commands);
+
+            commands = new String[]{"rm", "./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)};
+            proc = rt.exec(commands);
+
+            if (!keepTmpFile) {
+                commands = new String[]{"rm", tmpFile.getPath()};
+                proc = rt.exec(commands);
+            }
         }
     }
 }
@@ -180,7 +207,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
                 functionBehaviours.add(TestBehaviour.Verifyable);
             } else if(annotation.annotationType.toString().equals("Unwind")) {
                 try {
-                    unwinds.add(annotation.args.get(0).toString());
+                    unwinds.add(((JCTree.JCAssign)annotation.args.get(0)).rhs.toString());
                 } catch (Exception e) {
                     System.out.println("Cannot parse annotation " + annotation.toString());
                 }

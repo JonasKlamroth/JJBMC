@@ -160,7 +160,7 @@ public class translationUtils {
         return M.ForLoop(loopVarl, cond, loopStepl, loopBodyBlock);
     }
 
-    public JCTree.JCExpression makeNondetWithoutNull(Symbol currentSymbol) {
+    public JCTree.JCMethodInvocation makeNondetWithoutNull(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithoutNull"));
         List<JCTree.JCExpression> largs = List.nil();
@@ -185,7 +185,7 @@ public class translationUtils {
                     JCExpression assumeLength = treeutils.makeEquality(Position.NOPOS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Ident(arrLength));
                     block = block.append(translationUtils.makeAssumeStatement(assumeLength, M));
                     res = res.append(M.Block(0l, block));
-                } else if(aexpr.hi != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
+                } else if(aexpr.hi != null && aexpr.lo != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
                     Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                     JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
                     if(elemtype.isPrimitive()) {
@@ -195,8 +195,16 @@ public class translationUtils {
                     }
                 } else {
                     try {
-                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), aexpr.lo, currentSymbol);
-                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), aexpr.hi);
+                        JCExpression lo = aexpr.lo;
+                        JCExpression hi = aexpr.hi;
+                        if(lo == null) {
+                            lo = M.Literal(0);
+                        }
+                        if(hi == null) {
+                            hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Literal(1));
+                        }
+                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), lo, currentSymbol);
+                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), hi);
                         JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
                         Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                         List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
@@ -205,8 +213,16 @@ public class translationUtils {
                         throw new NotImplementedException();
                     }
                 }
+            } else if(expr instanceof JCFieldAccess) {
+                JCFieldAccess fexpr = (JCFieldAccess)expr;
+                if(fexpr.name == null) {
+                    //TODO not sound!!
+                    res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
+                } else {
+                    res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(fexpr.type, currentSymbol))));
+                }
             } else {
-                throw new NotImplementedException();
+                throw new RuntimeException("Havoc for expression " + expr + " not supported");
             }
         }
         return res;
@@ -225,8 +241,12 @@ public class translationUtils {
             return makeNondetShort(currentSymbol);
         } else if(type.equals(syms.charType)) {
             return makeNondetChar(currentSymbol);
+        } else if(type instanceof Type.ArrayType) {
+            return makeNondetWithoutNull(currentSymbol);
+        } else if(type instanceof Type.ClassType) {
+            return makeNondetWithNull(currentSymbol);
         }
-        throw new NotImplementedException();
+        throw new RuntimeException("Nondet for type " + type + " not supported.");
     }
 }
 

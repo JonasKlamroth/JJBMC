@@ -234,9 +234,27 @@ public class TestSuite {
         return fakeTest(i);
     }
 
+    //@ ensures \result == 56;
+    @Fails
+    private int methodInvcationTest4() {
+        int i = 4;
+        return fakeTest(i);
+    }
+
+    //@ ensures \result == 56;
+    @Verifyable
+    private int methodInvcationTest5() {
+        int i = 4;
+        return fakeTest();
+    }
+
     //@ ensures \result == 5;
     @Fails
     private int fakeTest(int i) {
         return 0;
+    }
+
+    private int fakeTest() {
+        return 56;
     }
 }

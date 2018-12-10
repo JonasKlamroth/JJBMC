@@ -543,7 +543,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
-        copy.meth = M.Ident(copy.meth.toString() + "Symb");
+        if(copy.meth instanceof JCIdent) {
+            copy.meth = M.Ident(copy.meth.toString() + "Symb");
+        }
         return copy;
     }
 
