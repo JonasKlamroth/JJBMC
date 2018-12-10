@@ -106,14 +106,16 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         returnBool = null;
-        if(that.token == JmlTokenKind.ENSURES) {
-            translationMode = VerifyFunctionVisitor.TranslationMode.ENSURES;
-        } else if(that.token == JmlTokenKind.REQUIRES) {
-            translationMode = VerifyFunctionVisitor.TranslationMode.REQUIRES;
-        }
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
-        JmlMethodClauseExpr copy = expressionVisitor.copy(that);
+        if(that.token == JmlTokenKind.ENSURES) {
+            expressionVisitor.setTranslationMode(TranslationMode.ENSURES);
+            translationMode = TranslationMode.ENSURES;
+        } else if(that.token == JmlTokenKind.REQUIRES) {
+            expressionVisitor.setTranslationMode(TranslationMode.REQUIRES);
+            translationMode = TranslationMode.REQUIRES;
+        }
+        JCExpression copy = expressionVisitor.copy(that.expression);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
@@ -124,7 +126,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M, expressionVisitor.getAssertionAssumptions()));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M, expressionVisitor.getAssertionAssumptions()));
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
@@ -134,33 +136,16 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             if(returnBool != null) {
                 newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy.expression, M));
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy, M));
             }
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-        return copy;
+        return M.JmlMethodClauseExpr(that.token, copy);
     }
 
-    @Override
-    public JCTree visitReturn(ReturnTree node, Void p) {
-        hasReturn = true;
-        JCReturn copy = (JCReturn)super.visitReturn(node, p);
-        JCAssign assign = null;
-        if(returnVar != null) {
-            assign = M.Assign(M.Ident(returnVar), copy.getExpression());
-        }
-        JCExpression ty = M.at(copy).Type(baseVisitor.getExceptionClass().type);
-        JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.nil(), null));
-        if(assign != null) {
-            JCBlock block = M.Block(0L, List.of(M.Exec(assign), throwStmt));
-            return block;
-        } else {
-            JCBlock block = M.Block(0L, List.of(throwStmt));
-            return block;
-        }
-    }
+
 
     @Override
     public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
@@ -169,16 +154,22 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlStatementSpec(JmlStatementSpec that, Void p) {
+        return that;
+    }
+
+    @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
         requiresList.clear();
         ensuresList.clear();
         currentAssignable = List.nil();
-        currentMethod = that;
+        currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
         if(!(t instanceof Type.JCVoidType)) {
             returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, getLiteralForType(t));
+            hasReturn = true;
             this.returnVar = returnVar.sym;
         } else {
             this.returnVar = null;

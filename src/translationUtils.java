@@ -2,6 +2,7 @@ import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.tree.JCTree;
@@ -17,8 +18,14 @@ import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Utils;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collections;
+
+import static com.sun.tools.javac.tree.JCTree.*;
+import static org.jmlspecs.openjml.JmlTree.*;
+import static com.sun.tools.javac.util.List.*;
+
 
 /**
  * Created by jklamroth on 11/13/18.
@@ -158,6 +165,68 @@ public class translationUtils {
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithoutNull"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol) {
+        List<JCStatement> res = List.nil();
+        for(JCExpression expr : storerefs) {
+            if(expr instanceof JCIdent) {
+                if(((JCIdent) expr).type.isPrimitive()) {
+                    res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(((JCIdent) expr).type, currentSymbol))));
+                }
+            } else if(expr instanceof  JmlStoreRefArrayRange) {
+                JmlStoreRefArrayRange aexpr = (JmlStoreRefArrayRange)expr;
+                if(aexpr.hi == null && aexpr.lo == null) {
+                    //TODO not always a valid translation
+                    List<JCStatement> block = List.nil();
+                    JCVariableDecl arrLength = treeutils.makeVariableDecl(M.Name("arrLength"), syms.intType, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), Position.NOPOS);
+                    block = block.append(arrLength);
+                    block = block.append(M.Exec(M.Assign(aexpr.expression, makeNondetWithoutNull(currentSymbol))));
+                    JCExpression assumeLength = treeutils.makeEquality(Position.NOPOS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Ident(arrLength));
+                    block = block.append(translationUtils.makeAssumeStatement(assumeLength, M));
+                    res = res.append(M.Block(0l, block));
+                } else if(aexpr.hi != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
+                    Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
+                    JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
+                    if(elemtype.isPrimitive()) {
+                        res = res.append(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
+                    } else {
+                        res = res.append(M.Exec(M.Assign(elemExpr, makeNondetWithNull(currentSymbol))));
+                    }
+                } else {
+                    try {
+                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), aexpr.lo, currentSymbol);
+                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), aexpr.hi);
+                        JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
+                        Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
+                        List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
+                        res = res.append(makeStandardLoop(range, body, loopVar, currentSymbol));
+                    } catch (NumberFormatException e) {
+                        throw new NotImplementedException();
+                    }
+                }
+            } else {
+                throw new NotImplementedException();
+            }
+        }
+        return res;
+    }
+
+    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
+        if(type.equals(syms.intType)) {
+            return makeNondetInt(currentSymbol);
+        } else if(type.equals(syms.floatType)) {
+            return makeNondetFloat(currentSymbol);
+        } else if(type.equals(syms.doubleType)) {
+            return makeNondetDouble(currentSymbol);
+        } else if(type.equals(syms.longType)) {
+            return makeNondetLong(currentSymbol);
+        } else if(type.equals(syms.shortType)) {
+            return makeNondetShort(currentSymbol);
+        } else if(type.equals(syms.charType)) {
+            return makeNondetChar(currentSymbol);
+        }
+        throw new NotImplementedException();
     }
 }
 

@@ -122,4 +122,8 @@ public final class CProver
             throw new RuntimeException("CProver.assume() predicate is false");
         }
     }
+
+    public static boolean uninterpreted_fresh(Object o) {
+        return true;
+    }
 }

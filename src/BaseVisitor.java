@@ -51,6 +51,7 @@ public class BaseVisitor extends JmlTreeCopier {
         for(JCTree def : copy.defs) {
             if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
                 newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
+                newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
             } else {
                 newDefs = newDefs.append(def);
             }
