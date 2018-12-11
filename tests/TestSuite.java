@@ -46,7 +46,6 @@ public class TestSuite {
     }
 
 
-
     @Unwind(number = 11)
     @Verifyable
     public void loopTest1() {
@@ -81,6 +80,25 @@ public class TestSuite {
     private void assignalbeTest10() {
         arr[1] = 5;
         arr[5] = 3;
+    }
+
+    /*@ assignable \nothing;
+      @ */
+    @Fails
+    private void assigableNothingTest() {
+        arr[1] = 5;
+        arr[5] = 3;
+    }
+
+    /*@ requires arr != null && arr.length > 5;
+      @ assignable \everything;
+      @ */
+    @Verifyable
+    private void assigableEverythingTest() {
+        arr[1] = 5;
+        arr[5] = 3;
+        t2 = new TestSuite();
+        privInt = 12039;
     }
 
     //@ requires arr != null && arr.length > 3;

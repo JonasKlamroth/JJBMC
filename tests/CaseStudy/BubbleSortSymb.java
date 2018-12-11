@@ -34,16 +34,6 @@ class BubbleSortSymb {
         return arr;
     }
 
-    /*@
-      @ requires array != null && array.length >= 2;
-      @ requires first < array.length && first >= 0;
-      @ requires second < array.length && second >= 0;
-      @ requires first != second;
-      @ requires false;
-      @ ensures \old(array)[first] == array[second] && \old(array)[second] == array[first];
-      @ assignable array[first], array[second];
-      @*/
-    @Verifyable
     static void swap(int array[], int first, int second) {
         array[first] = array[first] ^ array[second];
         array[second] = array[second] ^ array[first];

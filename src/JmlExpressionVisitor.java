@@ -360,6 +360,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
         JCExpression cond = editAssignable(assign.getVariable());
+        if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+            return super.visitAssignment(node, p);
+        }
         if(cond != null) {
             JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
             newStatements = newStatements.append(ifst);

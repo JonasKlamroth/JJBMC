@@ -13,6 +13,7 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
+import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
@@ -181,9 +182,7 @@ public class translationUtils {
                     List<JCStatement> block = List.nil();
                     JCVariableDecl arrLength = treeutils.makeVariableDecl(M.Name("arrLength"), syms.intType, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), Position.NOPOS);
                     block = block.append(arrLength);
-                    block = block.append(M.Exec(M.Assign(aexpr.expression, makeNondetWithoutNull(currentSymbol))));
-                    JCExpression assumeLength = treeutils.makeEquality(Position.NOPOS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Ident(arrLength));
-                    block = block.append(translationUtils.makeAssumeStatement(assumeLength, M));
+                    M.Assign(aexpr, M.NewArray(M.Type(((Type.ArrayType)aexpr.expression.type).elemtype), List.of(M.Ident(arrLength)), null));
                     res = res.append(M.Block(0l, block));
                 } else if(aexpr.hi != null && aexpr.lo != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
                     Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
@@ -220,6 +219,10 @@ public class translationUtils {
                     res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
                 } else {
                     res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(fexpr.type, currentSymbol))));
+                }
+            } else if(expr instanceof JmlStoreRefKeyword) {
+                if(((JmlStoreRefKeyword) expr).token.equals(JmlTokenKind.BSEVERYTHING)) {
+                    System.out.println("NOTE: Havoc of \\everything is currently not supported.");
                 }
             } else {
                 throw new RuntimeException("Havoc for expression " + expr + " not supported");

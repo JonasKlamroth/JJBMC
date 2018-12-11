@@ -149,7 +149,16 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
-        currentAssignable = currentAssignable.appendList(that.list);
+        if(that.list != null) {
+            if(that.list.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword
+            && ((JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
+                if(that.list.size() + currentAssignable.size() > 1) {
+                    throw new RuntimeException("Assignable containing \nothing and something else is not valid.");
+                }
+            } else {
+                currentAssignable = currentAssignable.appendList(that.list);
+            }
+        }
         return super.visitJmlMethodClauseStoreRef(that, p);
     }
 

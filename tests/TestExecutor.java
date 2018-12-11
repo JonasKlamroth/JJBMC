@@ -165,7 +165,7 @@ public class TestExecutor {
             commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
             proc = rt.exec(commands);
 
-            commands = new String[]{"rm", "./tests/TestAnnotations/Fails.class".replaceAll("/", File.separator)};
+            commands = new String[]{"rm", "Fails.class".replaceAll("/", File.separator)};
             proc = rt.exec(commands);
 
             commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
