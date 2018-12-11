@@ -46,12 +46,13 @@ public class TestSuite {
     }
 
 
+
     @Unwind(number = 11)
     @Verifyable
     public void loopTest1() {
         int[] arr = new int[10];
-        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         for(int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -249,7 +250,6 @@ public class TestSuite {
     }
 
     //@ ensures \result == 5;
-    @Fails
     private int fakeTest(int i) {
         return 0;
     }

@@ -28,8 +28,8 @@ public class TestExecutor {
     static String[] fileNames = {"./tests/TestSuite.java"};
     private File tmpFile = new File("./tests/tmp.java");
     private boolean keepTmpFile = true;
-    private boolean filterOutput = false;
-    private boolean doCleanup = false;
+    private boolean filterOutput = true;
+    private boolean doCleanup = true;
 
     @org.junit.Test
     public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
@@ -100,7 +100,6 @@ public class TestExecutor {
                 if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
                     System.out.println("Running test for function: " + function);
                     //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-                    function = tmpFile.getName().replace(".java", ".") + function;
                     String classFile = tmpFile.getPath().replace(".java", ".class");
                     if(unwinds.get(idx) != null) {
                         commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx)};
@@ -122,15 +121,15 @@ public class TestExecutor {
                     if (s != null) {
                         out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
                         while (s != null) {
-                            if (filterOutput && (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                                out += s;
+                            if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
+                                out += s +"\n";
                             }
                             s = stdInput.readLine();
                         }
                         s = stdError.readLine();
                         while (s != null) {
-                            if (filterOutput && (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                                out += s;
+                            if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
+                                out += s + "\n";
                             }
                             s = stdError.readLine();
                         }
@@ -139,6 +138,7 @@ public class TestExecutor {
                         }
                         assertFalse(out, out.contains("FAILURE") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Verifyable);
                         assertFalse(out, out.contains("SUCCESSFUL") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Fails);
+                        assertTrue(out, out.contains("VERIFICATION"));
 
 
                     } else {
@@ -194,7 +194,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
     }
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        functionNames.add(that.getName().toString());
+        functionNames.add(that.sym.owner.toString() + "." + that.getName().toString());
         translateAnnotations(that.mods.annotations);
         super.visitJmlMethodDecl(that);
     }
