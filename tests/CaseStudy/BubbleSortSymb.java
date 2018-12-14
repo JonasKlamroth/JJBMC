@@ -8,13 +8,12 @@ import TestAnnotations.Verifyable;
  */
 class BubbleSortSymb {
     /*@
-      @ requires arr != null;
+      @ requires arr != null && arr.length <= 5;
       @ ensures (\forall int v; v >= 0 && v <= \result.length - 1; (\forall int w; w >= 0 && w <= v - 1; \result[v] >= \result[w]));
-      @ ensures false;
       @ assignable arr[*];
       @*/
     @Verifyable
-    @Unwind(number = 10)
+    @Unwind(number = 6)
     static int[] sort(int arr[]) {
         //@ loop_invariant j <= arr.length - 1 && j >= -1;
         //@ loop_invariant (\forall int k; k > j && k < arr.length; (\forall int k1; k1 >= 0 && k1 < k; arr[k1] <= arr[k]));

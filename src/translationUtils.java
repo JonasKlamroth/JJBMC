@@ -177,14 +177,7 @@ public class translationUtils {
                 }
             } else if(expr instanceof  JmlStoreRefArrayRange) {
                 JmlStoreRefArrayRange aexpr = (JmlStoreRefArrayRange)expr;
-                if(aexpr.hi == null && aexpr.lo == null) {
-                    //TODO not always a valid translation
-                    List<JCStatement> block = List.nil();
-                    JCVariableDecl arrLength = treeutils.makeVariableDecl(M.Name("arrLength"), syms.intType, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), Position.NOPOS);
-                    block = block.append(arrLength);
-                    M.Assign(aexpr, M.NewArray(M.Type(((Type.ArrayType)aexpr.expression.type).elemtype), List.of(M.Ident(arrLength)), null));
-                    res = res.append(M.Block(0l, block));
-                } else if(aexpr.hi != null && aexpr.lo != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
+                if(aexpr.hi != null && aexpr.lo != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
                     Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                     JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
                     if(elemtype.isPrimitive()) {

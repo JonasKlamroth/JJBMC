@@ -53,6 +53,45 @@ public class TestSuite {
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
+        //@ decreases 11 - i;
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Fails
+    public void decreasesTest1() {
+        int[] arr = new int[10];
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 11 + i;
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Verifyable
+    public void decreasesTest2() {
+        int[] arr = new int[10];
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Fails
+    public void decreasesTest3() {
+        int[] arr = new int[10];
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 5 - i;
         for(int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
@@ -265,6 +304,48 @@ public class TestSuite {
     private int methodInvcationTest5() {
         int i = 4;
         return fakeTest();
+    }
+
+    @Fails
+    public void havocTest() {
+        assert pubInt == 0;
+    }
+
+    @Fails
+    public void havocTest1() {
+        assert t2 == null;
+    }
+
+    @Fails
+    public void havocTest2() {
+        assert arr.length == 0;
+    }
+
+    //@ requires arr != null && arr.length >= 1;
+    @Fails
+    public void havocTest3(int[] arr) {
+        assert arr[0] == 0;
+    }
+
+    //@ requires arr != null && arr.length == 2 && arr[0] == 5 && arr[1] == 1;
+    //@ ensures false;
+    @Fails
+    public void havocTest4(int[] arr) {
+    }
+
+    /*
+    //@ requires arr != null && arr.length == 10;
+    //@ requires (\forall int i; i >= 0 && i < 10; arr[i] == i);
+    //@ ensures false;
+    @Fails
+    public void havocTest5(int[] arr) {
+    }*/
+
+    //@ requires arr != null && arr.length == 5;
+    //@ requires (\forall int i; i >= 0 && i < 10; arr[i] == i);
+    //@ ensures false;
+    @Fails
+    private void havocTest6() {
     }
 
     //@ ensures \result == 5;

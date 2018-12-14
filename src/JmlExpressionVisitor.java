@@ -1,4 +1,5 @@
 import com.sun.imageio.plugins.jpeg.JPEG;
+import com.sun.source.tree.AssertTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BlockTree;
@@ -21,6 +22,7 @@ import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import javafx.geometry.Pos;
 import jdk.nashorn.internal.codegen.CompilerConstants;
+import org.jmlspecs.lang.JML;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -246,8 +248,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitJmlStatementLoopExpr(JmlTree.JmlStatementLoopExpr that, Void p) {
         if(that.token == JmlTokenKind.LOOP_INVARIANT) {
             return super.visitJmlStatementLoopExpr(that, p);
+        } else if(that.token == JmlTokenKind.DECREASES) {
+            return super.visitJmlStatementLoopExpr(that, p);
         }
-        throw new RuntimeException("Token " + that.token + " currently not supported.");
+        throw new RuntimeException("Token " + that.token + " for loop specifications currently not supported.");
     }
 
     @Override
@@ -285,6 +289,19 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
         }
         assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.REQUIRES);
+        JCVariableDecl oldD = null;
+        JCExpression dExpr = null;
+        for(JmlStatementLoop spec : that.loopSpecs) {
+            if(spec instanceof JmlStatementLoopExpr && spec.token == JmlTokenKind.DECREASES) {
+                if(oldD != null) {
+                    throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
+                }
+                dExpr = ((JmlStatementLoopExpr) spec).expression;
+                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue"),  dExpr, currentSymbol);
+                newStatements = newStatements.append(oldD);
+            }
+        }
+
         List<JCStatement> statements = newStatements;
         newStatements = List.nil();
         JCStatement assumefalse = translationUtils.makeAssumeStatement(treeutils.makeLit(Position.NOPOS, syms.booleanType, false), M);
@@ -304,9 +321,19 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.ENSURES);
         ifbodystatements = ifbodystatements.appendList(newStatements);
+        if(dExpr != null) {
+            ifbodystatements = ifbodystatements.append(
+                    translationUtils.makeAssertStatement(makeDereasesStatement(oldD, dExpr), M));
+        }
         JCBlock ifbody = M.Block(0L, ifbodystatements.append(assumefalse));
         newStatements = statements.append(M.If(that.cond, ifbody, null));
         return that;
+    }
+
+    private JCExpression makeDereasesStatement(JCVariableDecl oldD, JCExpression dExpr) {
+        JCExpression res = M.Binary(Tag.GT, dExpr, M.Literal(0));
+        JCExpression snd = M.Binary(Tag.LT, dExpr, M.Ident(oldD.name));
+        return M.Binary(Tag.AND, res, snd);
     }
 
     @Override
@@ -331,7 +358,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JCStatement> l = newStatements;
         newStatements = List.nil();
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
-            if(spec instanceof JmlStatementLoopExpr) {
+            if(spec instanceof JmlStatementLoopExpr && spec.token == JmlTokenKind.LOOP_INVARIANT) {
                 translationMode = mode;
                 returnBool = null;
                 JCExpression assertCopy = this.copy(((JmlStatementLoopExpr) spec).expression);
