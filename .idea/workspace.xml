@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="added defaultReplaceVisitor to show simple substitution in ivil sample project">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/JBMC_Tests/LoopInvTest.java" afterPath="$PROJECT_DIR$/../Examples/JBMC_Tests/LoopInvTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/translationUtils.java" afterPath="$PROJECT_DIR$/src/translationUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestExecutor.java" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestSuite.java" afterPath="$PROJECT_DIR$/tests/TestSuite.java" />
+    <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/JBMC_Tests/assumeTest4.java" afterPath="$PROJECT_DIR$/../Examples/JBMC_Tests/assumeTest4.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/JBMC_Tests/at4.c" afterPath="$PROJECT_DIR$/../Examples/JBMC_Tests/at4.c" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/JBMC_Tests/runJBMC.sh" afterPath="$PROJECT_DIR$/../Examples/JBMC_Tests/runJBMC.sh" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -51,7 +46,7 @@
               <caret line="299" column="103" lean-forward="false" selection-start-line="299" selection-start-column="103" selection-end-line="299" selection-end-column="103" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1544548634517" expanded="true" signature="27589:27595" ph=" }" />
+                <marker date="1544807766671" expanded="true" signature="27589:27595" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -60,7 +55,7 @@
       <file leaf-file-name="BubbleSortSymb.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="160">
+            <state relative-caret-position="300">
               <caret line="15" column="22" lean-forward="false" selection-start-line="15" selection-start-column="22" selection-end-line="15" selection-end-column="22" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -98,9 +93,17 @@
         <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="200">
-              <caret line="37" column="5" lean-forward="true" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
+              <caret line="37" column="5" lean-forward="false" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <marker date="1544807766519" expanded="true" signature="1063:1172" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="1269:6557" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="6616:7607" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="7660:10063" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="7895:7953" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="8031:8219" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="8298:9328" ph="{...}" />
+                <marker date="1544807766519" expanded="true" signature="9373:10061" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -123,7 +126,7 @@
         <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="380">
-              <caret line="346" column="10" lean-forward="true" selection-start-line="346" selection-start-column="10" selection-end-line="346" selection-end-column="10" />
+              <caret line="346" column="10" lean-forward="false" selection-start-line="346" selection-start-column="10" selection-end-line="346" selection-end-column="10" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#6884#6885#0" expanded="true" />
@@ -687,7 +690,14 @@
       <option name="project" value="LOCAL" />
       <updated>1537881536265</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="implemented supported for decreases clauses">
+      <created>1544807743947</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1544807743947</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -724,7 +734,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1173" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -733,7 +742,7 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.331" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -796,7 +805,8 @@
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
     <MESSAGE value="added defaultReplaceVisitor to show simple substitution in ivil sample project" />
-    <option name="LAST_COMMIT_MESSAGE" value="added defaultReplaceVisitor to show simple substitution in ivil sample project" />
+    <MESSAGE value="implemented supported for decreases clauses" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented supported for decreases clauses" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1125,7 +1135,7 @@
           <caret line="299" column="103" lean-forward="false" selection-start-line="299" selection-start-column="103" selection-end-line="299" selection-end-column="103" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1544548634517" expanded="true" signature="27589:27595" ph=" }" />
+            <marker date="1544807766671" expanded="true" signature="27589:27595" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -1173,7 +1183,7 @@
     <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
-          <caret line="346" column="10" lean-forward="true" selection-start-line="346" selection-start-column="10" selection-end-line="346" selection-end-column="10" />
+          <caret line="346" column="10" lean-forward="false" selection-start-line="346" selection-start-column="10" selection-end-line="346" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#6884#6885#0" expanded="true" />
@@ -1199,16 +1209,24 @@
     <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="200">
-          <caret line="37" column="5" lean-forward="true" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
+          <caret line="37" column="5" lean-forward="false" selection-start-line="37" selection-start-column="5" selection-end-line="37" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
+            <marker date="1544807766519" expanded="true" signature="1063:1172" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="1269:6557" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="6616:7607" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="7660:10063" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="7895:7953" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="8031:8219" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="8298:9328" ph="{...}" />
+            <marker date="1544807766519" expanded="true" signature="9373:10061" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
+        <state relative-caret-position="300">
           <caret line="15" column="22" lean-forward="false" selection-start-line="15" selection-start-column="22" selection-end-line="15" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
