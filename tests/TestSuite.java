@@ -10,6 +10,7 @@ public class TestSuite {
     public int pubInt;
     TestSuite t2;
     int[] arr;
+    TestSuite[] objects;
 
     //@ requires  i > 0 && i < 10000;
     //@ ensures \result > 1;
@@ -306,6 +307,13 @@ public class TestSuite {
         return fakeTest();
     }
 
+    //@ assignable t2;
+    @Verifyable
+    private int methodInvcationTest6() {
+        calledMethod();
+        return 0;
+    }
+
     @Fails
     public void havocTest() {
         assert pubInt == 0;
@@ -355,5 +363,24 @@ public class TestSuite {
 
     private int fakeTest() {
         return 56;
+    }
+
+    //@ assignable t2;
+    private void calledMethod() {
+        t2 = new TestSuite();
+    }
+
+    //@ requires objects != null && objects.length >= 1 && objects[0] != null;
+    //@ assignable objects[0..3].t2;
+    @Verifyable
+    private void assignableTest12() {
+        objects[0].t2 = new TestSuite();
+    }
+
+    //@ requires objects != null && objects.length >= 1 && objects[0] != null;
+    //@ assignable objects[0..3].t2;
+    @Fails
+    private void assignableTest13() {
+        objects[0] = new TestSuite();
     }
 }

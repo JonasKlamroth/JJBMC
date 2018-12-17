@@ -153,7 +153,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             if(that.list.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword
             && ((JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
                 if(that.list.size() + currentAssignable.size() > 1) {
-                    throw new RuntimeException("Assignable containing \nothing and something else is not valid.");
+                    throw new RuntimeException("Assignable containing \\nothing and something else is not valid.");
                 }
             } else {
                 currentAssignable = currentAssignable.appendList(that.list);

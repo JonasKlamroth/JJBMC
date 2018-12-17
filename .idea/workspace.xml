@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/BaseVisitor.java" afterPath="$PROJECT_DIR$/src/BaseVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestExecutor.java" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FunctionCallsVisitor.java" afterPath="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" afterPath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/translationUtils.java" afterPath="$PROJECT_DIR$/src/translationUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestSuite.java" afterPath="$PROJECT_DIR$/tests/TestSuite.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -44,11 +46,11 @@
       <file leaf-file-name="JmlExpressionVisitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="574" column="54" lean-forward="false" selection-start-line="574" selection-start-column="34" selection-end-line="574" selection-end-column="54" />
+            <state relative-caret-position="153">
+              <caret line="637" column="101" lean-forward="false" selection-start-line="637" selection-start-column="101" selection-end-line="637" selection-end-column="101" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1544807766671" expanded="true" signature="27589:27595" ph=" }" />
+                <marker date="1545062233168" expanded="true" signature="27266:27272" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -57,73 +59,89 @@
       <file leaf-file-name="VerifyFunctionVisitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="178" column="17" lean-forward="false" selection-start-line="178" selection-start-column="17" selection-end-line="178" selection-end-column="17" />
+            <state relative-caret-position="339">
+              <caret line="277" column="5" lean-forward="true" selection-start-line="277" selection-start-column="5" selection-end-line="277" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BaseVisitor.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/BaseVisitor.java">
+      <file leaf-file-name="translationUtils.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/translationUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-              <folding>
-                <element signature="e#3672#3673#0" expanded="true" />
-                <element signature="e#3718#3719#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="1986">
+              <caret line="176" column="34" lean-forward="false" selection-start-line="176" selection-start-column="34" selection-end-line="176" selection-end-column="34" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FunctionCallsVisitor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
+      <file leaf-file-name="JmlTree.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTree.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="14" column="50" lean-forward="true" selection-start-line="14" selection-start-column="50" selection-end-line="14" selection-end-column="50" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#513#514#0" expanded="true" />
-                <element signature="e#550#551#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="170">
+              <caret line="1184" column="0" lean-forward="false" selection-start-line="1184" selection-start-column="0" selection-end-line="1184" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/Main.java">
+      <file leaf-file-name="JmlSpecs.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlSpecs.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#2144#2145#0" expanded="true" />
-                <element signature="e#2178#2179#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="271">
+              <caret line="1104" column="0" lean-forward="false" selection-start-line="1104" selection-start-column="0" selection-end-line="1104" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestExecutor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
+      <file leaf-file-name="JmlTreeCopier.class" pinned="false" current-in-tab="false">
+        <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="200">
-              <caret line="28" column="39" lean-forward="true" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="210">
+              <caret line="229" column="0" lean-forward="false" selection-start-line="229" selection-start-column="0" selection-end-line="229" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestSuite.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TestSuite.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="621">
-              <caret line="345" column="21" lean-forward="false" selection-start-line="345" selection-start-column="21" selection-end-line="345" selection-end-column="21" />
+            <state relative-caret-position="360">
+              <caret line="382" column="37" lean-forward="true" selection-start-line="382" selection-start-column="37" selection-end-line="382" selection-end-column="37" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#388#389#0" expanded="true" />
+                <element signature="e#416#417#0" expanded="true" />
+                <element signature="e#2680#2681#0" expanded="true" />
+                <element signature="e#2707#2708#0" expanded="true" />
+                <element signature="e#3549#3550#0" expanded="true" />
+                <element signature="e#3575#3576#0" expanded="true" />
+                <element signature="e#3717#3718#0" expanded="true" />
+                <element signature="e#3743#3744#0" expanded="true" />
+                <element signature="e#3908#3909#0" expanded="true" />
+                <element signature="e#3935#3936#0" expanded="true" />
+                <element signature="e#4531#4532#0" expanded="true" />
+                <element signature="e#4561#4562#0" expanded="true" />
+                <element signature="e#7038#7039#0" expanded="true" />
+                <element signature="e#7072#7073#0" expanded="true" />
+                <element signature="e#7115#7116#0" expanded="true" />
+                <element signature="e#7148#7149#0" expanded="true" />
+                <element signature="e#7191#7192#0" expanded="true" />
+                <element signature="e#7229#7230#0" expanded="true" />
+                <element signature="e#7330#7331#0" expanded="true" />
+                <element signature="e#7364#7365#0" expanded="true" />
+                <element signature="e#7981#7982#0" expanded="true" />
+                <element signature="e#8005#8006#0" expanded="true" />
+                <element signature="e#8035#8036#0" expanded="true" />
+                <element signature="e#8060#8061#0" expanded="true" />
+                <element signature="e#8118#8119#0" expanded="true" />
+                <element signature="e#8154#8155#0" expanded="true" />
+                <element signature="e#8325#8326#0" expanded="true" />
+                <element signature="e#8372#8373#0" expanded="true" />
+                <element signature="e#8582#8583#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -141,15 +159,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>mods.ann</find>
-      <find>hi</find>
-      <find>hi =</find>
-      <find>hi ==</find>
-      <find>hi == n</find>
-      <find>hi == nu</find>
-      <find>hi == nul</find>
-      <find>hi == null</find>
-      <find>system</find>
       <find>looptest1</find>
       <find>currentassignable</find>
       <find>c</find>
@@ -170,7 +179,16 @@
       <find>ha</find>
       <find>havoc</find>
       <find>assert fa</find>
+      <find>\</find>
+      <find>\n</find>
+      <find>\noth</find>
+      <find>\nothing</find>
+      <find>assignable</find>
+      <find>JmlStoreRefArrayRange</find>
+      <find>throw</find>
+      <find>illegal</find>
       <find>invocation</find>
+      <find>edit</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -219,17 +237,17 @@
         <option value="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/BubbleSort.java" />
-        <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/tests/TestSuitetmp.java" />
-        <option value="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
-        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
-        <option value="$PROJECT_DIR$/src/translationUtils.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java" />
-        <option value="$PROJECT_DIR$/tests/TestSuite.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
-        <option value="$PROJECT_DIR$/src/BaseVisitor.java" />
         <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
+        <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
+        <option value="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
+        <option value="$PROJECT_DIR$/src/BaseVisitor.java" />
         <option value="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
+        <option value="$PROJECT_DIR$/src/translationUtils.java" />
+        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/TestSuite.java" />
       </list>
     </option>
   </component>
@@ -331,6 +349,24 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openjmlToBMC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openjmlToBMC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="translationUtils.java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -669,43 +705,51 @@
       <option name="project" value="LOCAL" />
       <updated>1545044196721</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="only called Functions are duplicated">
+      <created>1545045744144</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1545045744145</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 11h 54m 17s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 51m 05s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 11h 54m 41s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 52m 27s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 11h 58m 17s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 57m 19s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 14m 15s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 57m 33s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 16m 01s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 57m 50s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 16m 20s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 58m 14s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 17m 24s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 58m 22s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 20m 34s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 16h 58m 34s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 21m 06s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 17h 00m 20s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 12h 21m 27s.xml">
+    <history-entry file="TestExecutor_testTranslation - 2018.12.17 at 17h 01m 04s.xml">
       <configuration name="TestExecutor.testTranslation" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1173" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -714,7 +758,7 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.331" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -724,7 +768,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.397" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.397" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -779,7 +823,8 @@
     <MESSAGE value="added defaultReplaceVisitor to show simple substitution in ivil sample project" />
     <MESSAGE value="implemented supported for decreases clauses" />
     <MESSAGE value="- translation now reacts to jmltypecheck errors&#10;- removed std.err messages of openjml (hackey solution)" />
-    <option name="LAST_COMMIT_MESSAGE" value="- translation now reacts to jmltypecheck errors&#10;- removed std.err messages of openjml (hackey solution)" />
+    <MESSAGE value="only called Functions are duplicated" />
+    <option name="LAST_COMMIT_MESSAGE" value="only called Functions are duplicated" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -792,24 +837,42 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>454</line>
+          <line>447</line>
           <properties />
           <option name="timeStamp" value="63" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/translationUtils.java</url>
-          <line>244</line>
+          <line>320</line>
           <properties />
           <option name="timeStamp" value="96" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/BaseVisitor.java</url>
-          <line>64</line>
+          <url>file://$PROJECT_DIR$/src/translationUtils.java</url>
+          <line>240</line>
           <properties />
-          <option name="timeStamp" value="126" />
+          <option name="timeStamp" value="133" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/translationUtils.java</url>
+          <line>179</line>
+          <properties />
+          <option name="timeStamp" value="134" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>635</line>
+          <properties />
+          <option name="timeStamp" value="135" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>637</line>
+          <properties />
+          <option name="timeStamp" value="136" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="129" />
+      <option name="time" value="137" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -822,13 +885,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/esc/JmlAssertionAdder.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3080">
-          <caret line="12" column="47" lean-forward="true" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeUtils.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="196">
@@ -967,13 +1023,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="940">
-          <caret line="189" column="0" lean-forward="false" selection-start-line="189" selection-start-column="0" selection-end-line="189" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/TestExecutorTest.java" />
     <entry file="file://$PROJECT_DIR$/tests/TestAnnotations/Unwind.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1004,13 +1053,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Test.java" />
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTree.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="1184" column="0" lean-forward="false" selection-start-line="1184" selection-start-column="0" selection-end-line="1184" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/lang/Runtime.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="9100">
@@ -1027,31 +1069,6 @@
           <folding>
             <element signature="e#2731#2732#0" expanded="false" />
             <element signature="e#2758#2759#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/SymbFunctionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2480">
-          <caret line="157" column="35" lean-forward="false" selection-start-line="157" selection-start-column="35" selection-end-line="157" selection-end-column="35" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#7366#7367#0" expanded="false" />
-            <element signature="e#7393#7394#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/translationUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4260">
-          <caret line="213" column="20" lean-forward="false" selection-start-line="213" selection-start-column="20" selection-end-line="213" selection-end-column="20" />
-          <folding>
-            <element signature="e#15022#15023#0" expanded="false" />
-            <element signature="e#15054#15055#0" expanded="false" />
-            <element signature="e#15097#15098#0" expanded="false" />
-            <element signature="e#15129#15130#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1082,16 +1099,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="621">
-          <caret line="345" column="21" lean-forward="false" selection-start-line="345" selection-start-column="21" selection-end-line="345" selection-end-column="21" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/openjmlout.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1111,16 +1118,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="28" column="39" lean-forward="true" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
@@ -1133,52 +1130,150 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestSuitetmp.java">
+    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="492" column="20" lean-forward="false" selection-start-line="492" selection-start-column="20" selection-end-line="492" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="178" column="17" lean-forward="false" selection-start-line="178" selection-start-column="17" selection-end-line="178" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="574" column="54" lean-forward="false" selection-start-line="574" selection-start-column="34" selection-end-line="574" selection-end-column="54" />
+        <state relative-caret-position="200">
+          <caret line="28" column="39" lean-forward="true" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1544807766671" expanded="true" signature="27589:27595" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/SymbFunctionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="191" column="0" lean-forward="true" selection-start-line="191" selection-start-column="0" selection-end-line="191" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlSpecs.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="1104" column="0" lean-forward="false" selection-start-line="1104" selection-start-column="0" selection-end-line="1104" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="229" column="0" lean-forward="false" selection-start-line="229" selection-start-column="0" selection-end-line="229" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTree.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="1184" column="0" lean-forward="false" selection-start-line="1184" selection-start-column="0" selection-end-line="1184" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/BaseVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="381">
+          <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
+          <folding>
+            <element signature="e#3722#3723#0" expanded="true" />
+            <element signature="e#3768#3769#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="14" column="50" lean-forward="true" selection-start-line="14" selection-start-column="50" selection-end-line="14" selection-end-column="50" />
+        <state relative-caret-position="581">
+          <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#513#514#0" expanded="true" />
-            <element signature="e#550#551#0" expanded="true" />
+            <element signature="e#701#702#0" expanded="true" />
+            <element signature="e#738#739#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/BaseVisitor.java">
+    <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+        <state relative-caret-position="339">
+          <caret line="277" column="5" lean-forward="true" selection-start-line="277" selection-start-column="5" selection-end-line="277" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/translationUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1986">
+          <caret line="176" column="34" lean-forward="false" selection-start-line="176" selection-start-column="34" selection-end-line="176" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="637" column="101" lean-forward="false" selection-start-line="637" selection-start-column="101" selection-end-line="637" selection-end-column="101" />
           <folding>
-            <element signature="e#3672#3673#0" expanded="true" />
-            <element signature="e#3718#3719#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <marker date="1545062233168" expanded="true" signature="27266:27272" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestSuitetmp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="740" column="3" lean-forward="true" selection-start-line="740" selection-start-column="3" selection-end-line="740" selection-end-column="3" />
+          <folding>
+            <element signature="e#17178#17179#0" expanded="true" />
+            <element signature="e#17206#17207#0" expanded="true" />
+            <element signature="e#17250#17251#0" expanded="true" />
+            <element signature="e#17277#17278#0" expanded="true" />
+            <element signature="e#17321#17322#0" expanded="true" />
+            <element signature="e#17353#17354#0" expanded="true" />
+            <element signature="e#19982#19983#0" expanded="true" />
+            <element signature="e#20001#20002#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="382" column="37" lean-forward="true" selection-start-line="382" selection-start-column="37" selection-end-line="382" selection-end-column="37" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#388#389#0" expanded="true" />
+            <element signature="e#416#417#0" expanded="true" />
+            <element signature="e#2680#2681#0" expanded="true" />
+            <element signature="e#2707#2708#0" expanded="true" />
+            <element signature="e#3549#3550#0" expanded="true" />
+            <element signature="e#3575#3576#0" expanded="true" />
+            <element signature="e#3717#3718#0" expanded="true" />
+            <element signature="e#3743#3744#0" expanded="true" />
+            <element signature="e#3908#3909#0" expanded="true" />
+            <element signature="e#3935#3936#0" expanded="true" />
+            <element signature="e#4531#4532#0" expanded="true" />
+            <element signature="e#4561#4562#0" expanded="true" />
+            <element signature="e#7038#7039#0" expanded="true" />
+            <element signature="e#7072#7073#0" expanded="true" />
+            <element signature="e#7115#7116#0" expanded="true" />
+            <element signature="e#7148#7149#0" expanded="true" />
+            <element signature="e#7191#7192#0" expanded="true" />
+            <element signature="e#7229#7230#0" expanded="true" />
+            <element signature="e#7330#7331#0" expanded="true" />
+            <element signature="e#7364#7365#0" expanded="true" />
+            <element signature="e#7981#7982#0" expanded="true" />
+            <element signature="e#8005#8006#0" expanded="true" />
+            <element signature="e#8035#8036#0" expanded="true" />
+            <element signature="e#8060#8061#0" expanded="true" />
+            <element signature="e#8118#8119#0" expanded="true" />
+            <element signature="e#8154#8155#0" expanded="true" />
+            <element signature="e#8325#8326#0" expanded="true" />
+            <element signature="e#8372#8373#0" expanded="true" />
+            <element signature="e#8582#8583#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -1,6 +1,9 @@
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.List;
+import org.jmlspecs.openjml.JmlSpecs;
+import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
@@ -12,7 +15,8 @@ import java.util.Set;
  * Created by jklamroth on 12/17/18.
  */
 public class FunctionCallsVisitor extends JmlTreeCopier {
-    Set<String> calledFunctions = new HashSet<>();
+    public Set<String> calledFunctions = new HashSet<>();
+    public List<JCTree.JCExpression> assignables = List.nil();
 
     public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -24,5 +28,32 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
             calledFunctions.add(((JCTree.JCIdent) ((JCTree.JCMethodInvocation)that).meth).getName().toString());
         }
         return super.visitMethodInvocation(that, p);
+    }
+
+    @Override
+    public JCTree visitJmlMethodClauseStoreRef(JmlTree.JmlMethodClauseStoreRef that, Void p) {
+        if(that.list != null) {
+            if(that.list.stream().anyMatch(loc -> loc instanceof JmlTree.JmlStoreRefKeyword
+                    && ((JmlTree.JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
+                if(that.list.size() + assignables.size() > 1) {
+                    throw new RuntimeException("Assignable containing \\nothing and something else is not valid.");
+                }
+            } else {
+                assignables = assignables.appendList(that.list);
+            }
+        }
+        return super.visitJmlMethodClauseStoreRef(that, p);
+    }
+
+    @Override
+    public JCTree visitJmlMethodDecl(JmlTree.JmlMethodDecl that, Void p) {
+        JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitMethod(that, p);
+        copy.sourcefile = that.sourcefile;
+        copy.specsDecl = that.specsDecl;
+        //copy.cases = (JmlMethodSpecs)this.copy((JCTree)that.cases, (Object)p);
+        copy.methodSpecsCombined = JmlSpecs.copy(that.methodSpecsCombined, p, this);
+        copy.cases = (JmlTree.JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
+        copy.type = that.type;
+        return copy;
     }
 }

@@ -1,8 +1,5 @@
-import com.sun.imageio.plugins.jpeg.JPEG;
-import com.sun.source.tree.AssertTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ReturnTree;
@@ -20,9 +17,6 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
-import javafx.geometry.Pos;
-import jdk.nashorn.internal.codegen.CompilerConstants;
-import org.jmlspecs.lang.JML;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -31,7 +25,6 @@ import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -391,7 +384,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return super.visitAssignment(node, p);
         }
         if(cond != null) {
-            JCIf ifst = M.If(cond, makeAssignmentException("Illegal assignment: " + assign.toString()), null);
+            JCIf ifst = M.If(cond, makeException("Illegal assignment: " + assign.toString()), null);
             newStatements = newStatements.append(ifst);
             newStatements = newStatements.append(M.Exec(assign));
         }
@@ -421,7 +414,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
-    public JCThrow makeAssignmentException(String msg) {
+    public JCThrow makeException(String msg) {
         JCExpression ty = M.Type(syms.runtimeExceptionType);
         JCTree.JCExpression msgexpr = treeutils.makeStringLiteral(Position.NOPOS, msg);
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msgexpr), null));
@@ -574,6 +567,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
         if(copy.meth instanceof JCIdent) {
+            //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
+            //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
+            //newStatements = newStatements.append(ifst);
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
         return copy;
@@ -637,9 +633,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }*/
             if(accessList.equals(accessList1) || (fa.name == null && accessList.size() == accessList1.size())) {
                 if(expr == null) {
-                    expr = treeutils.makeNeqObject(Position.NOPOS, selected, selected1);
+                    expr = editAssignable(selected, selected1);
                 } else {
-                    expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, selected, selected1));
+                    expr = treeutils.makeAnd(Position.NOPOS, expr, editAssignable(selected, selected1));
                 }
             }
         }
@@ -648,6 +644,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         } else {
             return treeutils.makeAnd(Position.NOPOS, editAssignable(selected), expr);
         }
+    }
+
+    private JCExpression editAssignable(JCExpression lhs, JCExpression assignable) {
+        List tmp = currentAssignable;
+        currentAssignable = List.of(assignable);
+        JCExpression res = editAssignable(lhs);
+        currentAssignable = tmp;
+        return res;
+
     }
 
     public List<JCStatement> getNewStatements() {

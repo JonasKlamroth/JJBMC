@@ -12,6 +12,7 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -166,6 +167,81 @@ public class translationUtils {
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithoutNull"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
+    }
+
+    public JCExpression checkConformAssignables(List<JCExpression> calleeAssignables, List<JCExpression> calledAssignables) {
+        if(calledAssignables.size() == 0) {
+            return M.Literal(true);
+        }
+        if(calleeAssignables.size() == 0) {
+            return M.Literal(false);
+        }
+        JCExpression res = null;
+        for(JCExpression expr : calledAssignables) {
+            JCExpression tmp = null;
+            for(JCExpression expr1 : calleeAssignables) {
+                if(tmp == null) {
+                    tmp = checkConformAssignables(expr, expr1);
+                } else {
+                    tmp = treeutils.makeBinary(Position.NOPOS, Tag.OR, tmp, checkConformAssignables(expr, expr1));
+                }
+            }
+            if(res == null) {
+                res = tmp;
+            } else {
+                res = treeutils.makeBinary(Position.NOPOS, Tag.AND, res, tmp);
+            }
+        }
+        return res;
+    }
+
+    //expr1 < expr2
+    private JCExpression checkConformAssignables(JCExpression expr1, JCExpression expr2) {
+        Symbol symb1 = null;
+        Symbol symb2 = null;
+        if(expr1 instanceof JCIdent) {
+            symb1 = ((JCIdent) expr1).sym;
+        }
+        if(expr2 instanceof JCIdent) {
+            symb2 = ((JCIdent) expr2).sym;
+        }
+        if(expr1 instanceof JCFieldAccess) {
+            symb1 = ((JCFieldAccess) expr1).sym;
+        }
+        if(expr2 instanceof JCFieldAccess) {
+            symb2 = ((JCFieldAccess) expr2).sym;
+        }
+        if(expr1 instanceof JmlStoreRefArrayRange && expr2 instanceof  JmlStoreRefArrayRange) {
+            JCExpression prev = checkConformAssignables(((JmlStoreRefArrayRange) expr1).expression, ((JmlStoreRefArrayRange) expr2).expression);
+
+            JmlStoreRefArrayRange aexpr1 = (JmlStoreRefArrayRange)expr1;
+            JCExpression lo1 = aexpr1.lo;
+            JCExpression hi1 = aexpr1.hi;
+            if(lo1 == null) {
+                lo1 = M.Literal(0);
+            }
+            if(hi1 == null) {
+                hi1 = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr1.expression), M.Literal(1));
+            }
+            JmlStoreRefArrayRange aexpr2 = (JmlStoreRefArrayRange)expr2;
+            JCExpression lo2 = aexpr2.lo;
+            JCExpression hi2 = aexpr2.hi;
+            if(lo2 == null) {
+                lo2 = M.Literal(0);
+            }
+            if(hi2 == null) {
+                hi2 = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr2.expression), M.Literal(1));
+            }
+            JCExpression res = treeutils.makeBinary(Position.NOPOS, Tag.GE, lo1, lo2);
+            JCExpression res1 = treeutils.makeBinary(Position.NOPOS, Tag.LE, hi1, hi2);
+            res = treeutils.makeBinary(Position.NOPOS, Tag.AND, res, res1);
+            return treeutils.makeBinary(Position.NOPOS, Tag.AND, res, prev);
+
+        }
+        if(symb1 != null && symb2 != null) {
+            return treeutils.makeBooleanLiteral(Position.NOPOS, symb1.equals(symb2));
+        }
+        return treeutils.makeBooleanLiteral(Position.NOPOS, false);
     }
 
     public List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol) {

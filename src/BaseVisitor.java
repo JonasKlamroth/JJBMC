@@ -22,7 +22,7 @@ public class BaseVisitor extends JmlTreeCopier {
     private JCTree.JCClassDecl returnExcClass;
     private final ClassReader reader;
     private final Symtab syms;
-    private final Map<String, JmlMethodDecl> functionsByNames = new HashMap<>();
+    private final Map<String, List<JCExpression>> functionsByNames = new HashMap<>();
     private final ArrayList<String> calledFunctions = new ArrayList<>();
 
 
@@ -57,9 +57,10 @@ public class BaseVisitor extends JmlTreeCopier {
         FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
         for(JCTree def : copy.defs) {
             if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
-                functionsByNames.put(((JmlMethodDecl) def).getName().toString(), (JmlMethodDecl)def);
                 fcv.copy(def);
+                functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.assignables);
             }
+            fcv.assignables = List.nil();
         }
         calledFunctions.addAll(fcv.calledFunctions);
         for(JCTree def : copy.defs) {
@@ -89,7 +90,7 @@ public class BaseVisitor extends JmlTreeCopier {
         return returnExcClass;
     }
 
-    public JmlMethodDecl getMethodDeclForName(String n) {
+    public List<JCExpression> getAssignablesForName(String n) {
         return functionsByNames.get(n);
     }
 }
