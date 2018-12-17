@@ -44,6 +44,9 @@ public class TestExecutor {
             try {
                 File f = new File(fileName);
                 String translation = Main.translate(f);
+                if(translation == null) {
+                    assertTrue("Error translating file: " + f.getName(), false);
+                }
                 String name = f.getName().substring(0, f.getName().indexOf("."));
                 //TODO This is not always sound!!
                 translation = translation.replaceAll(name, name + "tmp");
@@ -102,7 +105,7 @@ public class TestExecutor {
                     //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
                     String classFile = tmpFile.getPath().replace(".java", ".class");
                     if(unwinds.get(idx) != null) {
-                        commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx)};
+                        commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions"};
                     } else {
                         commands = new String[]{"jbmc", classFile, "--function", function};
                     }

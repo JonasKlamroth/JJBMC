@@ -10,6 +10,10 @@ import org.jmlspecs.openjml.*;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Locale;
 
 
 /**
@@ -20,7 +24,12 @@ import java.io.File;
  */
 public class Main {
     public static final void main(String[] args) throws Exception {
-        System.out.println(translate(args));
+        String translation = translate(args);
+        if(translation != null) {
+            System.out.println();
+        } else {
+            System.out.println("An error occurred during translation.");
+        }
     }
 
     static JCTree rewriteRAC(JmlTree.JmlCompilationUnit cu, Context context) {
@@ -41,17 +50,52 @@ public class Main {
     }
 
     public static String translate(String[] args) throws Exception {
+        System.setErr(new CostumPrintStream(System.err));
+        System.setOut(new CostumPrintStream(System.out));
         IAPI api = Factory.makeAPI();
         java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
         int a = api.typecheck(cu);
-        //System.out.printf("a=%d", a);
-
+        if(a != 0) {
+            System.out.println("OpenJml parser Error.");
+            return null;
+        }
         Context ctx = api.context();
+
 
         for (JmlTree.JmlCompilationUnit it : cu) {
             //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
             return api.prettyPrint(rewriteAssert(it, ctx));
         }
         return null;
+    }
+
+    static class CostumPrintStream extends PrintStream {
+        static private boolean filtered = false;
+
+        public CostumPrintStream(OutputStream out) {
+            super(out);
+        }
+
+        public CostumPrintStream(String fileName) throws FileNotFoundException {
+            super(fileName);
+        }
+
+        @Override
+        public void print(String s) {
+            if(!s.startsWith("class ")) {
+                super.print(s);
+            } else {
+                filtered = true;
+            }
+        }
+
+        @Override
+        public void write(byte[] buf, int off, int len) {
+            if(!filtered) {
+                super.write(buf, off, len);
+            } else {
+                filtered = false;
+            }
+        }
     }
 }
