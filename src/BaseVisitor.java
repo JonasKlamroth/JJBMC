@@ -8,6 +8,10 @@ import com.sun.tools.javac.util.List;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
 
@@ -18,6 +22,8 @@ public class BaseVisitor extends JmlTreeCopier {
     private JCTree.JCClassDecl returnExcClass;
     private final ClassReader reader;
     private final Symtab syms;
+    private final Map<String, JmlMethodDecl> functionsByNames = new HashMap<>();
+    private final ArrayList<String> calledFunctions = new ArrayList<>();
 
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
@@ -48,10 +54,20 @@ public class BaseVisitor extends JmlTreeCopier {
         returnExcClass.type = classSymbol.type;
         JmlClassDecl copy = (JmlClassDecl)super.visitJmlClassDecl(that, p);
         List<JCTree> newDefs = List.nil();
+        FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
+        for(JCTree def : copy.defs) {
+            if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
+                functionsByNames.put(((JmlMethodDecl) def).getName().toString(), (JmlMethodDecl)def);
+                fcv.copy(def);
+            }
+        }
+        calledFunctions.addAll(fcv.calledFunctions);
         for(JCTree def : copy.defs) {
             if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
                 newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
-                newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
+                if(calledFunctions.contains(((JmlMethodDecl) def).getName().toString())) {
+                    newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
+                }
             } else {
                 newDefs = newDefs.append(def);
             }
@@ -71,5 +87,9 @@ public class BaseVisitor extends JmlTreeCopier {
 
     public JCClassDecl getExceptionClass() {
         return returnExcClass;
+    }
+
+    public JmlMethodDecl getMethodDeclForName(String n) {
+        return functionsByNames.get(n);
     }
 }

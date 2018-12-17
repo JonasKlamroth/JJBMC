@@ -1,26 +1,16 @@
-import com.sun.tools.javac.code.JmlTypes;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.comp.JmlAttr;
-import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.*;
 import org.jmlspecs.openjml.*;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Locale;
 
 
 /**
- * @author Alexander Weigl
- * @version 1 (23.07.18)
  * @author jklamroth
- * @version 2 (1.10.18)
+ * @version 1 (1.10.18)
  */
 public class Main {
     public static final void main(String[] args) throws Exception {
@@ -74,10 +64,6 @@ public class Main {
 
         public CostumPrintStream(OutputStream out) {
             super(out);
-        }
-
-        public CostumPrintStream(String fileName) throws FileNotFoundException {
-            super(fileName);
         }
 
         @Override
