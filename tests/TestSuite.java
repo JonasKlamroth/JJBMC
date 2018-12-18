@@ -13,7 +13,7 @@ public class TestSuite {
     TestSuite[] objects;
 
     //@ requires  i > 0 && i < 10000;
-    //@ ensures \result > 1;
+    //@ ensures \result == i + 1;
     @Verifyable
     public int test1(int i) {
         return i + 1;
@@ -202,7 +202,7 @@ public class TestSuite {
         }
     }
 
-    @Fails
+    @Verifyable
     private void assignalbeTest9() {
         if(privInt > 10) {
             privInt = 20;
@@ -382,5 +382,39 @@ public class TestSuite {
     @Fails
     private void assignableTest13() {
         objects[0] = new TestSuite();
+    }
+
+    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[0] != null;
+    //@ assignable t2.objects[0..1].t2;
+    @Verifyable
+    private void assignableTest14() {
+        t2.objects[0].t2 = new TestSuite();
+    }
+
+    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[2] != null;
+    //@ assignable t2.objects[0..1].t2;
+    @Fails
+    private void assignableTest15() {
+        t2.objects[2].t2 = new TestSuite();
+    }
+
+    //@ assignable \nothing;
+    @Verifyable
+    private void assignableTest16() {
+        TestSuite t2 = new TestSuite();
+        t2 = new TestSuite();
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest17() {
+        TestSuite t2 = new TestSuite();
+        t2 = new TestSuite();
+        this.t2 = new TestSuite();
+    }
+
+    @Verifyable
+    private void assignableTest18() {
+        this.t2 = new TestSuite();
     }
 }

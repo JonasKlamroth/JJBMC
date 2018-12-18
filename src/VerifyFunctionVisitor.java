@@ -73,7 +73,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
-    private List<JCExpression> currentAssignable = List.nil();
+    private List<JCExpression> currentAssignable = null;
 
     public enum TranslationMode { REQUIRES, ENSURES, JAVA}
 
@@ -149,6 +149,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
+        if(currentAssignable == null) {
+            currentAssignable = List.nil();
+        }
         if(that.list != null) {
             if(that.list.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword
             && ((JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
@@ -171,7 +174,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
         requiresList.clear();
         ensuresList.clear();
-        currentAssignable = List.nil();
+        currentAssignable = null;
         currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
         JCVariableDecl returnVar = null;
@@ -255,6 +258,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         List<JCStatement> body = List.nil();
         for(JCStatement st : oBody) {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
+            if(currentAssignable == null) {
+                currentAssignable = List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+            }
             ev.setCurrentAssignable(currentAssignable);
             JCStatement copy = ev.copy(st);
             if(ev.getNewStatements().size() == 0) {
