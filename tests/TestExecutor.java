@@ -37,6 +37,18 @@ public class TestExecutor {
     }
 
     @org.junit.Test
+    public void runHammingWeightCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/HammingWeight.java"};
+        testTranslation();
+    }
+
+    @org.junit.Test
+    public void runToUnsingedCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/ToUnsigned.java"};
+        testTranslation();
+    }
+
+    @org.junit.Test
     public void testTranslation() throws IOException, InterruptedException {
         for(String fileName : fileNames) {
 

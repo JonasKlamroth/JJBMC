@@ -417,4 +417,40 @@ public class TestSuite {
     private void assignableTest18() {
         this.t2 = new TestSuite();
     }
+
+    //@ ensures \result == 10;
+    @Verifyable
+    @Unwind(number = 6)
+    private int testNoInvariantLoop() {
+        int res = 0;
+        for(int i = 0; i < 5; i++) {
+            res += i;
+        }
+        return res;
+    }
+
+    //@ ensures i > 0 ==> i > -1;
+    @Verifyable
+    private void impliesTest(int i) {
+    }
+
+    //@ ensures i > 0 ==> i > 1;
+    @Fails
+    private void impliesTest1(int i) {
+    }
+
+    //@ ensures i > 0 <==> i >= 1;
+    @Verifyable
+    private void equivalenceTest(int i) {
+    }
+
+    //@ ensures i > 0 <==> i > 1;
+    @Fails
+    private void equivalenceTest1(int i) {
+    }
+
+    //@ ensures (\forall int j; j >= 0 && j <= 10; j > i) ==> i < 0;
+    @Verifyable
+    private void impliesTest2(int i) {
+    }
 }

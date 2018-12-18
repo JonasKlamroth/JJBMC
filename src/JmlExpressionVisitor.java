@@ -74,6 +74,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private List<JCExpression> currentAssignable = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
+    private boolean negated = false;
 
 
 
@@ -117,6 +118,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         returnBool = null;
         JmlQuantifiedExpr copy = that;
+        if(negated) {
+            if(copy.op == JmlTokenKind.BSFORALL) {
+                copy.op = JmlTokenKind.BSEXISTS;
+            } else if(copy.op == JmlTokenKind.BSEXISTS) {
+                copy.op = JmlTokenKind.BSFORALL;
+            }
+            copy.value = treeutils.makeUnary(Position.NOPOS, Tag.NOT, copy.value);
+        }
 
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
             if(copy.op == JmlTokenKind.BSFORALL) {
@@ -138,6 +147,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = stmts.appendList(l);
                 returnBool = boolVar.sym;
                 return M.Ident(boolVar);
+            } else {
+                throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
             }
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.REQUIRES) {
             if(copy.op == JmlTokenKind.BSFORALL) {
@@ -159,9 +170,52 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(translationUtils.makeAssumeStatement(super.copy(copy.range), M));
                 JCExpression value = super.copy(copy.value);
                 return value;
+            } else {
+                throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
             }
         }
         return copy;
+    }
+
+    @Override
+    public JCTree visitJmlBinary(JmlBinary that, Void p) {
+
+        if(that.op == JmlTokenKind.IMPLIES) {
+            int countStmts = newStatements.size();
+            JCExpression rhs = super.copy(that.rhs);
+            if(countStmts > newStatements.size()) {
+                rhs = M.Ident(returnBool);
+            }
+
+            countStmts = newStatements.size();
+            negated = true;
+            JCExpression lhs = super.copy(that.lhs);
+            negated = false;
+            if(countStmts > newStatements.size()) {
+                lhs = M.Ident(returnBool);
+            }
+            if(returnBool == null) {
+                return treeutils.makeBinary(Position.NOPOS, Tag.OR, treeutils.makeUnary(Position.NOPOS, Tag.NOT, lhs), rhs);
+            } else {
+                returnBool = null;
+                return treeutils.makeBinary(Position.NOPOS, Tag.OR, lhs, rhs);
+            }
+        }
+        if(that.op == JmlTokenKind.EQUIVALENCE) {
+            int countStmts = newStatements.size();
+            JCExpression rhs = super.copy(that.rhs);
+            if(countStmts > newStatements.size()) {
+                rhs = M.Ident(returnBool);
+            }
+
+            countStmts = newStatements.size();
+            JCExpression lhs = super.copy(that.lhs);
+            if(countStmts > newStatements.size()) {
+                lhs = M.Ident(returnBool);
+            }
+            return treeutils.makeBinary(Position.NOPOS, Tag.EQ, lhs, rhs);
+        }
+        return super.visitJmlBinary(that, p);
     }
 
     @Override
@@ -172,9 +226,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, copy);
             //newStatements.append(boolVar);
             returnBool = boolVar.sym;
-            return copy;
         }
-        return super.visitBinary(node, p);
+
+        return copy;
     }
 
     /*@Override
@@ -249,18 +303,42 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlWhileLoop(JmlWhileLoop that, Void p) {
-        throw new RuntimeException("While-Loops currently not supported.");
+        if(that.loopSpecs == null) {
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JmlWhileLoop copy = (JmlWhileLoop)super.visitJmlWhileLoop(that, p);
+            assert(newStatements.size() == 1);
+            copy.body = newStatements.get(0);
+            newStatements = tmp.append(copy);
+            return copy;
+        }
+        throw new RuntimeException("While-Loops with invariants currently not supported.");
     }
 
     @Override
     public JCTree visitJmlDoWhileLoop(JmlDoWhileLoop that, Void p) {
-        throw new RuntimeException("While-Loops currently not supported.");
+        if(that.loopSpecs == null) {
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JmlDoWhileLoop copy = (JmlDoWhileLoop)super.visitJmlDoWhileLoop(that, p);
+            assert(newStatements.size() == 1);
+            copy.body = newStatements.get(0);
+            newStatements = tmp.append(copy);
+            return copy;
+        }
+        throw new RuntimeException("While-Loops with invaraints currently not supported.");
     }
 
     @Override
     public JCTree visitJmlForLoop(JmlTree.JmlForLoop that, Void p) {
         if(that.loopSpecs == null) {
-            return super.visitJmlForLoop(that, p);
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JmlForLoop copy = (JmlForLoop)super.visitJmlForLoop(that, p);
+            assert(newStatements.size() == 1);
+            copy.body = newStatements.get(0);
+            newStatements = tmp.append(copy);
+            return copy;
         }
         if(that.init.size() > 1) {
             throw new RuntimeException("More than 1 loopVariable currently not supported");
