@@ -5,6 +5,7 @@ import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.junit.After;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +53,12 @@ public class TestExecutor {
     @org.junit.Test
     public void runTmpTest() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/TmpTest.java"};
+        testTranslation();
+    }
+
+    @org.junit.Test
+    public void runFailingTests() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/FailingTests.java"};
         testTranslation();
     }
 
@@ -163,7 +171,7 @@ public class TestExecutor {
 
 
                     } else {
-                        System.out.println("Fucntion: " + function + " ignored due to missing annotation.");
+                        System.out.println("Function: " + function + " ignored due to missing annotation.");
                     }
                 }
                 idx++;
@@ -171,6 +179,12 @@ public class TestExecutor {
 
             cleanup();
         }
+    }
+
+    @Test
+    public void test() {
+        int[] arr = new int[5];
+        Arrays.stream(arr).forEach(i -> System.out.println("i = " + i));
     }
 
 

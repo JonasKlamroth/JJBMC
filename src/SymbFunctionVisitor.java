@@ -15,7 +15,6 @@ import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
-import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
@@ -29,7 +28,6 @@ import java.util.Set;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
-import static com.sun.tools.javac.util.List.*;
 
 /**
  * Created by jklamroth on 12/10/18.
@@ -104,17 +102,17 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.token == JmlTokenKind.ENSURES) {
-            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ENSURES);
-            translationMode = VerifyFunctionVisitor.TranslationMode.ENSURES;
+            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
+            translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
         } else if(that.token == JmlTokenKind.REQUIRES) {
-            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.REQUIRES);
-            translationMode = VerifyFunctionVisitor.TranslationMode.REQUIRES;
+            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSUME);
+            translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
         }
         JCExpression copy = expressionVisitor.copy(that.expression);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
-        if(translationMode == VerifyFunctionVisitor.TranslationMode.REQUIRES) {
+        if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
             if(returnBool != null) {
                 newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, expressionVisitor.getAssertionAssumptions()));
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
@@ -127,7 +125,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
             }
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
-        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ENSURES){
+        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
             if(returnBool != null) {
                 newStatements = List.of(M.Block(0l, newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M))));
             } else {

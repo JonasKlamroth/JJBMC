@@ -337,6 +337,14 @@ public class translationUtils {
         }
         return res;
     }
+
+    public JCExpression unwrapExpression(JCExpression expr) {
+        JCExpression res = expr;
+        while(res instanceof JCParens) {
+            res = ((JCParens) res).expr;
+        }
+        return res;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {

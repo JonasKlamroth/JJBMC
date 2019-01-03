@@ -538,4 +538,36 @@ public class TestSuite {
     private void assignableTest28() {
         privInt += 5;
     }
+
+    @Fails
+    private void assertTest() {
+        //@ assert(0 > 1);
+    }
+
+    @Fails
+    private void assertTest2() {
+        //@ assert (\forall int i; i > 0 && i < 10; i > 2);
+    }
+
+    @Verifyable
+    private void assertTest3() {
+        //@ assert (\forall int i; i > 0 && i < 10; i > 0);
+    }
+
+    @Verifyable
+    private void assertTest4() {
+        //@ assert (\exists int i; i > 0 && i < 10; i > 5);
+    }
+
+    @Fails
+    private void assertTest5() {
+        //@ assert (\exists int i; i > 0 && i < 10; i > 11);
+    }
+
+    @Verifyable
+    private void assumeTest1() {
+        int i = 0;
+        //@ assume i > 0;
+        //@ assert i > -1;
+    }
 }

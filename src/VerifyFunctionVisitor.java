@@ -1,6 +1,3 @@
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.LiteralTree;
-import com.sun.source.tree.ReturnTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -16,17 +13,14 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Position;
-import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
-import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,7 +28,6 @@ import java.util.Set;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
-import static com.sun.tools.javac.util.List.*;
 
 /**
  * Created by jklamroth on 11/13/18.
@@ -75,7 +68,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
 
-    public enum TranslationMode { REQUIRES, ENSURES, JAVA}
+    public enum TranslationMode {ASSUME, ASSERT, JAVA}
 
     public VerifyFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
         super(context, maker);
@@ -109,17 +102,17 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.token == JmlTokenKind.ENSURES) {
-            expressionVisitor.setTranslationMode(TranslationMode.ENSURES);
-            translationMode = TranslationMode.ENSURES;
+            expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
+            translationMode = TranslationMode.ASSERT;
         } else if(that.token == JmlTokenKind.REQUIRES) {
-            expressionVisitor.setTranslationMode(TranslationMode.REQUIRES);
-            translationMode = TranslationMode.REQUIRES;
+            expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
+            translationMode = TranslationMode.ASSUME;
         }
         JCExpression copy = expressionVisitor.copy(that.expression);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
-        if(translationMode == VerifyFunctionVisitor.TranslationMode.ENSURES) {
+        if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
             if(returnBool != null) {
                 newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, expressionVisitor.getAssertionAssumptions()));
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
@@ -132,7 +125,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
             }
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
-        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.REQUIRES){
+        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME){
             if(returnBool != null) {
                 newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
             } else {
