@@ -186,12 +186,7 @@ public class TestSuite {
         t3.t2.pubInt = 10;
     }
 
-    /*@ assignable t2.arr[4];
-      @ */
-    @Fails
-    private void assignalbeTest7(TestSuite t3) {
-        t3.arr[5] = 10;
-    }
+
 
     @Verifyable
     private void assignalbeTest8() {
@@ -452,5 +447,95 @@ public class TestSuite {
     //@ ensures (\forall int j; j >= 0 && j <= 10; j > i) ==> i < 0;
     @Verifyable
     private void impliesTest2(int i) {
+    }
+
+    //@ ensures (\exists int j; j >= 0 && j <= 10; j > i) ==> i < 0;
+    @Fails
+    private void impliesTest3(int i) {
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 10;
+    @Verifyable
+    @Unwind(number = 11)
+    private void assignableTest19() {
+        for(; privInt < 10; privInt++) {
+            int i = 0;
+        }
+    }
+
+    //@ requires privInt == 0;
+    //@ assignable \nothing;
+    //@ ensures privInt == 10;
+    @Fails
+    @Unwind(number = 11)
+    private void assignableTest20() {
+        for(; privInt < 10; privInt++) {
+            int i = 0;
+        }
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest21() {
+        privInt++;
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 1;
+    //@ assignable privInt;
+    @Verifyable
+    private void assignableTest22() {
+        privInt++;
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 1;
+    //@ assignable privInt;
+    @Verifyable
+    private void assignableTest23() {
+        if(privInt++ > 0) {
+            return;
+        }
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 1;
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest24() {
+        if(privInt++ > 0) {
+            return;
+        }
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 1;
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest25() {
+        fakeTest(privInt++);
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 1;
+    //@ assignable \everything;
+    @Verifyable
+    private void assignableTest26() {
+        fakeTest(privInt++);
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest27() {
+        privInt += 5;
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 5;
+    //@ assignable privInt;
+    @Verifyable
+    private void assignableTest28() {
+        privInt += 5;
     }
 }

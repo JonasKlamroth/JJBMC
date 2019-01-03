@@ -49,7 +49,14 @@ public class TestExecutor {
     }
 
     @org.junit.Test
+    public void runTmpTest() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/TmpTest.java"};
+        testTranslation();
+    }
+
+    @org.junit.Test
     public void testTranslation() throws IOException, InterruptedException {
+        cleanup();
         for(String fileName : fileNames) {
 
             try {
@@ -118,7 +125,7 @@ public class TestExecutor {
                     if(unwinds.get(idx) != null) {
                         commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions"};
                     } else {
-                        commands = new String[]{"jbmc", classFile, "--function", function};
+                        commands = new String[]{"jbmc", classFile, "--function", function, "--trace"};
                     }
 
                     proc = rt.exec(commands);

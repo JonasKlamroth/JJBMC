@@ -320,6 +320,23 @@ public class translationUtils {
         }
         throw new RuntimeException("Nondet for type " + type + " not supported.");
     }
+
+    public List<JCStatement> diff(List<JCStatement> l1, List<JCStatement> l2) {
+        List<JCStatement> res = List.nil();
+        for(JCStatement s1 : l1) {
+            boolean found = false;
+            for(JCStatement s2 : l2) {
+                if(s1.toString().equals(s2.toString())) {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                res = res.append(s1);
+            }
+        }
+        return res;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {

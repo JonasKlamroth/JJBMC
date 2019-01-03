@@ -1,8 +1,11 @@
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.CompoundAssignmentTree;
+import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.UnaryTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -115,6 +118,47 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitExpressionStatement(ExpressionStatementTree node, Void p) {
+        JCExpression copy = super.copy((JCExpression)(node.getExpression()));
+        if(newStatements.size() > 0) {
+            newStatements = newStatements.append(M.Exec(copy));
+        }
+        return M.Exec(copy);
+    }
+
+    @Override
+    public JCTree visitUnary(UnaryTree node, Void p) {
+        JCUnary u = (JCUnary)node;
+        if(u.getTag() == Tag.NOT) {
+            negated = true;
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JCExpression expr = super.copy(u.arg);
+            if(newStatements.size() == 0) {
+                newStatements = tmp;
+                return M.Unary(Tag.NOT, expr);
+            } else {
+                newStatements = tmp.appendList(newStatements);
+                return expr;
+            }
+        } else if(u.getTag() == Tag.POSTINC || u.getTag() == Tag.POSTDEC ||
+                u.getTag() == Tag.PREDEC || u.getTag() == Tag.PREINC) {
+            if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+                return super.visitUnary(node, p);
+            }
+            JCExpression cond = editAssignable(u.arg);
+            if(cond != null) {
+                JCIf ifst = M.If(cond, makeException("Illegal assignment: " + u.toString()), null);
+                newStatements = newStatements.append(ifst);
+                //newStatements = newStatements.append(M.Exec(u));
+            }
+            return super.visitUnary(node, p);
+        } else {
+            throw new RuntimeException("Unsupported unary token: " + u.getTag());
+        }
+    }
+
+    @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         returnBool = null;
         JmlQuantifiedExpr copy = that;
@@ -195,7 +239,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 lhs = M.Ident(returnBool);
             }
             if(returnBool == null) {
-                return treeutils.makeBinary(Position.NOPOS, Tag.OR, treeutils.makeUnary(Position.NOPOS, Tag.NOT, lhs), rhs);
+                return treeutils.makeBinary(Position.NOPOS, Tag.OR, treeutils.makeNot(Position.NOPOS, lhs), rhs);
             } else {
                 returnBool = null;
                 return treeutils.makeBinary(Position.NOPOS, Tag.OR, lhs, rhs);
@@ -227,7 +271,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //newStatements.append(boolVar);
             returnBool = boolVar.sym;
         }
-
         return copy;
     }
 
@@ -326,7 +369,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(copy);
             return copy;
         }
-        throw new RuntimeException("While-Loops with invaraints currently not supported.");
+        throw new RuntimeException("While-Loops with invariants currently not supported.");
     }
 
     @Override
@@ -334,9 +377,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(that.loopSpecs == null) {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
-            JmlForLoop copy = (JmlForLoop)super.visitJmlForLoop(that, p);
+            ArrayList<JCStatement> inits = new ArrayList();
+            that.init.stream().forEach(el -> inits.add(super.copy(el)));
+            ArrayList<JCExpressionStatement> steps = new ArrayList();
+            that.step.stream().forEach(el -> steps.add(super.copy(el)));
+            newStatements = transUtils.diff(newStatements, List.from(steps));
+            newStatements = transUtils.diff(newStatements, List.from(inits));
+            tmp = tmp.appendList(newStatements);
+            newStatements = List.nil();
+            JCStatement bodyCopy = (JCStatement)super.copy(that.body);
             assert(newStatements.size() == 1);
-            copy.body = newStatements.get(0);
+            JmlForLoop copy = M.ForLoop(List.from(inits), super.copy(that.cond), List.from(steps), newStatements.get(0));
             newStatements = tmp.append(copy);
             return copy;
         }
@@ -467,6 +518,25 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = newStatements.append(M.Exec(assign));
         }
         return super.visitAssignment(node, p);
+    }
+
+    @Override
+    public JCTree visitCompoundAssignment(CompoundAssignmentTree node, Void p) {
+        JCAssignOp copy = (JCAssignOp)super.visitCompoundAssignment(node, p);
+        if(copy.getTag() == Tag.PLUS_ASG || copy.getTag() == Tag.MINUS_ASG) {
+            if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+                return copy;
+            }
+            JCExpression cond = editAssignable(copy.lhs);
+            if(cond != null) {
+                JCIf ifst = M.If(cond, makeException("Illegal assignment: " + copy.toString()), null);
+                newStatements = newStatements.append(ifst);
+                //newStatements = newStatements.append(M.Exec(u));
+            }
+            return copy;
+        } else {
+            throw new RuntimeException("Illegal assignment.");
+        }
     }
 
     public JCExpression editAssignable(JCIdent e) {
@@ -671,7 +741,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             then = newStatements.get(0);
         }
         JCExpression cond = super.copy((JCExpression)node.getCondition());
-        newStatements = l.append(M.If(cond, then, elseSt));
+        newStatements = newStatements.appendList(l.append(M.If(cond, then, elseSt)));
         return (JCIf)node;
     }
 
