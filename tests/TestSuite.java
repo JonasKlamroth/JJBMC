@@ -570,4 +570,65 @@ public class TestSuite {
         //@ assume i > 0;
         //@ assert i > -1;
     }
+
+    @Verifyable
+    private void assumeTest2() {
+        int[] arr = new int[2];
+        //@ assume (\forall int i; i >= 0 && i < 2; arr[i] == 2);
+        //@ assert (\exists int i; i >= 0 && i < 2; arr[i] == 2);
+    }
+
+    @Fails
+    private void assumeTest4() {
+        int[] arr = new int[2];
+        //@ assert (\forall int i; i >= 0 && i < 2; arr[i] == 2);
+    }
+
+    //@ ensures \result == 2.0f;
+    @Verifyable
+    private float floatTest() {
+        float f = 1.0f;
+        f += 1.0f;
+        return f;
+    }
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 3; j > i));
+    @Fails
+    private void nestedQuantifierTest() {}
+
+    //@ ensures (\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
+    @Fails
+    private void nestedQuantifierTest1() {}
+
+    //@ ensures (\forall int i; i >= 0 && i < 3; (\exists int j; j >= -1 && j < 3; i > j));
+    @Verifyable
+    private void nestedQuantifierTest3() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void nestedQuantifierTest2() {}
+
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
+    @Verifyable
+    private void negatedQuantifierTest() {}
+
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
+    @Verifyable
+    private void negatedQuantifierTest1() {}
+
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= -1 && j < 3; i > j));
+    @Fails
+    private void negatedQuantifierTest3() {}
+
+    //@ ensures !(\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
+    @Fails
+    private void negatedQuantifierTest2() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; !(\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void negatedQuantifierTest4() {}
+
+    //@ ensures (\exists int i; i >= 3 && i < 5; !(\forall int j; j >= 0 && j < 2; i > j));
+    @Fails
+    private void negatedQuantifierTest5() {}
 }

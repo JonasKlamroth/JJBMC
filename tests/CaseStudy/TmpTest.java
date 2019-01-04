@@ -21,58 +21,44 @@ public class TmpTest {
         assert(false);
     }*/
 
-    /*@ assignable t2.arr[4];
-      @ */
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 3; j > i));
     @Fails
-    private void assignalbeTest7(TmpTest t3) {
-        t3.arr[5] = 10;
-    }
+    private void nestedQuantifierTest() {}
 
+    //@ ensures (\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
     @Fails
-    private void assertTest2() {
-        //@ assert (\forall int i; i > 0 && i < 10; i > 2);
-    }
+    private void nestedQuantifierTest1() {}
 
+    //@ ensures (\forall int i; i >= 0 && i < 3; (\exists int j; j >= -1 && j < 3; i > j));
     @Verifyable
-    private void assertTest3() {
-        //@ assert (\forall int i; i > 0 && i < 10; i > 0);
-    }
+    private void nestedQuantifierTest3() {}
 
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
     @Verifyable
-    private void assertTest4() {
-        //@ assert (\exists int i; i > 0 && i < 10; i > 5);
-    }
+    private void nestedQuantifierTest2() {}
 
-    @Fails
-    private void assertTest5() {
-        //@ assert (\exists int i; i > 0 && i < 10; i > 11);
-    }
-
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
     @Verifyable
-    private void assumeTest1() {
-        int i = 0;
-        //@ assume i > 0;
-        //@ assert i > -1;
-    }
+    private void negatedQuantifierTest() {}
 
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
     @Verifyable
-    private void assumeTest2() {
-        int[] arr = new int[2];
-        //@ assume (\forall int i; i >= 0 && i < 2; arr[i] == 2);
-        //@ assert (\exists int i; i >= 0 && i < 2; arr[i] == 2);
-    }
+    private void negatedQuantifierTest1() {}
 
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= -1 && j < 3; i > j));
     @Fails
-    private void assumeTest4() {
-        int[] arr = new int[2];
-        //@ assert (\forall int i; i >= 0 && i < 2; arr[i] == 2);
-    }
+    private void negatedQuantifierTest3() {}
 
+    //@ ensures !(\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
     @Fails
-    private void assumeTest3() {
-        arr = new int[2];
-        //@ assume (\forall int i; i >= 0 && i < 2; arr[i] == 2);
-        //@ assert false;
-        //@ assert (\forall int i; i >= 0 && i < 2; arr[i] == 2);
-    }
+    private void negatedQuantifierTest2() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; !(\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void negatedQuantifierTest4() {}
+
+    //@ ensures (\exists int i; i >= 3 && i < 5; !(\forall int j; j >= 0 && j < 2; i > j));
+    @Fails
+    private void negatedQuantifierTest5() {}
+
 }

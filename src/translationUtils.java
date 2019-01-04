@@ -82,6 +82,17 @@ public class translationUtils {
         return makeAssertStatement(expr, M, List.nil());
     }
 
+    static JCExpression getConjunction(List<JCExpression> exprs, Maker M) {
+        if(exprs.size() > 0) {
+            JCTree.JCExpression ifexpr = exprs.get(0);
+            for(int idx = 1; idx < exprs.size(); ++idx) {
+                ifexpr = M.Binary(JCTree.Tag.AND, ifexpr, exprs.get(idx));
+            }
+            return ifexpr;
+        }
+        return null;
+    }
+
     public JCTree.JCVariableDecl makeNondetIntVar(Name name, Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
