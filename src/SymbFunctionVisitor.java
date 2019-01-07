@@ -114,12 +114,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
             if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, expressionVisitor.getAssertionAssumptions()));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M, expressionVisitor.getAssertionAssumptions()));
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));

@@ -67,19 +67,8 @@ public class translationUtils {
                 M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
     }
 
-    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M, List<JCTree.JCExpression> assumptions) {
-        if(assumptions.size() > 0) {
-            JCTree.JCExpression ifexpr = assumptions.get(0);
-            for(int idx = 1; idx < assumptions.size(); ++idx) {
-                ifexpr = M.Binary(JCTree.Tag.AND, ifexpr, assumptions.get(idx));
-            }
-            return M.If(ifexpr, M.at(Position.NOPOS).Assert(expr, null), null);
-        }
-        return M.at(Position.NOPOS).Assert(expr, null);
-    }
-
     static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
-        return makeAssertStatement(expr, M, List.nil());
+        return M.at(Position.NOPOS).Assert(expr, null);
     }
 
     static JCExpression getConjunction(List<JCExpression> exprs, Maker M) {
@@ -356,6 +345,36 @@ public class translationUtils {
         }
         return res;
     }
+
+    public List<JCStatement> assumeOrAssertInIf(JCIf ist, JCExpression expr, VerifyFunctionVisitor.TranslationMode transMode) {
+        List<JCStatement> newStatements = List.nil();
+        if(transMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
+            if (ist != null) {
+                if (ist.thenpart == null) {
+                    ist.thenpart = translationUtils.makeAssumeStatement(expr, M);
+                } else if (ist.thenpart instanceof JCBlock) {
+                    ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(expr, M));
+                } else {
+                    ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(expr, M)));
+                }
+            } else {
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(expr, M));
+            }
+        } else if (transMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
+            if (ist != null) {
+                if (ist.thenpart == null) {
+                    ist.thenpart = translationUtils.makeAssertStatement(expr, M);
+                } else if (ist.thenpart instanceof JCBlock) {
+                    ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(expr, M));
+                } else {
+                    ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(expr, M)));
+                }
+            } else {
+                newStatements = newStatements.append(translationUtils.makeAssertStatement(expr, M));
+            }
+        }
+        return newStatements;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {
@@ -405,6 +424,7 @@ class RangeExtractor extends JmlTreeScanner {
         }
         super.visitBinary(tree);
     }
+
 
     public JCTree.JCExpression getMin() {
         return minResult;

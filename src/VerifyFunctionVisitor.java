@@ -111,15 +111,36 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         JCExpression copy = expressionVisitor.copy(that.expression);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
+        JCIf ist = expressionVisitor.getOutermostIf();
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
             if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M, expressionVisitor.getAssertionAssumptions()));
+                if(ist != null) {
+                    if (ist.thenpart == null) {
+                        ist.thenpart = translationUtils.makeAssertStatement(M.Ident(returnBool), M);
+                    } else if (ist.thenpart instanceof JCBlock) {
+                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+                    } else {
+                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(M.Ident(returnBool), M)));
+                    }
+                } else {
+                    newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+                }
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M, expressionVisitor.getAssertionAssumptions()));
+                if(ist != null) {
+                    if(ist.thenpart == null) {
+                        ist.thenpart = translationUtils.makeAssertStatement(copy, M);
+                    } else if(ist.thenpart instanceof JCBlock) {
+                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(copy, M));
+                    } else {
+                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(copy, M)));
+                    }
+                } else {
+                    newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
+                }
                 JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
                 newStatements = List.of(ifstmt);
                 //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
@@ -127,9 +148,29 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME){
             if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
+                if(ist != null) {
+                    if (ist.thenpart == null) {
+                        ist.thenpart = translationUtils.makeAssumeStatement(M.Ident(returnBool), M);
+                    } else if (ist.thenpart instanceof JCBlock) {
+                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
+                    } else {
+                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M)));
+                    }
+                } else {
+                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
+                }
             } else {
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy, M));
+                if(ist != null) {
+                    if (ist.thenpart == null) {
+                        ist.thenpart = translationUtils.makeAssumeStatement(copy, M);
+                    } else if (ist.thenpart instanceof JCBlock) {
+                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(copy, M));
+                    } else {
+                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(copy, M)));
+                    }
+                } else {
+                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy, M));
+                }
             }
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
