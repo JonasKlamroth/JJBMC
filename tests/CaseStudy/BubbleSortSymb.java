@@ -13,7 +13,7 @@ class BubbleSortSymb {
       @ assignable arr[*];
       @*/
     @Verifyable
-    @Unwind(number = 6)
+    @Unwind(number = 7)
     static int[] sort(int arr[]) {
         //@ loop_invariant j <= arr.length - 1 && j >= -1;
         //@ loop_invariant (\forall int k; k > j && k < arr.length; (\forall int k1; k1 >= 0 && k1 < k; arr[k1] <= arr[k]));

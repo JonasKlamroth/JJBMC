@@ -216,7 +216,7 @@ public class TestSuite {
 
     //@ requires t2 != null;
     //@ assignable t2.*;
-    @Verifyable
+    @Fails
     private void assignableTest11() {
         TestSuite testSuite = new TestSuite();
         testSuite = t2;
@@ -396,8 +396,9 @@ public class TestSuite {
     //@ assignable \nothing;
     @Verifyable
     private void assignableTest16() {
-        TestSuite t2 = new TestSuite();
-        t2 = new TestSuite();
+        int i = 0;
+        ++i;
+        assert i == 1;
     }
 
     //@ assignable \nothing;
@@ -640,4 +641,36 @@ public class TestSuite {
     //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
     @Verifyable
     private void nestedQuantifierTest2() {}
+
+    //@ ensures (\forall int i; i >= 3 && i < 5; (\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void nestedQuantifierTest4() {}
+
+    //@ ensures (\forall int i; i >= 2 && i < 6; (\forall int j; j >= 0 && j < 3; i > j));
+    @Fails
+    private void nestedQuantifierTest5() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void nestedQuantifierTest6() {}
+
+    //@ ensures (\exists int i; i >= -4 && i < 0; (\exists int j; j >= 0 && j < 2; i > j));
+    @Fails
+    private void nestedQuantifierTest7() {}
+
+    //@ ensures (\forall int i; i >= 5 && i < 10; (\forall int j; j >= 0 && j < 2; (\exists int k; k >= 2 && k < 5; i > k && k > j)));
+    @Verifyable
+    private void nestedQuantifierTest8() {}
+
+    //@ ensures (\forall int i; i >= 5 && i < 10; (\forall int j; j >= 0 && j < 2; (\exists int k; k >= 6 && k < 10; i > k && k > j)));
+    @Fails
+    private void nestedQuantifierTest9() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 10; (\exists int j; j >= 0 && j < 10; (\forall int k; k >= 2 && k < 5; i > k && k > j)));
+    @Verifyable
+    private void nestedQuantifierTest10() {}
+
+    //@ ensures (\exists int i; i >= 5 && i < 10; (\exists int j; j >= 0 && j < 2; (\forall int k; k >= 6 && k < 10; i > k && k > j)));
+    @Fails
+    private void nestedQuantifierTest11() {}
 }

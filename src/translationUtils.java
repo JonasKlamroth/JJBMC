@@ -360,21 +360,37 @@ public class translationUtils {
      * Inserts the given Statement into the given ifStatement or returns it in a list if the ifstatement is null
      *
      * @param ist the ifstatement to be inserted to
-     * @param expr the statement to be inserted
+     * @param statement the statement to be inserted
      * @return
      */
-    public List<JCStatement> insertIntoIf(JCIf ist, JCStatement expr) {
+    public List<JCStatement> insertIntoIf(JCIf ist, JCStatement statement) {
         List<JCStatement> newStatements = List.nil();
         if (ist != null) {
             if (ist.thenpart == null) {
-                ist.thenpart = expr;
+                ist.thenpart = statement;
             } else if (ist.thenpart instanceof JCBlock) {
-                ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(expr);
+                ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(statement);
             } else {
-                ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(expr));
+                ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(statement));
             }
         } else {
-            newStatements = newStatements.append(expr);
+            newStatements = newStatements.append(statement);
+        }
+        return newStatements;
+    }
+
+    public List<JCStatement> insertIntoElse(JCIf ist, JCStatement st) {
+        List<JCStatement> newStatements = List.nil();
+        if (ist != null) {
+            if (ist.elsepart == null) {
+                ist.elsepart = st;
+            } else if (ist.elsepart instanceof JCBlock) {
+                ((JCBlock) ist.elsepart).stats = ((JCBlock) ist.elsepart).stats.append(st);
+            } else {
+                ist.elsepart = M.Block(0L, List.of(ist.elsepart).append(st));
+            }
+        } else {
+            newStatements = newStatements.append(st);
         }
         return newStatements;
     }

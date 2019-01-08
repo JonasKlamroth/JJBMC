@@ -111,7 +111,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         JCExpression copy = expressionVisitor.copy(that.expression);
         returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
-        JCIf ist = expressionVisitor.getOutermostIf();
+        JCIf ist = expressionVisitor.getInnermostIf();
         oldVars = expressionVisitor.getOldVars();
         if(returnBool != null) {
             if(isGoodQuantifier(transUtils.unwrapExpression(that.expression))) {
