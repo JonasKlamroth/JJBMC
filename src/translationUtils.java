@@ -349,31 +349,43 @@ public class translationUtils {
     public List<JCStatement> assumeOrAssertInIf(JCIf ist, JCExpression expr, VerifyFunctionVisitor.TranslationMode transMode) {
         List<JCStatement> newStatements = List.nil();
         if(transMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            if (ist != null) {
-                if (ist.thenpart == null) {
-                    ist.thenpart = translationUtils.makeAssumeStatement(expr, M);
-                } else if (ist.thenpart instanceof JCBlock) {
-                    ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(expr, M));
-                } else {
-                    ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(expr, M)));
-                }
-            } else {
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(expr, M));
-            }
+            newStatements = insertIntoIf(ist, makeAssumeStatement(expr, M));
         } else if (transMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
-            if (ist != null) {
-                if (ist.thenpart == null) {
-                    ist.thenpart = translationUtils.makeAssertStatement(expr, M);
-                } else if (ist.thenpart instanceof JCBlock) {
-                    ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(expr, M));
-                } else {
-                    ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(expr, M)));
-                }
-            } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(expr, M));
-            }
+            newStatements = insertIntoIf(ist, makeAssertStatement(expr, M));
         }
         return newStatements;
+    }
+
+    /**
+     * Inserts the given Statement into the given ifStatement or returns it in a list if the ifstatement is null
+     *
+     * @param ist the ifstatement to be inserted to
+     * @param expr the statement to be inserted
+     * @return
+     */
+    public List<JCStatement> insertIntoIf(JCIf ist, JCStatement expr) {
+        List<JCStatement> newStatements = List.nil();
+        if (ist != null) {
+            if (ist.thenpart == null) {
+                ist.thenpart = expr;
+            } else if (ist.thenpart instanceof JCBlock) {
+                ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(expr);
+            } else {
+                ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(expr));
+            }
+        } else {
+            newStatements = newStatements.append(expr);
+        }
+        return newStatements;
+    }
+
+    public JCStatement makeAssumeOrAssertStatement(JCExpression expr, VerifyFunctionVisitor.TranslationMode mode) {
+        if(mode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
+            return makeAssertStatement(expr, M);
+        } else if(mode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
+            return makeAssumeStatement(expr, M);
+        }
+        throw new RuntimeException("Cant create assume or assert in java mode.");
     }
 }
 

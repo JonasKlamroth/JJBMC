@@ -22,12 +22,22 @@ public class TmpTest {
         assert(false);
     }*/
 
+    //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
+    @Verifyable
+    private void negatedQuantifierTest() {}
+
+    //@ ensures (\forall int i; i >= 0 && i < 3; (\exists int j; j >= -1 && j < 3; i > j));
+    @Verifyable
+    private void nestedQuantifierTest3() {}
+
+    //@ ensures !(\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
     @Fails
-    private void assumeTest() {
-        {
-            //@ assume false;
-        }
-        assert false;
-    }
+    private void negatedQuantifierTest2() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void nestedQuantifierTest2() {}
+
+
 
 }

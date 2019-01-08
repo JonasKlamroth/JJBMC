@@ -27,9 +27,9 @@ public class TestSuite {
     }
 
     //@ requires (\forall int i; i > 0 && i < 10; 3 + 10 > i);
-    //@ requires (\exists int i; i > 0 && i < 10; 3 + 10 > i);
+    //@ requires (\exists int j; j > 0 && j < 10; 3 + 10 > j);
     //@ ensures (\forall int i; i > 0 && i < 10; 3 + 10 > i);
-    //@ ensures (\exists int i; i > 0 && i < 10; 3 + 10 > i);
+    //@ ensures (\exists int j; j > 0 && j < 10; 3 + 10 > j);
     @Verifyable
     public void quantTest4() {
         //this is basically a lemma
@@ -604,10 +604,6 @@ public class TestSuite {
     @Verifyable
     private void nestedQuantifierTest3() {}
 
-    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
-    @Verifyable
-    private void nestedQuantifierTest2() {}
-
     //@ ensures !(\forall int i; i >= 0 && i < 3; (\exists int j; j >= 0 && j < 3; j > i));
     @Verifyable
     private void negatedQuantifierTest() {}
@@ -620,10 +616,6 @@ public class TestSuite {
     @Fails
     private void negatedQuantifierTest3() {}
 
-    //@ ensures !(\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
-    @Fails
-    private void negatedQuantifierTest2() {}
-
     //@ ensures (\exists int i; i >= 0 && i < 3; !(\forall int j; j >= 0 && j < 2; i > j));
     @Verifyable
     private void negatedQuantifierTest4() {}
@@ -631,4 +623,12 @@ public class TestSuite {
     //@ ensures (\exists int i; i >= 3 && i < 5; !(\forall int j; j >= 0 && j < 2; i > j));
     @Fails
     private void negatedQuantifierTest5() {}
+
+    //@ ensures !(\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
+    @Fails
+    private void negatedQuantifierTest2() {}
+
+    //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 2; i > j));
+    @Verifyable
+    private void nestedQuantifierTest2() {}
 }

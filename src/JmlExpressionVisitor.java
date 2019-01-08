@@ -190,7 +190,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         returnBool = null;
-        JmlQuantifiedExpr copy = that;
+        JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         if(negated) {
             if(copy.op == JmlTokenKind.BSFORALL) {
                 copy.op = JmlTokenKind.BSEXISTS;
@@ -218,7 +218,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
                 JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
-                newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
+                newStatements = newStatements.appendList(transUtils.insertIntoIf(outermostIf, M.Exec(M.Assign(M.Ident(boolVar), b))));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
@@ -235,7 +235,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
-                newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
+                newStatements = newStatements.appendList(transUtils.insertIntoIf(outermostIf, M.Exec(M.Assign(M.Ident(boolVar), b))));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));

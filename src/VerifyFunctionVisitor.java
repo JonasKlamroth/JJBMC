@@ -113,70 +113,47 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         newStatements = expressionVisitor.getNewStatements();
         JCIf ist = expressionVisitor.getOutermostIf();
         oldVars = expressionVisitor.getOldVars();
-        if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
-            if(returnBool != null) {
-                if(ist != null) {
-                    if (ist.thenpart == null) {
-                        ist.thenpart = translationUtils.makeAssertStatement(M.Ident(returnBool), M);
-                    } else if (ist.thenpart instanceof JCBlock) {
-                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
-                    } else {
-                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(M.Ident(returnBool), M)));
-                    }
-                } else {
-                    newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
-                }
-                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-                newStatements = List.of(ifstmt);
-                //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
+        if(returnBool != null) {
+            if(isGoodQuantifier(transUtils.unwrapExpression(that.expression))) {
+                newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(ist, M.Ident(returnBool), translationMode));
             } else {
-                if(ist != null) {
-                    if(ist.thenpart == null) {
-                        ist.thenpart = translationUtils.makeAssertStatement(copy, M);
-                    } else if(ist.thenpart instanceof JCBlock) {
-                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssertStatement(copy, M));
-                    } else {
-                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssertStatement(copy, M)));
-                    }
-                } else {
-                    newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
-                }
-                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-                newStatements = List.of(ifstmt);
-                //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
+                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(M.Ident(returnBool), translationMode));
             }
+        } else {
+            if(isGoodQuantifier(transUtils.unwrapExpression(that.expression))) {
+                newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(ist, copy, translationMode));
+            } else {
+                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
+            }
+        }
+        if(translationMode == TranslationMode.ASSERT) {
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
-        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME){
-            if(returnBool != null) {
-                if(ist != null) {
-                    if (ist.thenpart == null) {
-                        ist.thenpart = translationUtils.makeAssumeStatement(M.Ident(returnBool), M);
-                    } else if (ist.thenpart instanceof JCBlock) {
-                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
-                    } else {
-                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M)));
-                    }
-                } else {
-                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M));
-                }
-            } else {
-                if(ist != null) {
-                    if (ist.thenpart == null) {
-                        ist.thenpart = translationUtils.makeAssumeStatement(copy, M);
-                    } else if (ist.thenpart instanceof JCBlock) {
-                        ((JCBlock) ist.thenpart).stats = ((JCBlock) ist.thenpart).stats.append(translationUtils.makeAssumeStatement(copy, M));
-                    } else {
-                        ist.thenpart = M.Block(0L, List.of(ist.thenpart).append(translationUtils.makeAssumeStatement(copy, M)));
-                    }
-                } else {
-                    newStatements = newStatements.append(translationUtils.makeAssumeStatement(copy, M));
-                }
-            }
+        } else if(translationMode == TranslationMode.ASSUME) {
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         return M.JmlMethodClauseExpr(that.token, copy);
+    }
+
+    private boolean isGoodQuantifier(JCExpression expr) {
+        boolean negated = false;
+        if(expr instanceof JCUnary) {
+            if(expr.getTag() == Tag.NOT) {
+                expr = ((JCUnary) expr).arg;
+                negated = true;
+            }
+        }
+        expr = transUtils.unwrapExpression(expr);
+        if(!(expr instanceof JmlQuantifiedExpr)) {
+            return false;
+        }
+        JmlQuantifiedExpr qexpr = (JmlQuantifiedExpr)expr;
+        if(!negated && qexpr.op == JmlTokenKind.BSFORALL && translationMode == TranslationMode.ASSUME) return false;
+        if(!negated && qexpr.op == JmlTokenKind.BSEXISTS && translationMode == TranslationMode.ASSERT) return false;
+        if(negated && qexpr.op == JmlTokenKind.BSFORALL && translationMode == TranslationMode.ASSERT) return false;
+        if(negated && qexpr.op == JmlTokenKind.BSEXISTS && translationMode == TranslationMode.ASSUME) return false;
+        return true;
     }
 
 
