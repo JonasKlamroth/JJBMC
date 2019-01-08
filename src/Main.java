@@ -69,7 +69,7 @@ public class Main {
             return;
         }
         boolean keepTmpFile = false;
-        boolean filterOutput = false;
+        boolean filterOutput = true;
         int unwinds = -1;
         String fileName = args[0];
         String function = args[1];
@@ -154,12 +154,15 @@ public class Main {
 
             s = stdInput.readLine();
             String out = "";
+            String fullOut = "";
             if (s != null) {
-                out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
+                out += "JBMC Output" + (filterOutput ? " (filtered)" : "") +  "f or file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
+                fullOut += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
                 while (s != null) {
                     if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
                         out += s + "\n";
                     }
+                    fullOut += s + "\n";
                     s = stdInput.readLine();
                 }
                 s = stdError.readLine();
@@ -167,9 +170,14 @@ public class Main {
                     if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
                         out += s + "\n";
                     }
+                    fullOut += s + "\n";
                     s = stdError.readLine();
                 }
-                System.out.println(out);
+                if(out.equals("")) {
+                    System.out.println(fullOut);
+                } else {
+                    System.out.println(out);
+                }
             }
         } catch (IOException e) {
             System.out.println("Error running jbmc.");
