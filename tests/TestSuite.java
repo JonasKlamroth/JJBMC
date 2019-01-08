@@ -592,6 +592,15 @@ public class TestSuite {
         return f;
     }
 
+    @Verifyable
+    private void trivialTest() {
+        int i = 0;
+        i = i + 5;
+        //@ assert i == 5;
+        i++;
+        //@ assert i == 6;
+    }
+
     //@ ensures (\exists int i; i >= 0 && i < 3; (\forall int j; j >= 0 && j < 3; j > i));
     @Fails
     private void nestedQuantifierTest() {}

@@ -2,11 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/NormalHammingWeight.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" afterPath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/translationUtils.java" afterPath="$PROJECT_DIR$/src/translationUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestExecutor.java" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestSuite.java" afterPath="$PROJECT_DIR$/tests/TestSuite.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -58,12 +59,22 @@
       <file leaf-file-name="JmlExpressionVisitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="192" column="34" lean-forward="false" selection-start-line="192" selection-start-column="34" selection-end-line="192" selection-end-column="34" />
+            <state relative-caret-position="256">
+              <caret line="547" column="14" lean-forward="false" selection-start-line="547" selection-start-column="14" selection-end-line="547" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1546942845853" expanded="true" signature="35051:35057" ph=" }" />
+                <marker date="1546945874550" expanded="true" signature="35076:35082" ph=" }" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NormalHammingWeighttmp.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeighttmp.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="200">
+              <caret line="53" column="20" lean-forward="true" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -80,22 +91,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="translationUtils.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/translationUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6500">
-              <caret line="353" column="56" lean-forward="false" selection-start-line="353" selection-start-column="56" selection-end-line="353" selection-end-column="56" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#20629#20630#0" expanded="false" />
-                <element signature="e#20661#20662#0" expanded="false" />
-                <element signature="e#20704#20705#0" expanded="false" />
-                <element signature="e#20736#20737#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="VerifyFunctionVisitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -106,7 +101,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TmpTesttmp.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="TmpTesttmp.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="9">
@@ -116,11 +111,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestSuite.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
+      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="608" column="43" lean-forward="true" selection-start-line="606" selection-start-column="4" selection-end-line="608" selection-end-column="43" />
+            <state relative-caret-position="400">
+              <caret line="142" column="81" lean-forward="false" selection-start-line="142" selection-start-column="81" selection-end-line="142" selection-end-column="81" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -128,12 +123,34 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestSuitetmp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/TestSuitetmp.java">
+      <file leaf-file-name="HammingWeight.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="1211" column="30" lean-forward="true" selection-start-line="1211" selection-start-column="30" selection-end-line="1211" selection-end-column="30" />
+            <state relative-caret-position="400">
+              <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NormalHammingWeight.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeight.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="320">
+              <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestSuite.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="400">
+              <caret line="600" column="26" lean-forward="false" selection-start-line="600" selection-start-column="26" selection-end-line="600" selection-end-column="26" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -141,9 +158,11 @@
       <file leaf-file-name="TestExecutor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3120">
-              <caret line="177" column="13" lean-forward="false" selection-start-line="177" selection-start-column="13" selection-end-line="177" selection-end-column="13" />
-              <folding />
+            <state relative-caret-position="-774">
+              <caret line="178" column="9" lean-forward="true" selection-start-line="178" selection-start-column="9" selection-end-line="178" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -160,7 +179,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>methodIn</find>
       <find>methodInvo</find>
       <find>methodInvoc</find>
       <find>methodInvoca</find>
@@ -190,6 +208,7 @@
       <find>quanttest4</find>
       <find>negat</find>
       <find>quantifie</find>
+      <find>visitAs</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -238,22 +257,23 @@
         <option value="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/BubbleSort.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/BubbleSortSymb.java" />
-        <option value="$PROJECT_DIR$/src/Main.java" />
         <option value="$PROJECT_DIR$/src/BaseVisitor.java" />
         <option value="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
-        <option value="$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/ToUnsinged.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/ToUnsigned.java" />
         <option value="$PROJECT_DIR$/tests/TestSuitetmp.java" />
         <option value="$PROJECT_DIR$/tests/FailingTests.java" />
-        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
         <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java" />
         <option value="$PROJECT_DIR$/src/translationUtils.java" />
-        <option value="$PROJECT_DIR$/tests/TestSuite.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
-        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
         <option value="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
+        <option value="$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java" />
+        <option value="$PROJECT_DIR$/src/Main.java" />
+        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/TestSuite.java" />
+        <option value="$PROJECT_DIR$/tests/NormalHammingWeight.java" />
       </list>
     </option>
   </component>
@@ -428,28 +448,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runTmpTest">
-    <configuration default="false" name="TestExecutor.runFailingTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="openjmlivil" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runFailingTests" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Application.Main">
     <configuration default="false" name="TestExecutor.runTmpTest" type="JUnit" factoryName="JUnit" singleton="true" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="openjmlivil" />
@@ -532,6 +531,21 @@
       </option>
       <envs />
       <patterns />
+      <method />
+    </configuration>
+    <configuration default="false" name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="tests/NormalHammingWeight.java weight2 33" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="openjmlivil" />
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
@@ -688,19 +702,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runFailingTests" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.test" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.testTranslation" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.test" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.testTranslation" />
+      <item index="4" class="java.lang.String" itemvalue="Application.Main" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.testTranslation" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.test" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runFailingTests" />
+        <item index="0" class="java.lang.String" itemvalue="Application.Main" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.testTranslation" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.test" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
       </list>
     </recent_temporary>
   </component>
@@ -788,7 +802,14 @@
       <option name="project" value="LOCAL" />
       <updated>1546868672017</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="BROKEN: towards fixing bug if/assume conditions of quntified expressions 2">
+      <created>1546943189213</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1546943189213</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -834,7 +855,7 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.501" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.331" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -906,7 +927,8 @@
     <MESSAGE value="assignmentchecks for assignops and post and pre inc/dec now supported" />
     <MESSAGE value="jmlassume assert now supported" />
     <MESSAGE value="BROKEN: towards fixing bug if/assume conditions of quntified expressions" />
-    <option name="LAST_COMMIT_MESSAGE" value="BROKEN: towards fixing bug if/assume conditions of quntified expressions" />
+    <MESSAGE value="BROKEN: towards fixing bug if/assume conditions of quntified expressions 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="BROKEN: towards fixing bug if/assume conditions of quntified expressions 2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1009,20 +1031,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/main/Main.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="47" column="13" lean-forward="false" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/Main.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="940">
-          <caret line="117" column="29" lean-forward="false" selection-start-line="117" selection-start-column="29" selection-end-line="117" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/TreeCopier.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -1122,13 +1130,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/openjmlout.txt" />
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/io/PrintStream.java" />
-    <entry file="file://$PROJECT_DIR$/src/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlSpecs.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="20380">
@@ -1155,13 +1156,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeighttmp.java" />
-    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1140">
-          <caret line="58" column="23" lean-forward="false" selection-start-line="58" selection-start-column="23" selection-end-line="58" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/ToUnsignedtmp.java" />
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/ToUnsigned.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1191,14 +1185,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
           <caret line="8" column="14" lean-forward="false" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3120">
-          <caret line="177" column="13" lean-forward="false" selection-start-line="177" selection-start-column="13" selection-end-line="177" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -1247,16 +1233,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="608" column="43" lean-forward="true" selection-start-line="606" selection-start-column="4" selection-end-line="608" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="164">
@@ -1267,13 +1243,38 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="192" column="34" lean-forward="false" selection-start-line="192" selection-start-column="34" selection-end-line="192" selection-end-column="34" />
+        <state relative-caret-position="9">
+          <caret line="66" column="7" lean-forward="true" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="73" column="0" lean-forward="false" selection-start-line="73" selection-start-column="0" selection-end-line="73" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-774">
+          <caret line="178" column="9" lean-forward="true" selection-start-line="178" selection-start-column="9" selection-end-line="178" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1546942845853" expanded="true" signature="35051:35057" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="142" column="81" lean-forward="false" selection-start-line="142" selection-start-column="81" selection-end-line="142" selection-end-column="81" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1286,10 +1287,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
+    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9">
-          <caret line="66" column="7" lean-forward="true" selection-start-line="66" selection-start-column="7" selection-end-line="66" selection-end-column="7" />
+        <state relative-caret-position="256">
+          <caret line="547" column="14" lean-forward="false" selection-start-line="547" selection-start-column="14" selection-end-line="547" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <marker date="1546945874550" expanded="true" signature="35076:35082" ph=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeighttmp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="53" column="20" lean-forward="true" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestSuite.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="600" column="26" lean-forward="false" selection-start-line="600" selection-start-column="26" selection-end-line="600" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeight.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
           <folding />
         </state>
       </provider>

@@ -64,9 +64,7 @@ public class TestExecutor {
 
     @org.junit.Test
     public void testTranslation() throws IOException, InterruptedException {
-        cleanup();
         for(String fileName : fileNames) {
-
             try {
                 File f = new File(fileName);
                 String translation = Main.translate(f);

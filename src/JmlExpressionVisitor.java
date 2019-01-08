@@ -545,7 +545,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(cond != null) {
             JCIf ifst = M.If(cond, makeException("Illegal assignment: " + assign.toString()), null);
             newStatements = newStatements.append(ifst);
-            newStatements = newStatements.append(M.Exec(assign));
+            //newStatements = newStatements.append(M.Exec(assign));
         }
         return super.visitAssignment(node, p);
     }
@@ -565,7 +565,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return copy;
         } else {
-            throw new RuntimeException("Illegal assignment.");
+            throw new RuntimeException("Unkonwn assignment type " + copy.toString());
         }
     }
 
