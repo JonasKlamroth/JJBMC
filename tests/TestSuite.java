@@ -216,10 +216,18 @@ public class TestSuite {
 
     //@ requires t2 != null;
     //@ assignable t2.*;
-    @Fails
+    @Verifyable
     private void assignableTest11() {
         TestSuite testSuite = new TestSuite();
         testSuite = t2;
+        testSuite.arr = new int[10];
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.*;
+    @Fails
+    private void assignableTest111() {
+        TestSuite testSuite = new TestSuite();
         testSuite.arr = new int[10];
     }
 
@@ -407,6 +415,44 @@ public class TestSuite {
         TestSuite t2 = new TestSuite();
         t2 = new TestSuite();
         this.t2 = new TestSuite();
+    }
+
+    //@ assignable \nothing;
+    @Verifyable
+    private void assignableTest171() {
+        TestSuite t2 = new TestSuite();
+        t2 = new TestSuite();
+    }
+
+    //@ assignable t2;
+    @Verifyable
+    private void assignableTest172() {
+        TestSuite t2 = new TestSuite();
+        t2 = new TestSuite();
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2;
+    @Fails
+    private void assignableTest173() {
+        TestSuite t2 = this.t2;
+        t2.t2 = new TestSuite();
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.t2;
+    @Fails
+    private void assignableTest174() {
+        TestSuite t2 = new TestSuite();
+        t2.t2 = new TestSuite();
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.t2;
+    @Verifyable
+    private void assignableTest175() {
+        TestSuite t2 = this.t2;
+        t2.t2 = new TestSuite();
     }
 
     @Verifyable

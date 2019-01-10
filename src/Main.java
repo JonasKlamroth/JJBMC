@@ -1,18 +1,22 @@
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.*;
-import com.sun.tools.javac.util.List;
 import org.jmlspecs.openjml.*;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static com.sun.org.apache.bcel.internal.util.SecuritySupport.getResourceAsStream;
 
 
 /**
@@ -24,6 +28,7 @@ public class Main {
 
     public static final void main(String[] args) throws Exception {
         translateAndRunJBMC(args);
+        //cleanUp();
     }
 
     static JCTree rewriteRAC(JmlTree.JmlCompilationUnit cu, Context context) {
@@ -73,6 +78,7 @@ public class Main {
         int unwinds = -1;
         String fileName = args[0];
         String function = args[1];
+        createCProverFolder(fileName);
         try {
             if(args.length > 2) {
                 unwinds = Integer.parseInt(args[2]);
@@ -186,9 +192,35 @@ public class Main {
         }
     }
 
+    private static void createCProverFolder(String fileName) {
+        File f = new File(fileName);
+        File dir = new File(f.getParent() + File.separator + "org" + File.separator + "cprover");
+        dir.mkdirs();
+        try {
+            InputStream is = Main.class.getResourceAsStream("CProver.java");
+            String content = convertStreamToString(is);
+            File to = new File(dir.toPath() + File.separator + "CProver.java");
+            Files.write(to.toPath(), content.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error trying to copy CProver.java");
+        }
+    }
 
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
 
-
+    private static void cleanUp() {
+        try {
+            Files.delete(new File("org" + File.separator + "cprover" + File.separator + "CProver.java").toPath());
+            Files.delete(new File("org" + File.separator + "cprover").toPath());
+            Files.delete(new File("org").toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     static class CostumPrintStream extends PrintStream {
         static private boolean filtered = false;
