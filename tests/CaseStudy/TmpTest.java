@@ -10,14 +10,18 @@ import org.cprover.CProver;
 public class TmpTest {
     int[] arr;
     TmpTest t2;
+    public int pubInt;
     private int privInt;
     TmpTest[] objects;
 
-    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[2] != null;
-    //@ assignable t2.objects[0..1].t2;
+    /*@ assignable t2.t2.pubInt;
+      @ */
     @Fails
-    private void assignableTest15() {
-        t2.objects[2].t2 = new TmpTest();
+    private void assignalbeTest6(TmpTest t3) {
+        t3 = new TmpTest();
+        t3.pubInt = 5;
+        t3.t2 = new TmpTest();
+        t3.t2.pubInt = 10;
     }
 
 }

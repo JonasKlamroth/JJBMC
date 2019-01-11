@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExecutor {
 
-    static String[] fileNames = {"./tests/TestSuite.java"};
+    static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java"};
     private File tmpFile = new File("./tests/tmp.java");
     private boolean keepTmpFile = true;
     private boolean filterOutput = true;
@@ -35,36 +35,43 @@ public class TestExecutor {
     @org.junit.Test
     public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/BubbleSortSymb.java"};
-        testTranslation();
+        runAllTests();
     }
 
     @org.junit.Test
     public void runHammingWeightCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/HammingWeight.java"};
-        testTranslation();
+        runAllTests();
     }
 
     @org.junit.Test
     public void runToUnsingedCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/ToUnsigned.java"};
-        testTranslation();
+        runAllTests();
     }
 
     @org.junit.Test
     public void runTmpTest() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/TmpTest.java"};
-        testTranslation();
+        runAllTests();
     }
 
     @org.junit.Test
     public void runFailingTests() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/FailingTests.java"};
-        testTranslation();
+        runAllTests();
     }
 
     @org.junit.Test
-    public void testTranslation() throws IOException, InterruptedException {
+    public void runAssignableTests() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/AssignableTests.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
+    public void runAllTests() throws IOException, InterruptedException {
         for(String fileName : fileNames) {
+            cleanup();
             try {
                 File f = new File(fileName);
                 String translation = Main.translate(f);
@@ -257,6 +264,9 @@ class FunctionNameVisitor extends JmlTreeScanner {
     }
 
     static void parseFile(String fileName) {
+        functionNames = new ArrayList();
+        functionBehaviours = new ArrayList<>();
+        unwinds = new ArrayList<>();
         try {
             String[] args = {fileName};
             IAPI api = Factory.makeAPI();

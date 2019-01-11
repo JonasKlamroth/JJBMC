@@ -585,36 +585,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
-    public JCExpression editAssignable(JCIdent e) {
-        JCIdent lhs = e;
-        if(lhs.type.isPrimitive()) {
-            if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                    .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
-                return M.Literal(true);
-            }
-            return M.Literal(false);
-        } else {
-            List<JCIdent> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                    .map(as -> (JCIdent)as)
-                    .filter(as -> !as.type.isPrimitive())
-                    .collect(Collectors.toList()));
-            if(pot.size() == 0) {
-                return M.Literal(true);
-            }
-            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
-            if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.")) {
-                expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), lhs);
-            }
-            for(int i = 1; i < pot.size(); ++i) {
-                if(!pot.get(i).sym.owner.equals(currentSymbol) && !pot.get(i).toString().startsWith("this.")) {
-                    expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(i)), lhs);
-                } else {
-                    expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs));
-                }
-            }
-            return expr;
-        }
-    }
+
 
     public JCThrow makeException(String msg) {
         JCExpression ty = M.Type(syms.runtimeExceptionType);
@@ -631,7 +602,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         ArrayList<Symbol> params = new ArrayList<>();
         currentMethod.params.stream().map(vd -> vd.sym).forEach(s -> params.add(s));
         if(e instanceof JCIdent) {
-            if(!ignoreLocals && ((JCIdent) e).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) e).sym)) {
+            if(!ignoreLocals && ((JCIdent) e).sym.owner.equals(currentSymbol)) {
                 return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
@@ -659,15 +630,49 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
+    public JCExpression editAssignable(JCIdent e) {
+        JCIdent lhs = e;
+        if(lhs.type.isPrimitive()) {
+            if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                    .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
+                return M.Literal(true);
+            }
+            return M.Literal(false);
+        } else {
+            List<JCIdent> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                    .map(as -> (JCIdent)as)
+                    .filter(as -> !as.type.isPrimitive())
+                    .filter(as -> as.type instanceof Type.ArrayType == e.type instanceof Type.ArrayType)
+                    .collect(Collectors.toList()));
+            if(pot.size() == 0) {
+                return M.Literal(true);
+            }
+            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
+            if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.")) {
+                expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), lhs);
+            }
+            for(int i = 1; i < pot.size(); ++i) {
+                if(!pot.get(i).sym.owner.equals(currentSymbol) && !pot.get(i).toString().startsWith("this.")) {
+                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(i)), lhs);
+                    expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+                } else {
+                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs);
+                    expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+                }
+            }
+            return expr;
+        }
+    }
+
     public JCExpression editAssignable(JCArrayAccess e) {
         JCArrayAccess lhs = e;
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
                 .map(arr -> ((JmlStoreRefArrayRange)arr))
                 .collect(Collectors.toList()));
-        if(pot.size() == 0) {
-            return editAssignable(lhs.indexed);
-        }
         JCExpression expr = editAssignable(lhs.indexed);
+        if(pot.size() == 0) {
+            return expr;
+        }
         JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.indexed);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
@@ -699,6 +704,56 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
         }
         return expr;
+    }
+
+    public JCExpression editAssignable(JCFieldAccess f) {
+        List<JCFieldAccess> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
+                .map(arr -> ((JCFieldAccess)arr))
+                .filter(fa -> fa.name == f.name || fa.name == null)
+                .collect(Collectors.toList()));
+        List<JCIdent> pot1 = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                .map(arr -> ((JCIdent)arr))
+                .filter(i -> !i.type.isPrimitive())
+                .collect(Collectors.toList()));
+
+        JCExpression expr = null;
+        for(JCFieldAccess fa : pot) {
+            if(expr == null) {
+                expr = editAssignable(f.selected, fa.selected, true);
+            } else {
+                expr = treeutils.makeAnd(Position.NOPOS, expr, editAssignable(f.selected, fa.selected, true));
+            }
+
+        }
+        for(JCIdent i : pot1) {
+            if(expr == null) {
+                expr = treeutils.makeNeqObject(Position.NOPOS, i, f);
+            } else {
+                expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, i, f));
+            }
+        }
+        if(expr == null) {
+            return M.Literal(true);
+        }
+        return expr;
+    }
+
+    private JCExpression editAssignable(JCExpression lhs, JCExpression assignable) {
+        List tmp = currentAssignable;
+        currentAssignable = List.of(assignable);
+        JCExpression res = editAssignable(lhs, false);
+        currentAssignable = tmp;
+        return res;
+
+    }
+
+    private JCExpression editAssignable(JCExpression lhs, JCExpression assignable, boolean ignoreLocals) {
+        List tmp = currentAssignable;
+        currentAssignable = List.of(assignable);
+        JCExpression res = editAssignable(lhs, ignoreLocals);
+        currentAssignable = tmp;
+        return res;
+
     }
 
     @Override
@@ -806,55 +861,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return (JCIf)node;
     }
 
-    public JCExpression editAssignable(JCFieldAccess f) {
-        List<JCFieldAccess> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
-                .map(arr -> ((JCFieldAccess)arr))
-                .filter(fa -> fa.name == f.name || fa.name == null)
-                .collect(Collectors.toList()));
-        List<JCIdent> pot1 = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                .map(arr -> ((JCIdent)arr))
-                .filter(i -> !i.type.isPrimitive())
-                .collect(Collectors.toList()));
 
-        JCExpression expr = null;
-        for(JCFieldAccess fa : pot) {
-            if(expr == null) {
-                expr = editAssignable(f.selected, fa.selected, true);
-            } else {
-                expr = treeutils.makeAnd(Position.NOPOS, expr, editAssignable(f.selected, fa.selected, true));
-            }
-
-        }
-        for(JCIdent i : pot1) {
-            if(expr == null) {
-                expr = treeutils.makeNeqObject(Position.NOPOS, i, f);
-            } else {
-                expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, i, f));
-            }
-        }
-        if(expr == null) {
-            return M.Literal(true);
-        }
-        return expr;
-    }
-
-    private JCExpression editAssignable(JCExpression lhs, JCExpression assignable) {
-        List tmp = currentAssignable;
-        currentAssignable = List.of(assignable);
-        JCExpression res = editAssignable(lhs, false);
-        currentAssignable = tmp;
-        return res;
-
-    }
-
-    private JCExpression editAssignable(JCExpression lhs, JCExpression assignable, boolean ignoreLocals) {
-        List tmp = currentAssignable;
-        currentAssignable = List.of(assignable);
-        JCExpression res = editAssignable(lhs, ignoreLocals);
-        currentAssignable = tmp;
-        return res;
-
-    }
 
     public List<JCStatement> getNewStatements() {
         return newStatements;
