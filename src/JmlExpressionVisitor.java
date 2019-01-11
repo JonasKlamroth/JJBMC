@@ -599,8 +599,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCExpression e, boolean ignoreLocals) {
-        ArrayList<Symbol> params = new ArrayList<>();
-        currentMethod.params.stream().map(vd -> vd.sym).forEach(s -> params.add(s));
         if(e instanceof JCIdent) {
             if(!ignoreLocals && ((JCIdent) e).sym.owner.equals(currentSymbol)) {
                 return M.Literal(false);
@@ -609,11 +607,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         } else if(e instanceof JCArrayAccess) {
             JCExpression expr =  ((JCArrayAccess) e).indexed;
             if(expr instanceof JCIdent) {
-                if(((JCIdent) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCIdent) expr).sym)) {
+                if(((JCIdent) expr).sym.owner.equals(currentSymbol)) {
                     return M.Literal(false);
                 }
             } else if(expr instanceof JCFieldAccess) {
-                if(((JCFieldAccess) expr).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) expr).sym)) {
+                if(((JCFieldAccess) expr).sym.owner.equals(currentSymbol)) {
                     return M.Literal(false);
                 }
             } else {

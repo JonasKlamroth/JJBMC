@@ -80,17 +80,7 @@ public class AssignableTests {
         arr1[4] = 2;
     }
 
-//    /*@ assignable t2.*;
-//      @ */
-//    @Fails
-//    private void assignalbeTest5(TestSuite t3) {
-//        t3 = new TestSuite();
-//        t3.pubInt = 5;
-//        t3.t2 = new TestSuite();
-//        t3.t2.pubInt = 10;
-//        t3.arr = new int[10];
-//        t3.arr[5] = 10;
-//    }
+
 
     /*@ assignable t2.t2.pubInt;
       @ */
@@ -120,7 +110,7 @@ public class AssignableTests {
         }
     }
 
-    /*
+
     //@ requires t != null;
     //@ assignable t2.*;
     @TestAnnotations.Fails
@@ -128,7 +118,7 @@ public class AssignableTests {
         TestSuite testSuite = new TestSuite();
         testSuite = t;
         testSuite.arr = new int[10];
-    }*/
+    }
 
     //@ requires t2 != null;
     //@ assignable t2.*;
@@ -161,26 +151,24 @@ public class AssignableTests {
         objects[0] = new TestSuite();
     }
 
-    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[0] != null;
-    //@ assignable t2.objects[0..1].t2;
-    @Verifyable
-    private void assignableTest14() {
-        t2.objects[0].t2 = new TestSuite();
-    }
-
-    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[2] != null;
-    //@ assignable t2.objects[0..1].t2;
-    @Fails
-    private void assignableTest15() {
-        t2.objects[2].t2 = new TestSuite();
-    }
-
     //@ assignable \nothing;
     @Verifyable
     private void assignableTest16() {
         int i = 0;
         ++i;
         assert i == 1;
+    }
+
+    /*@ assignable t2.*;
+      @ */
+    @Fails
+    private void assignalbeTest5(TestSuite t3) {
+        t3 = new TestSuite();
+        t3.pubInt = 5;
+        t3.t2 = new TestSuite();
+        t3.t2.pubInt = 10;
+        t3.arr = new int[10];
+        t3.arr[5] = 10;
     }
 
     //@ assignable \nothing;

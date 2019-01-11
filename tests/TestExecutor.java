@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExecutor {
 
-    static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java"};
+    static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
     private File tmpFile = new File("./tests/tmp.java");
     private boolean keepTmpFile = true;
     private boolean filterOutput = true;
@@ -64,7 +64,7 @@ public class TestExecutor {
 
     @org.junit.Test
     public void runAssignableTests() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/AssignableTests.java"};
+        fileNames = new String[]{"./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
         runAllTests();
     }
 
@@ -138,7 +138,7 @@ public class TestExecutor {
                     if(unwinds.get(idx) != null) {
                         commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions"};
                     } else {
-                        commands = new String[]{"jbmc", classFile, "--function", function, "--trace"};
+                        commands = new String[]{"jbmc", classFile, "--function", function};
                     }
 
                     proc = rt.exec(commands);
