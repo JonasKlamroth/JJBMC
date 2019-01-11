@@ -13,6 +13,12 @@ public class AssignableTests {
     TestSuite t3;
     int[] arr;
     TestSuite[] objects;
+    Object o;
+    A a;
+    B b;
+
+    class A { public A a1; }
+    class B extends A { public B b1; }
 
     /*@ assignable privInt;
       @ */
@@ -21,14 +27,22 @@ public class AssignableTests {
         privInt = 0;
     }
 
-//    /*@ assignable t2;
-//      @ */
-//    @Fails
-//    private void assignalbeTest1(TestSuite t3) {
-//        t3 = new TestSuite();
-//        t3.t2 = new TestSuite();
-//        privInt = 0;
-//    }
+    //@ requires b != null;
+    //@ assignable b.a1, a;
+    @Verifyable
+    private void assignableTestInheritance() {
+        a = b;
+        a.a1 = new A();
+    }
+
+    /*@ assignable t2;
+      @ */
+    @Fails
+    private void assignalbeTest1(TestSuite t3) {
+        t3 = new TestSuite();
+        t3.t2 = new TestSuite();
+        privInt = 0;
+    }
 
     /*@ assignable arr[5];
       @ */

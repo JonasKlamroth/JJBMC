@@ -42,41 +42,46 @@ public class BaseVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
-        Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
-        classSymbol.sourcefile = that.sourcefile;
-        classSymbol.completer = null;
-        classSymbol.flatname = M.Name("ReturnException");
-        returnExcClass = M.ClassDef(M.Modifiers(8L), M.Name("ReturnException"), List.nil(),
-                M.Type(syms.runtimeExceptionType),
-                com.sun.tools.javac.util.List.nil(),
-                com.sun.tools.javac.util.List.nil());
-        returnExcClass.sym = classSymbol;
-        returnExcClass.type = classSymbol.type;
-        JmlClassDecl copy = (JmlClassDecl)super.visitJmlClassDecl(that, p);
-        List<JCTree> newDefs = List.nil();
-        FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
-        for(JCTree def : copy.defs) {
-            if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
-                fcv.copy(def);
-                functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.assignables);
-            }
-            fcv.assignables = List.nil();
-        }
-        calledFunctions.addAll(fcv.calledFunctions);
-        for(JCTree def : copy.defs) {
-            if(def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
-                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
-                if(calledFunctions.contains(((JmlMethodDecl) def).getName().toString())) {
-                    newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
+        if(!that.sym.toString().contains(".")) {
+            Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
+            classSymbol.sourcefile = that.sourcefile;
+            classSymbol.completer = null;
+            classSymbol.flatname = M.Name("ReturnException");
+            returnExcClass = M.ClassDef(M.Modifiers(8L), M.Name("ReturnException"), List.nil(),
+                    M.Type(syms.runtimeExceptionType),
+                    com.sun.tools.javac.util.List.nil(),
+                    com.sun.tools.javac.util.List.nil());
+            returnExcClass.sym = classSymbol;
+            returnExcClass.type = classSymbol.type;
+            JmlClassDecl copy = (JmlClassDecl) super.visitJmlClassDecl(that, p);
+            List<JCTree> newDefs = List.nil();
+            FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
+            for (JCTree def : copy.defs) {
+                if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
+                    fcv.copy(def);
+                    functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.assignables);
                 }
-            } else {
-                newDefs = newDefs.append(def);
+                fcv.assignables = List.nil();
             }
-        }
-        newDefs = newDefs.append(returnExcClass);
-        copy.defs = newDefs;
+            calledFunctions.addAll(fcv.calledFunctions);
+            for (JCTree def : copy.defs) {
+                if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
+                    newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
+                    if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString())) {
+                        newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
+                    }
+                } else {
+                    newDefs = newDefs.append(def);
+                }
+            }
+            newDefs = newDefs.append(returnExcClass);
+            copy.defs = newDefs;
 
-        return copy;
+            return copy;
+        } else {
+            System.out.println("NOTE: Inner classes do not get translated but only copied.");
+        }
+        return that;
     }
 
     @Override

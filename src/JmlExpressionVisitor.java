@@ -640,7 +640,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCIdent> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                     .map(as -> (JCIdent)as)
                     .filter(as -> !as.type.isPrimitive())
-                    .filter(as -> as.type instanceof Type.ArrayType == e.type instanceof Type.ArrayType)
+                    .filter(as -> isSuperType(as.type , lhs.type) || isSuperType(lhs.type , as.type))
                     .collect(Collectors.toList()));
             if(pot.size() == 0) {
                 return M.Literal(true);
@@ -660,6 +660,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return expr;
         }
+    }
+
+    private boolean isSuperType(Type base, Type sup) {
+        if(base.equals(sup)) return true;
+        if(!(base instanceof Type.ClassType) || !(sup instanceof Type.ClassType)) {
+            return false;
+        }
+        Type.ClassType b = (Type.ClassType)base;
+        return isSuperType(b.supertype_field, sup);
     }
 
     public JCExpression editAssignable(JCArrayAccess e) {
