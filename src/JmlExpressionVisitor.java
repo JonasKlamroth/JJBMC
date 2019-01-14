@@ -163,6 +163,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             JCExpression expr = super.copy(u.arg);
+            negated = false;
             if(newStatements.size() == 0) {
                 newStatements = tmp;
                 return M.Unary(Tag.NOT, expr);
@@ -265,7 +266,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression value = super.copy(copy.value);
                 return value;
             } else {
-                throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
+                throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
             }
         }
         return copy;
@@ -316,11 +317,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitBinary(BinaryTree node, Void p) {
         int countStmts = newStatements.size();
         JCBinary copy = (JCBinary) super.visitBinary(node, p);
-        if(copy.operator.asType().getReturnType() == syms.booleanType && countStmts < newStatements.size()) {
+        /*if(copy.operator.asType().getReturnType() == syms.booleanType && countStmts < newStatements.size()) {
             JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, copy);
             //newStatements.append(boolVar);
             returnBool = boolVar.sym;
-        }
+        }*/
         return copy;
     }
 
