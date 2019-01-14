@@ -60,7 +60,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
-    private Symbol returnBool = null;
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -98,7 +97,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
-        returnBool = null;
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.token == JmlTokenKind.ENSURES) {
@@ -109,28 +107,16 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
         }
         JCExpression copy = expressionVisitor.copy(that.expression);
-        returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            if(returnBool != null) {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
-                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-                newStatements = List.of(ifstmt);
-                //newStatements = newStatements.append(translationUtils.makeAssertStatement(M.Ident(returnBool), M));
-            } else {
-                newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
-                JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-                newStatements = List.of(ifstmt);
-                //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
-            }
+            newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
+            JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
+            newStatements = List.of(ifstmt);
+            //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
-            if(returnBool != null) {
-                newStatements = List.of(M.Block(0l, newStatements.append(translationUtils.makeAssumeStatement(M.Ident(returnBool), M))));
-            } else {
-                newStatements = List.of(M.Block(0L, newStatements.append(translationUtils.makeAssumeStatement(copy, M))));
-            }
+            newStatements = List.of(M.Block(0L, newStatements.append(translationUtils.makeAssumeStatement(copy, M))));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         }
         newStatements = List.nil();

@@ -19,6 +19,11 @@ public class TmpTest {
     private void negatedTest() {
     }
 
+    //@ ensures !(true && (\exists int i; i >= 0 && i < 5; i > 6));
+    @Verifyable
+    private void negatedTest1() {
+    }
+
     //@ ensures (\forall int i; i >= 0 && i < 5; i > -1) || (\forall int j; j >= 0 && j < 5; j > 0);
     @Verifyable
     private void binaryTest() {

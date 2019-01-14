@@ -60,7 +60,6 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
-    private Symbol returnBool = null;
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -98,7 +97,6 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
-        returnBool = null;
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.token == JmlTokenKind.ENSURES) {
@@ -109,15 +107,10 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             translationMode = TranslationMode.ASSUME;
         }
         JCExpression copy = expressionVisitor.copy(that.expression);
-        returnBool = expressionVisitor.getReturnBool();
         newStatements = expressionVisitor.getNewStatements();
         JCIf ist = expressionVisitor.getInnermostIf();
         oldVars = expressionVisitor.getOldVars();
-        if(returnBool != null) {
-            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(M.Ident(returnBool), translationMode));
-        } else {
-            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
-        }
+        newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == TranslationMode.ASSUME) {
