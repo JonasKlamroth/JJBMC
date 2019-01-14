@@ -1,10 +1,16 @@
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.BreakTree;
+import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CompoundAssignmentTree;
+import com.sun.source.tree.ContinueTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.IfTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.SwitchTree;
+import com.sun.source.tree.ThrowTree;
+import com.sun.source.tree.TryTree;
 import com.sun.source.tree.UnaryTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
@@ -254,6 +260,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitThrow(ThrowTree node, Void p) {
+        throw new RuntimeException("Throwing exceptions is currently not supported.");
+    }
+
+    @Override
     public JCTree visitJmlBinary(JmlBinary that, Void p) {
         if(that.op == JmlTokenKind.IMPLIES) {
             JCExpression rhs = super.copy(that.rhs);
@@ -358,6 +369,31 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return super.visitJmlStatementLoopExpr(that, p);
         }
         throw new RuntimeException("Token " + that.token + " for loop specifications currently not supported.");
+    }
+
+    @Override
+    public JCTree visitSwitch(SwitchTree node, Void p) {
+        throw new RuntimeException("Switch-Statements are currently not supported.");
+    }
+
+    @Override
+    public JCTree visitTry(TryTree node, Void p) {
+        throw new RuntimeException("Try-Catch-Statements are currently not supported.");
+    }
+
+    @Override
+    public JCTree visitCase(CaseTree node, Void p) {
+        throw new RuntimeException("Case-Statements are currently not supported.");
+    }
+
+    @Override
+    public JCTree visitBreak(BreakTree node, Void p) {
+        throw new RuntimeException("Break-Statements are currently not supported.");
+    }
+
+    @Override
+    public JCTree visitContinue(ContinueTree node, Void p) {
+        throw new RuntimeException("Continue-Statements are currently not supported.");
     }
 
     @Override
