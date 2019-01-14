@@ -206,28 +206,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(that.decls.get(0).getName().toString()), currentSymbol);
                 newStatements = newStatements.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
-                List<JCStatement> tmp = newStatements;
-                newStatements = List.nil();
-                JCIf ist = M.If(cond, M.Block(0L, newStatements), null);
-                innermostIf = ist;
                 JCExpression value = super.copy(copy.value);
-                ist.thenpart = M.Block(0L, newStatements);
-                if(innermostIf == null) {
-                    innermostIf = ist;
-                }
-                newStatements = tmp.append(ist);
-                return value;
+                JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
+                returnBool = null;
+                return res;
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
-                innermostIf = null;
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
                 JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
-                newStatements = newStatements.appendList(transUtils.insertIntoIf(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), b))));
-                if(innermostIf != null) {
-                    newStatements = newStatements.appendList(transUtils.insertIntoElse(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), M.Literal(true)))));
-                }
+                newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
@@ -245,13 +234,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
-                newStatements = newStatements.appendList(transUtils.insertIntoIf(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), b))));
-                /*if(innermostIf != null) {
-                    newStatements = newStatements.appendList(transUtils.insertIntoElse(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), M.Literal(false)))));
-                }*/
-                if(innermostIf != null) {
-                    innermostIf.elsepart = null;
-                }
+                newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
@@ -262,9 +245,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(that.decls.get(0).getName().toString()), currentSymbol);
                 newStatements = newStatements.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
-                newStatements = newStatements.append(translationUtils.makeAssumeStatement(cond, M));
                 JCExpression value = super.copy(copy.value);
-                return value;
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(cond, M));
+                JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
+                returnBool = null;
+                return res;
             } else {
                 throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
             }

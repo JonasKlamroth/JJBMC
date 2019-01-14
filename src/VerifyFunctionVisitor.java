@@ -114,17 +114,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         JCIf ist = expressionVisitor.getInnermostIf();
         oldVars = expressionVisitor.getOldVars();
         if(returnBool != null) {
-            if(isGoodQuantifier(transUtils.unwrapExpression(that.expression))) {
-                newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(ist, M.Ident(returnBool), translationMode));
-            } else {
-                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(M.Ident(returnBool), translationMode));
-            }
+            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(M.Ident(returnBool), translationMode));
         } else {
-            if(isGoodQuantifier(transUtils.unwrapExpression(that.expression))) {
-                newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(ist, copy, translationMode));
-            } else {
-                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
-            }
+            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         }
         if(translationMode == TranslationMode.ASSERT) {
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
