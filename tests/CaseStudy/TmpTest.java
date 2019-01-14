@@ -14,42 +14,59 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
-    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[0] != null;
-    //@ assignable t2.objects[0..1].t2;
-    @Verifyable
-    private void assignableTest14() {
-        t2.objects[0].t2 = new TmpTest();
-    }
-
-    //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[2] != null;
-    //@ assignable t2.objects[0..1].t2;
+    //@ requires (\exists int i; i >= 0 && i < 10; i > 5);
+    //@ ensures false;
     @Fails
-    private void assignableTest15() {
-        t2.objects[2].t2 = new TmpTest();
+    private void requiresTest() {
     }
 
-    /*@ assignable t2.*;
-      @ */
-    @Fails
-    private void assignalbeTest5(TmpTest t3) {
-        t3 = new TmpTest();
-        t3.pubInt = 5;
-        t3.t2 = new TmpTest();
-        t3.t2.pubInt = 10;
-        t3.arr = new int[10];
-        t3.arr[5] = 10;
-    }
-
-    /*@ requires t2 != null;
-      @ assignable t2.*;
-      @ */
+    //@ requires false;
+    //@ ensures false;
     @Verifyable
-    private void assignalbeTest51(TmpTest t3) {
-        t3 = this.t2;
-        t3.pubInt = 5;
-        t3.t2 = new TmpTest();
-        t3.arr = new int[10];
-        t3.arr[5] = 10;
+    private void requiresTest2(int j) {
+    }
+
+    //@ requires j > 10;
+    //@ requires (\exists int i; i >= 0 && i < 10; i > j);
+    //@ ensures false;
+    @Verifyable
+    private void requiresTest1(int j) {
+    }
+
+    //@ requires (\forall int i; i >= 0 && i < 10; \exists int j; j >= 0 && j <= 10; j > i);
+    //@ ensures false;
+    @Fails
+    private void requiresTest3() {
+    }
+
+    //@ requires (\forall int i; i >= 0 && i < 10; \exists int j; j >= 0 && j < 10; j > i);
+    //@ ensures false;
+    @Verifyable
+    private void requiresTest4() {
+    }
+
+    //@ requires (\exists int i; i >= 0 && i < 10; \exists int j; j >= 0 && j <= 10; j > i);
+    //@ ensures false;
+    @Fails
+    private void requiresTest5() {
+    }
+
+    //@ requires (\exists int i; i >= 0 && i < 0; \exists int j; j >= 0 && j < 10; j > i);
+    //@ ensures false;
+    @Verifyable
+    private void requiresTest6() {
+    }
+
+    //@ requires (\forall int i; i >= 0 && i < 10; \forall int j; j >= 10 && j <= 10; j > i);
+    //@ ensures false;
+    @Fails
+    private void requiresTest7() {
+    }
+
+    //@ requires (\forall int i; i >= 0 && i < 10; \forall int j; j >= 0 && j < 10; j > i);
+    //@ ensures false;
+    @Verifyable
+    private void requiresTest8() {
     }
 
 }

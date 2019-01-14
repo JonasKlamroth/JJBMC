@@ -42,7 +42,7 @@ public class BaseVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
-        if(!that.sym.toString().contains(".")) {
+        if(!that.sym.flatname.toString().contains("$")) {
             Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
             classSymbol.sourcefile = that.sourcefile;
             classSymbol.completer = null;

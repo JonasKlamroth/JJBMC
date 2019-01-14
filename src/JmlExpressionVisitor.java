@@ -245,8 +245,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
                 newStatements = newStatements.appendList(transUtils.insertIntoIf(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), b))));
+                /*if(innermostIf != null) {
+                    newStatements = newStatements.appendList(transUtils.insertIntoElse(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), M.Literal(false)))));
+                }*/
                 if(innermostIf != null) {
-                    newStatements = newStatements.appendList(transUtils.insertIntoElse(innermostIf, M.Exec(M.Assign(M.Ident(boolVar), M.Literal(true)))));
+                    innermostIf.elsepart = null;
                 }
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
@@ -258,16 +261,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(that.decls.get(0).getName().toString()), currentSymbol);
                 newStatements = newStatements.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
-                List<JCStatement> tmp = newStatements;
-                newStatements = List.nil();
-                JCIf ist = M.If(cond, M.Block(0L, newStatements), null);
-                innermostIf = ist;
+                newStatements = newStatements.append(translationUtils.makeAssumeStatement(cond, M));
                 JCExpression value = super.copy(copy.value);
-                ist.thenpart = M.Block(0L, newStatements);
-                if(innermostIf == null) {
-                    innermostIf = ist;
-                }
-                newStatements = tmp.append(ist);
                 return value;
             } else {
                 throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
