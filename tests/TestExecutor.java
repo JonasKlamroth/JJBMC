@@ -74,7 +74,7 @@ public class TestExecutor {
             cleanup();
             try {
                 File f = new File(fileName);
-                String translation = Main.translate(f);
+                String translation = CLI.translate(f);
                 if(translation == null) {
                     assertTrue("Error translating file: " + f.getName(), false);
                 }

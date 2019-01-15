@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="openjmlivil">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/openjml.jar!/" />
-      <root url="jar://$PROJECT_DIR$/jmlruntime.jar!/" />
-      <root url="jar://$PROJECT_DIR$/jmlspecs.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/openjml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jmlruntime.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/picocli-3.9.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

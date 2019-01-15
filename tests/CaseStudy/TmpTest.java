@@ -14,12 +14,9 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
-    //@ ensures !(true && (\exists int i; i >= 0 && i < 5; i > 3));
-    @Fails
+    //@ requires true || (\forall int i; i >= 0 && i < 1; 1/i == 1/i);
+    @Verifyable
     private void negatedTest() {
-        while(true) {
-            continue;
-        }
     }
 
 

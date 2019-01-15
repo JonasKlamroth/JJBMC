@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/testRes" type="java-test-resource" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -47,5 +48,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="jmlruntime" level="project" />
+    <orderEntry type="library" name="picocli-3.9.1" level="project" />
   </component>
 </module>

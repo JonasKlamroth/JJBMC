@@ -3,9 +3,10 @@
     <output-path>$PROJECT_DIR$/out/artifacts/openjmlivil_jar</output-path>
     <root id="archive" name="jmlbmc.jar">
       <element id="module-output" name="openjmlivil" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/openjml.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/jmlruntime.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/jmlspecs.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/openjml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jmlruntime.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jmlspecs.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/picocli-3.9.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
