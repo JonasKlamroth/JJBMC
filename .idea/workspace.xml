@@ -7,20 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/picocli-3.9.1.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/CLI.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/testRes/NormalHammingWeight.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tests/NormalHammingWeight.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/jmlruntime.jar" afterPath="$PROJECT_DIR$/lib/jmlruntime.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/jmlspecs.jar" afterPath="$PROJECT_DIR$/lib/jmlspecs.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/openjml.jar" afterPath="$PROJECT_DIR$/lib/openjml.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/openjmlivil_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/openjmlivil_jar.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/openjmlivil.xml" afterPath="$PROJECT_DIR$/.idea/libraries/openjmlivil.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Notes/formalisation.pdf" afterPath="$PROJECT_DIR$/../Notes/formalisation.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/openjmlivil.iml" afterPath="$PROJECT_DIR$/openjmlivil.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestExecutor.java" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testRes/NormalHammingWeight.java" afterPath="$PROJECT_DIR$/testRes/NormalHammingWeight.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -71,7 +60,7 @@
       <file leaf-file-name="TmpTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
+            <state relative-caret-position="280">
               <caret line="16" column="21" lean-forward="false" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -93,7 +82,7 @@
       <file leaf-file-name="TestExecutor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1484">
+            <state relative-caret-position="2320">
               <caret line="137" column="0" lean-forward="false" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -102,15 +91,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CLI.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CLI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/CLI.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="200">
               <caret line="211" column="45" lean-forward="false" selection-start-line="211" selection-start-column="45" selection-end-line="211" selection-end-column="45" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2168#2169#0" expanded="true" />
-                <element signature="e#2205#2206#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -119,18 +106,18 @@
       <file leaf-file-name="ProcessBuilder.java" pinned="false" current-in-tab="false">
         <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/lang/ProcessBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
+            <state relative-caret-position="19220">
               <caret line="1011" column="0" lean-forward="false" selection-start-line="1011" selection-start-column="0" selection-end-line="1011" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NormalHammingWeight.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NormalHammingWeight.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeight.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="64" column="17" lean-forward="false" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
+            <state relative-caret-position="222">
+              <caret line="61" column="20" lean-forward="true" selection-start-line="61" selection-start-column="20" selection-end-line="61" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -259,8 +246,8 @@
         <option value="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
         <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
-        <option value="$PROJECT_DIR$/testRes/NormalHammingWeight.java" />
         <option value="$PROJECT_DIR$/src/CLI.java" />
+        <option value="$PROJECT_DIR$/testRes/NormalHammingWeight.java" />
       </list>
     </option>
   </component>
@@ -286,7 +273,6 @@
     </navigator>
     <panes>
       <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -366,6 +352,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scratches" />
       <pane id="AndroidView" />
     </panes>
   </component>
@@ -885,7 +872,14 @@
       <option name="project" value="LOCAL" />
       <updated>1547547602063</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Towards a working cli">
+      <created>1547573130058</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1547573130058</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -931,12 +925,11 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.499" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.499" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.333" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16363636" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1657754" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="ANTLR Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -948,6 +941,7 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -993,7 +987,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="- translation now reacts to jmltypecheck errors&#10;- removed std.err messages of openjml (hackey solution)" />
     <MESSAGE value="only called Functions are duplicated" />
     <MESSAGE value="improved assignable handling&#10;part implementation of assignable checks for functioncalls" />
     <MESSAGE value="adding some tests&#10;making assignable everything the default" />
@@ -1018,7 +1011,8 @@
     <MESSAGE value="more unsupported statements throw exceptions" />
     <MESSAGE value="draft version of new chapter on assignables and quantifiers written" />
     <MESSAGE value="more drafts for chapters added" />
-    <option name="LAST_COMMIT_MESSAGE" value="more drafts for chapters added" />
+    <MESSAGE value="Towards a working cli" />
+    <option name="LAST_COMMIT_MESSAGE" value="Towards a working cli" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1096,22 +1090,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/DemoProgress.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="500">
-          <caret line="33" column="15" lean-forward="false" selection-start-line="33" selection-start-column="15" selection-end-line="33" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/DemoProgress.class" />
     <entry file="file://$PROJECT_DIR$/openjmlout.txt" />
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/io/PrintStream.java" />
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlSpecs.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20380">
-          <caret line="1104" column="0" lean-forward="false" selection-start-line="1104" selection-start-column="0" selection-end-line="1104" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlSpecs.class" />
     <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="581">
@@ -1122,20 +1104,8 @@
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeighttmp.java" />
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/ToUnsignedtmp.java" />
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/lang/Object.java" />
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/util/List.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="354" column="32" lean-forward="false" selection-start-line="354" selection-start-column="32" selection-end-line="354" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/JCTree.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1372">
-          <caret line="2512" column="10" lean-forward="false" selection-start-line="2512" selection-start-column="10" selection-end-line="2512" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/util/List.class" />
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/tree/JCTree.class" />
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/util/function/Predicate.java" />
     <entry file="file://$PROJECT_DIR$/tests/FailingTeststmp.java" />
     <entry file="file://$PROJECT_DIR$/tests/FailingTests.java">
@@ -1145,20 +1115,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="715" column="0" lean-forward="false" selection-start-line="715" selection-start-column="0" selection-end-line="715" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTree.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="1016" column="24" lean-forward="false" selection-start-line="1016" selection-start-column="24" selection-end-line="1016" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class" />
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTree.class" />
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/HammingWeight.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
@@ -1195,20 +1153,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/code/Type.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10340">
-          <caret line="780" column="29" lean-forward="false" selection-start-line="780" selection-start-column="20" selection-end-line="780" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeUtils.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8100">
-          <caret line="474" column="15" lean-forward="false" selection-start-line="474" selection-start-column="4" selection-end-line="474" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/com/sun/tools/javac/code/Type.class" />
+    <entry file="jar://$PROJECT_DIR$/openjml.jar!/org/jmlspecs/openjml/JmlTreeUtils.class" />
     <entry file="file://$PROJECT_DIR$/tests/AssignableTests2.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
@@ -1222,14 +1168,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/AssignableTeststmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-460">
-          <caret line="49" column="2" lean-forward="true" selection-start-line="49" selection-start-column="2" selection-end-line="49" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/AssignableTeststmp.java" />
     <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="580">
@@ -1294,7 +1233,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="333">
           <caret line="117" column="83" lean-forward="false" selection-start-line="117" selection-start-column="83" selection-end-line="117" selection-end-column="83" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1302,7 +1240,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="112" column="108" lean-forward="false" selection-start-line="112" selection-start-column="108" selection-end-line="112" selection-end-column="108" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1310,13 +1247,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="580">
           <caret line="44" column="0" lean-forward="false" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#3962#3963#0" expanded="false" />
-            <element signature="e#3999#4000#0" expanded="false" />
-            <element signature="e#4064#4065#0" expanded="false" />
-            <element signature="e#4110#4111#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1379,35 +1309,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeight.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="11" column="14" lean-forward="false" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/AssignableTests2tmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
-          <caret line="1" column="18" lean-forward="false" selection-start-line="1" selection-start-column="18" selection-end-line="1" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/org/cprover/CProver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/NormalHammingWeight.java" />
+    <entry file="file://$PROJECT_DIR$/tests/AssignableTests2tmp.java" />
+    <entry file="file://$PROJECT_DIR$/testRes/org/cprover/CProver.java" />
     <entry file="jar://$PROJECT_DIR$/lib/openjml.jar!/com/sun/tools/javac/file/RegularFileObject.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
           <caret line="42" column="0" lean-forward="false" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1415,7 +1323,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="50">
           <caret line="217" column="0" lean-forward="false" selection-start-line="217" selection-start-column="0" selection-end-line="217" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1429,7 +1336,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1484">
+        <state relative-caret-position="2320">
           <caret line="137" column="0" lean-forward="false" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1439,31 +1346,17 @@
     </entry>
     <entry file="jar://$USER_HOME$/java/jdk1.8.0_162/src.zip!/java/lang/ProcessBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
+        <state relative-caret-position="19220">
           <caret line="1011" column="0" lean-forward="false" selection-start-line="1011" selection-start-column="0" selection-end-line="1011" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeighttmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="66" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeight.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2584">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeighttmp.java" />
+    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeight.class" />
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
+        <state relative-caret-position="280">
           <caret line="16" column="21" lean-forward="false" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1479,23 +1372,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeight.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="64" column="17" lean-forward="false" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/CLI.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="200">
           <caret line="211" column="45" lean-forward="false" selection-start-line="211" selection-start-column="45" selection-end-line="211" selection-end-column="45" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2168#2169#0" expanded="true" />
-            <element signature="e#2205#2206#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeight.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="61" column="20" lean-forward="true" selection-start-line="61" selection-start-column="20" selection-end-line="61" selection-end-column="20" />
+          <folding />
         </state>
       </provider>
     </entry>

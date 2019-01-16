@@ -62,7 +62,6 @@ class NormalHammingWeight {
         x = x >>> 1;
       }
     }
-    assert false;
     return result;
   }
 }
