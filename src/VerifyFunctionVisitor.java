@@ -44,7 +44,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     private final JmlTypes jmltypes;
     private final JmlSpecs specs;
     private final JmlTreeUtils treeutils;
-    private final translationUtils transUtils;
+    private final TranslationUtils transUtils;
     private final JmlAttr attr;
     private final Name resultName;
     private final Name exceptionName;
@@ -83,7 +83,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         this.specs = JmlSpecs.instance(context);
         this.jmltypes = JmlTypes.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
-        this.transUtils = new translationUtils(context, M);
+        this.transUtils = new TranslationUtils(context, M);
         this.attr = JmlAttr.instance(context);
         this.resultName = names.fromString(Strings.resultVarString);
         this.exceptionName = names.fromString(Strings.exceptionVarString);
@@ -99,6 +99,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
+
         if(that.token == JmlTokenKind.ENSURES) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
             translationMode = TranslationMode.ASSERT;
@@ -106,7 +107,8 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
         }
-        JCExpression copy = expressionVisitor.copy(that.expression);
+        JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
+        JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         JCIf ist = expressionVisitor.getInnermostIf();
         oldVars = expressionVisitor.getOldVars();

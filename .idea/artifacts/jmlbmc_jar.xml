@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="jmlbmc:jar">
+  <artifact type="jar" name="jmlbmc:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/jmlbmc_jar</output-path>
     <root id="archive" name="jmlbmc.jar">
       <element id="module-output" name="jmlbmc" />

@@ -14,12 +14,8 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
-    //@ requires true || (\forall int i; i >= 0 && i < 1; 1/i == 1/i);
+    //@ ensures (\forall int j; j >= 0 && j <= 10; j > i) ==> i < 0;
     @Verifyable
-    private void negatedTest() {
+    private void impliesTest2(int i) {
     }
-
-
-
-
 }

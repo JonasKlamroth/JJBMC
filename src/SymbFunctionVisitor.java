@@ -44,7 +44,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private final JmlTypes jmltypes;
     private final JmlSpecs specs;
     private final JmlTreeUtils treeutils;
-    private final translationUtils transUtils;
+    private final TranslationUtils transUtils;
     private final JmlAttr attr;
     private final Name resultName;
     private final Name exceptionName;
@@ -83,7 +83,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         this.specs = JmlSpecs.instance(context);
         this.jmltypes = JmlTypes.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
-        this.transUtils = new translationUtils(context, M);
+        this.transUtils = new TranslationUtils(context, M);
         this.attr = JmlAttr.instance(context);
         this.resultName = names.fromString(Strings.resultVarString);
         this.exceptionName = names.fromString(Strings.exceptionVarString);
@@ -110,13 +110,13 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            newStatements = newStatements.append(translationUtils.makeAssertStatement(copy, M));
+            newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy, M));
             JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
             newStatements = List.of(ifstmt);
-            //newStatements = newStatements.append(translationUtils.makeAssertStatement(copy.expression, M));
+            //newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy.expression, M));
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
-            newStatements = List.of(M.Block(0L, newStatements.append(translationUtils.makeAssumeStatement(copy, M))));
+            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssumeStatement(copy, M))));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         }
         newStatements = List.nil();

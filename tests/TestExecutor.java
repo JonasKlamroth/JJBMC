@@ -5,6 +5,7 @@ import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -28,9 +29,15 @@ public class TestExecutor {
 
     static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
     private File tmpFile = new File("./tests/tmp.java");
-    private boolean keepTmpFile = true;
+    private boolean keepTmpFile = false;
     private boolean filterOutput = true;
     private boolean doCleanup = true;
+
+    @Before
+    public void init() {
+        System.setErr(new CostumPrintStream(System.err));
+        System.setOut(new CostumPrintStream(System.out));
+    }
 
     @org.junit.Test
     public void runBubbleSortCaseStudy() throws IOException, InterruptedException {

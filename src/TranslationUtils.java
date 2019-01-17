@@ -32,7 +32,7 @@ import static com.sun.tools.javac.util.List.*;
 /**
  * Created by jklamroth on 11/13/18.
  */
-public class translationUtils {
+public class TranslationUtils {
     private final Context context;
     private final Log log;
     private final Names names;
@@ -45,7 +45,7 @@ public class translationUtils {
     private final JmlTreeUtils treeutils;
     private final JmlTree.Maker M;
 
-    public translationUtils(Context context, JmlTree.Maker maker) {
+    public TranslationUtils(Context context, JmlTree.Maker maker) {
         this.context = context;
         this.log = Log.instance(context);
         this.M = JmlTree.Maker.instance(context);
