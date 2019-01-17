@@ -555,8 +555,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return super.visitAssignment(node, p);
         }
         if(cond != null) {
-            JCIf ifst = M.If(cond, makeException("Illegal assignment: " + assign.toString()), null);
-            newStatements = newStatements.append(ifst);
+            cond = treeutils.makeNot(Position.NOPOS, cond);
+            JCStatement expr = translationUtils.makeAssertStatement(cond, M);
+            newStatements = newStatements.append(expr);
             //newStatements = newStatements.append(M.Exec(assign));
         }
         return super.visitAssignment(node, p);
@@ -681,7 +682,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
             if(hi == null) {
-                hi = treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression);
+                hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
             }
             if(lo == null) {
                 lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
@@ -696,7 +697,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
                 if(hi == null) {
-                    hi = treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression);
+                    hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression), M.Literal(1));
                 }
                 if(lo == null) {
                     lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));

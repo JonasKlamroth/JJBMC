@@ -341,6 +341,13 @@ public class AssignableTests {
         privInt += 5;
     }
 
+    //@ requires t2 != null && t2.t2 == t2;
+    //@ assignable t2;
+    @Verifyable
+    private void assignableTest29() {
+        t2.t2 = new TestSuite();
+    }
+
     //@ ensures \result == 5;
     private int fakeTest(int i) {
         return 0;
