@@ -17,6 +17,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -137,6 +138,11 @@ public class TestExecutor {
             assertEquals(functionNames.size(), testBehaviours.size());
             assertEquals(functionNames.size(), unwinds.size());
             int idx = 0;
+            System.out.println("Running " +
+                    testBehaviours.stream().
+                            filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).
+                            collect(Collectors.toList()).size() +
+                    " tests in file: " + tmpFile.getName());
             for(String function : functionNames) {
                 if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
                     System.out.println("Running test for function: " + function);
