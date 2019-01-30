@@ -8,7 +8,11 @@ import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,6 +60,8 @@ public class CLI implements Runnable {
             description = "Print usage help and exit.")
     boolean usageHelpRequested;
 
+    File tmpFolder = null;
+
     @Override
     public void run() {
         translateAndRunJBMC();
@@ -86,7 +92,6 @@ public class CLI implements Runnable {
     }
 
     public void translateAndRunJBMC() {
-        createCProverFolder(fileName);
 
         File tmpFile = null;
         try {
@@ -95,12 +100,20 @@ public class CLI implements Runnable {
                 System.out.println("Could not find file " + f);
                 return;
             }
-            String translation = translate(f);
-            Files.copy(f.toPath(), new File(fileName.replace(".java", "tmp.java")).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            tmpFolder = new File(f.getParentFile(), "tmp");
+            tmpFolder.mkdirs();
+            tmpFile = new File(tmpFolder, f.getName());
+            Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            createCProverFolder(tmpFile.getAbsolutePath());
+            if(!copyJBMC()) {
+                cleanUp();
+                return;
+            }
+            String translation = translate(tmpFile);
+            //Files.copy(f.toPath(), new File(fileName.replace(".java", "tmp.java")).toPath(), StandardCopyOption.REPLACE_EXISTING);
             //String name = f.getName().substring(0, f.getName().indexOf("."));
             //TODO This is not always sound!!
             //translation = translation.replaceAll(name, name + "tmp");
-            tmpFile = f;
             Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
         } catch (Exception e) {
             cleanUp();
@@ -143,7 +156,7 @@ public class CLI implements Runnable {
             }
 
             List<String> functionNames = new ArrayList<>();
-            functionNames.addAll(FunctionNameVisitor.parseFile(fileName.replace(".java", "tmp.java")));
+            functionNames.addAll(FunctionNameVisitor.parseFile(fileName));
             if(functionName != null) {
                 functionNames = functionNames.stream().filter(f -> f.endsWith("." + functionName)).collect(Collectors.toList());
                 if(functionNames.size() == 0) {
@@ -163,7 +176,7 @@ public class CLI implements Runnable {
             System.out.println("Error. Jbmc got interrupted.");
             e.printStackTrace();
         }
-        cleanUp();
+        //cleanUp();
     }
 
     private List<String> prepareJBMCOptions(List<String> options) {
@@ -182,7 +195,7 @@ public class CLI implements Runnable {
             String classFile = tmpFile.getPath().replace(".java", ".class");
 
             ArrayList<String> tmp = new ArrayList<>();
-            tmp.add("jbmc");
+            tmp.add(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
             tmp.add(classFile);
             tmp.add("--function");
             tmp.add(functionName);
@@ -192,6 +205,7 @@ public class CLI implements Runnable {
             commands = tmp.toArray(commands);
 
             Runtime rt = Runtime.getRuntime();
+            rt.addShutdownHook(new Thread(() -> {cleanUp();}));
             Process proc = rt.exec(commands);
             proc.waitFor();
 
@@ -238,6 +252,7 @@ public class CLI implements Runnable {
         } catch (Exception e) {
             System.out.println("Error running jbmc.");
             e.printStackTrace();
+            return;
         }
     }
 
@@ -257,26 +272,89 @@ public class CLI implements Runnable {
         }
     }
 
+    private boolean copyJBMC() {
+        try {
+            InputStream is = Main.class.getResourceAsStream("jbmc");
+            File to = new File(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
+            FileOutputStream buffer = new FileOutputStream(to.getAbsoluteFile());
+            int nRead;
+            byte[] data = new byte[1024];
+            while ((nRead = is.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
+            }
+            buffer.flush();
+            buffer.close();
+            is.close();
+
+            ArrayList<String> tmp = new ArrayList<>();
+            tmp.add("chmod");
+            tmp.add("+x");
+            tmp.add(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
+            String[] commandsChmod = new String[tmp.size()];
+            commandsChmod = tmp.toArray(commandsChmod);
+
+            Runtime rt = Runtime.getRuntime();
+            rt.addShutdownHook(new Thread(() -> {cleanUp();}));
+            Process proc = rt.exec(commandsChmod);
+            proc.waitFor();
+        } catch (IOException e) {
+            System.out.println("Could not copy jbmc.");
+            return false;
+        } catch (InterruptedException e) {
+            System.out.println("Could not copy jbmc.");
+            return false;
+        }
+        return true;
+
+    }
+
     String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 
     private void cleanUp() {
-        try {
-            if(keepTranslation) {
-                Files.move(new File(fileName).toPath(), new File(fileName.replace(".java", "Translated.java")).toPath(), StandardCopyOption.REPLACE_EXISTING);
+//        try {
+//            if(!keepTranslation) {
+//                Files.delete(new File(tmpFolder, new File(fileName).getName()).toPath());
+//            }
+//            String parent = tmpFolder.getAbsolutePath();
+//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.java").toPath());
+//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.class").toPath());
+//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover").toPath());
+//            Files.delete(new File(parent + File.separator + "org").toPath());
+//            Files.delete(new File(fileName.replace(".java", ".class")).toPath());
+//            Files.delete(new File(fileName.replace(".java", "$ReturnException.class")).toPath());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        deleteFolder(tmpFolder);
+        if(!keepTranslation) {
+            try {
+                if(tmpFolder.exists()) {
+                    Files.delete(tmpFolder.toPath());
+                }
+            } catch (IOException e) {
+                //System.out.println("Could not delete tmp folder.");
             }
-            Files.move(new File(fileName.replace(".java", "tmp.java")).toPath(), new File(fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
-            String parent = new File(fileName).getParent();
-            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.java").toPath());
-            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.class").toPath());
-            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover").toPath());
-            Files.delete(new File(parent + File.separator + "org").toPath());
-            Files.delete(new File(fileName.replace(".java", ".class")).toPath());
-            Files.delete(new File(fileName.replace(".java", "$ReturnException.class")).toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+    }
+
+    private void deleteFolder(File folder) {
+        File[] tmpFiles = folder.listFiles();
+        for(File f : tmpFiles) {
+            if(!keepTranslation || !f.getName().endsWith(new File(fileName).getName())) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                }
+                try {
+                    if(f.exists()) {
+                        Files.delete(f.toPath());
+                    }
+                } catch (IOException ex) {
+                    //System.out.println("Could not delete temporary file: " + f.getAbsolutePath());
+                }
+            }
         }
     }
 
