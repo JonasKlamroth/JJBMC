@@ -1,4 +1,3 @@
-import com.sun.source.tree.AnnotationTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.jvm.ClassReader;

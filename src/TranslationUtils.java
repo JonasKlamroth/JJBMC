@@ -12,7 +12,6 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
-import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
