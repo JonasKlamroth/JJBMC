@@ -41,8 +41,14 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
+    public void runBubbleSortSymbCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/BubbleSortSymb.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
+    public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/BubbleSort.java"};
         runAllTests();
     }
 
