@@ -277,7 +277,7 @@ public class TranslationUtils {
                         List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
                         res = res.append(makeStandardLoop(range, body, loopVar, currentSymbol));
                     } catch (NumberFormatException e) {
-                        throw new NotImplementedException();
+                        throw new RuntimeException("Cant havoc expression " + expr);
                     }
                 }
             } else if(expr instanceof JCFieldAccess) {

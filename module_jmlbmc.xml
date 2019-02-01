@@ -75,7 +75,7 @@
   </path>
   
   
-  <target name="compile.module.jmlbmc" depends="compile.module.jmlbmc.production,compile.module.jmlbmc.tests" description="Compile module jmlbmc"/>
+  <target name="compile.module.jmlbmc" depends="compile.module.jmlbmc.production" description="Compile module jmlbmc"/>
   
   <target name="compile.module.jmlbmc.production" description="Compile module jmlbmc; production classes">
     <mkdir dir="${jmlbmc.output.dir}"/>
@@ -93,28 +93,6 @@
         <type type="file"/>
       </fileset>
       <fileset dir="${module.jmlbmc.basedir}/resources">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-    </copy>
-  </target>
-  
-  <target name="compile.module.jmlbmc.tests" depends="compile.module.jmlbmc.production" description="compile module jmlbmc; test classes" unless="skip.tests">
-    <mkdir dir="${jmlbmc.testoutput.dir}"/>
-    <javac destdir="${jmlbmc.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="javac">
-      <compilerarg line="${compiler.args.jmlbmc}"/>
-      <bootclasspath refid="jmlbmc.module.bootclasspath"/>
-      <classpath refid="jmlbmc.module.classpath"/>
-      <src refid="jmlbmc.module.test.sourcepath"/>
-      <patternset refid="excluded.from.compilation.jmlbmc"/>
-    </javac>
-    
-    <copy todir="${jmlbmc.testoutput.dir}">
-      <fileset dir="${module.jmlbmc.basedir}/tests">
-        <patternset refid="compiler.resources"/>
-        <type type="file"/>
-      </fileset>
-      <fileset dir="${module.jmlbmc.basedir}/testRes">
         <patternset refid="compiler.resources"/>
         <type type="file"/>
       </fileset>
