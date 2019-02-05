@@ -8,13 +8,12 @@ import TestAnnotations.Verifyable;
  */
 class BubbleSort {
     /*@
-      @ requires arr != null;
-      @ requires arr.length < 5;
+      @ requires arr != null && arr.length <= 5;
       @ ensures (\forall int v; v >= 0 && v <= \result.length - 1; (\forall int w; w >= 0 && w <= v - 1; \result[v] >= \result[w]));
       @ assignable arr[*];
       @*/
     @Verifyable
-    @Unwind(number = 6)
+    @Unwind(number = 7)
     static int[] sort(int arr[]) {
         for(int j = arr.length - 1; j >= 0; --j) {
             for (int i = 0; i < j; ++i) {
@@ -31,7 +30,7 @@ class BubbleSort {
       @ requires first < array.length && first >= 0;
       @ requires second < array.length && second >= 0;
       @ requires first != second;
-      @ ensures \old(array)[first] == array[second] && \old(array)[second] == array[first];
+      @ ensures \old(array[first]) == array[second] && \old(array[second]) == array[first];
       @ assignable array[first], array[second];
       @*/
     @Verifyable

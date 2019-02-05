@@ -17,6 +17,7 @@ import java.util.Set;
 public class FunctionCallsVisitor extends JmlTreeCopier {
     public Set<String> calledFunctions = new HashSet<>();
     public List<JCTree.JCExpression> assignables = List.nil();
+    private boolean foundNothing = false;
 
     public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -38,6 +39,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
                 if(that.list.size() + assignables.size() > 1) {
                     throw new RuntimeException("Assignable containing \\nothing and something else is not valid.");
                 }
+                foundNothing = true;
             } else {
                 assignables = assignables.appendList(that.list);
             }
@@ -54,6 +56,9 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         copy.methodSpecsCombined = JmlSpecs.copy(that.methodSpecsCombined, p, this);
         copy.cases = (JmlTree.JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
         copy.type = that.type;
+        if(assignables.size() == 0 && !foundNothing) {
+            assignables = assignables.append(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+        }
         return copy;
     }
 }

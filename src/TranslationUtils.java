@@ -284,6 +284,10 @@ public class TranslationUtils {
                 JCFieldAccess fexpr = (JCFieldAccess)expr;
                 if(fexpr.name == null) {
                     //TODO not sound!!
+                    if(fexpr.selected.toString().equals("this")) {
+                        throw new RuntimeException("havocing this.* is not supported.");
+                    }
+                    System.out.println("havocing o.* is currently not translated soundly.");
                     res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
                 } else {
                     res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(fexpr.type, currentSymbol))));
@@ -312,6 +316,8 @@ public class TranslationUtils {
             return makeNondetShort(currentSymbol);
         } else if(type.equals(syms.charType)) {
             return makeNondetChar(currentSymbol);
+        } else if(type.equals(syms.booleanType)) {
+            return makeNondetBoolean(currentSymbol);
         } else if(type instanceof Type.ArrayType) {
             return makeNondetWithoutNull(currentSymbol);
         } else if(type instanceof Type.ClassType) {

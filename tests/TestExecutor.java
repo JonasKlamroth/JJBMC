@@ -30,7 +30,7 @@ public class TestExecutor {
 
     static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
     private File tmpFile = new File("./tests/tmp.java");
-    private boolean keepTmpFile = false;
+    private boolean keepTmpFile = true;
     private boolean filterOutput = true;
     private boolean doCleanup = true;
 
@@ -43,6 +43,24 @@ public class TestExecutor {
     @org.junit.Test
     public void runBubbleSortSymbCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/BubbleSortSymb.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
+    public void runMultCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/MultExample.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
+    public void runBitMagicCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/BitMagicCollection.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
+    public void runDualPivotQSCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/DualPivotQuicksort.java"};
         runAllTests();
     }
 
@@ -103,6 +121,7 @@ public class TestExecutor {
             }
 
             Runtime rt = Runtime.getRuntime();
+            rt.addShutdownHook(new Thread(() -> cleanup()));
             String[] commands = {"javac", "-cp", "." + File.separator + "tests" + File.separator, tmpFile.getPath()};
             Process proc = rt.exec(commands);
             proc.waitFor();
@@ -155,9 +174,9 @@ public class TestExecutor {
                     //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
                     String classFile = tmpFile.getPath().replace(".java", ".class");
                     if(unwinds.get(idx) != null) {
-                        commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions"};
+                        commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions", "--trace"};
                     } else {
-                        commands = new String[]{"jbmc", classFile, "--function", function};
+                        commands = new String[]{"jbmc", classFile, "--function", function, "--trace"};
                     }
 
                     proc = rt.exec(commands);
@@ -213,30 +232,34 @@ public class TestExecutor {
 
 
     @After
-    public void cleanup() throws IOException {
-        if(doCleanup) {
-            Runtime rt = Runtime.getRuntime();
-            String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
-            Process proc;
-            proc = rt.exec(commands);
-
-
-            commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
-            proc = rt.exec(commands);
-
-            commands = new String[]{"rm", "Fails.class".replaceAll("/", File.separator)};
-            proc = rt.exec(commands);
-
-            commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
-            proc = rt.exec(commands);
-
-            commands = new String[]{"rm", "./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)};
-            proc = rt.exec(commands);
-
-            if (!keepTmpFile) {
-                commands = new String[]{"rm", tmpFile.getPath()};
+    public void cleanup() {
+        try {
+            if (doCleanup) {
+                Runtime rt = Runtime.getRuntime();
+                String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
+                Process proc;
                 proc = rt.exec(commands);
+
+
+                commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
+                proc = rt.exec(commands);
+
+                commands = new String[]{"rm", "Fails.class".replaceAll("/", File.separator)};
+                proc = rt.exec(commands);
+
+                commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
+                proc = rt.exec(commands);
+
+                commands = new String[]{"rm", "./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)};
+                proc = rt.exec(commands);
+
+                if (!keepTmpFile) {
+                    commands = new String[]{"rm", tmpFile.getPath()};
+                    proc = rt.exec(commands);
+                }
             }
+        } catch (IOException e) {
+            System.out.println("Error cleaning up.");
         }
     }
 }

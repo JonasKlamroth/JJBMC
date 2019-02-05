@@ -114,9 +114,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         oldVars = expressionVisitor.getOldVars();
         newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
-            combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
+            combinedNewEnsStatements = combinedNewEnsStatements.append(M.Block(0L, newStatements));
         } else if(translationMode == TranslationMode.ASSUME) {
-            combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
+            combinedNewReqStatements = combinedNewReqStatements.append(M.Block(0L, newStatements));
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -296,6 +296,9 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         }
         if(t.getTag().equals(TypeTag.SHORT)) {
             return M.Literal(0);
+        }
+        if(t.getTag().equals(TypeTag.BOOLEAN)) {
+            return M.Literal(true);
         }
         return treeutils.nullLit;
     }

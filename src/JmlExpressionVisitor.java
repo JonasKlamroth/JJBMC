@@ -201,7 +201,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
+                l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else {
@@ -218,7 +218,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoopFromRange(copy.range, newStatements, that.decls.get(0), currentSymbol));
+                l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
@@ -295,12 +295,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(arg instanceof JCIdent) {
                     if(!oldVars.keySet().contains(((JCIdent) arg).sym.hashCode())) {
                         if(arg.type instanceof Type.JCPrimitiveType) {
-                            oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentSymbol, arg);
+                            oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + oldVars.size())), currentSymbol, arg);
                         } else {
-                            oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentSymbol,
-                                    M.Apply(List.nil(),
-                                            M.Select(arg, M.Name("clone")),
-                                            List.nil()));
+                            throw new RuntimeException("\\old of non primitive types currently not supported.");
                         }
                         oldVars.put(((JCIdent) arg).sym.hashCode(), oldVar);
                     } else {
@@ -308,12 +305,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     }
                 } else {
                     if(arg.type instanceof Type.JCPrimitiveType) {
-                        oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentSymbol, arg);
+                        oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + oldVars.size())), currentSymbol, arg);
                     } else {
-                        oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + arg.hashCode())), currentSymbol,
-                                M.Apply(List.nil(),
-                                        M.Select(arg, M.Name("clone")),
-                                        List.nil()));
+                        throw new RuntimeException("\\old of non primitive types currently not supported.");
                     }
                     oldVars.put(arg.hashCode(), oldVar);
                 }
@@ -380,7 +374,49 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(copy);
             return copy;
         }
-        throw new RuntimeException("While-Loops with invariants currently not supported.");
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
+            if (spec instanceof JmlStatementLoopModifies) {
+                newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol));
+            }
+        }
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
+        JCVariableDecl oldD = null;
+        JCExpression dExpr = null;
+        for(JmlStatementLoop spec : that.loopSpecs) {
+            if(spec instanceof JmlStatementLoopExpr && spec.token == JmlTokenKind.DECREASES) {
+                if(oldD != null) {
+                    throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
+                }
+                dExpr = ((JmlStatementLoopExpr) spec).expression;
+                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue"),  dExpr, currentSymbol);
+                newStatements = newStatements.append(oldD);
+            }
+        }
+
+        List<JCStatement> statements = newStatements;
+        newStatements = List.nil();
+        JCStatement assumefalse = TranslationUtils.makeAssumeStatement(treeutils.makeLit(Position.NOPOS, syms.booleanType, false), M);
+        List<JCStatement> ifbodystatements = List.nil();
+        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
+        for(JCStatement st : ((JCBlock)that.body).getStatements()) {
+            JCStatement stcopy = super.copy(st);
+            if(newStatements.size() == 0) {
+                ifbodystatements = ifbodystatements.append(stcopy);
+            } else {
+                ifbodystatements = ifbodystatements.appendList(newStatements);
+                newStatements = List.nil();
+            }
+        }
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        ifbodystatements = ifbodystatements.appendList(newStatements);
+        if(dExpr != null) {
+            ifbodystatements = ifbodystatements.append(
+                    TranslationUtils.makeAssertStatement(makeDereasesStatement(oldD, dExpr), M));
+        }
+        JCBlock ifbody = M.Block(0L, ifbodystatements.append(assumefalse));
+        newStatements = statements.append(M.If(that.cond, ifbody, null));
+        return that;
     }
 
     @Override
@@ -426,7 +462,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(loopVar != null)  {
             newStatements = newStatements.append(loopVar);
         }
-        assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
         if(loopVar != null) {
             newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(loopVar), transUtils.makeNondetInt(currentSymbol))));
         }
@@ -435,7 +471,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol));
             }
         }
-        assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.ASSUME);
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;
         for(JmlStatementLoop spec : that.loopSpecs) {
@@ -466,7 +502,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         for(JCExpressionStatement est : that.step) {
             ifbodystatements = ifbodystatements.append(est);
         }
-        assumeOrAssertAllInvs(that, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
         ifbodystatements = ifbodystatements.appendList(newStatements);
         if(dExpr != null) {
             ifbodystatements = ifbodystatements.append(
@@ -501,11 +537,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
-    private void assumeOrAssertAllInvs(JmlForLoop that, VerifyFunctionVisitor.TranslationMode mode) {
+    private void assumeOrAssertAllInvs(List<JmlStatementLoop> invs, VerifyFunctionVisitor.TranslationMode mode) {
         List<JCStatement> l = newStatements;
         newStatements = List.nil();
         VerifyFunctionVisitor.TranslationMode oldMode = translationMode;
-        for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
+        for(JmlTree.JmlStatementLoop spec : invs) {
             if(spec instanceof JmlStatementLoopExpr && spec.token == JmlTokenKind.LOOP_INVARIANT) {
                 translationMode = mode;
                 JCExpression assertCopy = this.copy(((JmlStatementLoopExpr) spec).expression);
@@ -545,8 +581,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             JCExpression cond = editAssignable(copy.lhs);
             if(cond != null) {
-                JCIf ifst = M.If(cond, makeException("Illegal assignment: " + copy.toString()), null);
-                newStatements = newStatements.append(ifst);
+                JCStatement assertSt = transUtils.makeAssumeOrAssertStatement(treeutils.makeNot(Position.NOPOS, cond), VerifyFunctionVisitor.TranslationMode.ASSERT);
+                newStatements = newStatements.append(assertSt);
                 //newStatements = newStatements.append(M.Exec(u));
             }
             return copy;
@@ -574,6 +610,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
+        } else if(e instanceof JmlStoreRefArrayRange) {
+            return editAssignable((JmlStoreRefArrayRange) e);
         } else if(e instanceof JCArrayAccess) {
             JCExpression expr =  ((JCArrayAccess) e).indexed;
             if(expr instanceof JCIdent) {
@@ -593,6 +631,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return M.Literal(false);
             }*/
             return editAssignable((JCFieldAccess) e);
+        } else if(e instanceof JmlStoreRefKeyword) {
+            JmlStoreRefKeyword k = (JmlStoreRefKeyword)e;
+            if(k.token == JmlTokenKind.BSNOTHING) {
+                return M.Literal(false);
+            } else if(k.token == JmlTokenKind.BSEVERYTHING) {
+                return M.Literal(!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword));
+            } else {
+                throw new RuntimeException("Cannot handle assignment to " + e.toString());
+            }
         } else {
             throw new RuntimeException("Could not handle assignment to " + e.toString());
         }
@@ -607,6 +654,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return M.Literal(false);
         } else {
+            if(currentAssignable.stream().anyMatch(
+                    fa -> fa instanceof JCFieldAccess &&
+                            ((JCFieldAccess) fa).name == null &&
+                            ((JCFieldAccess) fa).selected.toString().equals("this"))) {
+                return M.Literal(false);
+            }
             List<JCIdent> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                     .map(as -> (JCIdent)as)
                     .filter(as -> !as.type.isPrimitive())
@@ -683,6 +736,48 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return expr;
     }
 
+    public JCExpression editAssignable(JmlStoreRefArrayRange e) {
+        JmlStoreRefArrayRange lhs = e;
+        List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
+                .map(arr -> ((JmlStoreRefArrayRange)arr))
+                .collect(Collectors.toList()));
+        JCExpression expr = editAssignable(lhs.expression);
+        if(pot.size() == 0) {
+            return expr;
+        }
+        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.expression);
+        if(pot.get(0).lo != null || pot.get(0).hi != null) {
+            JCExpression hi = pot.get(0).hi;
+            JCExpression lo = pot.get(0).lo;
+            if(hi == null) {
+                hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
+            }
+            if(lo == null) {
+                lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+            }
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.hi, hi));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.lo, lo));
+        }
+        expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
+        for(int i = 1; i < pot.size(); ++i) {
+            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, lhs.expression);
+            if(pot.get(i).lo != null || pot.get(0).hi != null) {
+                JCExpression hi = pot.get(i).hi;
+                JCExpression lo = pot.get(i).lo;
+                if(hi == null) {
+                    hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression), M.Literal(1));
+                }
+                if(lo == null) {
+                    lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                }
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.hi, hi));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.lo, lo));
+            }
+            expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+        }
+        return expr;
+    }
+
     public JCExpression editAssignable(JCFieldAccess f) {
         List<JCFieldAccess> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
                 .map(arr -> ((JCFieldAccess)arr))
@@ -694,6 +789,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 .collect(Collectors.toList()));
 
         JCExpression expr = null;
+        if(f.name == null) {
+            pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
+                    .map(arr -> ((JCFieldAccess)arr))
+                    .filter(fa -> fa.name == null)
+                    .collect(Collectors.toList()));
+            if(pot.size() == 0) {
+                return M.Literal(true);
+            }
+        }
         for(JCFieldAccess fa : pot) {
             if(expr == null) {
                 expr = editAssignable(f.selected, fa.selected, true);
@@ -800,6 +904,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //newStatements = newStatements.append(ifst);
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
+        List<JCExpression> assignables = baseVisitor.getAssignablesForName(((JCMethodInvocation)node).meth.toString());
+        for(JCExpression e : assignables) {
+            JCExpression cond = editAssignable(e);
+            cond = treeutils.makeNot(Position.NOPOS, cond);
+            JCStatement expr = TranslationUtils.makeAssertStatement(cond, M);
+            newStatements = newStatements.append(expr);
+        }
+
         return copy;
     }
 
