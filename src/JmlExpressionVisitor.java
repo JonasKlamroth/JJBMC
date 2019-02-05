@@ -173,8 +173,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             JCExpression cond = editAssignable(u.arg);
             if(cond != null) {
-                JCIf ifst = M.If(cond, makeException("Illegal assignment: " + u.toString()), null);
-                newStatements = newStatements.append(ifst);
+                JCStatement jcAssert = TranslationUtils.makeAssertStatement(treeutils.makeNot(Position.NOPOS, cond), M);
+                newStatements = newStatements.append(jcAssert);
                 //newStatements = newStatements.append(M.Exec(u));
             }
             return super.visitUnary(node, p);
@@ -730,6 +730,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
+            if(!(hi instanceof JCIdent || hi instanceof JCLiteral || lo instanceof JCIdent || lo instanceof JCLiteral)) {
+                throw new RuntimeException("Only sidecondition free array indices supported. (" + e.toString() + ")");
+            }
             if(hi == null) {
                 hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
             }

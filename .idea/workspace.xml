@@ -10,9 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="more case studies, now checking for assignables when invocing a method">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/FilterVisitor.java" />
       <change type="DELETED" beforePath="$PROJECT_DIR$/../Examples/CBMC/output1.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/JmlToAssertVisitor.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.pdf" afterPath="$PROJECT_DIR$/../Thesis/thesis.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/LoopInv.c" afterPath="$PROJECT_DIR$/../Examples/CBMC/LoopInv.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/out1.txt" afterPath="$PROJECT_DIR$/../Examples/CBMC/out1.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/output.txt" afterPath="$PROJECT_DIR$/../Examples/CBMC/output.txt" />
@@ -20,11 +19,10 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/code/jmlex.java" afterPath="$PROJECT_DIR$/../Thesis/code/jmlex.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Introduction.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Introduction.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.tex" afterPath="$PROJECT_DIR$/../Thesis/thesis.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/BaseVisitor.java" afterPath="$PROJECT_DIR$/src/BaseVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/FunctionCallsVisitor.java" afterPath="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" afterPath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -73,57 +71,17 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="JmlExpressionVisitor.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="JmlExpressionVisitor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="285" column="62" lean-forward="true" selection-start-line="285" selection-start-column="62" selection-end-line="285" selection-end-column="62" />
+            <state relative-caret-position="237">
+              <caret line="175" column="115" lean-forward="false" selection-start-line="175" selection-start-column="115" selection-end-line="175" selection-end-column="115" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1549379532474" expanded="true" signature="27777:27785" ph="{...}" />
+                <element signature="e#29122#29123#0" expanded="true" />
+                <element signature="e#29169#29170#0" expanded="true" />
+                <marker date="1549382479547" expanded="true" signature="27802:27810" ph="{...}" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FilterVisitor.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/FilterVisitor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="275" column="0" lean-forward="true" selection-start-line="275" selection-start-column="0" selection-end-line="275" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="JmlTreeCopier.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/openjml.jar!/org/jmlspecs/openjml/JmlTreeCopier.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="146">
-              <caret line="601" column="34" lean-forward="false" selection-start-line="601" selection-start-column="34" selection-end-line="601" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TreeCopier.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/openjml.jar!/com/sun/tools/javac/tree/TreeCopier.class">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="213" column="18" lean-forward="false" selection-start-line="213" selection-start-column="18" selection-end-line="213" selection-end-column="18" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BaseVisitor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/BaseVisitor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="56" column="50" lean-forward="true" selection-start-line="56" selection-start-column="50" selection-end-line="56" selection-end-column="50" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -131,21 +89,28 @@
       <file leaf-file-name="FunctionCallsVisitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="541">
-              <caret line="51" column="29" lean-forward="false" selection-start-line="51" selection-start-column="29" selection-end-line="51" selection-end-column="29" />
-              <folding>
-                <element signature="e#743#744#0" expanded="true" />
-                <element signature="e#780#781#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="333">
+              <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TmpTesttmp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
+      <file leaf-file-name="TmpTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="46" column="1" lean-forward="false" selection-start-line="46" selection-start-column="1" selection-end-line="46" selection-end-column="1" />
+            <state relative-caret-position="300">
+              <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AssignableTests.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="217">
+              <caret line="173" column="5" lean-forward="true" selection-start-line="167" selection-start-column="4" selection-end-line="173" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -154,35 +119,27 @@
       <file leaf-file-name="AssignableTeststmp.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/AssignableTeststmp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12658">
-              <caret line="7" column="13" lean-forward="false" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+            <state relative-caret-position="137">
+              <caret line="274" column="31" lean-forward="false" selection-start-line="274" selection-start-column="29" selection-end-line="274" selection-end-column="31" />
               <folding>
-                <marker date="1549379638135" expanded="false" signature="16999:17004" ph=" { " />
-                <marker date="1549379638135" expanded="false" signature="17015:17019" ph=" }" />
-                <marker date="1549379638135" expanded="true" signature="17071:17111" ph="{...}" />
-                <marker date="1549379638135" expanded="true" signature="17321:17439" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AssignableTests.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="762">
-              <caret line="403" column="26" lean-forward="true" selection-start-line="403" selection-start-column="4" selection-end-line="403" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VerifyFunctionVisitor.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="257" column="0" lean-forward="false" selection-start-line="257" selection-start-column="0" selection-end-line="257" selection-end-column="0" />
-              <folding>
-                <marker date="1549371326658" expanded="true" signature="12725:12753" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="12529:12793" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="12848:13326" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="13376:13417" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="13472:13939" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="13994:14285" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="14319:14750" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="14788:15067" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="15096:15312" ph="{...}" />
+                <marker date="1549382583293" expanded="false" signature="15425:15432" ph=" { " />
+                <marker date="1549382583293" expanded="false" signature="15442:15446" ph=" }" />
+                <marker date="1549382583293" expanded="true" signature="15497:15536" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="15588:15664" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="15721:16028" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="16085:16136" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="16193:16465" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="16517:16556" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="16608:16648" ph="{...}" />
+                <marker date="1549382583293" expanded="true" signature="16858:16976" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -200,16 +157,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>currentAssigna</find>
-      <find>currentAssignabl</find>
-      <find>currentAssignable</find>
-      <find>currentAssignable =</find>
-      <find>visitmethcu</find>
-      <find>editassig</find>
-      <find>havoc</find>
-      <find>JmlStore</find>
-      <find>cleanup</find>
-      <find>functionsby</find>
       <find>throw new</find>
       <find>visitJmlcl</find>
       <find>return super.visit.*node.*;</find>
@@ -220,7 +167,6 @@
       <find>decreaseste</find>
       <find>visitBinar</find>
       <find>decrea</find>
-      <find>visitassign</find>
       <find>parseFiles</find>
       <find>methodin</find>
       <find>faketest</find>
@@ -230,6 +176,17 @@
       <find>translat</find>
       <find>visitmeth</find>
       <find>visitbinar</find>
+      <find>visitbin</find>
+      <find>currentAssignable =</find>
+      <find>i</find>
+      <find>il</find>
+      <find>ill</find>
+      <find>illeg</find>
+      <find>illega</find>
+      <find>illegal</find>
+      <find>visitassign</find>
+      <find>editassign</find>
+      <find>16</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -303,17 +260,17 @@
         <option value="$PROJECT_DIR$/tests/CaseStudy/BitMagicCollection.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/MultExample.java" />
         <option value="$PROJECT_DIR$/src/TranslationUtils.java" />
-        <option value="$PROJECT_DIR$/tests/AssignableTests.java" />
         <option value="$PROJECT_DIR$/src/CostumPrintStream.java" />
         <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
         <option value="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/src/BaseVisitor.java" />
         <option value="$PROJECT_DIR$/src/CLI.java" />
-        <option value="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
         <option value="$PROJECT_DIR$/src/FunctionCallsVisitor.java" />
-        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
         <option value="$PROJECT_DIR$/src/FilterVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/AssignableTests.java" />
+        <option value="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
+        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
       </list>
     </option>
   </component>
@@ -766,8 +723,8 @@
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAllTests" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runTmpTest" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
         <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runMultCaseStudy" />
         <item index="4" class="java.lang.String" itemvalue="Application.MultExample" />
       </list>
@@ -1060,38 +1017,45 @@
       <option name="project" value="LOCAL" />
       <updated>1549363044324</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="implementing whitelist approach">
+      <created>1549379691098</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1549379691098</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestExecutor_runAllTests - 2019.02.05 at 16h 07m 07s.xml">
+    <history-entry file="TestExecutor_runAllTests - 2019.02.05 at 17h 03m 19s.xml">
       <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.02.05 at 16h 10m 27s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.02.05 at 16h 14m 13s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 00m 00s.xml">
+    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 28m 35s.xml">
       <configuration name="TestExecutor.runAssignableTests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 06m 22s.xml">
+    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 29m 33s.xml">
       <configuration name="TestExecutor.runAssignableTests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 07m 03s.xml">
+    <history-entry file="TestExecutor_runAssignableTests - 2019.02.05 at 16h 29m 58s.xml">
       <configuration name="TestExecutor.runAssignableTests" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 15h 59m 08s.xml">
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 22m 10s.xml">
       <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 03m 12s.xml">
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 22m 14s.xml">
       <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 04m 27s.xml">
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 27m 40s.xml">
       <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 04m 55s.xml">
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 28m 01s.xml">
+      <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 16h 31m 37s.xml">
+      <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runTmpTest - 2019.02.05 at 17h 01m 25s.xml">
       <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -1169,7 +1133,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="towards standalone version&#10;improved assignables handling" />
     <MESSAGE value="splitting assignableTests and rest of Tests&#10;fixing minor bugs" />
     <MESSAGE value="fixing tests" />
     <MESSAGE value="better type handling for assignables" />
@@ -1194,7 +1157,8 @@
     <MESSAGE value="changed CLI to ship jbmc by default" />
     <MESSAGE value="improved ant build file" />
     <MESSAGE value="more case studies, now checking for assignables when invocing a method" />
-    <option name="LAST_COMMIT_MESSAGE" value="more case studies, now checking for assignables when invocing a method" />
+    <MESSAGE value="implementing whitelist approach" />
+    <option name="LAST_COMMIT_MESSAGE" value="implementing whitelist approach" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1249,18 +1213,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>922</line>
+          <line>925</line>
           <properties />
           <option name="timeStamp" value="236" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/FunctionCallsVisitor.java</url>
-          <line>59</line>
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>733</line>
           <properties />
-          <option name="timeStamp" value="237" />
+          <option name="timeStamp" value="239" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="238" />
+      <option name="time" value="240" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -1560,8 +1524,8 @@
         <state relative-caret-position="177">
           <caret line="232" column="5" lean-forward="true" selection-start-line="229" selection-start-column="4" selection-end-line="232" selection-end-column="5" />
           <folding>
-            <element signature="e#5292#5293#0" expanded="true" />
-            <element signature="e#5316#5317#0" expanded="true" />
+            <element signature="e#5292#5293#0" expanded="false" />
+            <element signature="e#5316#5317#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1574,50 +1538,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="24" column="26" lean-forward="false" selection-start-line="24" selection-start-column="26" selection-end-line="24" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="46" column="1" lean-forward="false" selection-start-line="46" selection-start-column="1" selection-end-line="46" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/AssignableTeststmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12658">
-          <caret line="7" column="13" lean-forward="false" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
-          <folding>
-            <marker date="1549379638135" expanded="false" signature="16999:17004" ph=" { " />
-            <marker date="1549379638135" expanded="false" signature="17015:17019" ph=" }" />
-            <marker date="1549379638135" expanded="true" signature="17071:17111" ph="{...}" />
-            <marker date="1549379638135" expanded="true" signature="17321:17439" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="762">
-          <caret line="403" column="26" lean-forward="true" selection-start-line="403" selection-start-column="4" selection-end-line="403" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="181">
           <caret line="257" column="0" lean-forward="false" selection-start-line="257" selection-start-column="0" selection-end-line="257" selection-end-column="0" />
-          <folding>
-            <marker date="1549371326658" expanded="true" signature="12725:12753" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1626,17 +1551,6 @@
         <state relative-caret-position="181">
           <caret line="56" column="50" lean-forward="true" selection-start-line="56" selection-start-column="50" selection-end-line="56" selection-end-column="50" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="541">
-          <caret line="51" column="29" lean-forward="false" selection-start-line="51" selection-start-column="29" selection-end-line="51" selection-end-column="29" />
-          <folding>
-            <element signature="e#743#744#0" expanded="true" />
-            <element signature="e#780#781#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1656,23 +1570,84 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+    <entry file="file://$PROJECT_DIR$/src/FilterVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="285" column="62" lean-forward="true" selection-start-line="285" selection-start-column="62" selection-end-line="285" selection-end-column="62" />
+        <state relative-caret-position="297">
+          <caret line="285" column="0" lean-forward="true" selection-start-line="285" selection-start-column="0" selection-end-line="285" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1549379532474" expanded="true" signature="27777:27785" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/FilterVisitor.java">
+    <entry file="file://$PROJECT_DIR$/src/FunctionCallsVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="275" column="0" lean-forward="true" selection-start-line="275" selection-start-column="0" selection-end-line="275" selection-end-column="0" />
+        <state relative-caret-position="333">
+          <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="260">
+          <caret line="40" column="17" lean-forward="true" selection-start-line="40" selection-start-column="17" selection-end-line="40" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="173" column="5" lean-forward="true" selection-start-line="167" selection-start-column="4" selection-end-line="173" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/AssignableTeststmp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="274" column="31" lean-forward="false" selection-start-line="274" selection-start-column="29" selection-end-line="274" selection-end-column="31" />
+          <folding>
+            <marker date="1549382583293" expanded="true" signature="12529:12793" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="12848:13326" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="13376:13417" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="13472:13939" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="13994:14285" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="14319:14750" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="14788:15067" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="15096:15312" ph="{...}" />
+            <marker date="1549382583293" expanded="false" signature="15425:15432" ph=" { " />
+            <marker date="1549382583293" expanded="false" signature="15442:15446" ph=" }" />
+            <marker date="1549382583293" expanded="true" signature="15497:15536" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="15588:15664" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="15721:16028" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="16085:16136" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="16193:16465" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="16517:16556" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="16608:16648" ph="{...}" />
+            <marker date="1549382583293" expanded="true" signature="16858:16976" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="175" column="115" lean-forward="false" selection-start-line="175" selection-start-column="115" selection-end-line="175" selection-end-column="115" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#29122#29123#0" expanded="true" />
+            <element signature="e#29169#29170#0" expanded="true" />
+            <marker date="1549382479547" expanded="true" signature="27802:27810" ph="{...}" />
           </folding>
         </state>
       </provider>

@@ -16,11 +16,11 @@ public class TmpTest {
     TmpTest[] objects;
 
 
-    //@ assignable pubInt;
-    @Fails
-    private void methodInvAss(int i) {
-        test();
+    //@ assignable \nothing;
+    @Verifyable
+    private void assignableTest16() {
+        int i = 0;
+        ++i;
+        assert i == 1;
     }
-
-    private void test() {}
 }
