@@ -81,6 +81,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private List<JCExpression> currentAssignable = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
+    private List<Tag> supportedBinaryTags = List.of(Tag.PLUS, Tag.MINUS, Tag.MUL, Tag.DIV, Tag.MOD,
+            Tag.BITXOR, Tag.BITOR, Tag.BITAND, Tag.SL, Tag.SR, Tag.AND, Tag.OR, Tag.EQ, Tag.NE,
+            Tag.GE, Tag.GT, Tag.LE, Tag.LT);
 
 
 
@@ -262,15 +265,25 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return super.visitJmlBinary(that, p);
     }
 
+//    @Override
+//    public JCTree visitBinary(BinaryTree node, Void p) {
+//        JCBinary b = (JCBinary)node;
+//        if(!supportedBinaryTags.contains(b.getTag())) {
+//            throw new RuntimeException("Unsupported Operation: " + b.toString());
+//        }
+//        JCExpression lhs = super.copy(b.getLeftOperand());
+//        JCExpression rhs = super.copy(b.getRightOperand());
+//        JCBinary r = M.Binary(((JCBinary) node).getTag(), lhs, rhs);
+//        r.operator = b.operator;
+//        return r;
+//    }
+
     @Override
     public JCTree visitBinary(BinaryTree node, Void p) {
-        int countStmts = newStatements.size();
+        if(!supportedBinaryTags.contains(((JCBinary)node).getTag())) {
+            throw new RuntimeException("Unsupported Operation: " + ((JCBinary)node).toString());
+        }
         JCBinary copy = (JCBinary) super.visitBinary(node, p);
-        /*if(copy.operator.asType().getReturnType() == syms.booleanType && countStmts < newStatements.size()) {
-            JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, copy);
-            //newStatements.append(boolVar);
-            returnBool = boolVar.sym;
-        }*/
         return copy;
     }
 
@@ -530,10 +543,20 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.nil(), null));
         if(assign != null) {
             JCBlock block = M.Block(0L, List.of(M.Exec(assign), throwStmt));
-            return block;
+            if(newStatements.size() == 0) {
+                return block;
+            } else {
+                newStatements = newStatements.append(block);
+                return block;
+            }
         } else {
             JCBlock block = M.Block(0L, List.of(throwStmt));
-            return block;
+            if(newStatements.size() == 0) {
+                return block;
+            } else {
+                newStatements = newStatements.append(block);
+                return block;
+            }
         }
     }
 
@@ -911,7 +934,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCStatement expr = TranslationUtils.makeAssertStatement(cond, M);
             newStatements = newStatements.append(expr);
         }
-
         return copy;
     }
 

@@ -1,3 +1,4 @@
+import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -32,7 +33,7 @@ import static org.jmlspecs.openjml.JmlTree.*;
 /**
  * Created by jklamroth on 11/13/18.
  */
-public class VerifyFunctionVisitor extends JmlTreeCopier {
+public class VerifyFunctionVisitor extends FilterVisitor {
     private final Maker M;
     private final Context context;
     private final Log log;
@@ -208,8 +209,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                 if(combinedNewEnsStatements.size() > 0) {
                     l1 = l1.append(ensTry);
                 }
-                l1 = l1.append(returnStmt);
-                List<JCStatement> body = transformBody(copy.body.getStatements());
+                List<JCStatement> body = transformBody(that.body.getStatements());
                 JCTry bodyTry = M.Try(M.Block(0L, body),
                         List.of(
                                 M.Catch(catchVarb, M.Block(0L, l1))
@@ -219,9 +219,10 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                     l = l.append(reqTry);
                 }
                 l = l.append(returnVar).append(bodyTry);
+                l = l.append(returnStmt);
             } else {
                 if(combinedNewEnsStatements.size() > 0) {
-                    List<JCStatement> body = transformBody(copy.body.getStatements());
+                    List<JCStatement> body = transformBody(that.body.getStatements());
                     JCTry bodyTry = M.Try(M.Block(0L, body),
                             List.of(
                                     M.Catch(catchVarb, M.Block(0L, List.of(ensTry)))
@@ -229,13 +230,13 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
                             null);
                     l = l.append(reqTry).append(bodyTry);
                 } else {
-                    l = transformBody(copy.body.getStatements());
+                    l = transformBody(that.body.getStatements());
                     l = l.prepend(reqTry);
                 }
             }
         } else {
             //l = copy.body.getStatements();
-            l = transformBody(copy.body.getStatements());
+            l = transformBody(that.body.getStatements());
             if(combinedNewEnsStatements.size() > 0) {
                 l = l.append(ensTry);
             }
@@ -271,7 +272,7 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
     }
 
     public JCTree visitJmlMethodDeclBugfix(JmlMethodDecl that, Void p) {
-        JmlMethodDecl copy = (JmlMethodDecl)super.visitMethod(that, p);
+        JmlMethodDecl copy = (JmlMethodDecl)visitMethodWithoutBody(that, p);
         copy.sourcefile = that.sourcefile;
         copy.specsDecl = that.specsDecl;
         //copy.cases = (JmlMethodSpecs)this.copy((JCTree)that.cases, (Object)p);
@@ -279,6 +280,19 @@ public class VerifyFunctionVisitor extends JmlTreeCopier {
         copy.cases = (JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
         copy.type = that.type;
         return copy;
+    }
+
+    public JCTree visitMethodWithoutBody(MethodTree node, Void p) {
+        JCMethodDecl t = (JCMethodDecl)node;
+        JCModifiers mods = (JCModifiers)this.copy((JCTree)t.mods, p);
+        JCExpression restype = (JCExpression)this.copy((JCTree)t.restype, p);
+        List<JCTypeParameter> typarams = this.copy(t.typarams, p);
+        List<JCVariableDecl> params = this.copy(t.params, p);
+        JCVariableDecl recvparam = (JCVariableDecl)this.copy((JCTree)t.recvparam, p);
+        List<JCExpression> thrown = this.copy(t.thrown, p);
+        JCBlock body = M.Block(0L, List.nil());
+        JCExpression defaultValue = (JCExpression)this.copy((JCTree)t.defaultValue, p);
+        return this.M.at(t.pos).MethodDef(mods, t.name, restype, typarams, recvparam, params, thrown, body, defaultValue);
     }
 
     private JCLiteral getLiteralForType(Type t) {

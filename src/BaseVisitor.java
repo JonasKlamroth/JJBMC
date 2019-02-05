@@ -17,7 +17,7 @@ import static org.jmlspecs.openjml.JmlTree.*;
 /**
  * Created by jklamroth on 11/13/18.
  */
-public class BaseVisitor extends JmlTreeCopier {
+public class BaseVisitor extends FilterVisitor {
     private JCTree.JCClassDecl returnExcClass;
     private final ClassReader reader;
     private final Symtab syms;
@@ -52,7 +52,7 @@ public class BaseVisitor extends JmlTreeCopier {
                     com.sun.tools.javac.util.List.nil());
             returnExcClass.sym = classSymbol;
             returnExcClass.type = classSymbol.type;
-            JmlClassDecl copy = (JmlClassDecl) super.visitJmlClassDecl(that, p);
+            JmlClassDecl copy = that;
             List<JCTree> newDefs = List.nil();
             FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
             for (JCTree def : copy.defs) {
