@@ -8,6 +8,31 @@ class DualPivotQuicksort {
     static int less, great;
     static int e1,e2,e3,e4,e5;
 
+//    /*@
+//      @ normal_behaviour
+//      @ requires 0 <= left && right < a.length;
+//      @ requires left == less && less < great && great < a.length;
+//      @ requires (\exists int j; less+1 <= j && j < great; a[j] >= pivot1);
+//      @ ensures less < great;
+//      @ ensures (\forall int i; left < i && i < less; a[i] < pivot1);
+//      @ ensures a[less] >= pivot1;
+//      @ ensures \old(less) < less;
+//      @ assignable less;
+//      @*/
+//    static void  move_less_right(int[] a, int left, int right, int pivot1) {
+//        /*@
+//          @ loop_invariant
+//          @     0 <= less && less <= great && great < a.length
+//          @  && (\forall int i; left < i && i < less+1; a[i] < pivot1)
+//          @  && (\exists int j; less+1 <= j && j < great; a[j] >= pivot1)
+//          @  && \old(less) <= less;
+//          @  assignable less;
+//          @  decreases great - less;
+//          @*/
+//        while (a[++less] < pivot1) {
+//        }
+//    }
+
     /*@
       @ requires a != null && a.length <= 5;
       @ requires 0 <= left && right < a.length;
@@ -35,6 +60,33 @@ class DualPivotQuicksort {
         }
     }
 
+
+
+//    /*@
+//      @ normal_behaviour
+//      @ requires 0 <= left && left <= less && less < great && great == right && right < a.length;
+//      @ requires (\exists int i; less <= i && i < great; a[i] <= pivot2);
+//      @ ensures less <= great;
+//      @ ensures (\forall int i; great < i && i < right; a[i] > pivot2);
+//      @ ensures a[great] <= pivot2;
+//      @ ensures great < \old(great);
+//      @ assignable great;
+//      @*/
+//    static void move_great_left(int[] a, int left, int right, int pivot2) {
+//      /*@
+//        @ loop_invariant great > 0;
+//        @ loop_invariant left <= great && great <= right;
+//        @ loop_invariant less <= great;
+//        @ loop_invariant (\forall int i; great-1 < i && i < right; a[i] > pivot2);
+//        @ loop_invariant (\exists int i; less <= i && i < great; a[i] <= pivot2);
+//        @ decreases great;
+//        @ assignable great;
+//        @*/
+//        while (a[--great] > pivot2) {
+//        }
+//    }
+
+
     /*@
       @ requires a != null && a.length <= 5;
       @ requires 0 <= left && left <= less && less < great && great == right && right < a.length;
@@ -61,6 +113,32 @@ class DualPivotQuicksort {
         }
     }
 
+//    /*@
+//      @ normal_behaviour
+//      @ requires 0 <= k && k <= great && great < a.length;
+//      @ requires (\exists int i; left <= i && i <= great; a[i] <= pivot2);
+//      @ ensures 0 <= great;
+//      @ ensures (\forall int i; great < i && i <= \old(great); a[i] > pivot2);
+//      @ ensures a[great] <= pivot2 || great == k;
+//      @ ensures k <= great && great <= \old(great);
+//      @ assignable great;
+//      @*/
+//    static void move_great_left_in_loop(int[] a, int k, int left, int right, int pivot2) {
+//        /*@
+//          @ loop_invariant
+//          @     k <= great && 0 <= great
+//          @  && (\exists int i; left <= i && i <= great; a[i] <= pivot2)
+//          @  && (\forall int i; great < i && i <= \old(great); a[i] > pivot2)
+//          @  && great <= \old(great);
+//          @ decreases great;
+//          @ assignable great;
+//          @*/
+//        while (a[great] > pivot2 && great != k) {
+//            --great;
+//        }
+//    }
+
+
     /*@
       @ requires a != null && a.length <= 5 && left >= 0;
       @ requires 0 <= k && k <= great && great < a.length;
@@ -77,9 +155,9 @@ class DualPivotQuicksort {
         /*@
           @ loop_invariant
           @     k <= great && 0 <= great
-          @  && great <= \old(great)
-          @  && (\exists int j; left <= j && j <= great; a[j] <= pivot2)
-          @  && (\forall int i; great < i && i <= \old(great); a[i] > pivot2);
+          @  && (\exists int i; left <= i && i <= great; a[i] <= pivot2)
+          @  && (\forall int j; great < j && j <= \old(great); a[j] > pivot2)
+          @  && great <= \old(great);
           @ decreases great;
           @ loop_modifies great;
           @*/

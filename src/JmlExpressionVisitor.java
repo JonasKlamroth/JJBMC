@@ -83,7 +83,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private List<JCStatement> combinedNewEnsStatements = List.nil();
     private List<Tag> supportedBinaryTags = List.of(Tag.PLUS, Tag.MINUS, Tag.MUL, Tag.DIV, Tag.MOD,
             Tag.BITXOR, Tag.BITOR, Tag.BITAND, Tag.SL, Tag.SR, Tag.AND, Tag.OR, Tag.EQ, Tag.NE,
-            Tag.GE, Tag.GT, Tag.LE, Tag.LT);
+            Tag.GE, Tag.GT, Tag.LE, Tag.LT, Tag.USR);
 
 
 
@@ -281,7 +281,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitBinary(BinaryTree node, Void p) {
         if(!supportedBinaryTags.contains(((JCBinary)node).getTag())) {
-            throw new RuntimeException("Unsupported Operation: " + ((JCBinary)node).toString());
+            throw new RuntimeException("Unsupported Operation: " + ((JCBinary)node).toString() + "(" + ((JCBinary) node).getTag() + ")");
         }
         JCBinary copy = (JCBinary) super.visitBinary(node, p);
         return copy;
@@ -929,13 +929,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
             //newStatements = newStatements.append(ifst);
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
-        }
-        List<JCExpression> assignables = baseVisitor.getAssignablesForName(((JCMethodInvocation)node).meth.toString());
-        for(JCExpression e : assignables) {
-            JCExpression cond = editAssignable(e);
-            cond = treeutils.makeNot(Position.NOPOS, cond);
-            JCStatement expr = TranslationUtils.makeAssertStatement(cond, M);
-            newStatements = newStatements.append(expr);
         }
         return copy;
     }

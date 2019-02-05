@@ -198,9 +198,6 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
 
         List< JCStatement> l = List.nil();
-        for(JCVariableDecl variableDecl : oldVars.values()) {
-            copy.body.stats = copy.body.getStatements().prepend(variableDecl);
-        }
 
         if(hasReturn) {
             if(returnVar != null) {
@@ -255,6 +252,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
     private List<JCStatement> transformBody(List<JCStatement> oBody) {
         List<JCStatement> body = List.nil();
+        for(JCVariableDecl variableDecl : oldVars.values()) {
+            body = body.prepend(variableDecl);
+        }
         for(JCStatement st : oBody) {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
             if(currentAssignable == null) {
