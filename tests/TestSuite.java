@@ -236,6 +236,11 @@ public class TestSuite {
         return 56;
     }
 
+    //@ ensures (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+    @Fails
+    private void quantifierTest() {
+    }
+
     //@ assignable t2;
     private void calledMethod() {
         t2 = new TestSuite();

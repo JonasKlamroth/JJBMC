@@ -460,10 +460,16 @@ class RangeExtractor extends JmlTreeScanner {
 
 
     public JCTree.JCExpression getMin() {
+        if(minResult == null) {
+            throw new RuntimeException("No lower bound for quantified variable found.");
+        }
         return minResult;
     }
 
     public JCTree.JCExpression getMax() {
+        if(maxResult == null) {
+            throw new RuntimeException("No upper bound for quantified variable found.");
+        }
         return maxResult;
     }
 }

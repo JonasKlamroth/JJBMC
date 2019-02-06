@@ -16,11 +16,8 @@ public class TmpTest {
     TmpTest[] objects;
 
 
-    //@ assignable \nothing;
+    //@ ensures true || (\exists int i; 0 <= i && i < 1; 1/0 == 0);
     @Verifyable
     private void assignableTest16() {
-        int i = 0;
-        ++i;
-        assert i == 1;
     }
 }

@@ -1,3 +1,4 @@
+import com.sun.imageio.plugins.jpeg.JPEG;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BreakTree;
@@ -77,13 +78,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
-    private JCIf innermostIf = null;
     private List<JCExpression> currentAssignable = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
     private List<Tag> supportedBinaryTags = List.of(Tag.PLUS, Tag.MINUS, Tag.MUL, Tag.DIV, Tag.MOD,
             Tag.BITXOR, Tag.BITOR, Tag.BITAND, Tag.SL, Tag.SR, Tag.AND, Tag.OR, Tag.EQ, Tag.NE,
             Tag.GE, Tag.GT, Tag.LE, Tag.LT, Tag.USR);
+    private List<JCStatement> neededVariableDefs = List.nil();
 
 
 
@@ -141,8 +142,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             copy = super.copy(expr, p);
-            newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(innermostIf, copy, translationMode));
-            innermostIf = null;
+            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = tmp.append(M.Block(0L, newStatements));
             translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         } else if(that.token == JmlTokenKind.ASSUME) {
@@ -151,8 +151,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             copy = super.copy(expr, p);
-            newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(innermostIf, copy, translationMode));
-            innermostIf = null;
+            newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = tmp.append(M.Block(0L, newStatements));
             translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         } else {
@@ -200,10 +199,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = List.nil();
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
+                neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
-                l = l.append(boolVar);
+                //l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
@@ -214,13 +214,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if(copy.op == JmlTokenKind.BSFORALL) {
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
-                innermostIf = null;
                 JCExpression value = super.copy(copy.value);
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
+                neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
-                l = l.append(boolVar);
+                //l = l.append(boolVar);
                 l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
@@ -282,6 +282,32 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitBinary(BinaryTree node, Void p) {
         if(!supportedBinaryTags.contains(((JCBinary)node).getTag())) {
             throw new RuntimeException("Unsupported Operation: " + ((JCBinary)node).toString() + "(" + ((JCBinary) node).getTag() + ")");
+        }
+        JCBinary b = (JCBinary)node;
+        if(b.getTag() == Tag.OR) {
+            JCExpression lhs = super.copy(b.getLeftOperand());
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JCExpression rhs = super.copy(b.getRightOperand());
+            if(newStatements.size() != 0) {
+                JCIf ifst = M.If(treeutils.makeNot(Position.NOPOS, lhs), M.Block(0L, newStatements), null);
+                newStatements = tmp.append(ifst);
+            } else {
+                newStatements = tmp;
+            }
+            return M.Binary(b.getTag(), lhs, rhs);
+        } else if(b.getTag() == Tag.AND) {
+            JCExpression lhs = super.copy(b.getLeftOperand());
+            List<JCStatement> tmp = newStatements;
+            newStatements = List.nil();
+            JCExpression rhs = super.copy(b.getRightOperand());
+            if(newStatements.size() != 0) {
+                JCIf ifst = M.If(lhs, M.Block(0L, newStatements), null);
+                newStatements = tmp.append(ifst);
+            } else {
+                newStatements = tmp;
+            }
+            return M.Binary(b.getTag(), lhs, rhs);
         }
         JCBinary copy = (JCBinary) super.visitBinary(node, p);
         return copy;
@@ -568,8 +594,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if(spec instanceof JmlStatementLoopExpr && spec.token == JmlTokenKind.LOOP_INVARIANT) {
                 translationMode = mode;
                 JCExpression assertCopy = this.copy(((JmlStatementLoopExpr) spec).expression);
-                newStatements = newStatements.appendList(transUtils.assumeOrAssertInIf(innermostIf, assertCopy, mode));
-                innermostIf = null;
+                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(assertCopy, mode));
             }
         }
         if(newStatements.size() > 0) {
@@ -977,7 +1002,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         this.translationMode = translationMode;
     }
 
-    public JCIf getInnermostIf() {
-        return innermostIf;
+    public List<JCStatement> getNeededVariableDefs() {
+        return neededVariableDefs;
     }
 }

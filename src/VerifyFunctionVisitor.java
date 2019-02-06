@@ -111,8 +111,8 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
-        JCIf ist = expressionVisitor.getInnermostIf();
         oldVars = expressionVisitor.getOldVars();
+        newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
             combinedNewEnsStatements = combinedNewEnsStatements.append(M.Block(0L, newStatements));
