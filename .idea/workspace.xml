@@ -13,13 +13,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="more case studies, now checking for assignables when invocing a method">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/../Examples/CBMC/output1.txt" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/experiments/cbmc_mult_exp.ods" afterPath="$PROJECT_DIR$/../Examples/experiments/cbmc_mult_exp.ods" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.pdf" afterPath="$PROJECT_DIR$/../Thesis/thesis.pdf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/LoopInv.c" afterPath="$PROJECT_DIR$/../Examples/CBMC/LoopInv.c" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/out1.txt" afterPath="$PROJECT_DIR$/../Examples/CBMC/out1.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/output.txt" afterPath="$PROJECT_DIR$/../Examples/CBMC/output.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Examples/CBMC/runCBMC.sh" afterPath="$PROJECT_DIR$/../Examples/CBMC/runCBMC.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Basics.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Basics.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" />
@@ -1191,7 +1185,14 @@
       <option name="project" value="LOCAL" />
       <updated>1549546710546</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="cbmc experiment updated">
+      <created>1549546739813</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1549546739813</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1299,7 +1300,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="fixed handling of quntifiers in requires" />
     <MESSAGE value="minor fix for negated formulas" />
     <MESSAGE value="quantified expression now without if" />
     <MESSAGE value="removing returnBool" />
@@ -1324,7 +1324,8 @@
     <MESSAGE value="some work on the thesis" />
     <MESSAGE value="cleanup and now supporting shortcut semantics" />
     <MESSAGE value="fixing binary bug, all tests running" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing binary bug, all tests running" />
+    <MESSAGE value="cbmc experiment updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="cbmc experiment updated" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
