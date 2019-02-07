@@ -4,7 +4,6 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.parser.Tokens;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
@@ -19,8 +18,6 @@ import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Utils;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.Collections;
 
 import static com.sun.tools.javac.tree.JCTree.*;
@@ -32,10 +29,6 @@ import static com.sun.tools.javac.util.List.*;
  * Created by jklamroth on 11/13/18.
  */
 public class TranslationUtils {
-    private final Context context;
-    private final Log log;
-    private final Names names;
-    private final Nowarns nowarns;
     private final Symtab syms;
     private final Types types;
     private final Utils utils;
@@ -45,11 +38,7 @@ public class TranslationUtils {
     private final JmlTree.Maker M;
 
     public TranslationUtils(Context context, JmlTree.Maker maker) {
-        this.context = context;
-        this.log = Log.instance(context);
         this.M = JmlTree.Maker.instance(context);
-        this.names = Names.instance(context);
-        this.nowarns = Nowarns.instance(context);
         this.syms = Symtab.instance(context);
         this.types = Types.instance(context);
         this.utils = Utils.instance(context);

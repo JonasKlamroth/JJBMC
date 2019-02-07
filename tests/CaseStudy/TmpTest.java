@@ -16,8 +16,8 @@ public class TmpTest {
     TmpTest[] objects;
 
 
-    //@ ensures true || (\exists int i; 0 <= i && i < 1; 1/0 == 0);
-    @Verifyable
-    private void assignableTest16() {
+    //@ ensures !(true && (\exists int i; i >= 0 && i < 5; i > 3));
+    @Fails
+    private void negatedTest() {
     }
 }

@@ -36,28 +36,15 @@ import static org.jmlspecs.openjml.JmlTree.*;
 public class SymbFunctionVisitor extends JmlTreeCopier {
     private final Maker M;
     private final Context context;
-    private final Log log;
     private final Names names;
     private final Nowarns nowarns;
     private final Symtab syms;
-    private final Types types;
-    private final Utils utils;
-    private final JmlTypes jmltypes;
-    private final JmlSpecs specs;
     private final JmlTreeUtils treeutils;
     private final TranslationUtils transUtils;
-    private final JmlAttr attr;
-    private final Name resultName;
-    private final Name exceptionName;
-    private final Name exceptionNameCall;
-    private final Name terminationName;
     private final ClassReader reader;
-    private final Symbol.ClassSymbol utilsClass;
-    private final JCIdent preLabel;
     private Set<JCExpression> ensuresList = new HashSet<>();
     private Set<JCExpression> requiresList = new HashSet<>();
     private JmlMethodDecl currentMethod;
-    private int boolVarCounter = 0;
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
@@ -69,32 +56,18 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;
 
-    public enum TranslationMode { REQUIRES, ENSURES, JAVA}
-
     public SymbFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
         super(context, maker);
         baseVisitor = base;
         this.context = context;
-        this.log = Log.instance(context);
         this.M = Maker.instance(context);
         this.names = Names.instance(context);
         this.nowarns = Nowarns.instance(context);
         this.syms = Symtab.instance(context);
-        this.types = Types.instance(context);
-        this.utils = Utils.instance(context);
-        this.specs = JmlSpecs.instance(context);
-        this.jmltypes = JmlTypes.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
         this.transUtils = new TranslationUtils(context, M);
-        this.attr = JmlAttr.instance(context);
-        this.resultName = names.fromString(Strings.resultVarString);
-        this.exceptionName = names.fromString(Strings.exceptionVarString);
-        this.exceptionNameCall = names.fromString(Strings.exceptionCallVarString);
-        this.terminationName = names.fromString(Strings.terminationVarString);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
-        this.utilsClass = reader.enterClass(names.fromString(Strings.runtimeUtilsFQName));
-        this.preLabel = treeutils.makeIdent(Position.NOPOS, Strings.empty, syms.intType);
     }
 
     @Override
@@ -167,13 +140,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
         List<JCExpression> assignables = baseVisitor.getAssignablesForName(that.getName().toString());
         List<JCStatement> assignableConditions = List.nil();
-        for(JCExpression e : assignables) {
-            JCExpression cond = editAssignable(e);
-            cond = treeutils.makeNot(Position.NOPOS, cond);
-            JCStatement expr = TranslationUtils.makeAssertStatement(cond, M);
-            assignableConditions = assignableConditions.append(expr);
-        }
-        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements).appendList(assignableConditions)),
+        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
                 List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
         JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
                 List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);

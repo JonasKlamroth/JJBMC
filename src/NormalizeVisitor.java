@@ -1,5 +1,6 @@
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.UnaryTree;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import org.jmlspecs.openjml.JmlTokenKind;
@@ -15,6 +16,7 @@ import static com.sun.tools.javac.tree.JCTree.*;
 public class NormalizeVisitor extends JmlTreeCopier {
     TranslationUtils transUtils = null;
     private boolean negated = false;
+    private boolean selfNegated = false;
 
     public NormalizeVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -29,17 +31,25 @@ public class NormalizeVisitor extends JmlTreeCopier {
         }
         if(binary.getTag() == Tag.AND) {
             negated = false;
-            JCExpression expr1 = super.copy(M.Unary(Tag.NOT, binary.getLeftOperand()));
+            JCExpression expr1 = super.copy(negateExpression(binary.getLeftOperand()));
             negated = false;
-            JCExpression expr2 = super.copy(M.Unary(Tag.NOT, binary.getRightOperand()));
-            return M.Binary(Tag.OR, expr1, expr2);
+            JCExpression expr2 = super.copy(negateExpression(binary.getRightOperand()));
+            selfNegated = true;
+            JCBinary b = M.Binary(Tag.OR, expr1, expr2); 
+            b = (JCBinary)b.setType(binary.type);
+            b.operator = binary.operator;
+            return b;
         }
         if(binary.getTag() == Tag.OR) {
             negated = false;
-            JCExpression expr1 = super.copy(M.Unary(Tag.NOT, binary.getLeftOperand()));
+            JCExpression expr1 = super.copy(negateExpression(binary.getLeftOperand()));
             negated = false;
-            JCExpression expr2 = super.copy(M.Unary(Tag.NOT, binary.getRightOperand()));
-            return M.Binary(Tag.AND, expr1, expr2);
+            JCExpression expr2 = super.copy(negateExpression(binary.getRightOperand()));
+            selfNegated = true;
+            JCBinary b = M.Binary(Tag.AND, expr1, expr2); 
+            b = (JCBinary)b.setType(binary.type);
+            b.operator = binary.operator;
+            return b;
         }
         return super.visitBinary(node, p);
     }
@@ -52,14 +62,20 @@ public class NormalizeVisitor extends JmlTreeCopier {
                 negated = false;
                 JCExpression expr1 = super.copy(binary.lhs);
                 negated = false;
-                JCExpression expr2 = super.copy(M.Unary(Tag.NOT, binary.rhs));
-                return M.Binary(Tag.AND, expr1, expr2);
+                JCExpression expr2 = super.copy(negateExpression(binary.rhs));
+                selfNegated = true;
+                JCBinary b = M.Binary(Tag.AND, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             } else {
                 negated = false;
-                JCExpression expr1 = super.copy(M.Unary(Tag.NOT, binary.lhs));
+                JCExpression expr1 = super.copy(negateExpression(binary.lhs));
                 negated = false;
                 JCExpression expr2 = super.copy(binary.rhs);
-                return M.Binary(Tag.OR, expr1, expr2);
+                selfNegated = true;
+                JCBinary b = M.Binary(Tag.OR, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             }
         }
         if(binary.getOp() == JmlTokenKind.REVERSE_IMPLIES) {
@@ -67,14 +83,20 @@ public class NormalizeVisitor extends JmlTreeCopier {
                 negated = false;
                 JCExpression expr1 = super.copy(binary.lhs);
                 negated = false;
-                JCExpression expr2 = super.copy(M.Unary(Tag.NOT, binary.rhs));
-                return M.Binary(Tag.OR, expr1, expr2);
+                JCExpression expr2 = super.copy(negateExpression(binary.rhs));
+                selfNegated = true;
+                JCBinary b = M.Binary(Tag.OR, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             } else {
                 negated = false;
-                JCExpression expr1 = super.copy(M.Unary(Tag.NOT, binary.lhs));
+                JCExpression expr1 = super.copy(negateExpression(binary.lhs));
                 negated = false;
                 JCExpression expr2 = super.copy(binary.rhs);
-                return M.Binary(Tag.AND, expr1, expr2);
+                selfNegated = true;
+                JCBinary b = M.Binary(Tag.AND, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             }
         }
         if(binary.getOp() == JmlTokenKind.EQUIVALENCE) {
@@ -82,10 +104,15 @@ public class NormalizeVisitor extends JmlTreeCopier {
             JCExpression expr1 = super.copy(binary.lhs);
             negated = false;
             JCExpression expr2 = super.copy(binary.rhs);
+            selfNegated = true;
             if(negated) {
-                return M.Binary(Tag.NE, expr1, expr2);
+                JCBinary b = M.Binary(Tag.NE, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             }
-            return M.Binary(Tag.EQ, expr1, expr2);
+            JCBinary b = M.Binary(Tag.EQ, expr1, expr2); 
+            b = (JCBinary)b.setType(binary.type);
+            return b;
         }
 
         if(binary.getOp() == JmlTokenKind.INEQUIVALENCE) {
@@ -93,10 +120,15 @@ public class NormalizeVisitor extends JmlTreeCopier {
             JCExpression expr1 = super.copy(binary.lhs);
             negated = false;
             JCExpression expr2 = super.copy(binary.rhs);
+            selfNegated = true;
             if(negated) {
-                return M.Binary(Tag.EQ, expr1, expr2);
+                JCBinary b = M.Binary(Tag.EQ, expr1, expr2); 
+                b = (JCBinary)b.setType(binary.type);
+                return b;
             }
-            return M.Binary(Tag.NE, expr1, expr2);
+            JCBinary b = M.Binary(Tag.NE, expr1, expr2); 
+            b = (JCBinary)b.setType(binary.type);
+            return b;
         }
         return super.visitBinary(that, p);
     }
@@ -107,7 +139,8 @@ public class NormalizeVisitor extends JmlTreeCopier {
             return super.visitJmlQuantifiedExpr(that, p);
         }
         negated = false;
-        JCExpression expr = super.copy(M.Unary(Tag.NOT, that.value));
+        JCExpression expr = super.copy(negateExpression(that.value));
+        selfNegated = true;
         if(that.op == JmlTokenKind.BSEXISTS) {
             return M.JmlQuantifiedExpr(JmlTokenKind.BSFORALL, that.decls, that.range, expr);
         } else if(that.op == JmlTokenKind.BSFORALL) {
@@ -127,12 +160,21 @@ public class NormalizeVisitor extends JmlTreeCopier {
             } else {
                 negated = true;
                 JCExpression e = transUtils.unwrapExpression(unary.arg);
-                if(e instanceof JmlQuantifiedExpr) {
-                    return super.copy(unary.arg);
+                JCExpression sub = super.copy(e);
+                if(selfNegated) {
+                    return sub;
+                } else {
+                    return negateExpression(sub);
                 }
             }
         }
         return super.visitUnary(unary, p);
+    }
+
+    private JCUnary negateExpression(JCExpression expression) {
+        JCUnary res = M.Unary(Tag.NOT, expression);
+        res = (JCUnary)res.setType(expression.type);
+        return res;
     }
 
     public static JCExpression normalize(JCExpression expression, Context context, Maker maker) {

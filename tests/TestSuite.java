@@ -503,5 +503,23 @@ public class TestSuite {
     private void binaryTest3() {
     }
 
+    //@ ensures true || (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+    @Verifyable
+    private void shortcutTest() {
+    }
 
+    //@ ensures false && (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+    @Fails
+    private void shortcutTest1() {
+    }
+
+    //@ ensures false || (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+    @Fails
+    private void shortcutTest2() {
+    }
+
+    //@ ensures true && (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+    @Fails
+    private void shortcutTest3() {
+    }
 }
