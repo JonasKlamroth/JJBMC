@@ -27,12 +27,6 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Theoretical_Solutions.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Theoretical_Solutions.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.tex" afterPath="$PROJECT_DIR$/../Thesis/thesis.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/NormalizeVisitor.java" afterPath="$PROJECT_DIR$/src/NormalizeVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" afterPath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TranslationUtils.java" afterPath="$PROJECT_DIR$/src/TranslationUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" afterPath="$PROJECT_DIR$/tests/CaseStudy/TmpTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestSuite.java" afterPath="$PROJECT_DIR$/tests/TestSuite.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -1190,7 +1184,14 @@
       <option name="project" value="LOCAL" />
       <updated>1549473155990</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="fixing binary bug, all tests running">
+      <created>1549546710546</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1549546710546</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -1227,7 +1228,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1173" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1299,7 +1299,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="towards quantifier chapter" />
     <MESSAGE value="fixed handling of quntifiers in requires" />
     <MESSAGE value="minor fix for negated formulas" />
     <MESSAGE value="quantified expression now without if" />
@@ -1324,7 +1323,8 @@
     <MESSAGE value="more fixes" />
     <MESSAGE value="some work on the thesis" />
     <MESSAGE value="cleanup and now supporting shortcut semantics" />
-    <option name="LAST_COMMIT_MESSAGE" value="cleanup and now supporting shortcut semantics" />
+    <MESSAGE value="fixing binary bug, all tests running" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixing binary bug, all tests running" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
