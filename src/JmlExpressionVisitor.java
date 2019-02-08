@@ -956,15 +956,18 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
             //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
             //newStatements = newStatements.append(ifst);
-            Symbol oldSymbol = currentSymbol;
-            currentSymbol = ((JCIdent)copy.meth).sym;
-            List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
-            for(JCExpression a : assignables) {
-                JCExpression cond = editAssignable(a);
-                cond = treeutils.makeNot(Position.NOPOS, cond);
-                newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+
+            if(!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+                Symbol oldSymbol = currentSymbol;
+                currentSymbol = ((JCIdent)copy.meth).sym;
+                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+                for(JCExpression a : assignables) {
+                    JCExpression cond = editAssignable(a);
+                    cond = treeutils.makeNot(Position.NOPOS, cond);
+                    newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+                }
+                currentSymbol = oldSymbol;
             }
-            currentSymbol = oldSymbol;
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
 

@@ -15,9 +15,17 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
+    //@ assignable \everything;
+    @Verifyable
+    private void test() {
+        negatedTest();
+    }
 
-    //@ ensures !(true && (\exists int i; i >= 0 && i < 5; i > 3));
-    @Fails
+
+    //@ ensures \old(pubInt) == pubInt + 1;
+    //@ assignable pubInt;
+    @Verifyable
     private void negatedTest() {
+        pubInt--;
     }
 }
