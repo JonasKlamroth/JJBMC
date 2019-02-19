@@ -2,7 +2,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 /*
-    This only prevents some error messages to be displayed.
+    This only prevents some error messages from being displayed.
      */
 class CostumPrintStream extends PrintStream {
     static private boolean filtered = false;

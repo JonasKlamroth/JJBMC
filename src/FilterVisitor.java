@@ -58,6 +58,10 @@ import org.jmlspecs.openjml.JmlTreeCopier;
 
 /**
  * Created by jklamroth on 2/5/19.
+ *
+ * This Visitor is used to implement the whitelisting apprach:
+ * the default is that no TreeElement is supported with some exceptions like for example
+ * basic types. Everything else has to overwritten in order to prevent the exception from being thrown.
  */
 public class FilterVisitor extends JmlTreeCopier {
     public FilterVisitor(Context context, JmlTree.Maker maker) {

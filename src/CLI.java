@@ -367,7 +367,6 @@ public class CLI implements Runnable {
     static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
         context.dump();
         return cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
-//        return cu.accept(new JmlToAssertVisitor(context, JmlTree.Maker.instance(context)), null);
     }
 }
 
@@ -389,13 +388,10 @@ class FunctionNameVisitor extends JmlTreeScanner {
             String[] args = {fileName};
             IAPI api = Factory.makeAPI();
             java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
-            int a = api.typecheck(cu);
-            //System.out.printf("a=%d", a);
 
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
-                //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
                 it.accept(fnv);
             }

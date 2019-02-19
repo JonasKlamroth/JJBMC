@@ -12,6 +12,8 @@ import static org.jmlspecs.openjml.JmlTree.*;
 import static com.sun.tools.javac.tree.JCTree.*;
 /**
  * Created by jklamroth on 1/17/19.
+ *
+ * This Visitor will transform any supported JML-expression into negation normal form.
  */
 public class NormalizeVisitor extends JmlTreeCopier {
     TranslationUtils transUtils = null;

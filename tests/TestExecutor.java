@@ -30,7 +30,7 @@ public class TestExecutor {
 
     static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
     private File tmpFile = new File("./tests/tmp.java");
-    private boolean keepTmpFile = true;
+    private boolean keepTmpFile = false;
     private boolean filterOutput = true;
     private boolean doCleanup = true;
 
@@ -103,7 +103,6 @@ public class TestExecutor {
     @org.junit.Test
     public void runAllTests() throws IOException, InterruptedException {
         for(String fileName : fileNames) {
-            cleanup();
             try {
                 File f = new File(fileName);
                 String translation = CLI.translate(f);
@@ -220,7 +219,7 @@ public class TestExecutor {
                 idx++;
             }
 
-            cleanup();
+
         }
     }
 
@@ -235,31 +234,16 @@ public class TestExecutor {
     public void cleanup() {
         try {
             if (doCleanup) {
-                Runtime rt = Runtime.getRuntime();
-                String[] commands = new String[]{"rm", tmpFile.getPath().replace(".java", ".class")};
-                Process proc;
-                proc = rt.exec(commands);
-
-
-                commands = new String[]{"rm", tmpFile.getPath().replace(".java", "$ReturnException.class")};
-                proc = rt.exec(commands);
-
-                commands = new String[]{"rm", "Fails.class".replaceAll("/", File.separator)};
-                proc = rt.exec(commands);
-
-                commands = new String[]{"rm", "./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)};
-                proc = rt.exec(commands);
-
-                commands = new String[]{"rm", "./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)};
-                proc = rt.exec(commands);
-
-                if (!keepTmpFile) {
-                    commands = new String[]{"rm", tmpFile.getPath()};
-                    proc = rt.exec(commands);
-                }
+                Files.delete(new File("./tests/org/cprover/CProver.class".replaceAll("/", File.separator)).toPath());
+                Files.delete(new File(tmpFile.getPath().replace(".java", ".class")).toPath());
+                Files.delete(new File(tmpFile.getPath().replace(".java", "$ReturnException.class")).toPath());
+                if (!keepTmpFile) Files.delete(tmpFile.toPath());
+                Files.delete(new File("./tests/TestAnnotations/Fails.class").toPath());
+                Files.delete(new File("./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)).toPath());
+                Files.delete(new File("./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)).toPath());
             }
         } catch (IOException e) {
-            System.out.println("Error cleaning up.");
+
         }
     }
 }

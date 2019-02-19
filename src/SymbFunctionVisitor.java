@@ -32,12 +32,13 @@ import static org.jmlspecs.openjml.JmlTree.*;
 
 /**
  * Created by jklamroth on 12/10/18.
+ *
+ * This visitor is used to create the second form of a specified method which is used
+ * if this method is invoked. It mainly asserts the precondition and assumes the postcondition.
  */
 public class SymbFunctionVisitor extends JmlTreeCopier {
     private final Maker M;
     private final Context context;
-    private final Names names;
-    private final Nowarns nowarns;
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final TranslationUtils transUtils;
@@ -61,8 +62,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         baseVisitor = base;
         this.context = context;
         this.M = Maker.instance(context);
-        this.names = Names.instance(context);
-        this.nowarns = Nowarns.instance(context);
         this.syms = Symtab.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
         this.transUtils = new TranslationUtils(context, M);

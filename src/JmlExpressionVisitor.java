@@ -49,27 +49,11 @@ import static org.jmlspecs.openjml.JmlTree.*;
  */
 public class JmlExpressionVisitor extends JmlTreeCopier {
     private final Maker M;
-    private final Context context;
-    private final Log log;
     private final Names names;
-    private final Nowarns nowarns;
     private final Symtab syms;
-    private final Types types;
-    private final Utils utils;
-    private final JmlTypes jmltypes;
-    private final JmlSpecs specs;
     private final JmlTreeUtils treeutils;
     private final TranslationUtils transUtils;
-
-
-    private final JmlAttr attr;
-    private final Name resultName;
-    private final Name exceptionName;
-    private final Name exceptionNameCall;
-    private final Name terminationName;
     private final ClassReader reader;
-    private final Symbol.ClassSymbol utilsClass;
-    private final JCIdent preLabel;
     private Symbol currentSymbol;
     private JmlMethodDecl currentMethod;
     private int boolVarCounter = 0;
@@ -97,26 +81,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         super(context, maker);
         baseVisitor = base;
         this.context = context;
-        this.log = Log.instance(context);
         this.M = Maker.instance(context);
         this.names = Names.instance(context);
-        this.nowarns = Nowarns.instance(context);
         this.syms = Symtab.instance(context);
-        this.types = Types.instance(context);
-        this.utils = Utils.instance(context);
-        this.specs = JmlSpecs.instance(context);
-        this.jmltypes = JmlTypes.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
         transUtils = new TranslationUtils(context, M);
-        this.attr = JmlAttr.instance(context);
-        this.resultName = names.fromString(Strings.resultVarString);
-        this.exceptionName = names.fromString(Strings.exceptionVarString);
-        this.exceptionNameCall = names.fromString(Strings.exceptionCallVarString);
-        this.terminationName = names.fromString(Strings.terminationVarString);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
-        this.utilsClass = reader.enterClass(names.fromString(Strings.runtimeUtilsFQName));
-        this.preLabel = treeutils.makeIdent(Position.NOPOS, Strings.empty, syms.intType);
         this.translationMode = translationMode;
         this.oldVars = oldVars;
         this.returnVar = returnVar;
@@ -271,19 +242,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         return super.visitJmlBinary(that, p);
     }
-
-//    @Override
-//    public JCTree visitBinary(BinaryTree node, Void p) {
-//        JCBinary b = (JCBinary)node;
-//        if(!supportedBinaryTags.contains(b.getTag())) {
-//            throw new RuntimeException("Unsupported Operation: " + b.toString());
-//        }
-//        JCExpression lhs = super.copy(b.getLeftOperand());
-//        JCExpression rhs = super.copy(b.getRightOperand());
-//        JCBinary r = M.Binary(((JCBinary) node).getTag(), lhs, rhs);
-//        r.operator = b.operator;
-//        return r;
-//    }
 
     @Override
     public JCTree visitBinary(BinaryTree node, Void p) {
