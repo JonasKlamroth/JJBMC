@@ -77,8 +77,8 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runToUnsingedCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/ToUnsigned.java"};
+    public void runBigIntCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/BigInt.java"};
         runAllTests();
     }
 

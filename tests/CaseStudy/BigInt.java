@@ -5,7 +5,7 @@ import TestAnnotations.Verifyable;
 /**
  * Created by jklamroth on 12/18/18.
  */
-public class ToUnsigned {
+public class BigInt {
     int[] result;
 
     final static long LONG_MASK = 0xffffffffL;
@@ -47,7 +47,9 @@ public class ToUnsigned {
         }
     }*/
 
-    /*@ requires xIndex >= 0 && xIndex < 5 && yIndex >= 0 && yIndex < 5;
+    /*@ requires y != null && y.length < 5 && x != null && x.length < 5;
+      @ requires xIndex >= 0 && xIndex < y.length && yIndex >= 0 && yIndex < y.length;
+      @ requires x.length - xIndex == y.length - yIndex;
       @ ensures result[xIndex - 1] == (((long)x[xIndex - 1] & 0xffffffffL)
       @ 	+ ((long)y[yIndex - 1] & 0xffffffffL) + (sum / 0x100000000L)) % 0x100000000L;
       @ assignable result[xIndex - 1];
