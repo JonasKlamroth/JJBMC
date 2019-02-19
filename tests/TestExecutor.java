@@ -47,6 +47,12 @@ public class TestExecutor {
     }
 
     @org.junit.Test
+    public void runPairInsertionSortCaseStudy() throws IOException, InterruptedException {
+        fileNames = new String[]{"./tests/CaseStudy/PairInsertionSort.java"};
+        runAllTests();
+    }
+
+    @org.junit.Test
     public void runMultCaseStudy() throws IOException, InterruptedException {
         fileNames = new String[]{"./tests/CaseStudy/MultExample.java"};
         runAllTests();
