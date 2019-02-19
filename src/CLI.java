@@ -110,10 +110,6 @@ public class CLI implements Runnable {
                 return;
             }
             String translation = translate(tmpFile);
-            //Files.copy(f.toPath(), new File(fileName.replace(".java", "tmp.java")).toPath(), StandardCopyOption.REPLACE_EXISTING);
-            //String name = f.getName().substring(0, f.getName().indexOf("."));
-            //TODO This is not always sound!!
-            //translation = translation.replaceAll(name, name + "tmp");
             Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
         } catch (Exception e) {
             cleanUp();

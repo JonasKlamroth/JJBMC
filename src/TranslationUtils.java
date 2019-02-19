@@ -263,7 +263,6 @@ public class TranslationUtils {
             } else if(expr instanceof JCFieldAccess) {
                 JCFieldAccess fexpr = (JCFieldAccess)expr;
                 if(fexpr.name == null) {
-                    //TODO not sound!!
                     if(fexpr.selected.toString().equals("this")) {
                         throw new RuntimeException("havocing this.* is not supported.");
                     }
