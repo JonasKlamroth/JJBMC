@@ -57,6 +57,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private Symbol currentSymbol;
     private JmlMethodDecl currentMethod;
     private int boolVarCounter = 0;
+    private static int intVarCounter = 0;
     private List<JCStatement> newStatements = List.nil();
     private Symbol returnVar = null;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -182,7 +183,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 //l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
+                RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
+                JCExpression range = super.copy(copy.range);
+                re.scan(range);
+                JCExpression init = super.copy(re.getMin());
+                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0), currentSymbol, init));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else {
@@ -199,7 +204,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 //l = l.append(boolVar);
-                l = l.append(transUtils.makeStandardLoopFromRange(super.copy(copy.range), newStatements, that.decls.get(0), currentSymbol));
+                RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
+                JCExpression range = super.copy(copy.range);
+                re.scan(range);
+                JCExpression init = super.copy(re.getMin());
+                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0), currentSymbol, init));
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
@@ -375,7 +384,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
-                newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol));
+                newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol, this));
             }
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
@@ -386,8 +395,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(oldD != null) {
                     throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
                 }
-                dExpr = ((JmlStatementLoopExpr) spec).expression;
-                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue"),  dExpr, currentSymbol);
+                dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
+                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + String.valueOf(intVarCounter++)),  dExpr, currentSymbol);
                 newStatements = newStatements.append(oldD);
             }
         }
@@ -466,7 +475,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
-                newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol));
+                newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol, this));
             }
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
@@ -477,8 +486,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(oldD != null) {
                     throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
                 }
-                dExpr = ((JmlStatementLoopExpr) spec).expression;
-                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue"),  dExpr, currentSymbol);
+                dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
+                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + String.valueOf(intVarCounter++)),  dExpr, currentSymbol);
                 newStatements = newStatements.append(oldD);
             }
         }

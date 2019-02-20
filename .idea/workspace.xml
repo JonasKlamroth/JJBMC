@@ -9,19 +9,22 @@
     </artifacts-to-build>
   </component>
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java" line="248" mnemonic="9" />
+    <bookmark url="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java" line="257" mnemonic="9" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d52777c9-8b66-49a1-8fd3-da9150b0ed26" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/CaseStudy/PairInsertionSortSymb.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.pdf" afterPath="$PROJECT_DIR$/../Thesis/thesis.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Basics.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Basics.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Evaluation.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Introduction.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Introduction.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/abstract_de.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/abstract_de.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/abstract_en.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/abstract_en.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.bib" afterPath="$PROJECT_DIR$/../Thesis/thesis.bib" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Implementation.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/Theoretical_Solutions.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/Theoretical_Solutions.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/sections/appendix.tex" afterPath="$PROJECT_DIR$/../Thesis/sections/appendix.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Thesis/thesis.tex" afterPath="$PROJECT_DIR$/../Thesis/thesis.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" afterPath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TranslationUtils.java" afterPath="$PROJECT_DIR$/src/TranslationUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TestExecutor.java" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -73,21 +76,41 @@
       <file leaf-file-name="TestExecutor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="50" column="69" lean-forward="false" selection-start-line="50" selection-start-column="69" selection-end-line="50" selection-end-column="69" />
+            <state relative-caret-position="331">
+              <caret line="56" column="73" lean-forward="false" selection-start-line="56" selection-start-column="73" selection-end-line="56" selection-end-column="73" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PairInsertionSort.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java">
+      <file leaf-file-name="PairInsertionSortSymb.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSortSymb.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1140">
-              <caret line="57" column="28" lean-forward="true" selection-start-line="57" selection-start-column="28" selection-end-line="57" selection-end-column="28" />
+            <state relative-caret-position="256">
+              <caret line="15" column="15" lean-forward="false" selection-start-line="15" selection-start-column="15" selection-end-line="15" selection-end-column="15" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JmlExpressionVisitor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="137">
+              <caret line="59" column="19" lean-forward="false" selection-start-line="59" selection-start-column="19" selection-end-line="59" selection-end-column="19" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <marker date="1550675875462" expanded="true" signature="27973:27981" ph="{...}" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VerifyFunctionVisitor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="191">
+              <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -95,7 +118,7 @@
       <file leaf-file-name="CLI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/CLI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
+            <state relative-caret-position="1660">
               <caret line="112" column="0" lean-forward="false" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
               <folding />
             </state>
@@ -105,8 +128,8 @@
       <file leaf-file-name="TranslationUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/TranslationUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="265" column="0" lean-forward="false" selection-start-line="265" selection-start-column="0" selection-end-line="265" selection-end-column="0" />
+            <state relative-caret-position="217">
+              <caret line="135" column="5" lean-forward="false" selection-start-line="135" selection-start-column="5" selection-end-line="135" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -114,12 +137,76 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="SymbFunctionVisitor.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/SymbFunctionVisitor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="213">
+              <caret line="151" column="91" lean-forward="false" selection-start-line="151" selection-start-column="91" selection-end-line="151" selection-end-column="91" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="AssignableTests.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="20" column="38" lean-forward="true" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
-              <folding />
+            <state relative-caret-position="340">
+              <caret line="20" column="38" lean-forward="false" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#517#518#0" expanded="false" />
+                <element signature="e#544#545#0" expanded="false" />
+                <element signature="e#1551#1552#0" expanded="false" />
+                <element signature="e#1577#1578#0" expanded="false" />
+                <element signature="e#1719#1720#0" expanded="false" />
+                <element signature="e#1745#1746#0" expanded="false" />
+                <element signature="e#1910#1911#0" expanded="false" />
+                <element signature="e#1937#1938#0" expanded="false" />
+                <element signature="e#3267#3268#0" expanded="false" />
+                <element signature="e#3314#3315#0" expanded="false" />
+                <element signature="e#3480#3481#0" expanded="false" />
+                <element signature="e#3524#3525#0" expanded="false" />
+                <element signature="e#5082#5083#0" expanded="false" />
+                <element signature="e#5117#5118#0" expanded="false" />
+                <element signature="e#5239#5240#0" expanded="false" />
+                <element signature="e#5275#5276#0" expanded="false" />
+                <element signature="e#5394#5395#0" expanded="false" />
+                <element signature="e#5432#5433#0" expanded="false" />
+                <element signature="e#5487#5488#0" expanded="false" />
+                <element signature="e#5528#5529#0" expanded="false" />
+                <element signature="e#6075#6076#0" expanded="false" />
+                <element signature="e#6100#6101#0" expanded="false" />
+                <element signature="e#6244#6245#0" expanded="false" />
+                <element signature="e#6269#6270#0" expanded="false" />
+                <element signature="e#6821#6822#0" expanded="false" />
+                <element signature="e#6856#6857#0" expanded="false" />
+                <element signature="e#7004#7005#0" expanded="false" />
+                <element signature="e#7039#7040#0" expanded="false" />
+                <element signature="e#7118#7119#0" expanded="false" />
+                <element signature="e#7146#7147#0" expanded="false" />
+                <element signature="e#7290#7291#0" expanded="false" />
+                <element signature="e#7318#7319#0" expanded="false" />
+                <element signature="e#7440#7441#0" expanded="false" />
+                <element signature="e#7479#7480#0" expanded="false" />
+                <element signature="e#7544#7545#0" expanded="false" />
+                <element signature="e#7568#7569#0" expanded="false" />
+                <element signature="e#7598#7599#0" expanded="false" />
+                <element signature="e#7623#7624#0" expanded="false" />
+                <element signature="e#7701#7702#0" expanded="false" />
+                <element signature="e#7723#7724#0" expanded="false" />
+                <element signature="e#7805#7806#0" expanded="false" />
+                <element signature="e#7828#7829#0" expanded="false" />
+                <element signature="e#7963#7964#0" expanded="false" />
+                <element signature="e#7986#7987#0" expanded="false" />
+                <element signature="e#8066#8067#0" expanded="false" />
+                <element signature="e#8089#8090#0" expanded="false" />
+                <element signature="e#8221#8222#0" expanded="false" />
+                <element signature="e#8244#8245#0" expanded="false" />
+                <element signature="e#8319#8320#0" expanded="false" />
+                <element signature="e#8341#8342#0" expanded="false" />
+                <element signature="e#8416#8417#0" expanded="false" />
+                <element signature="e#8439#8440#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -136,20 +223,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>oldVar</find>
-      <find>old</find>
-      <find>edit</find>
-      <find>inn</find>
-      <find>inner</find>
-      <find>innermo</find>
-      <find>innermost</find>
-      <find>visitbina</find>
-      <find>quantified</find>
-      <find>coun</find>
-      <find>jcunary</find>
-      <find>visitbinar</find>
-      <find>return M.Binary(.*);</find>
-      <find>visitunar</find>
       <find>whileLoo</find>
       <find>makeAssert</find>
       <find>makeAssume</find>
@@ -166,6 +239,20 @@
       <find>T</find>
       <find>TODO</find>
       <find>cleanup</find>
+      <find>oldDecr</find>
+      <find>_</find>
+      <find>__</find>
+      <find>__temp</find>
+      <find>__tem</find>
+      <find>__te</find>
+      <find>__t</find>
+      <find>__tmp</find>
+      <find>standard</find>
+      <find>quantified</find>
+      <find>stand</find>
+      <find>oldDe</find>
+      <find>oldDec</find>
+      <find>intvar</find>
     </findStrings>
     <replaceStrings>
       <replace>ic JmlTree visit</replace>
@@ -203,7 +290,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/tests/CProver.java" />
         <option value="$PROJECT_DIR$/src/org/cprover/CProver.java" />
         <option value="$PROJECT_DIR$/tests/Test2tmp.java" />
         <option value="$PROJECT_DIR$/tests/Test2.java" />
@@ -244,16 +330,17 @@
         <option value="$PROJECT_DIR$/tests/CaseStudy/BigInt.java" />
         <option value="$PROJECT_DIR$/src/CostumPrintStream.java" />
         <option value="$PROJECT_DIR$/src/FilterVisitor.java" />
-        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
         <option value="$PROJECT_DIR$/src/NormalizeVisitor.java" />
-        <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" />
         <option value="$PROJECT_DIR$/tests/AssignableTests.java" />
         <option value="$PROJECT_DIR$/src/CLI.java" />
-        <option value="$PROJECT_DIR$/src/TranslationUtils.java" />
-        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
         <option value="$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java" />
+        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
+        <option value="$PROJECT_DIR$/src/SymbFunctionVisitor.java" />
+        <option value="$PROJECT_DIR$/src/TranslationUtils.java" />
+        <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/CaseStudy/PairInsertionSortSymb.java" />
       </list>
     </option>
   </component>
@@ -278,8 +365,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -400,7 +488,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="AndroidView" />
     </panes>
   </component>
@@ -456,7 +543,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runPairInsertionSortCaseStudy">
+  <component name="RunManager" selected="JUnit.TestExecutor.runPairInsertionSortSymbCaseStudy">
     <configuration default="false" name="TestExecutor.runAllTests" type="JUnit" factoryName="JUnit" singleton="true" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="jmlbmc" />
@@ -469,27 +556,6 @@
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <envs />
-      <patterns />
-      <method />
-    </configuration>
-    <configuration default="false" name="TestExecutor.runToUnsingedCaseStudy" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <module name="jmlbmc" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runToUnsingedCaseStudy" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <option name="ENV_VARIABLES" />
       <option name="PASS_PARENT_ENVS" value="true" />
       <option name="TEST_SEARCH_SCOPE">
@@ -549,6 +615,27 @@
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="TestExecutor" />
       <option name="METHOD_NAME" value="runPairInsertionSortCaseStudy" />
+      <option name="TEST_OBJECT" value="method" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="false" name="TestExecutor.runPairInsertionSortSymbCaseStudy" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="jmlbmc" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
+      <option name="METHOD_NAME" value="runPairInsertionSortSymbCaseStudy" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" />
       <option name="PARAMETERS" />
@@ -717,18 +804,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAllTests" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runBigIntCaseStudy" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortCaseStudy" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runBigIntCaseStudy" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortCaseStudy" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortSymbCaseStudy" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortCaseStudy" />
-        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
-        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAllTests" />
-        <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runBigIntCaseStudy" />
-        <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runToUnsingedCaseStudy" />
+        <item index="0" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortSymbCaseStudy" />
+        <item index="1" class="java.lang.String" itemvalue="JUnit.TestExecutor.runPairInsertionSortCaseStudy" />
+        <item index="2" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAssignableTests" />
+        <item index="3" class="java.lang.String" itemvalue="JUnit.TestExecutor.runAllTests" />
+        <item index="4" class="java.lang.String" itemvalue="JUnit.TestExecutor.runBigIntCaseStudy" />
       </list>
     </recent_temporary>
   </component>
@@ -745,13 +832,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1537260286071</updated>
-    </task>
-    <task id="LOCAL-00005" summary="only called Functions are duplicated">
-      <created>1545045744144</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1545045744145</updated>
     </task>
     <task id="LOCAL-00006" summary="improved assignable handling&#10;part implementation of assignable checks for functioncalls">
       <created>1545062687303</created>
@@ -1089,39 +1169,46 @@
       <option name="project" value="LOCAL" />
       <updated>1550573040317</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="added pairinsertionsort case study">
+      <created>1550594719390</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1550594719390</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestExecutor_runAllTests - 2019.02.19 at 11h 20m 55s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 15h 46m 37s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runAssignableTests - 2019.02.19 at 11h 36m 24s.xml">
-      <configuration name="TestExecutor.runAssignableTests" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 15h 52m 34s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runAssignableTests - 2019.02.19 at 11h 41m 26s.xml">
-      <configuration name="TestExecutor.runAssignableTests" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 15h 55m 01s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runBigIntCaseStudy - 2019.02.19 at 11h 01m 46s.xml">
-      <configuration name="TestExecutor.runBigIntCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 01m 59s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runPairInsertionSortCaseStudy - 2019.02.19 at 17h 41m 50s.xml">
-      <configuration name="TestExecutor.runPairInsertionSortCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 09m 38s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runPairInsertionSortCaseStudy - 2019.02.19 at 17h 42m 16s.xml">
-      <configuration name="TestExecutor.runPairInsertionSortCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 13m 54s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runPairInsertionSortCaseStudy - 2019.02.19 at 17h 42m 50s.xml">
-      <configuration name="TestExecutor.runPairInsertionSortCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 14m 21s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runPairInsertionSortCaseStudy - 2019.02.19 at 17h 43m 34s.xml">
-      <configuration name="TestExecutor.runPairInsertionSortCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 15m 46s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runTmpTest - 2019.02.08 at 15h 40m 27s.xml">
-      <configuration name="TestExecutor.runTmpTest" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 17m 18s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="TestExecutor_runToUnsingedCaseStudy - 2019.02.19 at 11h 01m 45s.xml">
-      <configuration name="TestExecutor.runToUnsingedCaseStudy" configurationId="JUnit" />
+    <history-entry file="TestExecutor_runPairInsertionSortSymbCaseStudy - 2019.02.20 at 16h 18m 11s.xml">
+      <configuration name="TestExecutor.runPairInsertionSortSymbCaseStudy" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
@@ -1139,7 +1226,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.331" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.335" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21657754" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21925133" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="ANTLR Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1198,7 +1285,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="undoing assert false in hammingweight example" />
     <MESSAGE value="first working ant setup" />
     <MESSAGE value="working of thesis" />
     <MESSAGE value="minor bugfix&#10;assignables are now checked via assert instaed of exception" />
@@ -1223,32 +1309,33 @@
     <MESSAGE value="bigint blockcontract example updated" />
     <MESSAGE value="some cleanup and refactoring" />
     <MESSAGE value="removed 2 todos" />
-    <option name="LAST_COMMIT_MESSAGE" value="removed 2 todos" />
+    <MESSAGE value="added pairinsertionsort case study" />
+    <option name="LAST_COMMIT_MESSAGE" value="added pairinsertionsort case study" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/TranslationUtils.java</url>
-          <line>304</line>
+          <line>306</line>
           <properties />
           <option name="timeStamp" value="96" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/TranslationUtils.java</url>
-          <line>219</line>
+          <line>221</line>
           <properties />
           <option name="timeStamp" value="133" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/TranslationUtils.java</url>
-          <line>158</line>
+          <line>160</line>
           <properties />
           <option name="timeStamp" value="134" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>107</line>
+          <line>108</line>
           <properties />
           <option name="timeStamp" value="159" />
         </line-breakpoint>
@@ -1278,21 +1365,15 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>718</line>
+          <line>727</line>
           <properties />
           <option name="timeStamp" value="239" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>257</line>
+          <line>266</line>
           <properties />
           <option name="timeStamp" value="250" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java</url>
-          <line>84</line>
-          <properties />
-          <option name="timeStamp" value="251" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java</url>
@@ -1300,8 +1381,20 @@
           <properties />
           <option name="timeStamp" value="253" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>210</line>
+          <properties />
+          <option name="timeStamp" value="255" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>189</line>
+          <properties />
+          <option name="timeStamp" value="256" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="254" />
+      <option name="time" value="257" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -1339,17 +1432,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeighttmp.java" />
-    <entry file="file://$PROJECT_DIR$/ReadMe.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="140">
-            <caret line="7" column="24" lean-forward="false" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/testRes/NormalHammingWeightTranslated.java" />
     <entry file="jar://$PROJECT_DIR$/lib/picocli-3.9.1.jar!/picocli/CommandLine.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -1510,18 +1592,11 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTesttmp.java" />
-    <entry file="file://$PROJECT_DIR$/tests/TestSuitetmp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="1484" column="1" lean-forward="false" selection-start-line="1484" selection-start-column="1" selection-end-line="1484" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestSuitetmp.java" />
     <entry file="file://$PROJECT_DIR$/tests/CaseStudy/TmpTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
           <caret line="17" column="31" lean-forward="false" selection-start-line="17" selection-start-column="31" selection-end-line="17" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1529,7 +1604,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="59" column="61" lean-forward="true" selection-start-line="59" selection-start-column="61" selection-end-line="59" selection-end-column="61" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1561,17 +1635,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="920">
           <caret line="59" column="0" lean-forward="false" selection-start-line="59" selection-start-column="0" selection-end-line="59" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-298">
-          <caret line="89" column="31" lean-forward="false" selection-start-line="89" selection-start-column="31" selection-end-line="89" selection-end-column="31" />
-          <folding>
-            <marker date="1550571105642" expanded="true" signature="27377:27385" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1579,7 +1642,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1591,42 +1653,80 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/SymbFunctionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="36" column="40" lean-forward="false" selection-start-line="36" selection-start-column="40" selection-end-line="36" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3978">
-          <caret line="35" column="68" lean-forward="false" selection-start-line="35" selection-start-column="68" selection-end-line="35" selection-end-column="68" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/AssignableTests.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="20" column="38" lean-forward="true" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
-          <folding />
+        <state relative-caret-position="340">
+          <caret line="20" column="38" lean-forward="false" selection-start-line="20" selection-start-column="38" selection-end-line="20" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#517#518#0" expanded="false" />
+            <element signature="e#544#545#0" expanded="false" />
+            <element signature="e#1551#1552#0" expanded="false" />
+            <element signature="e#1577#1578#0" expanded="false" />
+            <element signature="e#1719#1720#0" expanded="false" />
+            <element signature="e#1745#1746#0" expanded="false" />
+            <element signature="e#1910#1911#0" expanded="false" />
+            <element signature="e#1937#1938#0" expanded="false" />
+            <element signature="e#3267#3268#0" expanded="false" />
+            <element signature="e#3314#3315#0" expanded="false" />
+            <element signature="e#3480#3481#0" expanded="false" />
+            <element signature="e#3524#3525#0" expanded="false" />
+            <element signature="e#5082#5083#0" expanded="false" />
+            <element signature="e#5117#5118#0" expanded="false" />
+            <element signature="e#5239#5240#0" expanded="false" />
+            <element signature="e#5275#5276#0" expanded="false" />
+            <element signature="e#5394#5395#0" expanded="false" />
+            <element signature="e#5432#5433#0" expanded="false" />
+            <element signature="e#5487#5488#0" expanded="false" />
+            <element signature="e#5528#5529#0" expanded="false" />
+            <element signature="e#6075#6076#0" expanded="false" />
+            <element signature="e#6100#6101#0" expanded="false" />
+            <element signature="e#6244#6245#0" expanded="false" />
+            <element signature="e#6269#6270#0" expanded="false" />
+            <element signature="e#6821#6822#0" expanded="false" />
+            <element signature="e#6856#6857#0" expanded="false" />
+            <element signature="e#7004#7005#0" expanded="false" />
+            <element signature="e#7039#7040#0" expanded="false" />
+            <element signature="e#7118#7119#0" expanded="false" />
+            <element signature="e#7146#7147#0" expanded="false" />
+            <element signature="e#7290#7291#0" expanded="false" />
+            <element signature="e#7318#7319#0" expanded="false" />
+            <element signature="e#7440#7441#0" expanded="false" />
+            <element signature="e#7479#7480#0" expanded="false" />
+            <element signature="e#7544#7545#0" expanded="false" />
+            <element signature="e#7568#7569#0" expanded="false" />
+            <element signature="e#7598#7599#0" expanded="false" />
+            <element signature="e#7623#7624#0" expanded="false" />
+            <element signature="e#7701#7702#0" expanded="false" />
+            <element signature="e#7723#7724#0" expanded="false" />
+            <element signature="e#7805#7806#0" expanded="false" />
+            <element signature="e#7828#7829#0" expanded="false" />
+            <element signature="e#7963#7964#0" expanded="false" />
+            <element signature="e#7986#7987#0" expanded="false" />
+            <element signature="e#8066#8067#0" expanded="false" />
+            <element signature="e#8089#8090#0" expanded="false" />
+            <element signature="e#8221#8222#0" expanded="false" />
+            <element signature="e#8244#8245#0" expanded="false" />
+            <element signature="e#8319#8320#0" expanded="false" />
+            <element signature="e#8341#8342#0" expanded="false" />
+            <element signature="e#8416#8417#0" expanded="false" />
+            <element signature="e#8439#8440#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/CLI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
+        <state relative-caret-position="1660">
           <caret line="112" column="0" lean-forward="false" selection-start-line="112" selection-start-column="0" selection-end-line="112" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/TranslationUtils.java">
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="265" column="0" lean-forward="false" selection-start-line="265" selection-start-column="0" selection-end-line="265" selection-end-column="0" />
+        <state relative-caret-position="580">
+          <caret line="29" column="15" lean-forward="true" selection-start-line="29" selection-start-column="15" selection-end-line="29" selection-end-column="15" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1635,19 +1735,61 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="50" column="69" lean-forward="false" selection-start-line="50" selection-start-column="69" selection-end-line="50" selection-end-column="69" />
+        <state relative-caret-position="331">
+          <caret line="56" column="73" lean-forward="false" selection-start-line="56" selection-start-column="73" selection-end-line="56" selection-end-column="73" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSort.java">
+    <entry file="file://$PROJECT_DIR$/src/VerifyFunctionVisitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1140">
-          <caret line="57" column="28" lean-forward="true" selection-start-line="57" selection-start-column="28" selection-end-line="57" selection-end-column="28" />
+        <state relative-caret-position="191">
+          <caret line="84" column="0" lean-forward="false" selection-start-line="84" selection-start-column="0" selection-end-line="84" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/SymbFunctionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="151" column="91" lean-forward="false" selection-start-line="151" selection-start-column="91" selection-end-line="151" selection-end-column="91" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TranslationUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="135" column="5" lean-forward="false" selection-start-line="135" selection-start-column="5" selection-end-line="135" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSortSymbtmp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="213">
+          <caret line="27" column="46" lean-forward="false" selection-start-line="27" selection-start-column="46" selection-end-line="27" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="137">
+          <caret line="59" column="19" lean-forward="false" selection-start-line="59" selection-start-column="19" selection-end-line="59" selection-end-column="19" />
+          <folding>
+            <marker date="1550675875462" expanded="true" signature="27973:27981" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/CaseStudy/PairInsertionSortSymb.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="15" column="15" lean-forward="false" selection-start-line="15" selection-start-column="15" selection-end-line="15" selection-end-column="15" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -8,10 +8,12 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
+import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Utils;
@@ -31,11 +33,13 @@ public class TranslationUtils {
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final JmlTree.Maker M;
+    private final Names names;
 
     public TranslationUtils(Context context, JmlTree.Maker maker) {
         this.M = JmlTree.Maker.instance(context);
         this.syms = Symtab.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
+        this.names = Names.instance(context);
     }
     static JCTree.JCStatement makeAssumeStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
@@ -125,10 +129,8 @@ public class TranslationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
-        RangeExtractor re = new RangeExtractor(M, loopVarName.sym);
-        re.scan(range);
-        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, loopVarName.name, currentSymbol, re.getMin());
+    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol, JCExpression init) {
+        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, loopVarName.name, currentSymbol, init);
         JCTree.JCExpression loopCond = range;
         return makeStandardLoop(loopCond, body, loopVar, currentSymbol);
     }
@@ -223,7 +225,7 @@ public class TranslationUtils {
         return treeutils.makeBooleanLiteral(Position.NOPOS, false);
     }
 
-    public List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol) {
+    public List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
         List<JCStatement> res = List.nil();
         for(JCExpression expr : storerefs) {
             if(expr instanceof JCIdent) {
@@ -250,8 +252,8 @@ public class TranslationUtils {
                         if(hi == null) {
                             hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Literal(1));
                         }
-                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), lo, currentSymbol);
-                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), hi);
+                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), jev.copy(lo), currentSymbol);
+                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), jev.copy(hi));
                         JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
                         Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                         List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));

@@ -149,7 +149,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         for(JCVariableDecl variableDecl : oldVars.values()) {
             bodyStats = bodyStats.prepend(variableDecl);
         }
-        bodyStats = bodyStats.appendList(transUtils.havoc(currentAssignable, copy.sym));
+        bodyStats = bodyStats.appendList(transUtils.havoc(currentAssignable, copy.sym, this));
 
         if(hasReturn) {
             if(returnVar != null) {
