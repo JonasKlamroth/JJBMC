@@ -42,14 +42,15 @@ public class NormalBigInt {
         }
     }*/
 
-    /*@
+    /*@ requires sum >= 0;
       @ ensures \result == sum / 0x100000000L;
       @*/
     private static long shiftLeftBy32Bits(long sum) {
+        long sum1 = sum;
         return sum >>> 32;
     }
 
-    /*@
+    /*@ requires i >= 0;
       @ ensures \result == i;
       @*/
     private static long andLongMask(int i) {
