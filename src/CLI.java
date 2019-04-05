@@ -368,10 +368,17 @@ public class CLI implements Runnable {
 
 class FunctionNameVisitor extends JmlTreeScanner {
     static private List<String> functionNames = new ArrayList();
+    static private String className = "";
+
+    @Override
+    public void visitJmlClassDecl(JmlTree.JmlClassDecl that) {
+        className = that.getSimpleName().toString();
+        super.visitJmlClassDecl(that);
+    }
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        String f = that.sym.owner.toString() + "." + that.getName().toString();
+        String f = className + "." + that.getName().toString();
         if(!f.contains("<init>")) {
             functionNames.add(f);
         }
@@ -393,6 +400,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             }
         } catch (Exception e) {
             System.out.println("error parsing for method names");
+            e.printStackTrace();
         }
         return functionNames;
     }

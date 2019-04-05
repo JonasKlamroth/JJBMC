@@ -1,11 +1,7 @@
-package CaseStudy;
-
-import TestAnnotations.Verifyable;
-
 /**
  * Created by jklamroth on 12/18/18.
  */
-public class BigInt {
+public class NormalBigInt {
     int[] result;
 
     final static long LONG_MASK = 0xffffffffL;
@@ -18,7 +14,6 @@ public class BigInt {
       @ ensures \result >= 0;
       @ ensures \result < 0x100000000L;
       @*/
-    @Verifyable
     public static long toUnsigned(int value) {
         return (long)value & 0xffffffffL;
     }
@@ -57,7 +52,6 @@ public class BigInt {
     /*@
       @ ensures \result == i;
       @*/
-    @Verifyable
     private static long andLongMask(int i) {
         return i & LONG_MASK;
     }
