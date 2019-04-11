@@ -86,7 +86,8 @@ public class CLI implements Runnable {
 
         for (JmlTree.JmlCompilationUnit it : cu) {
             //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
-            return api.prettyPrint(rewriteAssert(it, ctx));
+            JCTree t = rewriteAssert(it, ctx);
+            return api.prettyPrint(t);
         }
         return null;
     }
@@ -110,6 +111,9 @@ public class CLI implements Runnable {
                 return;
             }
             String translation = translate(tmpFile);
+            if(tmpFile.exists()) {
+                Files.delete(tmpFile.toPath());
+            }
             Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
         } catch (Exception e) {
             cleanUp();

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/jmlbmc.iml" filepath="$PROJECT_DIR$/jmlbmc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/openjmlToBMC.iml" filepath="$PROJECT_DIR$/openjmlToBMC.iml" />
     </modules>
   </component>
 </project>

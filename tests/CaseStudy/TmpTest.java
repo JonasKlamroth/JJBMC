@@ -15,17 +15,9 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
-    //@ assignable \everything;
     @Verifyable
-    private void test() {
-        negatedTest();
-    }
-
-
-    //@ ensures \old(pubInt) == pubInt + 1;
-    //@ assignable pubInt;
-    @Verifyable
-    private void negatedTest() {
-        pubInt--;
+    private void blockContractTest(int i, int j, int k) {
+        //@ assume i >= 0 && i < j && j < k && k <= 2;
+        assert false;
     }
 }

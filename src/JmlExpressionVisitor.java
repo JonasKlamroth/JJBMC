@@ -879,10 +879,23 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JCStatement> saveList = newStatements;
         newStatements = List.nil();
         super.copy(that.statementSpecs);
-        super.copy(that.statements);
+        super.copy(that.statements.get(0));
 
         newStatements = saveList.appendList(newStatements.prepend(M.Block(0L, combinedNewReqStatements)).
                 append(M.Block(0L, combinedNewEnsStatements)));
+
+        //dirty hack due to bug in OpenJML
+        saveList = newStatements;
+        for(JCStatement st : that.statements.tail) {
+            newStatements = List.nil();
+            JCStatement c = (JCStatement)super.copy(st);
+            if(newStatements.size() > 0) {
+                saveList = saveList.appendList(newStatements);
+            } else {
+                saveList = saveList.append(c);
+            }
+        }
+        newStatements = saveList;
 
         return that;
     }
@@ -903,9 +916,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy.expression, M));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME){
-            newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy, M));
-            JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-            newStatements = List.of(ifstmt);
+            newStatements = newStatements.append(TranslationUtils.makeAssumeStatement(copy, M));
+            newStatements = List.of(M.Block(0L, newStatements));
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
