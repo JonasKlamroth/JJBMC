@@ -140,7 +140,7 @@ public class CLI implements Runnable {
             }
         } catch (Exception e) {
             cleanUp();
-            //e.printStackTrace();
+            e.printStackTrace();
             return null;
         }
 
@@ -341,23 +341,23 @@ public class CLI implements Runnable {
         return s.hasNext() ? s.next() : "";
     }
 
-    private static void cleanUp() {
-//        if(!didCleanUp) {
-//            deleteFolder(tmpFolder);
-//            if (!keepTranslation) {
-//                try {
-//                    if (tmpFolder.exists()) {
-//                        Files.delete(tmpFolder.toPath());
-//                    }
-//                } catch (IOException e) {
-//                    //System.out.println("Could not delete tmp folder.");
-//                }
-//            }
-//        }
-//        didCleanUp = true;
+    public static void cleanUp() {
+        if(!didCleanUp) {
+            deleteFolder(tmpFolder);
+            if (!keepTranslation) {
+                try {
+                    if (tmpFolder.exists()) {
+                        Files.delete(tmpFolder.toPath());
+                    }
+                } catch (IOException e) {
+                    //System.out.println("Could not delete tmp folder.");
+                }
+            }
+        }
+        didCleanUp = true;
     }
 
-    private static void deleteFolder(File folder) {
+    public static void deleteFolder(File folder) {
         File[] tmpFiles = folder.listFiles();
         for(File f : tmpFiles) {
             if(!keepTranslation || !f.getName().endsWith(new File(fileName).getName())) {

@@ -31,7 +31,7 @@ public class TestExecutor {
     private File tmpFile = new File(baseTestFolder + "tmp.java");
     private boolean keepTmpFile = true;
     private boolean filterOutput = true;
-    private boolean doCleanup = true;
+    private boolean doCleanup = false;
 
     @Before
     public void init() {
@@ -114,15 +114,20 @@ public class TestExecutor {
     static private void createAnnotationsFolder(String fileName) {
         File f = new File(fileName);
         File dir = new File(f.getParent() + File.separator + "TestAnnotations");
+        File tmpdir = new File(f.getParent() + File.separator + "tmp" + File.separator + "TestAnnotations");
         System.out.println("Copying Annotation files to " + dir.getAbsolutePath());
         dir.mkdirs();
+        tmpdir.mkdirs();
         try {
             Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(tmpdir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(tmpdir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(tmpdir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error trying to copy CProver.java");
+            throw new RuntimeException("Error trying to copy TestAnnotations");
         }
     }
 
@@ -216,19 +221,8 @@ public class TestExecutor {
 
     @After
     public void cleanup() {
-        try {
-            if (doCleanup) {
-                Files.delete(new File(baseTestFolder + "org/cprover/CProver.class".replaceAll("/", File.separator)).toPath());
-                Files.delete(new File(tmpFile.getPath().replace(".java", ".class")).toPath());
-                Files.delete(new File(tmpFile.getPath().replace(".java", "$ReturnException.class")).toPath());
-                if (!keepTmpFile) Files.delete(tmpFile.toPath());
-                Files.delete(new File(baseTestFolder + "TestAnnotations/Fails.class").toPath());
-                Files.delete(new File(baseTestFolder + "TestAnnotations/Verifyable.class".replaceAll("/", File.separator)).toPath());
-                Files.delete(new File(baseTestFolder + "TestAnnotations/Unwind.class".replaceAll("/", File.separator)).toPath());
-            }
-        } catch (IOException e) {
+        CLI.cleanUp();
 
-        }
     }
 }
 

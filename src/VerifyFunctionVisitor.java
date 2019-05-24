@@ -155,56 +155,37 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
         List< JCStatement> l = List.nil();
 
-        if(hasReturn) {
-            if(returnVar != null) {
-                List< JCStatement> l1 = List.nil();
-                JCReturn returnStmt = M.Return(M.Ident(returnVar));
-                if(combinedNewEnsStatements.size() > 0) {
-                    l1 = l1.append(ensTry);
-                }
-                List<JCStatement> body = List.nil();
-                if(that.body != null) {
-                    body = transformBody(that.body.getStatements());
-                }
-                JCTry bodyTry = M.Try(M.Block(0L, body),
-                        List.of(
-                                M.Catch(catchVarb, M.Block(0L, l1))
-                        ),
-                        null);
-                if(combinedNewReqStatements.size() > 0) {
-                    l = l.append(reqTry);
-                }
-                l = l.append(returnVar).append(bodyTry);
-                l = l.append(returnStmt);
-            } else {
-                if(combinedNewEnsStatements.size() > 0) {
-                    List<JCStatement> body = List.nil();
-                    if(that.body != null) {
-                        body = transformBody(that.body.getStatements());
-                    }
-                    JCTry bodyTry = M.Try(M.Block(0L, body),
-                            List.of(
-                                    M.Catch(catchVarb, M.Block(0L, List.of(ensTry)))
-                            ),
-                            null);
-                    l = l.append(reqTry).append(bodyTry);
-                } else {
-                    l = transformBody(that.body.getStatements());
-                    l = l.prepend(reqTry);
-                }
-            }
-        } else {
-            //l = copy.body.getStatements();
-            if(that.body != null) {
-                l = transformBody(that.body.getStatements());
-            }
-            if(combinedNewEnsStatements.size() > 0) {
-                l = l.append(ensTry);
-            }
-            if(combinedNewReqStatements.size() > 0) {
-                l = l.prepend(reqTry);
-            }
+
+        List< JCStatement> l1 = List.nil();
+        JCReturn returnStmt = null;
+        if(returnVar != null) {
+            returnStmt = M.Return(M.Ident(returnVar));
         }
+        if(combinedNewEnsStatements.size() > 0) {
+            l1 = l1.append(ensTry);
+        }
+        List<JCStatement> body = List.nil();
+        if(that.body != null) {
+            body = transformBody(that.body.getStatements());
+        }
+        JCTry bodyTry = M.Try(M.Block(0L, body),
+                List.of(
+                        M.Catch(catchVarb, M.Block(0L, l1))
+                ),
+                null);
+        if(combinedNewReqStatements.size() > 0) {
+            l = l.append(reqTry);
+        }
+        if(returnVar != null) {
+            l = l.append(returnVar);
+        }
+        l = l.append(bodyTry);
+        if(returnStmt != null) {
+            l = l.append(returnStmt);
+        }
+
+
+
         for(JCVariableDecl variableDecl : oldVars.values()) {
             l = l.prepend(variableDecl);
         }
