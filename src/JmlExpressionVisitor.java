@@ -393,11 +393,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        boolean notEmpty = false;
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
                 newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol, this));
+                notEmpty = true;
             }
         }
+        System.out.println("Warning: Found loop-spcification without modifies clause. Currently only specified variables are havoced.");
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;

@@ -2,8 +2,8 @@ package openJMLDemo;
 
 abstract class BeanCan {
 
-    public static boolean WHITE;
-    public static boolean BLACK;
+    public static boolean WHITE = false;
+    public static boolean BLACK = true;
 
 
 
@@ -25,8 +25,6 @@ abstract class BeanCan {
     BeanCan(int M, int N) {
         num_black = M;
         num_white = N;
-        WHITE = false;
-        BLACK = true;
     }
 
     /*@ normal_behavior
@@ -92,12 +90,12 @@ abstract class BeanCan {
           ensures num_black >= 0;
     */
     public boolean play_game() {
-        num_white++;
         //@ loop_invariant num_black + num_white >= 1;
         //@ loop_invariant num_black >= 0;
         //@ loop_invariant num_white >= 0;
         //@ loop_invariant (num_white - \old(num_white)) %2 == 0;
         //@ decreases num_black + num_white;
+        //@ modifies num_black, num_white;
         while (num_black + num_white > 1) {
             boolean bean1 = pick_random();
             //@ assert (bean1 == WHITE) ==> num_white > 0;

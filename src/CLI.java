@@ -73,9 +73,18 @@ public class CLI implements Runnable {
         return translate(args);
     }
 
-    public static String translate(String[] args) throws Exception {
+    public static String translate(File file, String[] apiArgs) throws Exception {
+        String[] args = {file.getAbsolutePath()};
+        return translate(args, apiArgs);
+    }
 
-        IAPI api = Factory.makeAPI();
+    public static String translate(String[] args) throws Exception {
+        return translate(args, new String[]{});
+    }
+
+    public static String translate(String[] args, String[] apiArgs) throws Exception {
+
+        IAPI api = Factory.makeAPI(apiArgs);
         java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
         int a = api.typecheck(cu);
         if(a != 0) {
@@ -107,19 +116,21 @@ public class CLI implements Runnable {
             tmpFolder.mkdirs();
             tmpFile = new File(tmpFolder, f.getName());
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            String[] apiArgs = new String[]{"-cp", f.getParent()};
+            String translation = translate(tmpFile, apiArgs);
+            if(tmpFile.exists()) {
+                Files.delete(tmpFile.toPath());
+            }
+            Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
             createCProverFolder(tmpFile.getAbsolutePath());
             if(!copyJBMC()) {
                 cleanUp();
                 return;
             }
-            String translation = translate(tmpFile);
-            if(tmpFile.exists()) {
-                Files.delete(tmpFile.toPath());
-            }
-            Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
         } catch (Exception e) {
             cleanUp();
-            e.printStackTrace();
+            //e.printStackTrace();
             return;
         }
 
