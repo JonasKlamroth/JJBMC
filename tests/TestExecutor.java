@@ -8,11 +8,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,60 +111,29 @@ public class TestExecutor {
         runTests(new String[]{baseTestFolder + "AssignableTests.java", baseTestFolder + "AssignableTests2.java"});
     }
 
+    static private void createAnnotationsFolder(String fileName) {
+        File f = new File(fileName);
+        File dir = new File(f.getParent() + File.separator + "TestAnnotations");
+        System.out.println("Copying Annotation files to " + dir.getAbsolutePath());
+        dir.mkdirs();
+        try {
+            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error trying to copy CProver.java");
+        }
+    }
+
     public void runTests(String[] files) throws IOException, InterruptedException {
         for(String fileName : files) {
-            try {
-                File f = new File(fileName);
-                String translation = CLI.translate(f);
-                if(translation == null) {
-                    assertTrue("Error translating file: " + f.getName(), false);
-                }
-                String name = f.getName().substring(0, f.getName().indexOf("."));
-                //TODO This is not always sound!!
-                translation = translation.replaceAll(name, name + "tmp");
-                tmpFile = new File(f.getParent() + File.separator + name + "tmp.java");
-                Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
-            } catch (Exception e) {
-                e.printStackTrace();
+            createAnnotationsFolder(fileName);
+            File tmpFile = CLI.prepareForJBMC(fileName);
+            if(tmpFile == null) {
+                System.out.println("Someting went wrong. Test aborted.");
                 return;
             }
-
-            Runtime rt = Runtime.getRuntime();
-            rt.addShutdownHook(new Thread(() -> cleanup()));
-            String[] commands = {"javac", "-cp", baseTestFolder, tmpFile.getPath()};
-            Process proc = rt.exec(commands);
-            proc.waitFor();
-
-
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(proc.getInputStream()));
-
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(proc.getErrorStream()));
-
-            // read the output from the command
-            String s = stdInput.readLine();
-            if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.getPath());
-                while (s != null) {
-                    System.out.println(s);
-                    s = stdInput.readLine();
-                }
-                assertTrue("Error compiling file " + fileName, false);
-                return;
-            }
-            s = stdError.readLine();
-            if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.getPath());
-                while (s != null) {
-                    System.out.println(s);
-                    s = stdError.readLine();
-                }
-                assertTrue("Error compiling file " + tmpFile, false);
-                keepTmpFile = true;
-                return;
-            }
-
             FunctionNameVisitor.parseFile(tmpFile.getPath());
             List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.functionBehaviours;
             List<String> functionNames = FunctionNameVisitor.functionNames;
@@ -183,22 +151,24 @@ public class TestExecutor {
                     System.out.println("Running test for function: " + function);
                     //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
                     String classFile = tmpFile.getPath().replace(".java", ".class");
+                    String[] commands;
                     if(unwinds.get(idx) != null) {
-                        commands = new String[]{"jbmc", classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions", "--trace"};
+                        commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions", "--trace"};
                     } else {
-                        commands = new String[]{"jbmc", classFile, "--function", function, "--trace"};
+                        commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace"};
                     }
 
-                    proc = rt.exec(commands);
+                    Runtime rt = Runtime.getRuntime();
+                    Process proc = rt.exec(commands);
                     proc.waitFor();
 
-                    stdInput = new BufferedReader(new
+                    BufferedReader stdInput = new BufferedReader(new
                             InputStreamReader(proc.getInputStream()));
 
-                    stdError = new BufferedReader(new
+                    BufferedReader stdError = new BufferedReader(new
                             InputStreamReader(proc.getErrorStream()));
 
-                    s = stdInput.readLine();
+                    String s = stdInput.readLine();
                     String out = "";
                     if (s != null) {
                         out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";

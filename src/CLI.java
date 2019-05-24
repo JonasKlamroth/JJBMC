@@ -5,19 +5,14 @@ import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
-import picocli.CommandLine;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -39,29 +34,29 @@ public class CLI implements Runnable {
     public static final String GREEN_BOLD = "\033[1;32m";  // GREEN
 
     @Option(names = {"-kt", "-keepTranslation"}, description = "Keep the temporary file which contains the translation of the given file.")
-    boolean keepTranslation = false;
+    static boolean keepTranslation = false;
 
     @Option(names = {"-va", "-verifyAll"}, description = "Verify all functions not just one.")
-    boolean verifyAll = false;
+    static boolean verifyAll = false;
 
     @Parameters(index="0", arity = "1", description = "The file containing methods to be verified.")
-    String fileName = null;
+    static String fileName = null;
 
     @Parameters(index="1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
-    String functionName = null;
+    static String functionName = null;
 
     @Option(names = {"-df", "-dontFilter"}, description = "If set all JBMC output is printed.")
-    boolean filterOutput = true;
+    static boolean filterOutput = true;
 
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
-    List<String> jbmcOptions = new ArrayList<>();
+    static List<String> jbmcOptions = new ArrayList<>();
 
     @Option(names = {"-h", "-help"}, usageHelp = true,
             description = "Print usage help and exit.")
-    boolean usageHelpRequested;
+    static boolean usageHelpRequested;
 
-    File tmpFolder = null;
-    private boolean didCleanUp = false;
+    static File tmpFolder = null;
+    private static boolean didCleanUp = false;
 
     @Override
     public void run() {
@@ -102,15 +97,30 @@ public class CLI implements Runnable {
         return null;
     }
 
-    public void translateAndRunJBMC() {
+    public static void translateAndRunJBMC(String file) {
+        fileName = file;
+        translateAndRunJBMC();
+    }
 
+    public static void translateAndRunJBMC(String file, String functionName) {
+        CLI.functionName = functionName;
+        fileName = file;
+        translateAndRunJBMC();
+    }
+
+    public static File prepareForJBMC(String file) {
+        fileName = file;
+        return prepareForJBMC();
+    }
+
+    public static File prepareForJBMC() {
         File tmpFile = null;
         didCleanUp = false;
         try {
             File f = new File(fileName);
             if(!f.exists()) {
                 System.out.println("Could not find file " + f);
-                return;
+                return null;
             }
             tmpFolder = new File(f.getParentFile(), "tmp");
             tmpFolder.mkdirs();
@@ -126,12 +136,12 @@ public class CLI implements Runnable {
             createCProverFolder(tmpFile.getAbsolutePath());
             if(!copyJBMC()) {
                 cleanUp();
-                return;
+                return null;
             }
         } catch (Exception e) {
             cleanUp();
             //e.printStackTrace();
-            return;
+            return null;
         }
 
         try {
@@ -156,7 +166,7 @@ public class CLI implements Runnable {
                     System.out.println(s);
                     s = stdInput.readLine();
                 }
-                return;
+                return null;
             }
             s = stdError.readLine();
             if (s != null) {
@@ -165,34 +175,39 @@ public class CLI implements Runnable {
                     System.out.println(s);
                     s = stdError.readLine();
                 }
-                return;
+                return null;
             }
 
-            List<String> functionNames = new ArrayList<>();
-            functionNames.addAll(FunctionNameVisitor.parseFile(fileName));
-            if(functionName != null) {
-                functionNames = functionNames.stream().filter(f -> f.endsWith("." + functionName)).collect(Collectors.toList());
-                if(functionNames.size() == 0) {
-                    System.out.println("Function " + functionName + " could not be found in the specified file.");
-                    return;
-                }
-            }
 
-            for(String functionName : functionNames) {
-                //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
-                runJBMC(tmpFile, functionName);
-            }
         } catch (IOException e) {
-            System.out.println("Error running jbmc.");
+            System.out.println("Error running JBMC.");
             e.printStackTrace();
         } catch (InterruptedException e) {
-            System.out.println("Error. Jbmc got interrupted.");
+            System.out.println("Error. JBMC got interrupted.");
             e.printStackTrace();
         }
         //cleanUp();
+        return tmpFile;
     }
 
-    private List<String> prepareJBMCOptions(List<String> options) {
+    static public void translateAndRunJBMC() {
+        File tmpFile = prepareForJBMC();
+        List<String> functionNames = new ArrayList<>();
+        functionNames.addAll(NameExctractionVisitor.parseFile(fileName));
+        if(functionName != null) {
+            functionNames = functionNames.stream().filter(f -> f.endsWith("." + functionName)).collect(Collectors.toList());
+            if(functionNames.size() == 0) {
+                System.out.println("Function " + functionName + " could not be found in the specified file.");
+                return;
+            }
+        }
+        for(String functionName : functionNames) {
+            //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
+            runJBMC(tmpFile, functionName);
+        }
+    }
+
+    static private List<String> prepareJBMCOptions(List<String> options) {
         List<String> res = new ArrayList<>();
         for(String s : options) {
             for(String o : s.split(" "))
@@ -201,7 +216,7 @@ public class CLI implements Runnable {
         return res;
     }
 
-    public void runJBMC(File tmpFile, String functionName) {
+    static public void runJBMC(File tmpFile, String functionName) {
         try {
             System.out.println("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
@@ -269,7 +284,7 @@ public class CLI implements Runnable {
         }
     }
 
-    private void createCProverFolder(String fileName) {
+    static private void createCProverFolder(String fileName) {
         File f = new File(fileName);
         File dir = new File(f.getParent() + File.separator + "org" + File.separator + "cprover");
         System.out.println("Copying CProver.java to " + dir.getAbsolutePath());
@@ -285,7 +300,7 @@ public class CLI implements Runnable {
         }
     }
 
-    private boolean copyJBMC() {
+    private static boolean copyJBMC() {
         try {
             InputStream is = Main.class.getResourceAsStream("jbmc");
             File to = new File(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
@@ -321,28 +336,28 @@ public class CLI implements Runnable {
 
     }
 
-    String convertStreamToString(java.io.InputStream is) {
+    static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }
 
-    private void cleanUp() {
-        if(!didCleanUp) {
-            deleteFolder(tmpFolder);
-            if (!keepTranslation) {
-                try {
-                    if (tmpFolder.exists()) {
-                        Files.delete(tmpFolder.toPath());
-                    }
-                } catch (IOException e) {
-                    //System.out.println("Could not delete tmp folder.");
-                }
-            }
-        }
-        didCleanUp = true;
+    private static void cleanUp() {
+//        if(!didCleanUp) {
+//            deleteFolder(tmpFolder);
+//            if (!keepTranslation) {
+//                try {
+//                    if (tmpFolder.exists()) {
+//                        Files.delete(tmpFolder.toPath());
+//                    }
+//                } catch (IOException e) {
+//                    //System.out.println("Could not delete tmp folder.");
+//                }
+//            }
+//        }
+//        didCleanUp = true;
     }
 
-    private void deleteFolder(File folder) {
+    private static void deleteFolder(File folder) {
         File[] tmpFiles = folder.listFiles();
         for(File f : tmpFiles) {
             if(!keepTranslation || !f.getName().endsWith(new File(fileName).getName())) {
@@ -372,7 +387,7 @@ public class CLI implements Runnable {
     }
 }
 
-class FunctionNameVisitor extends JmlTreeScanner {
+class NameExctractionVisitor extends JmlTreeScanner {
     static private String packageName = "";
     static private List<String> functionNames = new ArrayList();
     static private String className = "";
@@ -400,7 +415,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
 
             Context ctx = api.context();
-            FunctionNameVisitor fnv = new FunctionNameVisitor();
+            NameExctractionVisitor fnv = new NameExctractionVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
                 if(it.pid != null) {
                     packageName = it.pid.toString();
