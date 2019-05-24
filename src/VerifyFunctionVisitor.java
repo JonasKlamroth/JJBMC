@@ -21,7 +21,9 @@ import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
+import org.jmlspecs.openjml.ext.RequiresClause;
 
+import javax.lang.model.element.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
+    private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
 
@@ -74,10 +76,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
 
-        if(that.token == JmlTokenKind.ENSURES) {
+        if(that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
             translationMode = TranslationMode.ASSERT;
-        } else if(that.token == JmlTokenKind.REQUIRES) {
+        } else if(that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
         }
@@ -94,7 +96,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-        return M.JmlMethodClauseExpr(that.token, copy);
+        return M.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
     }
 
     @Override
@@ -126,6 +128,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         ensuresList.clear();
         currentAssignable = null;
         currentMethod = (JmlMethodDecl)that.clone();
+        if(currentMethod.mods.getFlags().contains(Modifier.ABSTRACT)) {
+            return currentMethod;
+        }
         hasReturn = false;
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
@@ -157,7 +162,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 if(combinedNewEnsStatements.size() > 0) {
                     l1 = l1.append(ensTry);
                 }
-                List<JCStatement> body = transformBody(that.body.getStatements());
+                List<JCStatement> body = List.nil();
+                if(that.body != null) {
+                    body = transformBody(that.body.getStatements());
+                }
                 JCTry bodyTry = M.Try(M.Block(0L, body),
                         List.of(
                                 M.Catch(catchVarb, M.Block(0L, l1))
@@ -170,7 +178,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 l = l.append(returnStmt);
             } else {
                 if(combinedNewEnsStatements.size() > 0) {
-                    List<JCStatement> body = transformBody(that.body.getStatements());
+                    List<JCStatement> body = List.nil();
+                    if(that.body != null) {
+                        body = transformBody(that.body.getStatements());
+                    }
                     JCTry bodyTry = M.Try(M.Block(0L, body),
                             List.of(
                                     M.Catch(catchVarb, M.Block(0L, List.of(ensTry)))
@@ -184,7 +195,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             }
         } else {
             //l = copy.body.getStatements();
-            l = transformBody(that.body.getStatements());
+            if(that.body != null) {
+                l = transformBody(that.body.getStatements());
+            }
             if(combinedNewEnsStatements.size() > 0) {
                 l = l.append(ensTry);
             }
@@ -192,20 +205,21 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 l = l.prepend(reqTry);
             }
         }
+        for(JCVariableDecl variableDecl : oldVars.values()) {
+            l = l.prepend(variableDecl);
+        }
         currentMethod.body = M.Block(0L, l);
 
         currentMethod.methodSpecsCombined = null;
         currentMethod.cases = null;
         combinedNewReqStatements = List.nil();
         combinedNewEnsStatements = List.nil();
+
         return currentMethod;
     }
 
     private List<JCStatement> transformBody(List<JCStatement> oBody) {
         List<JCStatement> body = List.nil();
-        for(JCVariableDecl variableDecl : oldVars.values()) {
-            body = body.prepend(variableDecl);
-        }
         for(JCStatement st : oBody) {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
             if(currentAssignable == null) {

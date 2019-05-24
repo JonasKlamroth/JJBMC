@@ -21,6 +21,7 @@ import org.jmlspecs.openjml.Nowarns;
 import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
 
+import javax.lang.model.element.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private Map<Integer, JCVariableDecl> oldVars = new HashMap<>();
+    private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;
@@ -73,10 +74,10 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
-        if(that.token == JmlTokenKind.ENSURES) {
+        if(that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
-        } else if(that.token == JmlTokenKind.REQUIRES) {
+        } else if(that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSUME);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
         }
@@ -95,7 +96,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-        return M.JmlMethodClauseExpr(that.token, copy);
+        return M.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
     }
 
     @Override
@@ -115,6 +116,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
             copy.name = M.Name(copy.name.toString() + "Symb");
             copy.mods.annotations = List.nil();
+            if(copy.mods.getFlags().contains(Modifier.ABSTRACT)) {
+                copy.mods.flags &= 1024;
+            }
             return copy;
         }
         currentSymbol = that.sym;
@@ -189,6 +193,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         copy.mods.annotations = List.nil();
         combinedNewReqStatements = List.nil();
         combinedNewEnsStatements = List.nil();
+        if(copy.mods.getFlags().contains(Modifier.ABSTRACT)) {
+            copy.mods.flags ^= 1024;
+        }
         return copy;
     }
 

@@ -18,6 +18,7 @@ import static org.jmlspecs.openjml.JmlTree.*;
  * Created by jklamroth on 11/13/18.
  */
 public class BaseVisitor extends FilterVisitor {
+    private boolean used = false;
     private JCTree.JCClassDecl returnExcClass;
     private final ClassReader reader;
     private final Symtab syms;
@@ -34,9 +35,14 @@ public class BaseVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlCompilationUnit(JmlCompilationUnit that, Void p) {
-        JmlCompilationUnit cu = (JmlCompilationUnit) super.visitJmlCompilationUnit(that, p);
-        cu.defs = cu.defs.prepend(M.Import(M.Ident(M.Name("org.cprover.CProver")), false));
-        return cu;
+        if(!used) {
+            used = true;
+            JmlCompilationUnit cu = (JmlCompilationUnit) super.visitJmlCompilationUnit(that, p);
+            cu.defs = cu.defs.prepend(M.Import(M.Ident(M.Name("org.cprover.CProver")), false));
+            return cu;
+        } else {
+            return null;
+        }
     }
 
     @Override

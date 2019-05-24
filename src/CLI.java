@@ -61,6 +61,7 @@ public class CLI implements Runnable {
     boolean usageHelpRequested;
 
     File tmpFolder = null;
+    private boolean didCleanUp = false;
 
     @Override
     public void run() {
@@ -95,6 +96,7 @@ public class CLI implements Runnable {
     public void translateAndRunJBMC() {
 
         File tmpFile = null;
+        didCleanUp = false;
         try {
             File f = new File(fileName);
             if(!f.exists()) {
@@ -314,30 +316,19 @@ public class CLI implements Runnable {
     }
 
     private void cleanUp() {
-//        try {
-//            if(!keepTranslation) {
-//                Files.delete(new File(tmpFolder, new File(fileName).getName()).toPath());
-//            }
-//            String parent = tmpFolder.getAbsolutePath();
-//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.java").toPath());
-//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover" + File.separator + "CProver.class").toPath());
-//            Files.delete(new File(parent + File.separator + "org" + File.separator + "cprover").toPath());
-//            Files.delete(new File(parent + File.separator + "org").toPath());
-//            Files.delete(new File(fileName.replace(".java", ".class")).toPath());
-//            Files.delete(new File(fileName.replace(".java", "$ReturnException.class")).toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        deleteFolder(tmpFolder);
-        if(!keepTranslation) {
-            try {
-                if(tmpFolder.exists()) {
-                    Files.delete(tmpFolder.toPath());
+        if(!didCleanUp) {
+            deleteFolder(tmpFolder);
+            if (!keepTranslation) {
+                try {
+                    if (tmpFolder.exists()) {
+                        Files.delete(tmpFolder.toPath());
+                    }
+                } catch (IOException e) {
+                    //System.out.println("Could not delete tmp folder.");
                 }
-            } catch (IOException e) {
-                //System.out.println("Could not delete tmp folder.");
             }
         }
+        didCleanUp = true;
     }
 
     private void deleteFolder(File folder) {
@@ -371,6 +362,7 @@ public class CLI implements Runnable {
 }
 
 class FunctionNameVisitor extends JmlTreeScanner {
+    static private String packageName = "";
     static private List<String> functionNames = new ArrayList();
     static private String className = "";
 
@@ -382,7 +374,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        String f = className + "." + that.getName().toString();
+        String f = packageName + "." + className + "." + that.getName().toString();
         if(!f.contains("<init>")) {
             functionNames.add(f);
         }
@@ -399,6 +391,9 @@ class FunctionNameVisitor extends JmlTreeScanner {
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
+                if(it.pid != null) {
+                    packageName = it.pid.toString();
+                }
                 ctx.dump();
                 it.accept(fnv);
             }

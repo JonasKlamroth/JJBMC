@@ -27,10 +27,10 @@ import static org.junit.Assert.assertTrue;
  * Created by jklamroth on 12/3/18.
  */
 public class TestExecutor {
-
-    static String[] fileNames = {"./tests/TestSuite.java", "./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
-    private File tmpFile = new File("./tests/tmp.java");
-    private boolean keepTmpFile = false;
+    private static final String baseTestFolder = "testRes" + File.separator;
+    static String[] fileNames = {baseTestFolder + "TestSuite.java", baseTestFolder + "AssignableTests.java", baseTestFolder + "AssignableTests2.java"};
+    private File tmpFile = new File(baseTestFolder + "tmp.java");
+    private boolean keepTmpFile = true;
     private boolean filterOutput = true;
     private boolean doCleanup = true;
 
@@ -42,79 +42,78 @@ public class TestExecutor {
 
     @org.junit.Test
     public void runBubbleSortSymbCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/BubbleSortSymb.java"};
+        fileNames = new String[]{baseTestFolder + "CaseStudy/BubbleSortSymb.java"};
         runAllTests();
+    }
+
+    @org.junit.Test
+    public void runOpenJMLDemos() throws IOException, InterruptedException {
+        File folder = new File("./testRes/openJMLDemo");
+        File[] files = folder.listFiles();
+        String[] fileNames = new String[files.length];
+        for(int i = 0; i < files.length; ++i) {
+            fileNames[i] = files[i].getPath();
+        }
+        runTests(fileNames);
     }
 
     @org.junit.Test
     public void runPairInsertionSortCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/PairInsertionSort.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/PairInsertionSort.java"});
     }
 
     @org.junit.Test
     public void runPairInsertionSortSymbCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/PairInsertionSortSymb.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/PairInsertionSortSymb.java"});
     }
 
     @org.junit.Test
     public void runMultCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/MultExample.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/MultExample.java"});
     }
 
     @org.junit.Test
     public void runBitMagicCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/BitMagicCollection.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/BitMagicCollection.java"});
     }
 
     @org.junit.Test
     public void runDualPivotQSCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/DualPivotQuicksort.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/DualPivotQuicksort.java"});
     }
 
     @org.junit.Test
     public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/BubbleSort.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/BubbleSort.java"});
     }
 
     @org.junit.Test
     public void runHammingWeightCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/HammingWeight.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/HammingWeight.java"});
     }
 
     @org.junit.Test
     public void runBigIntCaseStudy() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/BigInt.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/BigInt.java"});
     }
 
     @org.junit.Test
     public void runTmpTest() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/CaseStudy/TmpTest.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "CaseStudy/TmpTest.java"});
     }
 
     @org.junit.Test
     public void runFailingTests() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/FailingTests.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "FailingTests.java"});
     }
 
     @org.junit.Test
     public void runAssignableTests() throws IOException, InterruptedException {
-        fileNames = new String[]{"./tests/AssignableTests.java", "./tests/AssignableTests2.java"};
-        runAllTests();
+        runTests(new String[]{baseTestFolder + "AssignableTests.java", baseTestFolder + "AssignableTests2.java"});
     }
 
-    @org.junit.Test
-    public void runAllTests() throws IOException, InterruptedException {
-        for(String fileName : fileNames) {
+    public void runTests(String[] files) throws IOException, InterruptedException {
+        for(String fileName : files) {
             try {
                 File f = new File(fileName);
                 String translation = CLI.translate(f);
@@ -133,7 +132,7 @@ public class TestExecutor {
 
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(() -> cleanup()));
-            String[] commands = {"javac", "-cp", "." + File.separator + "tests" + File.separator, tmpFile.getPath()};
+            String[] commands = {"javac", "-cp", baseTestFolder, tmpFile.getPath()};
             Process proc = rt.exec(commands);
             proc.waitFor();
 
@@ -230,9 +229,12 @@ public class TestExecutor {
                 }
                 idx++;
             }
-
-
         }
+    }
+
+    @org.junit.Test
+    public void runAllTests() throws IOException, InterruptedException {
+        runTests(fileNames);
     }
 
     @Test
@@ -246,13 +248,13 @@ public class TestExecutor {
     public void cleanup() {
         try {
             if (doCleanup) {
-                Files.delete(new File("./tests/org/cprover/CProver.class".replaceAll("/", File.separator)).toPath());
+                Files.delete(new File(baseTestFolder + "org/cprover/CProver.class".replaceAll("/", File.separator)).toPath());
                 Files.delete(new File(tmpFile.getPath().replace(".java", ".class")).toPath());
                 Files.delete(new File(tmpFile.getPath().replace(".java", "$ReturnException.class")).toPath());
                 if (!keepTmpFile) Files.delete(tmpFile.toPath());
-                Files.delete(new File("./tests/TestAnnotations/Fails.class").toPath());
-                Files.delete(new File("./tests/TestAnnotations/Verifyable.class".replaceAll("/", File.separator)).toPath());
-                Files.delete(new File("./tests/TestAnnotations/Unwind.class".replaceAll("/", File.separator)).toPath());
+                Files.delete(new File(baseTestFolder + "TestAnnotations/Fails.class").toPath());
+                Files.delete(new File(baseTestFolder + "TestAnnotations/Verifyable.class".replaceAll("/", File.separator)).toPath());
+                Files.delete(new File(baseTestFolder + "TestAnnotations/Unwind.class".replaceAll("/", File.separator)).toPath());
             }
         } catch (IOException e) {
 
@@ -261,6 +263,7 @@ public class TestExecutor {
 }
 
 class FunctionNameVisitor extends JmlTreeScanner {
+    static private String packageName = "";
     static public List<String> functionNames = new ArrayList();
     static public List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static public List<String> unwinds = new ArrayList<>();
@@ -315,6 +318,10 @@ class FunctionNameVisitor extends JmlTreeScanner {
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
+                if(it.pid != null) {
+                    packageName = it.pid.toString();
+                    System.out.println("packageName = " + packageName);
+                }
                 //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
                 it.accept(fnv);
