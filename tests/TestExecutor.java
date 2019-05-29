@@ -29,7 +29,7 @@ public class TestExecutor {
     private static final String baseTestFolder = "testRes" + File.separator;
     static String[] fileNames = {baseTestFolder + "tests/TestSuite.java", baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"};
     private File tmpFile = new File(baseTestFolder + "tmp.java");
-    private boolean keepTmpFile = false;
+    private boolean keepTmpFile = true;
     private boolean filterOutput = true;
     private boolean doCleanup = false;
 
@@ -53,7 +53,7 @@ public class TestExecutor {
         for(int i = 0; i < files.length; ++i) {
             fileNames[i] = files[i].getPath();
         }
-        runTests(fileNames);
+        runCaseStudies(fileNames);
     }
 
     @org.junit.Test
@@ -123,6 +123,69 @@ public class TestExecutor {
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error trying to copy TestAnnotations");
+        }
+    }
+
+    public void runCaseStudies(String[] files) throws IOException, InterruptedException {
+        for(String fileName : files) {
+            createAnnotationsFolder(fileName);
+            CLI.keepTranslation = keepTmpFile;
+            File tmpFile = CLI.prepareForJBMC(fileName);
+            if(tmpFile == null) {
+                System.out.println("Someting went wrong. Test aborted.");
+                return;
+            }
+            FunctionNameVisitor.parseFile(tmpFile.getPath());
+
+            List<String> functionNames = FunctionNameVisitor.functionNames;
+            for(String function : functionNames) {
+                if(function.endsWith("Symb") || function.endsWith("<init>")) {
+                    continue;
+                }
+                System.out.println("Running test for function: " + function);
+                //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
+                String classFile = tmpFile.getPath().replace(".java", ".class");
+                String[] commands = null;
+
+                commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace"};
+
+                Runtime rt = Runtime.getRuntime();
+                Process proc = rt.exec(commands);
+                proc.waitFor();
+
+                BufferedReader stdInput = new BufferedReader(new
+                        InputStreamReader(proc.getInputStream()));
+
+                BufferedReader stdError = new BufferedReader(new
+                        InputStreamReader(proc.getErrorStream()));
+
+                String s = stdInput.readLine();
+                String out = "";
+                if (s != null) {
+                    out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
+                    while (s != null) {
+                        if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
+                            out += s +"\n";
+                        }
+                        s = stdInput.readLine();
+                    }
+                    s = stdError.readLine();
+                    while (s != null) {
+                        if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
+                            out += s + "\n";
+                        }
+                        s = stdError.readLine();
+                    }
+                    if(!filterOutput) {
+                        System.out.println(out);
+                    }
+                    assertTrue(out, out.contains("SUCCESSFUL"));
+                    assertTrue(out, out.contains("VERIFICATION"));
+                } else {
+                    System.out.println("Function: " + function + " ignored due to missing annotation.");
+                }
+            }
+            CLI.cleanUp();
         }
     }
 

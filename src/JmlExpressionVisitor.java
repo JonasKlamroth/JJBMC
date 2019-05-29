@@ -148,7 +148,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCUnary copy = M.Unary(u.getTag(), argCopy);
         copy.operator = u.operator;
         copy = (JCUnary)copy.setType(u.type);
-        if(u.getTag() == Tag.NOT) {
+        if(u.getTag() == Tag.NOT || u.getTag() == Tag.NEG) {
             return copy;
         } else if(u.getTag() == Tag.POSTINC || u.getTag() == Tag.POSTDEC ||
                 u.getTag() == Tag.PREDEC || u.getTag() == Tag.PREINC) {
@@ -162,7 +162,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return copy;
         } else {
-            throw new RuntimeException("Unsupported unary token: " + u.getTag());
+            throw new RuntimeException("Unsupported unary token: " + u.getTag() + " in " + node.toString());
         }
     }
 
