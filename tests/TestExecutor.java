@@ -27,9 +27,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExecutor {
     private static final String baseTestFolder = "testRes" + File.separator;
-    static String[] fileNames = {baseTestFolder + "TestSuite.java", baseTestFolder + "AssignableTests.java", baseTestFolder + "AssignableTests2.java"};
+    static String[] fileNames = {baseTestFolder + "tests/TestSuite.java", baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"};
     private File tmpFile = new File(baseTestFolder + "tmp.java");
-    private boolean keepTmpFile = true;
+    private boolean keepTmpFile = false;
     private boolean filterOutput = true;
     private boolean doCleanup = false;
 
@@ -108,23 +108,18 @@ public class TestExecutor {
 
     @org.junit.Test
     public void runAssignableTests() throws IOException, InterruptedException {
-        runTests(new String[]{baseTestFolder + "AssignableTests.java", baseTestFolder + "AssignableTests2.java"});
+        runTests(new String[]{baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"});
     }
 
     static private void createAnnotationsFolder(String fileName) {
         File f = new File(fileName);
-        File dir = new File(f.getParent() + File.separator + "TestAnnotations");
-        File tmpdir = new File(f.getParent() + File.separator + "tmp" + File.separator + "TestAnnotations");
+        File dir = new File(f.getParent(),"tmp" + File.separator + "TestAnnotations" );
         System.out.println("Copying Annotation files to " + dir.getAbsolutePath());
         dir.mkdirs();
-        tmpdir.mkdirs();
         try {
             Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(tmpdir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(tmpdir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(tmpdir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Error trying to copy TestAnnotations");
@@ -134,6 +129,7 @@ public class TestExecutor {
     public void runTests(String[] files) throws IOException, InterruptedException {
         for(String fileName : files) {
             createAnnotationsFolder(fileName);
+            CLI.keepTranslation = keepTmpFile;
             File tmpFile = CLI.prepareForJBMC(fileName);
             if(tmpFile == null) {
                 System.out.println("Someting went wrong. Test aborted.");
@@ -160,7 +156,7 @@ public class TestExecutor {
                     if(unwinds.get(idx) != null) {
                         commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--unwind", unwinds.get(idx), "--unwinding-assertions", "--trace"};
                     } else {
-                        commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace"};
+                        commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function};
                     }
 
                     Runtime rt = Runtime.getRuntime();
@@ -204,6 +200,7 @@ public class TestExecutor {
                 }
                 idx++;
             }
+            CLI.cleanUp();
         }
     }
 
@@ -221,8 +218,9 @@ public class TestExecutor {
 
     @After
     public void cleanup() {
-        CLI.cleanUp();
-
+        if(!keepTmpFile) {
+            CLI.cleanUp();
+        }
     }
 }
 

@@ -1,5 +1,16 @@
+package tests;
+
 import TestAnnotations.Fails;
 import TestAnnotations.Verifyable;
+
+class TestSuite {
+    private int privInt = 0;
+    public int pubInt;
+    TestSuite t2;
+    TestSuite t3;
+    int[] arr;
+    TestSuite[] objects;
+}
 
 /**
  * Created by jklamroth on 1/11/19.

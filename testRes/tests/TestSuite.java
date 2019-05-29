@@ -1,4 +1,4 @@
-package test;
+package tests;
 
 import TestAnnotations.Fails;
 import TestAnnotations.Unwind;
@@ -7,7 +7,7 @@ import TestAnnotations.Verifyable;
 /**
  * Created by jklamroth on 9/18/18.
  */
-class TestSuite {
+public class TestSuite {
     private int privInt = 0;
     public int pubInt;
     TestSuite t2;
@@ -111,38 +111,38 @@ class TestSuite {
         assert(CProver.uninterpreted_fresh(o));
     }*/
 
-    @Verifyable
-    private void blockContractTest() {
-        int i = 0;
-        //@ requires i == 0;
-        //@ ensures i == 6;
-        {
-            i = 5;
-            i++;
-        }
-    }
-
-    @Fails
-    private void blockContractTest1() {
-        int i = 0;
-        //@ requires i == 0;
-        //@ ensures i == 7;
-        {
-            i = 5;
-            i++;
-        }
-    }
-
-    @Fails
-    private void blockContractTest2() {
-        int i = 0;
-        //@ requires i == 1;
-        //@ ensures i == 6;
-        {
-            i = 5;
-            i++;
-        }
-    }
+//    @Verifyable
+//    private void blockContractTest() {
+//        int i = 0;
+//        //@ requires i == 0;
+//        //@ ensures i == 6;
+//        {
+//            i = 5;
+//            i++;
+//        }
+//    }
+//
+//    @Fails
+//    private void blockContractTest1() {
+//        int i = 0;
+//        //@ requires i == 0;
+//        //@ ensures i == 7;
+//        {
+//            i = 5;
+//            i++;
+//        }
+//    }
+//
+//    @Fails
+//    private void blockContractTest2() {
+//        int i = 0;
+//        //@ requires i == 1;
+//        //@ ensures i == 6;
+//        {
+//            i = 5;
+//            i++;
+//        }
+//    }
 
     //@ ensures \result == 5;
     @Verifyable
@@ -238,10 +238,10 @@ class TestSuite {
         return 56;
     }
 
-    //@ ensures (\exists int i; 0 <= i && i < 1; 1/0 == 0);
-    @Fails
-    private void quantifierTest() {
-    }
+//    //@ ensures (\exists int i; 0 <= i && i < 1; 1/0 == 0);
+//    @Fails
+//    private void quantifierTest() {
+//    }
 
     //@ assignable t2;
     private void calledMethod() {

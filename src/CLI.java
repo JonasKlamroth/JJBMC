@@ -82,7 +82,7 @@ public class CLI implements Runnable {
         IAPI api = Factory.makeAPI(apiArgs);
         java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
         int a = api.typecheck(cu);
-        if(a != 0) {
+        if(a > 0) {
             System.out.println("OpenJml parser Error.");
             return null;
         }
@@ -108,12 +108,22 @@ public class CLI implements Runnable {
         translateAndRunJBMC();
     }
 
+    public static File prepareForJBMC(String file, String[] apiArgs) {
+        fileName = file;
+        return prepareForJBMC(apiArgs);
+    }
+
     public static File prepareForJBMC(String file) {
         fileName = file;
         return prepareForJBMC();
     }
 
     public static File prepareForJBMC() {
+        File f = new File(fileName);
+        return prepareForJBMC(new String[]{"-cp", new File(f.getParentFile(), "tmp").getAbsolutePath()});
+    }
+
+    public static File prepareForJBMC(String[] apiArgs) {
         File tmpFile = null;
         didCleanUp = false;
         try {
@@ -127,15 +137,18 @@ public class CLI implements Runnable {
             tmpFile = new File(tmpFolder, f.getName());
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            String[] apiArgs = new String[]{"-cp", f.getParent()};
             String translation = translate(tmpFile, apiArgs);
-            if(tmpFile.exists()) {
-                Files.delete(tmpFile.toPath());
-            }
-            Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
-            createCProverFolder(tmpFile.getAbsolutePath());
-            if(!copyJBMC()) {
-                cleanUp();
+            if(translation != null) {
+                if (tmpFile.exists()) {
+                    Files.delete(tmpFile.toPath());
+                }
+                Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
+                createCProverFolder(tmpFile.getAbsolutePath());
+                if (!copyJBMC()) {
+                    cleanUp();
+                    return null;
+                }
+            } else {
                 return null;
             }
         } catch (Exception e) {
@@ -146,7 +159,13 @@ public class CLI implements Runnable {
 
         try {
             Runtime rt = Runtime.getRuntime();
-            String[] commands = {"javac", tmpFile.getPath(), "-cp", tmpFile.getParent()};
+
+            String[] commands = new String[apiArgs.length + 2];
+            commands[0] = "javac";
+            commands[1] = tmpFile.getAbsolutePath();
+            for(int i = 0; i < apiArgs.length; ++i) {
+                commands[i + 2] = apiArgs[i];
+            }
             System.out.println("Compiling translated file: " + Arrays.toString(commands));
             Process proc = rt.exec(commands);
             proc.waitFor();

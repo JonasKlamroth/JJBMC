@@ -393,19 +393,21 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
-        boolean notEmpty = false;
+        boolean empty = true;
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
                 newStatements = newStatements.appendList(transUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol, this));
-                notEmpty = true;
+                empty = false;
             }
         }
-        System.out.println("Warning: Found loop-spcification without modifies clause. Currently only specified variables are havoced.");
+        if(empty) {
+            System.out.println("Warning: Found loop-spcification without modifies clause. Currently only specified variables are havoced.");
+        }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;
         for(JmlStatementLoop spec : that.loopSpecs) {
-            if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("decreases")) {
+            if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if(oldD != null) {
                     throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
                 }
@@ -496,7 +498,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;
         for(JmlStatementLoop spec : that.loopSpecs) {
-            if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("decreases")) {
+            if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if(oldD != null) {
                     throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
                 }

@@ -146,45 +146,40 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
-        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
-                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
-        JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
-                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
+//        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
+//                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
+//        JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
+//                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
 
         JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
 
         List< JCStatement> l = List.nil();
 
-
-        List< JCStatement> l1 = List.nil();
         JCReturn returnStmt = null;
         if(returnVar != null) {
             returnStmt = M.Return(M.Ident(returnVar));
         }
-        if(combinedNewEnsStatements.size() > 0) {
-            l1 = l1.append(ensTry);
-        }
+
         List<JCStatement> body = List.nil();
         if(that.body != null) {
             body = transformBody(that.body.getStatements());
         }
         JCTry bodyTry = M.Try(M.Block(0L, body),
                 List.of(
-                        M.Catch(catchVarb, M.Block(0L, l1))
+                        M.Catch(catchVarb, M.Block(0L, List.nil()))
                 ),
                 null);
         if(combinedNewReqStatements.size() > 0) {
-            l = l.append(reqTry);
+            l = l.appendList(combinedNewReqStatements);
         }
         if(returnVar != null) {
             l = l.append(returnVar);
         }
         l = l.append(bodyTry);
+        l = l.appendList(combinedNewEnsStatements);
         if(returnStmt != null) {
             l = l.append(returnStmt);
         }
-
-
 
         for(JCVariableDecl variableDecl : oldVars.values()) {
             l = l.prepend(variableDecl);
