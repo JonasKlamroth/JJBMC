@@ -284,7 +284,7 @@ public class TranslationUtils {
         return res;
     }
 
-    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
+    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol, boolean withNull) {
         if(type.equals(syms.intType)) {
             return makeNondetInt(currentSymbol);
         } else if(type.equals(syms.floatType)) {
@@ -302,9 +302,17 @@ public class TranslationUtils {
         } else if(type instanceof Type.ArrayType) {
             return makeNondetWithoutNull(currentSymbol);
         } else if(type instanceof Type.ClassType) {
-            return makeNondetWithNull(currentSymbol);
+            if(withNull) {
+                return makeNondetWithNull(currentSymbol);
+            } else {
+                return makeNondetWithoutNull(currentSymbol);
+            }
         }
         throw new RuntimeException("Nondet for type " + type + " not supported.");
+    }
+
+    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
+        return getNondetFunctionForType(type, currentSymbol, true);
     }
 
     public List<JCStatement> diff(List<JCStatement> l1, List<JCStatement> l2) {

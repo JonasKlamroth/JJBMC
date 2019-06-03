@@ -1,18 +1,5 @@
 import com.sun.imageio.plugins.jpeg.JPEG;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BreakTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.ThrowTree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.UnaryTree;
+import com.sun.source.tree.*;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -27,6 +14,7 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import javafx.geometry.Pos;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -74,6 +62,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             Tag.BITXOR, Tag.BITOR, Tag.BITAND, Tag.SL, Tag.SR, Tag.AND, Tag.OR, Tag.EQ, Tag.NE,
             Tag.GE, Tag.GT, Tag.LE, Tag.LT, Tag.USR);
     private List<JCStatement> neededVariableDefs = List.nil();
+    public boolean inConstructor = false;
 
 
 
@@ -944,28 +933,39 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitNewClass(NewClassTree node, Void p) {
+        JCNewClass newClass = (JCNewClass)node;
+        JCExpression ex = M.Ident(M.Name(newClass.getIdentifier() + "Symb"));
+        ex.setType(newClass.type);
+
+        return M.App(ex, newClass.args);
+    }
+
+    @Override
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         if(translationMode != VerifyFunctionVisitor.TranslationMode.JAVA) {
         //    throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
-        if(copy.meth instanceof JCIdent) {
-            //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
-            //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
-            //newStatements = newStatements.append(ifst);
+        if(baseVisitor.getAssignablesForName(copy.meth.toString()) != null || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {
+            if (copy.meth instanceof JCIdent) {
+                //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
+                //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
+                //newStatements = newStatements.append(ifst);
 
-            if(!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                Symbol oldSymbol = currentSymbol;
-                currentSymbol = ((JCIdent)copy.meth).sym;
-                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
-                for(JCExpression a : assignables) {
-                    JCExpression cond = editAssignable(a);
-                    cond = treeutils.makeNot(Position.NOPOS, cond);
-                    newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+                if (!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+                    Symbol oldSymbol = currentSymbol;
+                    currentSymbol = ((JCIdent) copy.meth).sym;
+                    List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+                    for (JCExpression a : assignables) {
+                        JCExpression cond = editAssignable(a);
+                        cond = treeutils.makeNot(Position.NOPOS, cond);
+                        newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+                    }
+                    currentSymbol = oldSymbol;
                 }
-                currentSymbol = oldSymbol;
+                copy.meth = M.Ident(copy.meth.toString() + "Symb");
             }
-            copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
 
         return copy;
@@ -994,7 +994,18 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return (JCIf)node;
     }
 
+    @Override
+    public JCTree visitIdentifier(IdentifierTree node, Void p) {
+        if(inConstructor && translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT && ((JCIdent)node).sym.owner != currentSymbol && !node.getName().toString().equals("this")) {
+            return M.Select(M.Ident(returnVar), (Name) node.getName());
+        }
+        return super.visitIdentifier(node, p);
+    }
 
+    @Override
+    public JCTree visitMemberSelect(MemberSelectTree node, Void p) {
+        return super.visitMemberSelect(node, p);
+    }
 
     public List<JCStatement> getNewStatements() {
         return newStatements;

@@ -57,6 +57,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;
+    private boolean inConstructor = false;
 
     public SymbFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
         super(context, maker);
@@ -81,6 +82,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSUME);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
         }
+        expressionVisitor.inConstructor = this.inConstructor;
         JCExpression copy = expressionVisitor.copy(that.expression);
         newStatements = expressionVisitor.getNewStatements();
         oldVars = expressionVisitor.getOldVars();
@@ -112,12 +114,18 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
+
         if(that.cases == null) {
             JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
             copy.name = M.Name(copy.name.toString() + "Symb");
             copy.mods.annotations = List.nil();
             if(copy.mods.getFlags().contains(Modifier.ABSTRACT)) {
                 copy.mods.flags &= 1024;
+            }
+            if(that.getName().toString().equals("<init>")) {
+                copy.mods.flags &= 8L;
+                copy.restype = M.Ident(copy.sym.owner.name);
+                copy.name = M.Name(copy.sym.owner.name + "Symb");
             }
             return copy;
         }
@@ -127,16 +135,36 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         currentAssignable = List.nil();
         currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
+
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
+
         if(!(t instanceof Type.JCVoidType)) {
             returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, transUtils.getNondetFunctionForType(t, currentMethod.sym));
+            hasReturn = true;
+            this.returnVar = returnVar.sym;
+        } else if(that.name.toString().equals("<init>")) {
+            List<JCExpression> l = List.nil();
+            for(JCVariableDecl vd : currentMethod.params) {
+                l = l.append(M.Ident(vd));
+            }
+            JCNewClass initVal = M.NewClass(null, null, M.at(Position.NOPOS).Type(currentSymbol.owner.type), l, null);
+            returnVar = treeutils.makeVarDef(currentMethod.sym.owner.type, M.Name("returnVar"), currentMethod.sym, initVal);
             hasReturn = true;
             this.returnVar = returnVar.sym;
         } else {
             this.returnVar = null;
         }
+
+        if(that.name.toString().equals("<init>")) {
+            inConstructor = true;
+        }
         JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
+        if(copy.name.toString().equals("<init>")) {
+            copy.mods.flags &= 8L;
+            copy.restype = M.Ident(copy.sym.owner.name);
+            inConstructor = false;
+        }
         JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
@@ -154,6 +182,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             bodyStats = bodyStats.prepend(variableDecl);
         }
         bodyStats = bodyStats.appendList(transUtils.havoc(currentAssignable, copy.sym, this));
+        if(copy.name.equals("<init")) {
+            //bodyStats = List.nil();
+        }
 
         if(hasReturn) {
             if(returnVar != null) {
@@ -166,7 +197,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 if(combinedNewReqStatements.size() > 0) {
                     l = l.append(reqTry);
                 }
-                l = l.append(returnVar).appendList(bodyStats).appendList(l1);
+
+                l = l.append(returnVar);
+                if(copy.name.toString().equals("<init>")) {
+                    l = l.append(transUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
+                }
+                l = l.appendList(bodyStats).appendList(l1);
             } else {
                 if(combinedNewEnsStatements.size() > 0) {
                     l = l.append(reqTry).append(ensTry);
@@ -189,7 +225,11 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
         copy.methodSpecsCombined = null;
         copy.cases = null;
-        copy.name = M.Name(currentMethod.name.toString() + "Symb");
+        if(copy.name.toString().equals("<init>")) {
+            copy.name = M.Name(copy.sym.owner.name + "Symb");
+        } else {
+            copy.name = M.Name(currentMethod.name.toString() + "Symb");
+        }
         copy.mods.annotations = List.nil();
         combinedNewReqStatements = List.nil();
         combinedNewEnsStatements = List.nil();

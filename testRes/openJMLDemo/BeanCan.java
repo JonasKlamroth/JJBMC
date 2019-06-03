@@ -18,7 +18,7 @@ abstract class BeanCan {
     /*@ requires M >= 0;
         requires N >= 0;
         requires M + N >= 1;
-        ensures num_black == M;
+        ensures this.num_black == M;
         ensures num_white == N;
         assignable \everything;
     */

@@ -50,7 +50,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodDecl(JmlTree.JmlMethodDecl that, Void p) {
         foundNothing = false;
-        JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitMethod(that, p);
+        JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
         copy.sourcefile = that.sourcefile;
         copy.specsDecl = that.specsDecl;
         //copy.cases = (JmlMethodSpecs)this.copy((JCTree)that.cases, (Object)p);

@@ -70,9 +70,9 @@ public class BaseVisitor extends FilterVisitor {
             }
             calledFunctions.addAll(fcv.calledFunctions);
             for (JCTree def : copy.defs) {
-                if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
+                if (def instanceof JmlMethodDecl) {
                     newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
-                    if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString())) {
+                    if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                         newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                     }
                 } else {

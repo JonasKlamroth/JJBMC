@@ -197,16 +197,18 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private List<JCStatement> transformBody(List<JCStatement> oBody) {
         List<JCStatement> body = List.nil();
         for(JCStatement st : oBody) {
-            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
-            if(currentAssignable == null) {
-                currentAssignable = List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
-            }
-            ev.setCurrentAssignable(currentAssignable);
-            JCStatement copy = ev.copy(st);
-            if(ev.getNewStatements().size() == 0) {
-                body = body.append(copy);
-            } else {
-                body = body.appendList(ev.getNewStatements());
+            if(!st.toString().equals("super();")) {
+                JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
+                if (currentAssignable == null) {
+                    currentAssignable = List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+                }
+                ev.setCurrentAssignable(currentAssignable);
+                JCStatement copy = ev.copy(st);
+                if (ev.getNewStatements().size() == 0) {
+                    body = body.append(copy);
+                } else {
+                    body = body.appendList(ev.getNewStatements());
+                }
             }
         }
         return body;

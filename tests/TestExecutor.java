@@ -185,7 +185,7 @@ public class TestExecutor {
                     System.out.println("Function: " + function + " ignored due to missing annotation.");
                 }
             }
-            CLI.cleanUp();
+            //CLI.cleanUp();
         }
     }
 
