@@ -57,6 +57,12 @@ public class TestExecutor {
     }
 
     @org.junit.Test
+    public void runOpenJMLDemo() throws IOException, InterruptedException {
+        String[] fileNames = new String[]{"./testRes/openJMLDemo/ChangeCase.java"};
+        runCaseStudies(fileNames);
+    }
+
+    @org.junit.Test
     public void runPairInsertionSortCaseStudy() throws IOException, InterruptedException {
         runTests(new String[]{baseTestFolder + "CaseStudy/PairInsertionSort.java"});
     }

@@ -145,7 +145,11 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseSignals(JmlTree.JmlMethodClauseSignals that, Void p) {
+        if(this instanceof VerifyFunctionVisitor && ((VerifyFunctionVisitor) this).currentMethod.name.toString().equals("<init>")) {
+            return super.visitJmlMethodClauseSignals(that, p);
+        }
         throw new RuntimeException("Not supported: " + that.toString());
+        //return super.visitJmlMethodClauseSignals(that, p);
     }
 
     @Override

@@ -114,6 +114,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
+        currentSymbol = that.sym;
+        requiresList.clear();
+        ensuresList.clear();
+        currentAssignable = List.nil();
+        currentMethod = (JmlMethodDecl)that.clone();
+        hasReturn = false;
 
         if(that.cases == null) {
             JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
@@ -123,6 +129,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 copy.mods.flags &= 1024;
             }
             if(that.getName().toString().equals("<init>")) {
+                List<JCExpression> l = List.nil();
+                for(JCVariableDecl vd : currentMethod.params) {
+                    l = l.append(M.Ident(vd));
+                }
+                JCReturn ret = M.Return(M.NewClass(null, null, M.at(Position.NOPOS).Type(currentSymbol.owner.type), l, null));
+                copy.body = M.Block(0L, List.of(ret));
                 copy.mods.flags &= 8L;
                 copy.restype = M.Ident(copy.sym.owner.name);
                 copy.name = M.Name(copy.sym.owner.name + "Symb");

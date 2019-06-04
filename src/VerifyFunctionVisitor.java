@@ -46,7 +46,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private final ClassReader reader;
     private Set<JCExpression> ensuresList = new HashSet<>();
     private Set<JCExpression> requiresList = new HashSet<>();
-    private JmlMethodDecl currentMethod;
+    protected JmlMethodDecl currentMethod;
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
@@ -256,6 +256,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         if(t.getTag().equals(TypeTag.BOOLEAN)) {
             return M.Literal(true);
+        }
+        if(t.getTag().equals(TypeTag.CHAR)) {
+            return M.Literal(0);
         }
         return treeutils.nullLit;
     }

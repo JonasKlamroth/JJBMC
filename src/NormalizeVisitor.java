@@ -29,7 +29,15 @@ public class NormalizeVisitor extends JmlTreeCopier {
     public JCTree visitBinary(BinaryTree node, Void p) {
         JCBinary binary = (JCBinary)node;
         if(!negated) {
-            return super.visitBinary(binary, p);
+            JCExpression expr1 = super.copy((binary.getLeftOperand()));
+            negated = false;
+            selfNegated = false;
+            JCExpression expr2 = super.copy((binary.getRightOperand()));
+            selfNegated = true;
+            JCBinary b = M.Binary(((JCBinary) node).getTag(), expr1, expr2);
+            b = (JCBinary)b.setType(binary.type);
+            b.operator = binary.operator;
+            return b;
         }
         if(binary.getTag() == Tag.AND) {
             negated = false;
@@ -181,6 +189,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
 
     public static JCExpression normalize(JCExpression expression, Context context, Maker maker) {
         NormalizeVisitor normalizeVisitor = new NormalizeVisitor(context, maker);
-        return normalizeVisitor.copy(expression);
+        JCExpression ex = normalizeVisitor.copy(expression);
+        return ex;
     }
 }

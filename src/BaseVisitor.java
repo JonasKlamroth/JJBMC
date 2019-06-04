@@ -103,4 +103,8 @@ public class BaseVisitor extends FilterVisitor {
     public List<JCExpression> getAssignablesForName(String n) {
         return functionsByNames.get(n);
     }
+
+    public boolean hasSymbolicVersion(String meth) {
+        return calledFunctions.contains(meth);
+    }
 }

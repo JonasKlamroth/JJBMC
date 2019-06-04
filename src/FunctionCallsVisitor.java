@@ -18,6 +18,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
     public Set<String> calledFunctions = new HashSet<>();
     public List<JCTree.JCExpression> assignables = List.nil();
     private boolean foundNothing = false;
+    JmlTree.JmlMethodDecl currentMethod = null;
 
     public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -27,6 +28,9 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
     public JCTree visitMethodInvocation(MethodInvocationTree that, Void p) {
         if(((JCTree.JCMethodInvocation)that).meth instanceof JCTree.JCIdent) {
             calledFunctions.add(((JCTree.JCIdent) ((JCTree.JCMethodInvocation)that).meth).getName().toString());
+        } else if((((JCTree.JCMethodInvocation) that).meth instanceof JCTree.JCFieldAccess
+                && ((JCTree.JCMethodInvocation) that).meth.type.getReturnType().equals(currentMethod.sym.owner.type))) {
+            calledFunctions.add(((JCTree.JCFieldAccess) ((JCTree.JCMethodInvocation)that).meth).name.toString());
         }
         return super.visitMethodInvocation(that, p);
     }
@@ -49,6 +53,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodDecl(JmlTree.JmlMethodDecl that, Void p) {
+        currentMethod = that;
         foundNothing = false;
         JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
         copy.sourcefile = that.sourcefile;

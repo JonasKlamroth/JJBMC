@@ -7,11 +7,11 @@ public class ChangeCase {
     //@   ensures \result >= 'A' && \result <= 'Z';
     public char changeCase(char c) {
         char result = ' ';
-        if (c >= 'z') {
+        if (c > 'z') {
             result = c;
         } else if (c >= 'a') {
             result =  (char)(c - 'a' + 'A');
-        } else if (c >= 'Z') {
+        } else if (c > 'Z') {
             result =  c;
         } else if (c >= 'A') {
             result =  (char)(c - 'A' + 'a');
@@ -23,13 +23,13 @@ public class ChangeCase {
 
     //@   requires c >= 'A' && c <= 'Z';
     //@   ensures \result >= 'a' && \result <= 'z';
-    public char changeCase(char c) {
+    public char changeCase1(char c) {
         char result = ' ';
-        if (c >= 'z') {
+        if (c > 'z') {
             result = c;
         } else if (c >= 'a') {
             result =  (char)(c - 'a' + 'A');
-        } else if (c >= 'Z') {
+        } else if (c > 'Z') {
             result =  c;
         } else if (c >= 'A') {
             result =  (char)(c - 'A' + 'a');
@@ -41,13 +41,13 @@ public class ChangeCase {
 
     //@   requires !(c >= 'A' && c <= 'Z') && !(c >= 'a' && c <= 'z');
     //@   ensures \result == c;
-    public char changeCase(char c) {
+    public char changeCase2(char c) {
         char result = ' ';
-        if (c >= 'z') {
+        if (c > 'z') {
             result = c;
         } else if (c >= 'a') {
             result =  (char)(c - 'a' + 'A');
-        } else if (c >= 'Z') {
+        } else if (c > 'Z') {
             result =  c;
         } else if (c >= 'A') {
             result =  (char)(c - 'A' + 'a');

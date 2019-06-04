@@ -947,25 +947,29 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         //    throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
-        if(baseVisitor.getAssignablesForName(copy.meth.toString()) != null || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {
-            if (copy.meth instanceof JCIdent) {
-                //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
-                //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
-                //newStatements = newStatements.append(ifst);
+        String functionName = "";
+        if(copy.meth instanceof JCIdent) {
+            functionName = ((JCIdent) copy.meth).name.toString();
+        } else if(copy.meth instanceof JCFieldAccess) {
+            functionName = ((JCFieldAccess) copy.meth).name.toString();
+        }
+        if(baseVisitor.hasSymbolicVersion(functionName) || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {
+            //JCExpression expr = transUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
+            //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
+            //newStatements = newStatements.append(ifst);
 
-                if (!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                    Symbol oldSymbol = currentSymbol;
-                    currentSymbol = ((JCIdent) copy.meth).sym;
-                    List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
-                    for (JCExpression a : assignables) {
-                        JCExpression cond = editAssignable(a);
-                        cond = treeutils.makeNot(Position.NOPOS, cond);
-                        newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
-                    }
-                    currentSymbol = oldSymbol;
+            if (!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+                Symbol oldSymbol = currentSymbol;
+                currentSymbol = ((JCIdent) copy.meth).sym;
+                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+                for (JCExpression a : assignables) {
+                    JCExpression cond = editAssignable(a);
+                    cond = treeutils.makeNot(Position.NOPOS, cond);
+                    newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
                 }
-                copy.meth = M.Ident(copy.meth.toString() + "Symb");
+                currentSymbol = oldSymbol;
             }
+            copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
 
         return copy;
