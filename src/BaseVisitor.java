@@ -47,12 +47,15 @@ public class BaseVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
-        if(!that.sym.flatname.toString().contains("$")) {
+        if(that.sym.flatname.toString().contains("$")) {
+            System.out.println("Inner classes currently only copied.");
+            return that;
+        }
             Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
             classSymbol.sourcefile = that.sourcefile;
             classSymbol.completer = null;
             classSymbol.flatname = M.Name("ReturnException");
-            returnExcClass = M.ClassDef(M.Modifiers(8L), M.Name("ReturnException"), List.nil(),
+            returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), List.nil(),
                     M.Type(syms.runtimeExceptionType),
                     com.sun.tools.javac.util.List.nil(),
                     com.sun.tools.javac.util.List.nil());
@@ -67,6 +70,7 @@ public class BaseVisitor extends FilterVisitor {
                     functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.assignables);
                 }
                 fcv.assignables = List.nil();
+
             }
             calledFunctions.addAll(fcv.calledFunctions);
             for (JCTree def : copy.defs) {
@@ -75,6 +79,10 @@ public class BaseVisitor extends FilterVisitor {
                     if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                         newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                     }
+                } else if(def instanceof JmlClassDecl) {
+                    BaseVisitor bv = new BaseVisitor(context, M);
+                    JmlClassDecl copiedClass = bv.copy((JmlClassDecl)def);
+                    newDefs = newDefs.append(copiedClass);
                 } else {
                     newDefs = newDefs.append(def);
                 }
@@ -83,10 +91,7 @@ public class BaseVisitor extends FilterVisitor {
             copy.defs = newDefs;
 
             return copy;
-        } else {
-            System.out.println("NOTE: Inner classes do not get translated but only copied.");
-        }
-        return that;
+
     }
 
     @Override

@@ -524,4 +524,12 @@ public class TestSuite {
     @Fails
     private void shortcutTest3() {
     }
+
+    //@ ensures !true || !false;
+    @Verifyable
+    private void normalizeTest() {}
+
+    //@ ensures !(!true && !false);
+    @Verifyable
+    private void normalizeTest1() {}
 }

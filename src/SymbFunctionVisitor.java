@@ -135,9 +135,15 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 }
                 JCReturn ret = M.Return(M.NewClass(null, null, M.at(Position.NOPOS).Type(currentSymbol.owner.type), l, null));
                 copy.body = M.Block(0L, List.of(ret));
-                copy.mods.flags &= 8L;
                 copy.restype = M.Ident(copy.sym.owner.name);
                 copy.name = M.Name(copy.sym.owner.name + "Symb");
+                //Make it static
+                copy.mods.flags |= 8L;
+                //Make it public
+                copy.mods.flags |= 1L;
+                //Make it not private and not protected
+                copy.mods.flags &= (0xffffffff ^ 2L);
+                copy.mods.flags &= (0xffffffff ^ 4L);
             }
             return copy;
         }
@@ -239,6 +245,13 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         copy.cases = null;
         if(copy.name.toString().equals("<init>")) {
             copy.name = M.Name(copy.sym.owner.name + "Symb");
+            //Make it static
+            copy.mods.flags |= 8L;
+            //Make it public
+            copy.mods.flags |= 1L;
+            //Make it not private and not protected
+            copy.mods.flags &= (0xffffffff ^ 2L);
+            copy.mods.flags &= (0xffffffff ^ 4L);
         } else {
             copy.name = M.Name(currentMethod.name.toString() + "Symb");
         }

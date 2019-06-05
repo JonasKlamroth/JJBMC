@@ -935,7 +935,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitNewClass(NewClassTree node, Void p) {
         JCNewClass newClass = (JCNewClass)node;
-        JCExpression ex = M.Ident(M.Name(newClass.getIdentifier() + "Symb"));
+        JCExpression ex = M.Ident(M.Name(newClass.getIdentifier() + "." + newClass.getIdentifier() + "Symb"));
         ex.setType(newClass.type);
 
         return M.App(ex, newClass.args);

@@ -2,6 +2,8 @@
 
 public class ChangeCase {
 
+    //Two times > instead of >= used to correct error.
+
 
     //@   requires c >= 'a' && c <= 'z';
     //@   ensures \result >= 'A' && \result <= 'Z';

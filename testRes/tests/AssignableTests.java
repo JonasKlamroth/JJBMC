@@ -17,6 +17,9 @@ class TestSuite {
     TestSuite[] objects;
 }
 
+class A { public A a1; }
+class B extends A { public B b1; }
+
 public class AssignableTests {
     private int privInt = 0;
     public int pubInt;
@@ -28,8 +31,7 @@ public class AssignableTests {
     A a;
     B b;
 
-    class A { public A a1; }
-    class B extends A { public B b1; }
+
 
     /*@ assignable privInt;
       @ */
