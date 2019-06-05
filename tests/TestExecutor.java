@@ -48,17 +48,19 @@ public class TestExecutor {
     @org.junit.Test
     public void runOpenJMLDemos() throws IOException, InterruptedException {
         File folder = new File("./testRes/openJMLDemo");
-        File[] files = folder.listFiles();
+        File[] files = folder.listFiles(File::isFile);
         String[] fileNames = new String[files.length];
         for(int i = 0; i < files.length; ++i) {
-            fileNames[i] = files[i].getPath();
+            if(files[i].isFile()) {
+                fileNames[i] = files[i].getPath();
+            }
         }
         runCaseStudies(fileNames);
     }
 
     @org.junit.Test
     public void runOpenJMLDemo() throws IOException, InterruptedException {
-        String[] fileNames = new String[]{"./testRes/openJMLDemo/ChangeCase.java"};
+        String[] fileNames = new String[]{"./testRes/openJMLDemo/CashAmount.java"};
         runCaseStudies(fileNames);
     }
 
@@ -134,6 +136,7 @@ public class TestExecutor {
 
     public void runCaseStudies(String[] files) throws IOException, InterruptedException {
         for(String fileName : files) {
+            System.out.println("Running tests for file: " + fileName);
             createAnnotationsFolder(fileName);
             CLI.keepTranslation = keepTmpFile;
             File tmpFile = CLI.prepareForJBMC(fileName);
@@ -351,7 +354,6 @@ class FunctionNameVisitor extends JmlTreeScanner {
             for (JmlTree.JmlCompilationUnit it : cu) {
                 if(it.pid != null) {
                     packageName = it.pid.toString();
-                    System.out.println("packageName = " + packageName);
                 }
                 //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
