@@ -30,7 +30,7 @@ public class TestExecutor {
     static String[] fileNames = {baseTestFolder + "tests/TestSuite.java", baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"};
     private File tmpFile = new File(baseTestFolder + "tmp.java");
     private boolean keepTmpFile = true;
-    private boolean filterOutput = true;
+    private boolean filterOutput = false;
     private boolean doCleanup = false;
 
     @Before
@@ -60,7 +60,7 @@ public class TestExecutor {
 
     @org.junit.Test
     public void runOpenJMLDemo() throws IOException, InterruptedException {
-        String[] fileNames = new String[]{"./testRes/openJMLDemo/CashAmount.java"};
+        String[] fileNames = new String[]{"./testRes/openJMLDemo/LoopExamples.java"};
         runCaseStudies(fileNames);
     }
 
@@ -156,7 +156,7 @@ public class TestExecutor {
                 String classFile = tmpFile.getPath().replace(".java", ".class");
                 String[] commands = null;
 
-                commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace"};
+                commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace", "--unwind", "7"};
 
                 Runtime rt = Runtime.getRuntime();
                 Process proc = rt.exec(commands);
