@@ -15,6 +15,34 @@ public class TestSuite {
     int[] arr;
     TestSuite[] objects;
 
+    //@ requires b1 == false;
+    //@ ensures (b1 == true) ==> -1 > 0;
+    @Verifyable
+    private void normalizeTest5(boolean b1) {
+
+    }
+
+    //@ ensures b1 == (b2 == b3);
+    @Fails
+    private void normalizeTest7(boolean b1, boolean b2, boolean b3, boolean b4) {
+
+    }
+    //@ ensures !(false == true);
+    @Verifyable
+    private void normalizeTest6() {
+
+    }
+
+    //@ ensures i > 0 ==> i > -1;
+    @Verifyable
+    private void impliesTest(int i) {
+    }
+
+    //@ ensures 1 == 0 <==> true == false;
+    @Verifyable
+    public void normalizeTest4() {
+    }
+
     //@ requires  i > 0 && i < 10000;
     //@ ensures \result == i + 1;
     @Verifyable
@@ -259,10 +287,6 @@ public class TestSuite {
         return res;
     }
 
-    //@ ensures i > 0 ==> i > -1;
-    @Verifyable
-    private void impliesTest(int i) {
-    }
 
     //@ ensures i > 0 ==> i > 1;
     @Fails

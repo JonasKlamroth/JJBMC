@@ -1,3 +1,4 @@
+import com.sun.imageio.plugins.jpeg.JPEG;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
@@ -129,10 +130,24 @@ public class TranslationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol, JCExpression init) {
-        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, loopVarName.name, currentSymbol, init);
-        JCTree.JCExpression loopCond = range;
+    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, String oldQunatVarName, Symbol currentSymbol, JCExpression init) {
+        JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, M.Name(loopVarName), currentSymbol, init);
+        JCTree.JCExpression loopCond = replaceVarName(oldQunatVarName, loopVarName, range);
+        body = replaceVarName(oldQunatVarName, loopVarName, body);
         return makeStandardLoop(loopCond, body, loopVar, currentSymbol);
+    }
+    public List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
+        for(JCStatement st : expr) {
+            ReplaceVisitor.replace(oldName, newName, st, M);
+        }
+        return expr;
+    }
+    public JCStatement replaceVarName(String oldName, String newName, JCStatement expr) {
+        return ReplaceVisitor.replace(oldName, newName, expr, M);
+    }
+
+    public JCExpression replaceVarName(String oldName, String newName, JCExpression expr) {
+        return ReplaceVisitor.replace(oldName, newName, expr, M);
     }
 
     public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
@@ -461,4 +476,38 @@ class RangeExtractor extends JmlTreeScanner {
         }
         return maxResult;
     }
+}
+
+class ReplaceVisitor extends JmlTreeScanner {
+    static String oldName = null;
+    static String newName = null;
+    private final JmlTree.Maker M;
+    public ReplaceVisitor(JmlTree.Maker maker) {
+        this.M = maker;
+    }
+    @Override
+    public void visitIdent(JCIdent tree) {
+        if(tree.name.toString().equals(oldName)) {
+            tree.name = M.Name(newName);
+        }
+        super.visitIdent(tree);
+    }
+
+    public static JCStatement replace(String oldName, String newName, JCStatement expr, Maker maker) {
+        ReplaceVisitor.newName = newName;
+        ReplaceVisitor.oldName = oldName;
+        ReplaceVisitor rv = new ReplaceVisitor(maker);
+        rv.scan(expr);
+        return expr;
+    }
+
+    public static JCExpression replace(String oldName, String newName, JCExpression expr, Maker maker) {
+        ReplaceVisitor.newName = newName;
+        ReplaceVisitor.oldName = oldName;
+        ReplaceVisitor rv = new ReplaceVisitor(maker);
+        rv.scan(expr);
+        return expr;
+    }
+
+
 }

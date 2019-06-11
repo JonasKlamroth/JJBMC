@@ -44,8 +44,6 @@ abstract class BeanCan {
         ensures num_black >= 0;
         ensures WHITE == false;
         ensures BLACK == true;
-        ensures num_white >= 0;
-        ensures num_black >= 0;
     */
     public void remove(boolean color) {
 

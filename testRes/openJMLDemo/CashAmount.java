@@ -65,11 +65,9 @@ public class CashAmount {
      * @return a new CashAmount representing the negation of this
      * CashAmount.
      *
-     * This fails if not excluding maxint
+     * This fails if not excluding maxint+
      */
     //@ requires -CENTS_IN_DOLLAR < my_cents && my_cents < CENTS_IN_DOLLAR;
-    //@ requires my_cents < Integer.MAX_VALUE && my_cents > Integer.MIN_VALUE;
-    //@ requires my_dollars < Integer.MAX_VALUE && my_dollars > Integer.MIN_VALUE;
     //@ requires (my_cents > 0 ==> my_dollars >= 0) && (my_dollars > 0 ==> my_cents >= 0);
     //@ requires (my_cents < 0 ==> my_dollars <= 0) && (my_dollars < 0 ==> my_cents <= 0);
     //@ ensures \result.my_dollars == -my_dollars;

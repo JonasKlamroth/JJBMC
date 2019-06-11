@@ -361,19 +361,19 @@ public class CLI implements Runnable {
     }
 
     public static void cleanUp() {
-//        if(!didCleanUp) {
-//            deleteFolder(tmpFolder);
-//            if (!keepTranslation) {
-//                try {
-//                    if (tmpFolder.exists()) {
-//                        Files.delete(tmpFolder.toPath());
-//                    }
-//                } catch (IOException e) {
-//                    //System.out.println("Could not delete tmp folder.");
-//                }
-//            }
-//        }
-//        didCleanUp = true;
+        if(!didCleanUp) {
+            deleteFolder(tmpFolder);
+            if (!keepTranslation) {
+                try {
+                    if (tmpFolder.exists()) {
+                        Files.delete(tmpFolder.toPath());
+                    }
+                } catch (IOException e) {
+                    //System.out.println("Could not delete tmp folder.");
+                }
+            }
+        }
+        didCleanUp = true;
     }
 
     public static void deleteFolder(File folder) {

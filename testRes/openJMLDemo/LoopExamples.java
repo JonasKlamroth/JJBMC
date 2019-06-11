@@ -13,7 +13,7 @@ public class LoopExamples {
     }
 
     /*@ normal_behavior
-        requires a != null && a.length <= 5;
+        requires a != null && a.length <= 4;
         ensures \result == (\exists int i; 0 <= i && i < a.length; a[i] == x);
      */
     boolean contains(int x) {
