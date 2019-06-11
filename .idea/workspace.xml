@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="added LoopExamples (openjml)">
-      <change afterPath="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testRes/openJMLDemo/Queue.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NormalizeVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/NormalizeVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/TranslationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TranslationUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/BeanCan.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/BeanCan.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/tests/TestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/TestSuite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/Queue.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/Queue.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -30,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="62" column="71" selection-start-line="62" selection-start-column="71" selection-end-line="62" selection-end-column="71" />
+            <state relative-caret-position="210">
+              <caret line="62" column="69" selection-start-line="62" selection-start-column="69" selection-end-line="62" selection-end-column="69" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -94,7 +85,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/NormalizeVisitor.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="202">
@@ -104,24 +95,38 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/JmlExpressionVisitor.java">
+        <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/Queue.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="227" column="75" selection-start-line="227" selection-start-column="75" selection-end-line="227" selection-end-column="75" />
+            <state relative-caret-position="60">
+              <caret line="53" column="68" selection-start-line="53" selection-start-column="68" selection-end-line="53" selection-end-column="68" />
               <folding>
-                <element signature="e#31353#31354#0" expanded="true" />
-                <element signature="e#31400#31401#0" expanded="true" />
-                <element signature="e#50112#50113#0" expanded="true" />
-                <element signature="e#50167#50168#0" expanded="true" />
-                <element signature="e#50218#50219#0" expanded="true" />
-                <element signature="e#50254#50255#0" expanded="true" />
-                <element signature="e#50315#50316#0" expanded="true" />
-                <element signature="e#50345#50346#0" expanded="true" />
-                <element signature="e#50554#50555#0" expanded="true" />
-                <element signature="e#50592#50593#0" expanded="true" />
-                <element signature="e#50795#50796#0" expanded="true" />
-                <element signature="e#50836#50837#0" expanded="true" />
+                <element signature="e#1716#1717#0" expanded="true" />
+                <element signature="e#1743#1744#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+              <folding>
+                <element signature="e#64#65#0" expanded="true" />
+                <element signature="e#94#95#0" expanded="true" />
+                <element signature="e#156#157#0" expanded="true" />
+                <element signature="e#182#183#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/tmp/Queue.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="25">
+              <caret line="95" column="6" selection-start-line="95" selection-start-column="6" selection-end-line="95" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -217,16 +222,17 @@
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/Test.java" />
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/tmp/LoopExamples.java" />
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" />
-        <option value="$PROJECT_DIR$/testRes/openJMLDemo/Queue.java" />
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" />
         <option value="$PROJECT_DIR$/src/TranslationUtils.java" />
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java" />
-        <option value="$PROJECT_DIR$/src/CLI.java" />
-        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
         <option value="$PROJECT_DIR$/src/JmlExpressionVisitor.java" />
         <option value="$PROJECT_DIR$/testRes/openJMLDemo/BeanCan.java" />
         <option value="$PROJECT_DIR$/testRes/tests/TestSuite.java" />
         <option value="$PROJECT_DIR$/src/NormalizeVisitor.java" />
+        <option value="$PROJECT_DIR$/tests/TestExecutor.java" />
+        <option value="$PROJECT_DIR$/src/CLI.java" />
+        <option value="$PROJECT_DIR$/testRes/openJMLDemo/tmp/Queue.java" />
+        <option value="$PROJECT_DIR$/testRes/openJMLDemo/Queue.java" />
       </list>
     </option>
   </component>
@@ -344,7 +350,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runAllTests">
+  <component name="RunManager" selected="JUnit.TestExecutor.runOpenJMLDemos">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="openjmlToBMC" />
@@ -402,9 +408,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="JUnit.TestExecutor.runOpenJMLDemos" />
         <item itemvalue="JUnit.TestExecutor.runOpenJMLDemo" />
+        <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="JUnit.TestExecutor.runAssignableTests" />
         <item itemvalue="Application.Main" />
       </list>
@@ -484,46 +490,53 @@
       <option name="project" value="LOCAL" />
       <updated>1559809221456</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="towards working normalization visitor">
+      <created>1560264096957</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1560264096957</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="TestExecutor_runOpenJMLDemos - 2019.06.11 at 16h 14m 40s.xml">
-      <configuration name="TestExecutor.runOpenJMLDemos" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 14m 58s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 16m 06s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 18m 47s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 18m 58s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 25m 37s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 36m 10s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
-    <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 36m 25s.xml">
-      <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
-    </history-entry>
     <history-entry file="TestExecutor_runOpenJMLDemos - 2019.06.11 at 16h 37m 03s.xml">
       <configuration name="TestExecutor.runOpenJMLDemos" configurationId="JUnit" />
     </history-entry>
     <history-entry file="TestExecutor_runAllTests - 2019.06.11 at 16h 40m 40s.xml">
       <configuration name="TestExecutor.runAllTests" configurationId="JUnit" />
     </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemos - 2019.06.11 at 16h 42m 41s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemos" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 16h 48m 14s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 16h 51m 17s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 16h 57m 10s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 17h 07m 12s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 17h 21m 07s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemo - 2019.06.11 at 17h 22m 13s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemo" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="TestExecutor_runOpenJMLDemos - 2019.06.11 at 17h 24m 55s.xml">
+      <configuration name="TestExecutor.runOpenJMLDemos" configurationId="JUnit" />
+    </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="27" width="1853" height="948" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16436082" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16436082" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -533,12 +546,12 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32833958" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.5221675" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.5221675" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37192118" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.3275862" />
+      <window_info anchor="bottom" id="Terminal" order="7" weight="0.3312808" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Messages" order="10" weight="0.32881773" />
@@ -562,7 +575,8 @@
     <MESSAGE value="now all tests and jmlexamples working" />
     <MESSAGE value="now multiple classes in 1 file supported. minor fixes" />
     <MESSAGE value="added LoopExamples (openjml)" />
-    <option name="LAST_COMMIT_MESSAGE" value="added LoopExamples (openjml)" />
+    <MESSAGE value="towards working normalization visitor" />
+    <option name="LAST_COMMIT_MESSAGE" value="towards working normalization visitor" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -825,13 +839,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/tmp/Queue.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2025">
-          <caret line="137" column="21" selection-start-line="137" selection-start-column="21" selection-end-line="137" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/openjml.jar!/org/jmlspecs/openjml/JmlTreeUtils.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="122">
@@ -873,47 +880,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="359">
           <caret line="71" column="22" selection-start-line="71" selection-start-column="22" selection-end-line="71" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/Queue.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="174">
-          <caret line="63" column="48" selection-start-line="63" selection-start-column="48" selection-end-line="63" selection-end-column="48" />
-          <folding>
-            <element signature="e#1716#1717#0" expanded="true" />
-            <element signature="e#1743#1744#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/CLI.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="363" selection-start-line="363" selection-end-line="363" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="41" selection-start-line="24" selection-start-column="41" selection-end-line="24" selection-end-column="41" />
-          <folding>
-            <element signature="e#64#65#0" expanded="true" />
-            <element signature="e#94#95#0" expanded="true" />
-            <element signature="e#156#157#0" expanded="true" />
-            <element signature="e#182#183#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="62" column="71" selection-start-line="62" selection-start-column="71" selection-end-line="62" selection-end-column="71" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1003,6 +969,54 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="202">
           <caret line="159" column="57" selection-start-line="159" selection-start-column="57" selection-end-line="159" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/TestExecutor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="62" column="69" selection-start-line="62" selection-start-column="69" selection-end-line="62" selection-end-column="69" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/CLI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="363" selection-start-line="363" selection-end-line="363" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/tmp/Queue.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25">
+          <caret line="95" column="6" selection-start-line="95" selection-start-column="6" selection-end-line="95" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/Queue.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="53" column="68" selection-start-line="53" selection-start-column="68" selection-end-line="53" selection-end-column="68" />
+          <folding>
+            <element signature="e#1716#1717#0" expanded="true" />
+            <element signature="e#1743#1744#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testRes/openJMLDemo/LoopExamples.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+          <folding>
+            <element signature="e#64#65#0" expanded="true" />
+            <element signature="e#94#95#0" expanded="true" />
+            <element signature="e#156#157#0" expanded="true" />
+            <element signature="e#182#183#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

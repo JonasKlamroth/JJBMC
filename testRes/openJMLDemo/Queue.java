@@ -49,7 +49,11 @@ public class Queue {
         return size;
     }
 
+
+    //  invariant not perserved: ensures first <= next ==> size == next - first;
+    // counter example: first = 1, next = 0, size = 1, arr.length = 2
     /*@ requires arr != null;
+      @ requires arr.length > 1 && arr.length <= 5;
       @ requires 0 <= size && size <= arr.length;
       @ requires 0 <= first && first < arr.length;
       @ requires 0 <= next && next < arr.length;
@@ -63,7 +67,6 @@ public class Queue {
       @ ensures 0 <= size && size <= arr.length;
       @ ensures 0 <= first && first < arr.length;
       @ ensures 0 <= next && next < arr.length;
-      @ ensures first <= next ==> size == next - first;
       @ ensures first > next ==> size == next + arr.length - first;
       @*/
     public void enqueue1( Object x ) {
