@@ -60,7 +60,7 @@ public class TestExecutor {
 
     @org.junit.Test
     public void runOpenJMLDemo() throws IOException, InterruptedException {
-        String[] fileNames = new String[]{"./testRes/openJMLDemo/BeanCan.java"};
+        String[] fileNames = new String[]{"./testRes/openJMLDemo/Taxpayer.java"};
         runCaseStudies(fileNames);
     }
 
