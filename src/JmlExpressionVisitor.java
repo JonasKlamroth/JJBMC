@@ -1,4 +1,3 @@
-import com.sun.imageio.plugins.jpeg.JPEG;
 import com.sun.source.tree.*;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;

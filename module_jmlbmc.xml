@@ -79,7 +79,7 @@
   
   <target name="compile.module.jmlbmc.production" description="Compile module jmlbmc; production classes">
     <mkdir dir="${jmlbmc.output.dir}"/>
-    <javac destdir="${jmlbmc.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="javac">
+    <javac destdir="${jmlbmc.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" includeantruntime="false">
       <compilerarg line="${compiler.args.jmlbmc}"/>
       <bootclasspath refid="jmlbmc.module.bootclasspath"/>
       <classpath refid="jmlbmc.module.production.classpath"/>
