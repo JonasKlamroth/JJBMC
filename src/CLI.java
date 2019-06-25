@@ -419,7 +419,12 @@ class NameExctractionVisitor extends JmlTreeScanner {
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        String f = packageName + "." + className + "." + that.getName().toString();
+        String f;
+        if(!packageName.equals("")) {
+            f = packageName + "." + className + "." + that.getName().toString();
+        } else {
+            f = className + "." + that.getName().toString();
+        }
         if(!f.contains("<init>")) {
             functionNames.add(f);
         }
