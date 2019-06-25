@@ -129,11 +129,9 @@ public class TranslationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, String oldQunatVarName, Symbol currentSymbol, JCExpression init) {
+    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
         JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, M.Name(loopVarName), currentSymbol, init);
-        JCTree.JCExpression loopCond = replaceVarName(oldQunatVarName, loopVarName, range);
-        body = replaceVarName(oldQunatVarName, loopVarName, body);
-        return makeStandardLoop(loopCond, body, loopVar, currentSymbol);
+        return makeStandardLoop(range, body, loopVar, currentSymbol);
     }
     public List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
         for(JCStatement st : expr) {
@@ -490,6 +488,14 @@ class ReplaceVisitor extends JmlTreeScanner {
             tree.name = M.Name(newName);
         }
         super.visitIdent(tree);
+    }
+
+    @Override
+    public void visitVarDef(JCVariableDecl tree) {
+        if(tree.name.toString().equals(oldName)) {
+            tree.name = M.Name(newName);
+        }
+        super.visitVarDef(tree);
     }
 
     public static JCStatement replace(String oldName, String newName, JCStatement expr, Maker maker) {

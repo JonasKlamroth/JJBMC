@@ -192,7 +192,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression range = super.copy(copy.range);
                 re.scan(range);
                 JCExpression init = super.copy(re.getMin());
-                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, variableReplacements.get(that.decls.get(0).getName().toString()), that.decls.get(0).getName().toString(), currentSymbol, init));
+                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init));
+                transUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else {
@@ -216,7 +217,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression range = super.copy(copy.range);
                 re.scan(range);
                 JCExpression init = super.copy(re.getMin());
-                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, variableReplacements.get(that.decls.get(0).getName().toString()), that.decls.get(0).name.toString(), currentSymbol, init));
+                l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init));
+                transUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
                 return M.Ident(boolVar);
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
