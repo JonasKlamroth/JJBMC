@@ -110,6 +110,11 @@ public class TestExecutor {
     }
 
     @org.junit.Test
+    public void runSomeTest() throws IOException, InterruptedException {
+        runTests(new String[]{baseTestFolder + "RemoveDup.java"});
+    }
+
+    @org.junit.Test
     public void runFailingTests() throws IOException, InterruptedException {
         runTests(new String[]{baseTestFolder + "FailingTests.java"});
     }

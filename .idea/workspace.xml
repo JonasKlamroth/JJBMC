@@ -5,9 +5,7 @@
       <change beforePath="$PROJECT_DIR$/../Presentation/template_Beamer.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../Presentation/template_Beamer.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Presentation/template_Beamer.tex" beforeDir="false" afterPath="$PROJECT_DIR$/../Presentation/template_Beamer.tex" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SymbFunctionVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -110,7 +108,15 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runAllTests">
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="openjmlToBMC" />
+      <option name="PROGRAM_PARAMETERS" value="./testRes/RemoveDup.java -j=--trace" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TestExecutor.runAWSFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
@@ -131,16 +137,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runAssignableTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runAssignableTests" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="TestExecutor.runOpenJMLDemo" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
@@ -151,30 +147,30 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runOpenJMLDemos" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestExecutor.runSomeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runOpenJMLDemos" />
+      <option name="METHOD_NAME" value="runSomeTest" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.Main" />
       <item itemvalue="JUnit.TestExecutor.runAWSFile" />
       <item itemvalue="JUnit.TestExecutor.runAllTests" />
-      <item itemvalue="JUnit.TestExecutor.runAssignableTests" />
       <item itemvalue="JUnit.TestExecutor.runOpenJMLDemo" />
-      <item itemvalue="JUnit.TestExecutor.runOpenJMLDemos" />
+      <item itemvalue="JUnit.TestExecutor.runSomeTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
         <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="JUnit.TestExecutor.runAWSFile" />
         <item itemvalue="JUnit.TestExecutor.runOpenJMLDemo" />
-        <item itemvalue="JUnit.TestExecutor.runOpenJMLDemos" />
-        <item itemvalue="JUnit.TestExecutor.runAssignableTests" />
       </list>
     </recent_temporary>
   </component>
@@ -280,7 +276,14 @@
       <option name="project" value="LOCAL" />
       <updated>1561470658517</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="bugfixes">
+      <created>1569587327655</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1569587327655</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -297,7 +300,8 @@
     <MESSAGE value="all openjml examples working again" />
     <MESSAGE value="taxpayer example now working aswell" />
     <MESSAGE value="fix bug which causes an exception to be thrown for classes which are not part of a package" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix bug which causes an exception to be thrown for classes which are not part of a package" />
+    <MESSAGE value="bugfixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="bugfixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -324,7 +328,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
-          <line>354</line>
+          <line>359</line>
           <option name="timeStamp" value="135" />
         </line-breakpoint>
       </breakpoints>
