@@ -166,6 +166,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
+                if(cond == null) {
+                    throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
+                }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
@@ -173,6 +176,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), value);
                 }
+//                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
                 JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
                 return res;
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
@@ -225,6 +229,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
+                if(cond == null) {
+                    throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
+                }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }

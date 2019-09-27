@@ -211,6 +211,10 @@ public class CLI implements Runnable {
 
     static public void translateAndRunJBMC() {
         File tmpFile = prepareForJBMC();
+        if(tmpFile == null) {
+            System.out.println("Error preparing translation.");
+            return;
+        }
         List<String> functionNames = new ArrayList<>();
         functionNames.addAll(NameExctractionVisitor.parseFile(fileName));
         if(functionName != null) {

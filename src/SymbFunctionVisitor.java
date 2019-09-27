@@ -76,25 +76,23 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.clauseKind.name().equals("ensures")) {
-            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
-            translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
-        } else if(that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSUME);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
+        } else if(that.clauseKind.name().equals("requires")) {
+            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
+            translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
         }
         expressionVisitor.inConstructor = this.inConstructor;
         JCExpression copy = expressionVisitor.copy(that.expression);
         newStatements = expressionVisitor.getNewStatements();
+        newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         oldVars = expressionVisitor.getOldVars();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy, M));
-            JCIf ifstmt = M.If(transUtils.makeNondetBoolean(currentMethod.sym), M.Block(0L, newStatements), null);
-            newStatements = List.of(ifstmt);
-            //newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy.expression, M));
-            combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
-        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
             newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssumeStatement(copy, M))));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
+        } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
+            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssertStatement(copy, M))));
+            combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
