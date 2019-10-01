@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="fix bug which causes an exception to be thrown for classes which are not part of a package">
-      <change beforePath="$PROJECT_DIR$/../Presentation/template_Beamer.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../Presentation/template_Beamer.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Presentation/template_Beamer.tex" beforeDir="false" afterPath="$PROJECT_DIR$/../Presentation/template_Beamer.tex" afterDir="false" />
+    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/ArrayMax.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/ArrayMax.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -73,10 +72,11 @@
     <option name="width" value="1400" />
     <option name="height" value="903" />
   </component>
+  <component name="ProjectId" id="1RbSfVeyMyAcImIvDSzUcDm7uHa" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/testRes/xmlTest" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -84,16 +84,17 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources" />
-      <recent name="$PROJECT_DIR$/testRes/org/cprover" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/testRes/tests" />
       <recent name="$PROJECT_DIR$/tests" />
       <recent name="$PROJECT_DIR$/testRes/CaseStudy" />
       <recent name="$PROJECT_DIR$/testRes/tmp" />
       <recent name="$PROJECT_DIR$/testRes" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testRes/xmlTest" />
+      <recent name="$PROJECT_DIR$/resources" />
+      <recent name="$PROJECT_DIR$/testRes/org/cprover" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -108,7 +109,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="JUnit.XmlParserTest.test1">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="openjmlToBMC" />
@@ -137,16 +138,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runOpenJMLDemo" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runOpenJMLDemo" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="TestExecutor.runSomeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
@@ -157,20 +148,30 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="XmlParserTest.test1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="openjmlToBMC" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="XmlParserTest" />
+      <option name="METHOD_NAME" value="test1" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.Main" />
       <item itemvalue="JUnit.TestExecutor.runAWSFile" />
       <item itemvalue="JUnit.TestExecutor.runAllTests" />
-      <item itemvalue="JUnit.TestExecutor.runOpenJMLDemo" />
       <item itemvalue="JUnit.TestExecutor.runSomeTest" />
+      <item itemvalue="JUnit.XmlParserTest.test1" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.XmlParserTest.test1" />
         <item itemvalue="Application.Main" />
         <item itemvalue="JUnit.TestExecutor.runSomeTest" />
         <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="JUnit.TestExecutor.runAWSFile" />
-        <item itemvalue="JUnit.TestExecutor.runOpenJMLDemo" />
       </list>
     </recent_temporary>
   </component>
@@ -283,8 +284,35 @@
       <option name="project" value="LOCAL" />
       <updated>1569587327655</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="adding to more case studies">
+      <created>1569589932486</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1569589932486</updated>
+    </task>
+    <task id="LOCAL-00016" summary="presentation updated for keysymposium 2019">
+      <created>1569589984327</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1569589984327</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="now original BeanCan is working" />
@@ -301,7 +329,9 @@
     <MESSAGE value="taxpayer example now working aswell" />
     <MESSAGE value="fix bug which causes an exception to be thrown for classes which are not part of a package" />
     <MESSAGE value="bugfixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="bugfixes" />
+    <MESSAGE value="adding to more case studies" />
+    <MESSAGE value="presentation updated for keysymposium 2019" />
+    <option name="LAST_COMMIT_MESSAGE" value="presentation updated for keysymposium 2019" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -331,64 +361,13 @@
           <line>359</line>
           <option name="timeStamp" value="135" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>100</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="debuggerHistoryManager">
-    <expressions id="evaluateExpression">
-      <expression>
-        <expression-string>tree.name.toString().equals(oldName)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>tree.name</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>oldName</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>that</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>baseVisitor.functionsByNames</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>baseVisitor.getAssignablesForName(copy.meth.toString())</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>baseVisitor.getAssignablesForName()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>copy.meth</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>((JCTree.JCMethodInvocation) that).meth</expression-string>
-        <language-id>JAVA</language-id>
-        <custom-info>com.sun.tools.javac.tree.JCTree</custom-info>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>((JCTree.JCMethodInvocation) that).meth.type.getReturnType()</expression-string>
-        <language-id>JAVA</language-id>
-        <custom-info>com.sun.tools.javac.tree.JCTree</custom-info>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-    </expressions>
   </component>
   <component name="masterDetails">
     <states>
