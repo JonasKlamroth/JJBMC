@@ -70,7 +70,7 @@ public class XmlParser {
                                 Element value = (Element) assignment.getElementsByTagName("value").item(0);
                                 String l = lines.get(Integer.parseInt(aLocation.getAttribute("line")) - 1);
                                 if(assignment.getAttribute("hidden").equals("false") && lhs.getTextContent().contains("this") || lhs.getTextContent().contains("anonlocal") || lhs.getTextContent().contains("arg")) {
-                                    Pattern p = Pattern.compile("(\\w*) ?= ?\\w*;");
+                                    Pattern p = Pattern.compile("(\\w*) ?= ?[\\w\\(\\)\\[\\]]*;");
                                     Matcher m = p.matcher(l);
                                     String guess = "null";
                                     if(m.find()) {

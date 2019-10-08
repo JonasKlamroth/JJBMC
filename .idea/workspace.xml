@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/ArrayMax.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/ArrayMax.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/XmlParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/XmlParser.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
