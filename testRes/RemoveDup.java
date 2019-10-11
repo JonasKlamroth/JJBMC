@@ -76,6 +76,7 @@ class RemoveDup {
                 return true;
             }
         }
+        assert false;
         return false;
     }
 
@@ -89,7 +90,6 @@ class RemoveDup {
       @*/
     int[] arrayPart(int[] a, int length) {
         int[] result = new int[length];
-
         /*@ loop_invariant
           @   0 <= i && i <= length &&
           @   (\forall int j; 0<=j && j < i; result[j] == a[j]);

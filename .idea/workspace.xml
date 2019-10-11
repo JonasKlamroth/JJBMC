@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
+    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="fixed one regex">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/XmlParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/XmlParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/RemoveDup.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/RemoveDup.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,47 +22,6 @@
         <option value="Class" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>apply</find>
-      <find>apply(</find>
-      <find>neededvar</find>
-      <find>app(</find>
-      <find>methodinvo</find>
-      <find>ensures</find>
-      <find>TranslationMode.assert</find>
-      <find>visitIde</find>
-      <find>newClass</find>
-      <find>cleanup</find>
-      <find>method</find>
-      <find>0</find>
-      <find>&gt;= 0</find>
-      <find>my_dollars &gt;= 0 &amp;&amp;</find>
-      <find>mycents</find>
-      <find>methodinv</find>
-      <find>curr</find>
-      <find>requires</find>
-      <find>default</find>
-      <find>newcl</find>
-      <find>negatedqua</find>
-      <find>normalize</find>
-      <find>if(self</find>
-      <find>nega</find>
-      <find>newclass</find>
-      <find>packageName =</find>
-      <find>a != nu</find>
-      <find>boolean</find>
-      <find>integer.max</find>
-      <find>error parsing</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>baseTestFolder + &quot;</replace>
-      <replace>min_val</replace>
-      <replace>my_cents</replace>
-      <replace>ensures</replace>
-      <replace>arr != nu</replace>
-    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -108,11 +69,11 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.XmlParserTest.test1">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="openjmlToBMC" />
-      <option name="PROGRAM_PARAMETERS" value="./testRes/RemoveDup.java -j=--trace" />
+      <option name="PROGRAM_PARAMETERS" value="./testRes/RemoveDup.java contains -j=--trace -j=&quot;--unwind 7&quot;" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -166,8 +127,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.XmlParserTest.test1" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.XmlParserTest.test1" />
         <item itemvalue="JUnit.TestExecutor.runSomeTest" />
         <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="JUnit.TestExecutor.runAWSFile" />
@@ -297,7 +258,14 @@
       <option name="project" value="LOCAL" />
       <updated>1569589984327</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="fixed one regex">
+      <created>1570545423252</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1570545423253</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -330,31 +298,12 @@
     <MESSAGE value="bugfixes" />
     <MESSAGE value="adding to more case studies" />
     <MESSAGE value="presentation updated for keysymposium 2019" />
-    <option name="LAST_COMMIT_MESSAGE" value="presentation updated for keysymposium 2019" />
+    <MESSAGE value="fixed one regex" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed one regex" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/CLI.java</url>
-          <line>438</line>
-          <option name="timeStamp" value="47" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>199</line>
-          <option name="timeStamp" value="130" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>224</line>
-          <option name="timeStamp" value="133" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/TranslationUtils.java</url>
-          <line>133</line>
-          <option name="timeStamp" value="134" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
           <line>359</line>
@@ -362,8 +311,21 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>100</line>
-          <option name="timeStamp" value="144" />
+          <line>60</line>
+          <option name="timeStamp" value="145" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>57</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/JBMCOutput.java</url>
+          <line>56</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="158" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

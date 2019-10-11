@@ -5,6 +5,7 @@ import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
+import org.smtlib.SolverProcess;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -199,10 +200,10 @@ public class CLI implements Runnable {
 
 
         } catch (IOException e) {
-            System.out.println("Error running JBMC.");
+            System.out.println("Error during preparation.");
             e.printStackTrace();
         } catch (InterruptedException e) {
-            System.out.println("Error. JBMC got interrupted.");
+            System.out.println("Error during preparation.");
             e.printStackTrace();
         }
         //cleanUp();
@@ -252,13 +253,13 @@ public class CLI implements Runnable {
             tmp.add(functionName);
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
             tmp.addAll(jbmcOptions);
+            tmp.add("--xml-ui");
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(() -> {cleanUp();}));
             Process proc = rt.exec(commands);
-            proc.waitFor();
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(proc.getInputStream()));
@@ -266,41 +267,20 @@ public class CLI implements Runnable {
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(proc.getErrorStream()));
 
-            String s = stdInput.readLine();
-            String out = "";
-            String fullOut = "";
-            if (s != null) {
-                out += "JBMC Output" + (filterOutput ? " (filtered)" : "") + " for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + functionName + "\n";
-                fullOut += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + functionName + "\n";
-                while (s != null) {
-                    if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                        if(s.contains("FAILED")) {
-                            out += RED_BOLD + s +  RESET + "\n";
-                        } else if(s.contains("VERIFICATION")) {
-                            out += GREEN_BOLD + s +  RESET + "\n";
-                        } else {
-                            out += s + "\n";
-                        }
-                    }
-                    fullOut += s + "\n";
-                    s = stdInput.readLine();
-                }
-                s = stdError.readLine();
-                while (s != null) {
-                    if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                        out += s + "\n";
-                    }
-                    fullOut += s + "\n";
-                    s = stdError.readLine();
-                }
-                if (!out.contains("VERIFICATION") && !out.contains("FAILURE")) {
-
-                    System.out.println(fullOut);
-                } else {
-                    System.out.println(out);
-                }
+            StringBuilder sb = new StringBuilder();
+            String line = stdInput.readLine();
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+                line = stdInput.readLine();
             }
-        } catch (Exception e) {
+
+            proc.waitFor();
+            String xmlOutput = sb.toString();
+            JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile);
+            output.printAllTraces();
+            output.printStatus();
+       } catch (Exception e) {
             System.out.println("Error running jbmc.");
             e.printStackTrace();
             return;
@@ -365,18 +345,18 @@ public class CLI implements Runnable {
     }
 
     public static void cleanUp() {
-        if(!didCleanUp) {
-            deleteFolder(tmpFolder);
-            if (!keepTranslation) {
-                try {
-                    if (tmpFolder.exists()) {
-                        Files.delete(tmpFolder.toPath());
-                    }
-                } catch (IOException e) {
-                    //System.out.println("Could not delete tmp folder.");
-                }
-            }
-        }
+      //  if(!didCleanUp) {
+      //      deleteFolder(tmpFolder);
+      //      if (!keepTranslation) {
+      //          try {
+      //              if (tmpFolder.exists()) {
+      //                  Files.delete(tmpFolder.toPath());
+      //              }
+      //          } catch (IOException e) {
+      //              //System.out.println("Could not delete tmp folder.");
+      //          }
+      //      }
+      //  }
         didCleanUp = true;
     }
 
