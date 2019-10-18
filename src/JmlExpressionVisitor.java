@@ -701,11 +701,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCExpression editAssignable(JCIdent e) {
         JCIdent lhs = e;
         if(lhs.type.isPrimitive()) {
-            if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
+            if(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                     .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
-                return M.Literal(true);
+                return M.Literal(false);
             }
-            return M.Literal(false);
+            if(currentAssignable.stream().filter(as -> as instanceof JCFieldAccess)
+                    .anyMatch(as -> ((JCFieldAccess)as).sym.equals(lhs.sym))) {
+                return M.Literal(false);
+            }
+            return M.Literal(true);
         } else {
             if(currentAssignable.stream().anyMatch(
                     fa -> fa instanceof JCFieldAccess &&
@@ -722,7 +726,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return M.Literal(true);
             }
             JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
-            if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.")) {
+            if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.") && !pot.get(0).toString().equals("this")) {
                 expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), lhs);
             }
             for(int i = 1; i < pot.size(); ++i) {
@@ -841,7 +845,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 .collect(Collectors.toList()));
         List<JCIdent> pot1 = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                 .map(arr -> ((JCIdent)arr))
-                .filter(i -> !i.type.isPrimitive())
+                //.filter(i -> !i.type.isPrimitive())
                 .collect(Collectors.toList()));
 
         JCExpression expr = null;

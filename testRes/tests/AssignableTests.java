@@ -424,4 +424,10 @@ public class AssignableTests {
 
     //@ assignable objects;
     private void test3() {}
+
+    //@ assignable privInt;
+    @Verifyable
+    private void assignableTest30() {
+        privInt = 0;
+    }
 }
