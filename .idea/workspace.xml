@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="fixed one regex">
+    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/XmlParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/XmlParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/testRes/RemoveDup.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/RemoveDup.java" afterDir="false" />
     </list>
@@ -265,7 +265,14 @@
       <option name="project" value="LOCAL" />
       <updated>1570545423253</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="now better counterexample presentation">
+      <created>1570786707573</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1570786707573</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -299,7 +306,8 @@
     <MESSAGE value="adding to more case studies" />
     <MESSAGE value="presentation updated for keysymposium 2019" />
     <MESSAGE value="fixed one regex" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed one regex" />
+    <MESSAGE value="now better counterexample presentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="now better counterexample presentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -320,12 +328,29 @@
           <option name="timeStamp" value="146" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/JBMCOutput.java</url>
-          <line>56</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="158" />
+          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
+          <line>750</line>
+          <option name="timeStamp" value="161" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="164" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>193</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>187</line>
+          <option name="timeStamp" value="170" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>200</line>
+          <option name="timeStamp" value="171" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
