@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 public class JBMCOutput {
     public String proverStatus = "";
     public List<String> messages = new ArrayList<>();
+    public List<String> errors = new ArrayList<>();
     public List<String> properties = new ArrayList<>();
     public List<List<Assignment>> traces = new ArrayList<>();
     public List<Integer> lineNumbers = new ArrayList<>();
@@ -98,5 +99,10 @@ public class JBMCOutput {
 
     public void printStatus() {
         System.out.println(proverStatus);
+        if(errors.size() > 0) {
+            for(String error : errors) {
+                System.out.println(error);
+            }
+        }
     }
 }

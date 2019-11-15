@@ -22,6 +22,14 @@ public class TestSuite {
 
     }
 
+    @Verifyable
+    public TestSuite() {}
+
+    @Verifyable
+    public TestSuite(int i) {
+        this.pubInt = i;
+    }
+
     //@ ensures b1 == (b2 == b3);
     @Fails
     private void normalizeTest7(boolean b1, boolean b2, boolean b3, boolean b4) {

@@ -5,11 +5,18 @@
     <option name="CUSTOM_SCOPE_NAME" value="Module 'openjmlToBMC'" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="">
+    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="now supporting overloaded methods but tests broken">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/JBMCOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JBMCOutput.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/RemoveDup.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/RemoveDup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/tests/AssignableTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/AssignableTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/XmlParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/XmlParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/tests/TestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/TestSuite.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Unwind.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Unwind.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Verifyable.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Verifyable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -47,7 +54,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -75,11 +82,11 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runSomeTest">
+  <component name="RunManager" selected="JUnit.TestExecutor.runAllTests">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="openjmlToBMC" />
-      <option name="PROGRAM_PARAMETERS" value="./testRes/RemoveDup.java contains -j=--trace -j=&quot;--unwind 7&quot;" />
+      <option name="PROGRAM_PARAMETERS" value="./testRes/openJMLDemo/CashAmount.java -j=--trace -j=&quot;--unwind 7&quot;" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -133,9 +140,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
         <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
         <item itemvalue="JUnit.XmlParserTest.test1" />
         <item itemvalue="JUnit.TestExecutor.runAWSFile" />
       </list>
@@ -285,7 +292,14 @@
       <option name="project" value="LOCAL" />
       <updated>1571401911482</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="remove assignable bug. try tests">
+      <created>1571405310972</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1571405310972</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -321,19 +335,21 @@
     <MESSAGE value="fixed one regex" />
     <MESSAGE value="now better counterexample presentation" />
     <MESSAGE value="counterexamples now support fields" />
-    <option name="LAST_COMMIT_MESSAGE" value="counterexamples now support fields" />
+    <MESSAGE value="remove assignable bug. try tests" />
+    <MESSAGE value="now supporting overloaded methods but tests broken" />
+    <option name="LAST_COMMIT_MESSAGE" value="now supporting overloaded methods but tests broken" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>60</line>
+          <line>64</line>
           <option name="timeStamp" value="145" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>57</line>
+          <line>61</line>
           <option name="timeStamp" value="146" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -343,28 +359,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>44</line>
-          <option name="timeStamp" value="164" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>193</line>
+          <line>232</line>
           <option name="timeStamp" value="169" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>187</line>
+          <line>226</line>
           <option name="timeStamp" value="170" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>200</line>
+          <line>239</line>
           <option name="timeStamp" value="171" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
           <line>270</line>
           <option name="timeStamp" value="174" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
+          <line>165</line>
+          <option name="timeStamp" value="185" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1037,7 +1037,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitIdentifier(IdentifierTree node, Void p) {
-        if(inConstructor && translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT && ((JCIdent)node).sym.owner != currentSymbol && !node.getName().toString().equals("this")) {
+        if(inConstructor && ((JCIdent)node).sym.owner != currentSymbol && !node.getName().toString().equals("this")) {
             return M.Select(M.Ident(returnVar), (Name) node.getName());
         }
         return super.visitIdentifier(node, p);

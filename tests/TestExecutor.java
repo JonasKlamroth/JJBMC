@@ -30,7 +30,7 @@ public class TestExecutor {
     static String[] fileNames = {baseTestFolder + "tests/TestSuite.java", baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"};
     private File tmpFile = new File(baseTestFolder + "tmp.java");
     private boolean keepTmpFile = true;
-    private boolean filterOutput = true;
+    private boolean filterOutput = false;
     private boolean doCleanup = false;
 
     @Before

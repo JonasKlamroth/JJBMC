@@ -45,9 +45,6 @@ public class CashAmount {
     public int my_cents;
 
 
-    //@ requires -CENTS_IN_DOLLAR < the_cents && the_cents < CENTS_IN_DOLLAR;
-    //@ requires (the_cents < 0 ==> the_dollars <= 0) && (the_dollars < 0 ==> the_cents <= 0);
-    //@ requires (the_cents > 0 ==> the_dollars >= 0) && (the_dollars > 0 ==> the_cents >= 0);
     //@ ensures my_dollars == the_dollars;
     //@ ensures my_cents == the_cents;
     /**
@@ -59,6 +56,11 @@ public class CashAmount {
     /*@ pure */ public CashAmount(final int the_dollars, final int the_cents) {
         my_dollars = the_dollars;
         my_cents = the_cents;
+    }
+
+    public CashAmount() {
+        my_cents = 0;
+        my_dollars = 0;
     }
 
     /**

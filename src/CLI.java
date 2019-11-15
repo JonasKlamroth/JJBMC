@@ -1,3 +1,4 @@
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import org.jmlspecs.openjml.Factory;
@@ -401,6 +402,41 @@ class NameExctractionVisitor extends JmlTreeScanner {
         super.visitJmlClassDecl(that);
     }
 
+    private String getParamString(List<JCTree.JCVariableDecl> params) {
+        String res = "(";
+        for(JCTree.JCVariableDecl p : params) {
+            res += typeToString(p.vartype);
+        }
+        return res + ")";
+    }
+
+    private String returnTypeString(JCTree.JCExpression rtType) {
+        return typeToString(rtType);
+    }
+
+    private String typeToString(JCTree.JCExpression type) {
+        if(type instanceof JCTree.JCPrimitiveTypeTree) {
+            if(type.toString().equals("void"))
+                return "V";
+            if(type.toString().equals("int"))
+                return "I";
+            if(type.toString().equals("float"))
+                return "F";
+            if(type.toString().equals("double"))
+                return "D";
+            if(type.toString().equals("char"))
+                return "C";
+            if(type.toString().equals("long"))
+                return "J";
+            if(type.toString().equals("boolean"))
+                return "Z";
+            throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+        } else if (type != null) {
+            return "L" + type.toString()  + ";";
+        }
+        return "V";
+    }
+
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
         String f;
@@ -409,9 +445,9 @@ class NameExctractionVisitor extends JmlTreeScanner {
         } else {
             f = className + "." + that.getName().toString();
         }
-        if(!f.contains("<init>")) {
-            functionNames.add(f);
-        }
+        String rtString = returnTypeString(that.restype);
+        String paramString = getParamString(that.params);
+        functionNames.add(f + ":" + paramString + rtString);
         super.visitJmlMethodDecl(that);
     }
 
