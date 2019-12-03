@@ -217,8 +217,8 @@ public class CLI implements Runnable {
             System.out.println("Error preparing translation.");
             return;
         }
-        List<String> functionNames = new ArrayList<>();
-        functionNames.addAll(NameExctractionVisitor.parseFile(fileName));
+        FunctionNameVisitor.parseFile(fileName);
+        List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> allFunctionNames = new ArrayList<>();
         allFunctionNames.addAll(functionNames);
         if(functionName != null) {
@@ -395,92 +395,4 @@ public class CLI implements Runnable {
     }
 }
 
-class NameExctractionVisitor extends JmlTreeScanner {
-    static private String packageName = "";
-    static private List<String> functionNames = new ArrayList();
-    static private String className = "";
 
-    @Override
-    public void visitJmlClassDecl(JmlTree.JmlClassDecl that) {
-        className = that.getSimpleName().toString();
-        super.visitJmlClassDecl(that);
-    }
-
-    private String getParamString(List<JCTree.JCVariableDecl> params) {
-        String res = "(";
-        for(JCTree.JCVariableDecl p : params) {
-            res += typeToString(p.vartype);
-        }
-        return res + ")";
-    }
-
-    private String returnTypeString(JCTree.JCExpression rtType) {
-        return typeToString(rtType);
-    }
-
-    private String typeToString(JCTree.JCExpression type) {
-        if(type instanceof JCTree.JCPrimitiveTypeTree) {
-            if(type.toString().equals("void"))
-                return "V";
-            if(type.toString().equals("int"))
-                return "I";
-            if(type.toString().equals("float"))
-                return "F";
-            if(type.toString().equals("double"))
-                return "D";
-            if(type.toString().equals("char"))
-                return "C";
-            if(type.toString().equals("long"))
-                return "J";
-            if(type.toString().equals("boolean"))
-                return "Z";
-            if(type.toString().equals("byte"))
-                return "B";
-            if(type.toString().equals("short"))
-                return "S";
-            throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
-        } else if(type instanceof JCTree.JCArrayTypeTree) {
-            return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
-        } else if (type != null) {
-            return "L" + type.toString()  + ";";
-        }
-        return "V";
-    }
-
-    @Override
-    public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        String f;
-        if(!packageName.equals("")) {
-            f = packageName + "." + className + "." + that.getName().toString();
-        } else {
-            f = className + "." + that.getName().toString();
-        }
-        String rtString = returnTypeString(that.restype);
-        String paramString = getParamString(that.params);
-        functionNames.add(f + ":" + paramString + rtString);
-        super.visitJmlMethodDecl(that);
-    }
-
-    public static List<String> parseFile(String fileName) {
-        functionNames = new ArrayList();
-        try {
-            String[] args = {fileName};
-            IAPI api = Factory.makeAPI();
-            java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
-
-            Context ctx = api.context();
-            NameExctractionVisitor fnv = new NameExctractionVisitor();
-            for (JmlTree.JmlCompilationUnit it : cu) {
-                if(it.pid != null) {
-                    packageName = it.pid.toString();
-                }
-                ctx.dump();
-                it.accept(fnv);
-            }
-        } catch (Exception e) {
-            System.out.println("error parsing for method names");
-            e.printStackTrace();
-        }
-        return functionNames;
-    }
-}
