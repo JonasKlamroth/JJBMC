@@ -306,15 +306,31 @@ class FunctionNameVisitor extends JmlTreeScanner {
     static public List<String> functionNames = new ArrayList();
     static public List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static public List<String> unwinds = new ArrayList<>();
+    static private String className = "";
 
     public enum TestBehaviour {
         Verifyable,
         Fails,
         Ignored
     }
+
+    @Override
+    public void visitJmlClassDecl(JmlTree.JmlClassDecl that) {
+        className = that.getSimpleName().toString();
+        super.visitJmlClassDecl(that);
+    }
+
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        functionNames.add(that.sym.owner.toString() + "." + that.getName().toString());
+        String f;
+        if(!packageName.equals("")) {
+            f = packageName + "." + className + "." + that.getName().toString();
+        } else {
+            f = className + "." + that.getName().toString();
+        }
+        String rtString = returnTypeString(that.restype);
+        String paramString = getParamString(that.params);
+        functionNames.add(f + ":" + paramString + rtString);
         translateAnnotations(that.mods.annotations);
         super.visitJmlMethodDecl(that);
     }
@@ -367,5 +383,42 @@ class FunctionNameVisitor extends JmlTreeScanner {
         } catch (Exception e) {
             System.out.println("error parsing for method names");
         }
+    }
+
+    private String returnTypeString(JCTree.JCExpression rtType) {
+        return typeToString(rtType);
+    }
+
+    private String getParamString(List<JCTree.JCVariableDecl> params) {
+        String res = "(";
+        for(JCTree.JCVariableDecl p : params) {
+            res += typeToString(p.vartype);
+        }
+        return res + ")";
+    }
+
+    private String typeToString(JCTree.JCExpression type) {
+        if(type instanceof JCTree.JCPrimitiveTypeTree) {
+            if(type.toString().equals("void"))
+                return "V";
+            if(type.toString().equals("int"))
+                return "I";
+            if(type.toString().equals("float"))
+                return "F";
+            if(type.toString().equals("double"))
+                return "D";
+            if(type.toString().equals("char"))
+                return "C";
+            if(type.toString().equals("long"))
+                return "J";
+            if(type.toString().equals("boolean"))
+                return "Z";
+            throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+        } else if(type instanceof JCTree.JCArrayTypeTree) {
+            return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
+        } else if (type != null) {
+            return "L" + ((JCTree.JCIdent)type).sym.toString().replace(".", "/") + ";";
+        }
+        return "V";
     }
 }
