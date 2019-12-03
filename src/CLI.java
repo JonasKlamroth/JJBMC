@@ -258,6 +258,7 @@ public class CLI implements Runnable {
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
+            System.out.println(Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(() -> {cleanUp();}));
             Process proc = rt.exec(commands);
@@ -431,6 +432,8 @@ class NameExctractionVisitor extends JmlTreeScanner {
             if(type.toString().equals("boolean"))
                 return "Z";
             throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+        } else if(type instanceof JCTree.JCArrayTypeTree) {
+            return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
         } else if (type != null) {
             return "L" + type.toString()  + ";";
         }
