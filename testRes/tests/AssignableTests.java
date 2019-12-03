@@ -36,7 +36,7 @@ public class AssignableTests {
     /*@ assignable privInt;
       @ */
     @Verifyable
-    private void assignalbeTest() {
+    private void AssignalbeTest() {
         privInt = 0;
     }
 

@@ -114,4 +114,15 @@
   </target>
   
   <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+
+  <target name="run" depends="build.modules, build.all.artifacts" description="run program">
+      <java jar="out/artifacts/jmlbmc_jar/jmlbmc.jar" fork="true">
+          <arg line="${args}"/>
+      </java>
+  </target>
+  <target name="tests" depends="build.modules, build.all.artifacts" description="run tests">
+      <junit fork="true" showoutput="yes" printsummary="yes" haltonfailure="yes">
+          <test name="tests.TestExecuter.runAllTests"/>
+      </junit>
+  </target>
 </project>
