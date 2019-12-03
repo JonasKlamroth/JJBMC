@@ -8,18 +8,8 @@
     <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="now supporting overloaded methods but tests broken">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/JBMCOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JBMCOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/JmlExpressionVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/XmlParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/XmlParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/CashAmount.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/openJMLDemo/Paths.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testRes/tests/TestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/TestSuite.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Fails.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Unwind.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Unwind.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestAnnotations/Verifyable.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestAnnotations/Verifyable.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,6 +36,11 @@
   </component>
   <component name="ProjectId" id="1RbSfVeyMyAcImIvDSzUcDm7uHa" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/testRes/xmlTest" />
@@ -70,23 +65,11 @@
       <recent name="$PROJECT_DIR$/testRes/org/cprover" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runAllTests">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="openjmlToBMC" />
-      <option name="PROGRAM_PARAMETERS" value="./testRes/openJMLDemo/CashAmount.java -j=--trace -j=&quot;--unwind 7&quot;" />
+      <option name="PROGRAM_PARAMETERS" value="./testRes/AWS/CipherBlockHeaders.java toByteArray -j=--trace -j=&quot;--unwind 7&quot;" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -96,6 +79,16 @@
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="TestExecutor" />
       <option name="METHOD_NAME" value="runAWSFile" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestExecutor.runAWSTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="openjmlToBMC" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
+      <option name="METHOD_NAME" value="runAWSTests" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -121,32 +114,34 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="XmlParserTest.test1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="XmlParserTest" />
-      <option name="METHOD_NAME" value="test1" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Application.Main" />
       <item itemvalue="JUnit.TestExecutor.runAWSFile" />
       <item itemvalue="JUnit.TestExecutor.runAllTests" />
       <item itemvalue="JUnit.TestExecutor.runSomeTest" />
-      <item itemvalue="JUnit.XmlParserTest.test1" />
+      <item itemvalue="JUnit.TestExecutor.runAWSTests" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestExecutor.runAllTests" />
         <item itemvalue="Application.Main" />
-        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
-        <item itemvalue="JUnit.XmlParserTest.test1" />
+        <item itemvalue="JUnit.TestExecutor.runAWSTests" />
         <item itemvalue="JUnit.TestExecutor.runAWSFile" />
+        <item itemvalue="JUnit.TestExecutor.runAllTests" />
+        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -339,6 +334,44 @@
     <MESSAGE value="now supporting overloaded methods but tests broken" />
     <option name="LAST_COMMIT_MESSAGE" value="now supporting overloaded methods but tests broken" />
   </component>
+  <component name="WindowStateProjectService">
+    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1575392571271">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog/70.27.1850.948@70.27.1850.948" timestamp="1575392571271" />
+    <state width="1804" height="241" key="GridCell.Tab.0.bottom" timestamp="1575392573829">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="241" key="GridCell.Tab.0.bottom/70.27.1850.948@70.27.1850.948" timestamp="1575392573829" />
+    <state width="1804" height="241" key="GridCell.Tab.0.center" timestamp="1575392573828">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="241" key="GridCell.Tab.0.center/70.27.1850.948@70.27.1850.948" timestamp="1575392573828" />
+    <state width="1804" height="241" key="GridCell.Tab.0.left" timestamp="1575392573825">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="241" key="GridCell.Tab.0.left/70.27.1850.948@70.27.1850.948" timestamp="1575392573825" />
+    <state width="1804" height="241" key="GridCell.Tab.0.right" timestamp="1575392573829">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="241" key="GridCell.Tab.0.right/70.27.1850.948@70.27.1850.948" timestamp="1575392573829" />
+    <state width="1804" height="298" key="GridCell.Tab.1.bottom" timestamp="1575391673307">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="298" key="GridCell.Tab.1.bottom/70.27.1850.948@70.27.1850.948" timestamp="1575391673307" />
+    <state width="1804" height="298" key="GridCell.Tab.1.center" timestamp="1575391673306">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="298" key="GridCell.Tab.1.center/70.27.1850.948@70.27.1850.948" timestamp="1575391673306" />
+    <state width="1804" height="298" key="GridCell.Tab.1.left" timestamp="1575391673306">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="298" key="GridCell.Tab.1.left/70.27.1850.948@70.27.1850.948" timestamp="1575391673306" />
+    <state width="1804" height="298" key="GridCell.Tab.1.right" timestamp="1575391673307">
+      <screen x="70" y="27" width="1850" height="948" />
+    </state>
+    <state width="1804" height="298" key="GridCell.Tab.1.right/70.27.1850.948@70.27.1850.948" timestamp="1575391673307" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -374,13 +407,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
-          <line>270</line>
+          <line>279</line>
           <option name="timeStamp" value="174" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
           <line>165</line>
           <option name="timeStamp" value="185" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
+          <line>392</line>
+          <option name="timeStamp" value="187" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

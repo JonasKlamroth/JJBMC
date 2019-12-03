@@ -219,10 +219,13 @@ public class CLI implements Runnable {
         }
         List<String> functionNames = new ArrayList<>();
         functionNames.addAll(NameExctractionVisitor.parseFile(fileName));
+        List<String> allFunctionNames = new ArrayList<>();
+        allFunctionNames.addAll(functionNames);
         if(functionName != null) {
-            functionNames = functionNames.stream().filter(f -> f.endsWith("." + functionName)).collect(Collectors.toList());
+            functionNames = functionNames.stream().filter(f -> f.contains("." + functionName)).collect(Collectors.toList());
             if(functionNames.size() == 0) {
                 System.out.println("Function " + functionName + " could not be found in the specified file.");
+                System.out.println("Found the following functions: " + allFunctionNames.toString());
                 return;
             }
         }
@@ -431,6 +434,10 @@ class NameExctractionVisitor extends JmlTreeScanner {
                 return "J";
             if(type.toString().equals("boolean"))
                 return "Z";
+            if(type.toString().equals("byte"))
+                return "B";
+            if(type.toString().equals("short"))
+                return "S";
             throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
         } else if(type instanceof JCTree.JCArrayTypeTree) {
             return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
