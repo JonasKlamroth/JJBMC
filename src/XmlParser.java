@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +100,9 @@ public class XmlParser {
             assert statusList.getLength() == 1;
             res.proverStatus = statusList.item(0).getTextContent();
             NodeList propertyNodeList = doc.getElementsByTagName("result");
+            String reason = null;
             for (int i = 0; i < propertyNodeList.getLength(); ++i) {
+                reason = null;
                 Node propertyNode = propertyNodeList.item(i);
                 if (propertyNode.getNodeType() == Node.ELEMENT_NODE) {
                     references = null;
@@ -109,6 +111,7 @@ public class XmlParser {
                     if (propertyElemnt.getAttribute("status").equals("FAILURE")) {
                         references = new ArrayList<>();
                         Element failure = (Element) propertyElemnt.getElementsByTagName("failure").item(0);
+                        reason = failure.getAttribute("reason");
                         Element location = (Element) failure.getElementsByTagName("location").item(0);
                         lineNumber = Integer.parseInt(location.getAttribute("line"));
                         NodeList assignmentList = ((Element) propertyNode).getElementsByTagName("assignment");
@@ -185,9 +188,9 @@ public class XmlParser {
                     }
                     references = checkDynamicObjectAssignments(dynamicObjectsMap, references);
                     if (lineNumber < 0) {
-                        res.addProperty(propertyElemnt.getAttribute("property"), references, lineNumber, null);
+                        res.addProperty(propertyElemnt.getAttribute("property"), references, lineNumber, null, null);
                     } else {
-                        res.addProperty(propertyElemnt.getAttribute("property"), references, lineNumber, lines.get(lineNumber - 1));
+                        res.addProperty(propertyElemnt.getAttribute("property"), references, lineNumber, lines.get(lineNumber - 1), reason);
                     }
                 }
             }

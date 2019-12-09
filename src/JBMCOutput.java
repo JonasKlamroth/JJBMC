@@ -8,15 +8,17 @@ public class JBMCOutput {
     public List<String> messages = new ArrayList<>();
     public List<String> errors = new ArrayList<>();
     public List<String> properties = new ArrayList<>();
+    public List<String> reasons = new ArrayList<>();
     public List<List<Assignment>> traces = new ArrayList<>();
     public List<Integer> lineNumbers = new ArrayList<>();
     public List<String> failingLines = new ArrayList<>();
 
-    public void addProperty(String name, List<Assignment> trace, int lineNumber, String failingLine) {
+    public void addProperty(String name, List<Assignment> trace, int lineNumber, String failingLine, String reason) {
         properties.add(name);
         traces.add(trace);
         lineNumbers.add(lineNumber);
         failingLines.add(failingLine);
+        reasons.add(reason);
     }
 
     public static class Assignment {
@@ -84,7 +86,7 @@ public class JBMCOutput {
                 a.toString1();
             }
         }
-        System.out.println("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx));
+        System.out.println("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")");
     }
 
     public void printTrace(String property) {
