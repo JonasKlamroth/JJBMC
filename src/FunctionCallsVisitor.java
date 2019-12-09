@@ -8,6 +8,7 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,8 +16,9 @@ import java.util.Set;
  * Created by jklamroth on 12/17/18.
  */
 public class FunctionCallsVisitor extends JmlTreeCopier {
-    public Set<String> calledFunctions = new HashSet<>();
-    public List<JCTree.JCExpression> assignables = List.nil();
+    private Set<String> calledFunctions = new HashSet<>();
+    private Set<String> specifiedFunctions = new HashSet<>();
+    private List<JCTree.JCExpression> assignables = List.nil();
     private boolean foundNothing = false;
     JmlTree.JmlMethodDecl currentMethod = null;
 
@@ -58,6 +60,9 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
         copy.sourcefile = that.sourcefile;
         copy.specsDecl = that.specsDecl;
+        if(copy.specsDecl.cases != null) {
+            specifiedFunctions.add(that.getName().toString());
+        }
         //copy.cases = (JmlMethodSpecs)this.copy((JCTree)that.cases, (Object)p);
         copy.methodSpecsCombined = JmlSpecs.copy(that.methodSpecsCombined, p, this);
         copy.cases = (JmlTree.JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
@@ -66,5 +71,18 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
             assignables = assignables.append(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
         }
         return copy;
+    }
+
+    public Set<String> getCalledFunctions() {
+        calledFunctions.retainAll(specifiedFunctions);
+        return calledFunctions;
+    }
+
+    public List<JCTree.JCExpression> getAssignables() {
+        return assignables;
+    }
+
+    public void resetAssignables() {
+        assignables = List.nil();
     }
 }

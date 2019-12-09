@@ -100,7 +100,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
                 it.accept(fnv);
             }
         } catch (Exception e) {
-            System.out.println("error parsing for method names");
+            throw new RuntimeException("Error parsing for function names.");
         }
     }
 

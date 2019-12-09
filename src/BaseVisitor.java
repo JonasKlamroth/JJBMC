@@ -61,18 +61,20 @@ public class BaseVisitor extends FilterVisitor {
                     com.sun.tools.javac.util.List.nil());
             returnExcClass.sym = classSymbol;
             returnExcClass.type = classSymbol.type;
+            //make it static
+            returnExcClass.mods.flags |= 8L;
             JmlClassDecl copy = that;
             List<JCTree> newDefs = List.nil();
             FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
             for (JCTree def : copy.defs) {
                 if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
                     fcv.copy(def);
-                    functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.assignables);
+                    functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.getAssignables());
                 }
-                fcv.assignables = List.nil();
+                fcv.resetAssignables();
 
             }
-            calledFunctions.addAll(fcv.calledFunctions);
+            calledFunctions.addAll(fcv.getCalledFunctions());
             for (JCTree def : copy.defs) {
                 if (def instanceof JmlMethodDecl) {
                     newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
