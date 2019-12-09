@@ -34,6 +34,7 @@ class RemoveDup {
       @   ensures \result.length <= a.length;
       @*/
     int[] removeDup(int[] a) {
+        assert false;
         int[] result = new int[a.length];
         int p = 0;
 
@@ -51,12 +52,7 @@ class RemoveDup {
                 p++;
             }
         }
-        assert result.length <= a.length;
-        assert p <= a.length;
-        int[] res2 = arrayPart(result, p);
-        assert p <= a.length;
-        assert res2.length <= a.length;
-        return res2;
+        return result;
     }
 
     /*@
@@ -76,7 +72,6 @@ class RemoveDup {
                 return true;
             }
         }
-        assert false;
         return false;
     }
 
