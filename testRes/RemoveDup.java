@@ -34,7 +34,6 @@ class RemoveDup {
       @   ensures \result.length <= a.length;
       @*/
     int[] removeDup(int[] a) {
-        assert false;
         int[] result = new int[a.length];
         int p = 0;
 
