@@ -248,10 +248,10 @@ public class CLI implements Runnable {
         try {
             System.out.println("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-            String classFile = tmpFile.getPath().replace(".java", ".class");
+            String classFile = tmpFile.getName().replace(".java", ".class");
 
             ArrayList<String> tmp = new ArrayList<>();
-            tmp.add(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
+            tmp.add("./jbmc");
             tmp.add(classFile);
             tmp.add("--function");
             tmp.add(functionName);
@@ -264,13 +264,15 @@ public class CLI implements Runnable {
             System.out.println(Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(() -> {cleanUp();}));
-            Process proc = rt.exec(commands);
+            Process proc = rt.exec(commands, null, tmpFolder);
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(proc.getInputStream()));
 
             BufferedReader stdError = new BufferedReader(new
                     InputStreamReader(proc.getErrorStream()));
+
+
 
             StringBuilder sb = new StringBuilder();
             String line = stdInput.readLine();
@@ -279,8 +281,23 @@ public class CLI implements Runnable {
                 sb.append(System.getProperty("line.separator"));
                 line = stdInput.readLine();
             }
+            StringBuilder esb = new StringBuilder();
+            String eline = stdError.readLine();
+            while (eline != null) {
+                esb.append(eline);
+                esb.append(System.getProperty("line.separator"));
+                eline = stdError.readLine();
+            }
 
+            //Has to stay down here otherwise not reading the output may block the process
             proc.waitFor();
+            if(proc.exitValue() != 0 && proc.exitValue() != 10) {
+                System.out.println(esb.toString());
+                throw new RuntimeException("JBMC unexpectedly terminated with exitcode " + proc.exitValue());
+            } else {
+                System.out.println("JBMC terminated.");
+            }
+
             String xmlOutput = sb.toString();
             JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile);
             output.printAllTraces();
