@@ -47,9 +47,10 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runOpenJMLDemos() throws IOException, InterruptedException {
+    public void runOpenJMLDemos() {
         File folder = new File("./testRes/openJMLDemo");
         File[] files = folder.listFiles(File::isFile);
+        assert files != null;
         String[] fileNames = new String[files.length];
         for(int i = 0; i < files.length; ++i) {
             if(files[i].isFile()) {
@@ -60,7 +61,7 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runOpenJMLDemo() throws IOException, InterruptedException {
+    public void runOpenJMLDemo() {
         String[] fileNames = new String[]{"./testRes/openJMLDemo/Taxpayer.java"};
         runCaseStudies(fileNames);
     }
@@ -111,8 +112,8 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runSomeTest() throws IOException, InterruptedException {
-        runTests(new String[]{baseTestFolder + "RemoveDup.java"});
+    public void runSomeTest() {
+        runCaseStudies(new String[]{baseTestFolder + "tests/JBMCTests.java"});
     }
 
     @org.junit.Test
@@ -126,7 +127,7 @@ public class TestExecutor {
     }
 
     @org.junit.Test
-    public void runAWSTests() throws IOException, InterruptedException {
+    public void runAWSTests() {
         runCaseStudies(new String[]{baseTestFolder + "AWS/CipherBlockHeaders.java"});
     }
 
@@ -145,70 +146,9 @@ public class TestExecutor {
         }
     }
 
-    public void runCaseStudies(String[] files) throws IOException, InterruptedException {
+    public void runCaseStudies(String[] files) {
         for(String fileName : files) {
-            System.out.println("Running tests for file: " + fileName);
-            CLI.keepTranslation = keepTmpFile;
-            File tmpFile = CLI.prepareForJBMC(fileName);
-            if(tmpFile == null) {
-                System.out.println("Someting went wrong. Test aborted.");
-                return;
-            }
-            FunctionNameVisitor.parseFile(tmpFile.getPath());
-
-            List<String> functionNames = FunctionNameVisitor.getFunctionNames();
-            for(String function : functionNames) {
-                if(function.contains("Symb")) {
-                    continue;
-                }
-                System.out.println("Running test for function: " + function);
-                //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-                String classFile = tmpFile.getPath().replace(".java", ".class");
-                String[] commands = null;
-
-                commands = new String[]{new File(tmpFile.getParent(), "jbmc").getAbsolutePath(), classFile, "--function", function, "--trace", "--unwind", "7"};
-
-                Runtime rt = Runtime.getRuntime();
-                Process proc = rt.exec(commands);
-                proc.waitFor();
-
-                BufferedReader stdInput = new BufferedReader(new
-                        InputStreamReader(proc.getInputStream()));
-
-                BufferedReader stdError = new BufferedReader(new
-                        InputStreamReader(proc.getErrorStream()));
-
-                String s = stdInput.readLine();
-                String out = "";
-                if (s != null) {
-                    out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
-                    while (s != null) {
-                        if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                            out += s +"\n";
-                        }
-                        s = stdInput.readLine();
-                    }
-                    s = stdError.readLine();
-                    while (s != null) {
-                        if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                            out += s + "\n";
-                        }
-                        s = stdError.readLine();
-                    }
-                    if(!filterOutput) {
-                        System.out.println(out);
-                    }
-                    if (out.contains("SUCCESSFUL")) {
-                        System.out.println("Sucessfull");
-                    } else {
-                        System.out.println("Fail:");
-                        System.out.println(out);
-                    }
-                } else {
-                    System.out.println("Function: " + function + " ignored due to missing annotation.");
-                }
-            }
-            //CLI.cleanUp();
+            CLI.translateAndRunJBMC(fileName);
         }
     }
 
@@ -229,9 +169,8 @@ public class TestExecutor {
             assertEquals(functionNames.size(), unwinds.size());
             int idx = 0;
             System.out.println("Running " +
-                    testBehaviours.stream().
-                            filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).
-                            collect(Collectors.toList()).size() +
+                    (int) testBehaviours.stream().
+                            filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).count() +
                     " tests in file: " + tmpFile.getName());
             for(String function : functionNames) {
                 if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
@@ -256,28 +195,28 @@ public class TestExecutor {
                             InputStreamReader(proc.getErrorStream()));
 
                     String s = stdInput.readLine();
-                    String out = "";
+                    StringBuilder out = new StringBuilder();
                     if (s != null) {
-                        out += "JBMC Output for file: " + tmpFile.getPath().replace(".java", ".class") + " with function " + function + "\n";
+                        out.append("JBMC Output for file: ").append(tmpFile.getPath().replace(".java", ".class")).append(" with function ").append(function).append("\n");
                         while (s != null) {
                             if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                                out += s +"\n";
+                                out.append(s).append("\n");
                             }
                             s = stdInput.readLine();
                         }
                         s = stdError.readLine();
                         while (s != null) {
                             if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                                out += s + "\n";
+                                out.append(s).append("\n");
                             }
                             s = stdError.readLine();
                         }
                         if(!filterOutput) {
                             System.out.println(out);
                         }
-                        assertFalse(out, out.contains("FAILURE") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Verifyable);
-                        assertFalse(out, out.contains("SUCCESSFUL") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Fails);
-                        assertTrue(out, out.contains("VERIFICATION"));
+                        assertFalse(out.toString(), out.toString().contains("FAILURE") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Verifyable);
+                        assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && testBehaviours.get(idx) == FunctionNameVisitor.TestBehaviour.Fails);
+                        assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
 
 
                     } else {
@@ -294,13 +233,6 @@ public class TestExecutor {
     public void runAllTests() throws IOException, InterruptedException {
         runTests(fileNames);
     }
-
-    @Test
-    public void test() {
-        int[] arr = new int[5];
-        Arrays.stream(arr).forEach(i -> System.out.println("i = " + i));
-    }
-
 
     @After
     public void cleanup() {

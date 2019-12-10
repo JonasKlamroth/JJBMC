@@ -231,6 +231,7 @@ public class AssignableTests {
     //@ requires t2 != null;
     //@ assignable t2.t2;
     @Fails
+    //i think this is theoretically wrong but its a sound overapproximation?
     private void assignableTest174() {
         TestSuite t2 = new TestSuite();
         t2.t2 = new TestSuite();
