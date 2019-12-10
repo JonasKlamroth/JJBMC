@@ -58,7 +58,7 @@ public class JBMCOutput {
         for(int i = trace.size() - 1; i >= 0; --i) {
             int finalI = i;
             List<Assignment> finalTrace = trace;
-            if(!newTrace.stream().anyMatch(x -> x.guess.equals(finalTrace.get(finalI).guess))) {
+            if(newTrace.stream().noneMatch(x -> x.guess.equals(finalTrace.get(finalI).guess))) {
                  newTrace.add(trace.get(i));
              }
         }
@@ -93,6 +93,11 @@ public class JBMCOutput {
         printTrace(property, true);
     }
 
+    public void printErrors() {
+        for(String e : errors) {
+            System.out.println(e);
+        }
+    }
     public void printAllTraces() {
         for(String s : properties) {
             printTrace(s);

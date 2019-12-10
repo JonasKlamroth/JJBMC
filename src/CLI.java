@@ -1,19 +1,11 @@
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import org.jmlspecs.openjml.Factory;
 import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.esc.JmlAssertionAdder;
-import org.smtlib.SolverProcess;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -126,7 +118,7 @@ public class CLI implements Runnable {
     }
 
     public static File prepareForJBMC(String[] apiArgs) {
-        File tmpFile = null;
+        File tmpFile;
         didCleanUp = false;
         try {
             File f = new File(fileName);
@@ -165,9 +157,7 @@ public class CLI implements Runnable {
             String[] commands = new String[apiArgs.length + 2];
             commands[0] = "javac";
             commands[1] = tmpFile.getAbsolutePath();
-            for(int i = 0; i < apiArgs.length; ++i) {
-                commands[i + 2] = apiArgs[i];
-            }
+            System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
             System.out.println("Compiling translated file: " + Arrays.toString(commands));
             Process proc = rt.exec(commands);
             proc.waitFor();
@@ -200,10 +190,7 @@ public class CLI implements Runnable {
             }
 
 
-        } catch (IOException e) {
-            System.out.println("Error during preparation.");
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Error during preparation.");
             e.printStackTrace();
         }
@@ -219,8 +206,7 @@ public class CLI implements Runnable {
         }
         FunctionNameVisitor.parseFile(fileName);
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
-        List<String> allFunctionNames = new ArrayList<>();
-        allFunctionNames.addAll(functionNames);
+        List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
             functionNames = functionNames.stream().filter(f -> f.contains("." + functionName)).collect(Collectors.toList());
             if(functionNames.size() == 0) {
@@ -238,8 +224,7 @@ public class CLI implements Runnable {
     static private List<String> prepareJBMCOptions(List<String> options) {
         List<String> res = new ArrayList<>();
         for(String s : options) {
-            for(String o : s.split(" "))
-            res.add(o);
+            res.addAll(Arrays.asList(s.split(" ")));
         }
         return res;
     }
@@ -258,12 +243,15 @@ public class CLI implements Runnable {
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
             tmp.addAll(jbmcOptions);
             tmp.add("--xml-ui");
+            //tmp.add("--cp");
+            String libPath = System.getProperty("java.library.path");
+            //tmp.add(libPath);
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
             System.out.println(Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
-            rt.addShutdownHook(new Thread(() -> {cleanUp();}));
+            rt.addShutdownHook(new Thread(CLI::cleanUp));
             Process proc = rt.exec(commands, null, tmpFolder);
 
             BufferedReader stdInput = new BufferedReader(new
@@ -291,21 +279,29 @@ public class CLI implements Runnable {
 
             //Has to stay down here otherwise not reading the output may block the process
             proc.waitFor();
-            if(proc.exitValue() != 0 && proc.exitValue() != 10) {
-                System.out.println(esb.toString());
-                throw new RuntimeException("JBMC unexpectedly terminated with exitcode " + proc.exitValue());
-            } else {
-                System.out.println("JBMC terminated.");
-            }
 
             String xmlOutput = sb.toString();
             JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile);
-            output.printAllTraces();
-            output.printStatus();
+            if(output == null) {
+                throw new RuntimeException("Error parsing xml-output of JBMC.");
+            }
+            if(output.errors.size() == 0) {
+                output.printAllTraces();
+                output.printStatus();
+            } else {
+                output.printErrors();
+            }
+
+            if(proc.exitValue() != 0 && proc.exitValue() != 10) {
+                System.out.println("JBMC did not terminate as expected.");
+            } else {
+                System.out.println("JBMC terminated normally.");
+            }
+
+
        } catch (Exception e) {
             System.out.println("Error running jbmc.");
             e.printStackTrace();
-            return;
         }
     }
 
@@ -347,13 +343,10 @@ public class CLI implements Runnable {
             commandsChmod = tmp.toArray(commandsChmod);
 
             Runtime rt = Runtime.getRuntime();
-            rt.addShutdownHook(new Thread(() -> {cleanUp();}));
+            rt.addShutdownHook(new Thread(CLI::cleanUp));
             Process proc = rt.exec(commandsChmod);
             proc.waitFor();
-        } catch (IOException e) {
-            System.out.println("Could not copy jbmc.");
-            return false;
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Could not copy jbmc.");
             return false;
         }
@@ -384,6 +377,7 @@ public class CLI implements Runnable {
 
     public static void deleteFolder(File folder) {
         File[] tmpFiles = folder.listFiles();
+        assert tmpFiles != null;
         for(File f : tmpFiles) {
             if(!keepTranslation || !f.getName().endsWith(new File(fileName).getName())) {
                 if (f.isDirectory()) {
