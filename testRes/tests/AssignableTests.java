@@ -414,6 +414,7 @@ public class AssignableTests {
         test3();
     }
 
+    //@ assignable \everything;
     private void test() {}
 
     //@ assignable arr[1..3];

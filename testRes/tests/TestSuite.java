@@ -224,6 +224,13 @@ public class TestSuite {
     }
 
     @Fails
+    private void objectHavocTest() {
+        t2 = null;
+        calledMethod();
+        assert t2 == null;
+    }
+
+    @Fails
     public void havocTest() {
         assert pubInt == 0;
     }
