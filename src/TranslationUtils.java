@@ -243,6 +243,8 @@ public class TranslationUtils {
             if(expr instanceof JCIdent) {
                 if(((JCIdent) expr).type.isPrimitive()) {
                     res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(((JCIdent) expr).type, currentSymbol))));
+                } else {
+                    res = res.append(M.Exec(M.Assign(expr, makeNondetWithNull(currentSymbol))));
                 }
             } else if(expr instanceof  JmlStoreRefArrayRange) {
                 JmlStoreRefArrayRange aexpr = (JmlStoreRefArrayRange)expr;
