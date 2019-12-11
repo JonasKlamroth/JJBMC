@@ -178,6 +178,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
                 JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
+                variableReplacements.remove(that.decls.get(0).getName().toString());
                 return res;
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
                 List<JCStatement> stmts = newStatements;
@@ -199,6 +200,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init));
                 transUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
+                variableReplacements.remove(that.decls.get(0).getName().toString());
                 return M.Ident(boolVar);
             } else {
                 throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
@@ -224,6 +226,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 l = l.append(transUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init));
                 transUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
+                variableReplacements.remove(that.decls.get(0).getName().toString());
                 return M.Ident(boolVar);
             } else if(copy.op == JmlTokenKind.BSEXISTS) {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
@@ -240,13 +243,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), value);
                 }
                 newStatements = newStatements.append(TranslationUtils.makeAssumeStatement(cond, M));
+                variableReplacements.remove(that.decls.get(0).getName().toString());
                 return value;
             } else {
                 throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
             }
+        } else {
+            throw new RuntimeException("Quantified expressions may not occure in Java-mode.");
         }
-        variableReplacements.remove(that.decls.get(0).getName().toString());
-        return copy;
     }
 
     @Override
@@ -256,24 +260,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlBinary(JmlBinary that, Void p) {
-        if(that.op == JmlTokenKind.IMPLIES) {
-            JCExpression rhs = super.copy(that.rhs);
-
-            JCExpression orig = that.lhs;
-            JCExpression lhs = super.copy(that.lhs);
-            orig = transUtils.unwrapExpression(orig);
-            if(!(orig instanceof JmlQuantifiedExpr)) {
-                return treeutils.makeBinary(Position.NOPOS, Tag.OR, treeutils.makeNot(Position.NOPOS, lhs), rhs);
-            } else {
-                return treeutils.makeBinary(Position.NOPOS, Tag.OR, lhs, rhs);
-            }
-        }
-        if(that.op == JmlTokenKind.EQUIVALENCE) {
-            JCExpression rhs = super.copy(that.rhs);
-            JCExpression lhs = super.copy(that.lhs);
-            return treeutils.makeBinary(Position.NOPOS, Tag.EQ, lhs, rhs);
-        }
-        return super.visitJmlBinary(that, p);
+        throw new RuntimeException("JmlBinaries should be normalized to JavaBinaries.");
     }
 
     @Override
@@ -326,11 +313,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(arg instanceof JCIdent) {
                     if(!oldVars.keySet().contains(arg)) {
                         if(arg.type instanceof Type.JCPrimitiveType) {
-                            oldVar = treeutils.makeVarDef(arg.type, M.Name(String.valueOf("old" + oldVars.size())), currentSymbol, arg);
+                            oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, arg);
                         } else {
                             if(arg.type == null && arg instanceof JCIdent) {
                                 Symbol fieldSym = utils.findMember(currentSymbol.owner.type.tsym, ((JCIdent) arg).name.toString());
-                                oldVar = treeutils.makeVarDef(fieldSym.type, M.Name(String.valueOf("old" + oldVars.size())), currentSymbol, treeutils.makeIdent(Position.NOPOS, fieldSym));
+                                oldVar = treeutils.makeVarDef(fieldSym.type, M.Name("old" + oldVars.size()), currentSymbol, treeutils.makeIdent(Position.NOPOS, fieldSym));
                                 arg = treeutils.makeIdent(Position.NOPOS, fieldSym);
                             } else {
                                 throw new RuntimeException("\\old of non primitive types currently not supported. (" + arg + ")");
@@ -916,28 +903,29 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlStatementSpec(JmlStatementSpec that, Void p) {
-        List<JCStatement> saveList = newStatements;
-        newStatements = List.nil();
-        super.copy(that.statementSpecs);
-        super.copy(that.statements.get(0));
+        throw new RuntimeException("JmlStatementSpecs not supported. (" + that.toString() + ")");
+        //List<JCStatement> saveList = newStatements;
+        //newStatements = List.nil();
+        //super.copy(that.statementSpecs);
+        //super.copy(that.statements.get(0));
 
-        newStatements = saveList.appendList(newStatements.prepend(M.Block(0L, combinedNewReqStatements)).
-                append(M.Block(0L, combinedNewEnsStatements)));
+        //newStatements = saveList.appendList(newStatements.prepend(M.Block(0L, combinedNewReqStatements)).
+                //append(M.Block(0L, combinedNewEnsStatements)));
 
-        //dirty hack due to bug in OpenJML
-        saveList = newStatements;
-        for(JCStatement st : that.statements.tail) {
-            newStatements = List.nil();
-            JCStatement c = (JCStatement)super.copy(st);
-            if(newStatements.size() > 0) {
-                saveList = saveList.appendList(newStatements);
-            } else {
-                saveList = saveList.append(c);
-            }
-        }
-        newStatements = saveList;
+        ////dirty hack due to bug in OpenJML
+        //saveList = newStatements;
+        //for(JCStatement st : that.statements.tail) {
+            //newStatements = List.nil();
+            //JCStatement c = (JCStatement)super.copy(st);
+            //if(newStatements.size() > 0) {
+                //saveList = saveList.appendList(newStatements);
+            //} else {
+                //saveList = saveList.append(c);
+            //}
+        //}
+        //newStatements = saveList;
 
-        return that;
+        //return that;
     }
 
     @Override

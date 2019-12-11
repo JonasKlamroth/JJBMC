@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 class FunctionNameVisitor extends JmlTreeScanner {
-    static private String packageName = "";
     static private List<String> functionNames = new ArrayList();
     static private List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static private List<String> unwinds = new ArrayList<>();
-    static private String className = "";
 
     public enum TestBehaviour {
         Verifyable,
@@ -34,19 +32,8 @@ class FunctionNameVisitor extends JmlTreeScanner {
     }
 
     @Override
-    public void visitJmlClassDecl(JmlTree.JmlClassDecl that) {
-        className = that.getSimpleName().toString();
-        super.visitJmlClassDecl(that);
-    }
-
-    @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        String f;
-        if (!packageName.equals("")) {
-            f = packageName + "." + className + "." + that.getName().toString();
-        } else {
-            f = className + "." + that.getName().toString();
-        }
+        String f = that.sym.owner.toString() + "." + that.getName().toString();
         String rtString = returnTypeString(that.restype);
         String paramString = getParamString(that.params);
         functionNames.add(f + ":" + paramString + rtString);
@@ -92,9 +79,6 @@ class FunctionNameVisitor extends JmlTreeScanner {
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
-                if (it.pid != null) {
-                    packageName = it.pid.toString();
-                }
                 //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
                 it.accept(fnv);

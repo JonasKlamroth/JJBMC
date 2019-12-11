@@ -201,6 +201,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
                     selfNegated = false;
                     return unary;
                 }
+                selfNegated = true;
                 return copy;
             } else {
                 negated = true;

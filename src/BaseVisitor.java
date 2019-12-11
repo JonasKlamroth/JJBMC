@@ -51,56 +51,49 @@ public class BaseVisitor extends FilterVisitor {
             System.out.println("Inner classes currently only copied.");
             return that;
         }
-            Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
-            classSymbol.sourcefile = that.sourcefile;
-            classSymbol.completer = null;
-            classSymbol.flatname = M.Name("ReturnException");
-            returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), List.nil(),
-                    M.Type(syms.runtimeExceptionType),
-                    com.sun.tools.javac.util.List.nil(),
-                    com.sun.tools.javac.util.List.nil());
-            returnExcClass.sym = classSymbol;
-            returnExcClass.type = classSymbol.type;
-            //make it static
-            returnExcClass.mods.flags |= 8L;
-            JmlClassDecl copy = that;
-            List<JCTree> newDefs = List.nil();
-            FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
-            for (JCTree def : copy.defs) {
-                if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
-                    fcv.copy(def);
-                    functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.getAssignables());
-                }
-                fcv.resetAssignables();
-
+        Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);
+        classSymbol.sourcefile = that.sourcefile;
+        classSymbol.completer = null;
+        classSymbol.flatname = M.Name("ReturnException");
+        returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), List.nil(),
+                M.Type(syms.runtimeExceptionType),
+                com.sun.tools.javac.util.List.nil(),
+                com.sun.tools.javac.util.List.nil());
+        returnExcClass.sym = classSymbol;
+        returnExcClass.type = classSymbol.type;
+        //make it static
+        returnExcClass.mods.flags |= 8L;
+        JmlClassDecl copy = that;
+        List<JCTree> newDefs = List.nil();
+        FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
+        for (JCTree def : copy.defs) {
+            if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
+                fcv.copy(def);
+                functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.getAssignables());
             }
-            calledFunctions.addAll(fcv.getCalledFunctions());
-            for (JCTree def : copy.defs) {
-                if (def instanceof JmlMethodDecl) {
-                    newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
-                    if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
-                        newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
-                    }
-                } else if(def instanceof JmlClassDecl) {
-                    BaseVisitor bv = new BaseVisitor(context, M);
-                    JmlClassDecl copiedClass = bv.copy((JmlClassDecl)def);
-                    newDefs = newDefs.append(copiedClass);
-                } else {
-                    newDefs = newDefs.append(def);
+            fcv.resetAssignables();
+
+        }
+        calledFunctions.addAll(fcv.getCalledFunctions());
+        for (JCTree def : copy.defs) {
+            if (def instanceof JmlMethodDecl) {
+                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
+                if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
+                    newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                 }
+            } else if(def instanceof JmlClassDecl) {
+                BaseVisitor bv = new BaseVisitor(context, M);
+                JmlClassDecl copiedClass = bv.copy((JmlClassDecl)def);
+                newDefs = newDefs.append(copiedClass);
+            } else {
+                newDefs = newDefs.append(def);
             }
-            newDefs = newDefs.append(returnExcClass);
-            copy.defs = newDefs;
+        }
+        newDefs = newDefs.append(returnExcClass);
+        copy.defs = newDefs;
 
-            return copy;
+        return copy;
 
-    }
-
-    @Override
-    public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
-        JmlMethodDecl copy = (JmlMethodDecl)super.visitJmlMethodDecl(that, p);
-        copy.sym = that.sym;
-        return that;
     }
 
     public JCClassDecl getExceptionClass() {

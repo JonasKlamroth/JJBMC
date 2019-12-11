@@ -289,7 +289,7 @@ public class TranslationUtils {
                 }
             } else if(expr instanceof JmlStoreRefKeyword) {
                 if(((JmlStoreRefKeyword) expr).token.equals(JmlTokenKind.BSEVERYTHING)) {
-                    System.out.println("NOTE: Havoc of \\everything is currently not supported.");
+                    System.out.println("NOTE: Havoc of \\everything is currently not supported. In method: " + currentSymbol.toString());
                 }
             } else {
                 throw new RuntimeException("Havoc for expression " + expr + " not supported");

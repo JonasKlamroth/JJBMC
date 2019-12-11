@@ -8,6 +8,7 @@ import TestAnnotations.Verifyable;
  * Created by jklamroth on 9/18/18.
  */
 public class TestSuite {
+    class UnusedClassForTestingPurpose {}
     private int privInt = 0;
     public int pubInt;
     TestSuite t2;
@@ -25,9 +26,27 @@ public class TestSuite {
     @Verifyable
     public TestSuite() {}
 
+    //@ ensures pubInt == i;
     @Verifyable
     public TestSuite(int i) {
         this.pubInt = i;
+    }
+
+//    //@ ensures \result == 12;
+//    @Unwind(number = 5)
+//    @Verifyable
+//    private int unspecifiedWhileLoop() {
+//        int sum = 0;
+//        while(sum < 10) {
+//            sum += 3;
+//        }
+//        return sum;
+//    }
+
+    //@ ensures this.t2.pubInt == 10;
+    @Verifyable
+    private void constructorTest() {
+        t2 = new TestSuite(10);
     }
 
     //@ ensures b1 == (b2 == b3);
@@ -88,7 +107,38 @@ public class TestSuite {
 
     @Unwind(number = 11)
     @Verifyable
+    public void loopTest2() {
+        int[] arr = new int[10];
+        int i = 0;
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 11 - i;
+        while (i < 10) {
+            //@ assume i > 0;
+            arr[i] = i;
+            i++;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Verifyable
     public void loopTest1() {
+        int[] arr = new int[10];
+        int i = 0;
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 11 - i;
+        while (i < 10) {
+            arr[i] = i;
+            i++;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Verifyable
+    public void loopTest3() {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
@@ -571,4 +621,50 @@ public class TestSuite {
     //@ ensures !(!true && !false);
     @Verifyable
     private void normalizeTest1() {}
+
+    //@ ensures true <== true;
+    @Verifyable
+    private void normalizeTest22() {}
+
+    //@ ensures (!!true) == true;
+    @Verifyable
+    private void normalizeTest24() {}
+
+    //@ ensures true && true;
+    @Verifyable
+    private void normalizeTest23() {}
+
+    //@ ensures true <=!=> false;
+    @Verifyable
+    private void normalizeTest21() {}
+
+    //@ ensures true != false;
+    @Verifyable
+    private void normalizeTest20() {}
+
+    //@ ensures \result == 1;
+    private int calledMethod1() {
+        return 1;
+    }
+
+    @Verifyable
+    private void classMethodCallTest() {
+        int res = this.calledMethod1();
+        assert res == 1;
+    }
+
+    @Verifyable
+    private void typeTranslationTest(short s, byte b, double d, float f, long[] l, char[][] c) {}
+
+    //@ ensures pubInt + 5 == \old(pubInt + 5) + c;
+    @Verifyable
+    private void oldTest1(int c) {
+        pubInt += c;
+    }
+
+    //@ ensures pubInt == \old(pubInt) + c;
+    @Verifyable
+    private void oldTest(int c) {
+        pubInt += c;
+    }
 }

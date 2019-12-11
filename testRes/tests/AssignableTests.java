@@ -57,12 +57,68 @@ public class AssignableTests {
         privInt = 0;
     }
 
-    /*@ assignable arr[5];
+    /*@ requires arr != null && arr.length > 5;
+      @ assignable arr[5];
+      @ */
+    @Verifyable
+    private void assignalbeTest101() {
+        this.arr[5] = 3;
+    }
+
+    /*@ requires arr != null && arr.length > 5;
+      @ assignable this.arr[5];
+      @ */
+    @Verifyable
+    private void assignalbeTest102() {
+        arr[5] = 3;
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable arr[4];
       @ */
     @Fails
     private void assignalbeTest10() {
         arr[1] = 5;
-        arr[5] = 3;
+        arr[4] = 3;
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable arr[4], arr[2];
+      @ */
+    @Fails
+    private void assignalbeTest12() {
+        arr[1] = 5;
+        arr[4] = 3;
+    }
+
+    //@ assignable this.*;
+    @Verifyable
+    private void asteriskTest1() {
+        t2 = new TestSuite();
+    }
+
+    //@ assignable this.*;
+    @Fails
+    private void asteriskTest() {
+        t2 = new TestSuite();
+        t2.pubInt = 1;
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable arr[4];
+      @ */
+    @Verifyable
+    private void assignalbeTest103() {
+        arr[4] = 3;
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable arr[4], arr[1..2], arr[3..];
+      @ */
+    @Verifyable
+    private void assignalbeTest11() {
+        arr[1] = 5;
+        arr[4] = 3;
     }
 
     /*@ assignable \nothing;
@@ -96,14 +152,30 @@ public class AssignableTests {
       @ */
     @Verifyable
     private void assignalbeTest4() {
-        arr[4] = 2;
+
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable arr[1..], t2, t3;
+      @ */
+    @Verifyable
+    private void assignalbeTest42() {
+        arr[1] = 2;
+    }
+
+    /*@ requires arr != null && arr.length > 4;
+      @ assignable t2, t2, pubInt;
+      @ */
+    @Fails
+    private void assignalbeTest43() {
+        arr[1] = 2;
     }
 
     /*@ requires arr != null && arr.length > 5;
       @ assignable arr[1..3], arr[4..5];
       @ */
     @Verifyable
-    private void assignalbeTest41(int arr1[]) {
+    private void assignalbeTest43(int arr1[]) {
         arr1[4] = 2;
     }
 
