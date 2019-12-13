@@ -171,7 +171,7 @@ public class XmlParser {
                                                     //TODO this should not happend
                                                 }
                                                 if (argNum >= 0 && argNum < args.size()) {
-                                                    guess = args.get(argNum - 1);
+                                                    guess = args.get(argNum);
                                                 } else {
                                                     //System.out.println("argNum to big.");
                                                 }
