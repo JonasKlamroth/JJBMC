@@ -121,7 +121,12 @@ public class XmlParser {
                                 Element aLocation = (Element) assignment.getElementsByTagName("location").item(0);
                                 Element lhs = (Element) assignment.getElementsByTagName("full_lhs").item(0);
                                 Element value = (Element) assignment.getElementsByTagName("full_lhs_value").item(0);
-                                String l = lines.get(Integer.parseInt(aLocation.getAttribute("line")) - 1);
+                                int line = Integer.parseInt(aLocation.getAttribute("line")) - 1;
+                                if(line < 0 || line >= lines.size()) {
+                                    //something is fishy
+                                    continue;
+                                }
+                                String l = lines.get(line);
                                 if (lhs.getTextContent().contains("dynamic_object") || lhs.getTextContent().contains("tmp_object_factory") || lhs.getTextContent().contains("anonlocal") || lhs.getTextContent().contains("arg")) {
                                     Pattern p = Pattern.compile("(\\w*) ?= ?.*?;");
                                     Matcher m = p.matcher(l);
