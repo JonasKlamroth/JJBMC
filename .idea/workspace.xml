@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AnalysisUIOptions">
-    <option name="SCOPE_TYPE" value="8" />
-    <option name="CUSTOM_SCOPE_NAME" value="Module 'openjmlToBMC'" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="now supporting overloaded methods but tests broken">
-      <change afterPath="$PROJECT_DIR$/src/FunctionNameVisitor.java" afterDir="false" />
+    <list default="true" id="d71aa112-5685-44c1-b21f-bd1faf5ec8bb" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/tests/AssignableTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/AssignableTests2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/TestSuiteTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestExecutor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenJML/OpenJMLTest/test/gitbug672/commons-collections4-4.3-sources/META-INF/maven/org.apache.commons/commons-collections4/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/OpenJML/OpenJMLTest/test/gitbug672/commons-collections4-4.3-sources/META-INF/maven/org.apache.commons/commons-collections4/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="DefaultGradleProjectSettings">
-    <option name="isMigrated" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -29,13 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="293" />
-    <option name="y" value="47" />
-    <option name="width" value="1400" />
-    <option name="height" value="903" />
-  </component>
-  <component name="ProjectId" id="1RbSfVeyMyAcImIvDSzUcDm7uHa" />
+  <component name="ProjectId" id="1WCnS6It52Req6w4VDbWegmkKXq" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -43,92 +34,79 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/testRes/xmlTest" />
-    <property name="project.structure.last.edited" value="Project" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="project.structure.last.edited" value="Facets" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="restartRequiresConfirmation" value="false" />
-    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.externalTools" />
   </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/testRes/tests" />
-      <recent name="$PROJECT_DIR$/tests" />
-      <recent name="$PROJECT_DIR$/testRes/CaseStudy" />
-      <recent name="$PROJECT_DIR$/testRes/tmp" />
-      <recent name="$PROJECT_DIR$/testRes" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/testRes/xmlTest" />
-      <recent name="$PROJECT_DIR$/resources" />
-      <recent name="$PROJECT_DIR$/testRes/org/cprover" />
-    </key>
-  </component>
-  <component name="RunManager" selected="JUnit.TestExecutor.runAllTests">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Main" />
+  <component name="RunManager" selected="JUnit.TestSuiteTests">
+    <configuration name="AssignableTests and 2 more" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
-      <option name="PROGRAM_PARAMETERS" value="./testRes/AWS/CipherBlockHeaders.java toByteArray -j=--trace -j=&quot;--unwind 7&quot;" />
+      <option name="TEST_OBJECT" value="pattern" />
+      <patterns>
+        <pattern testClass="AssignableTests" />
+        <pattern testClass="AssignableTests2" />
+        <pattern testClass="TestSuiteTests" />
+      </patterns>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runAWSFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AssignableTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runAWSFile" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="AssignableTests" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runAWSTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AssignableTests2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runAWSTests" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="AssignableTests2" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runAllTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="TestSuiteTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runAllTests" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="TestSuiteTests" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="TestExecutor.runSomeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="*Tests*.java" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="openjmlToBMC" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestExecutor" />
-      <option name="METHOD_NAME" value="runSomeTest" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="pattern" />
+      <option name="PARAMETERS" value="" />
+      <patterns>
+        <pattern testClass="*Tests*.java" />
+      </patterns>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.Main" />
-      <item itemvalue="JUnit.TestExecutor.runAWSFile" />
-      <item itemvalue="JUnit.TestExecutor.runAllTests" />
-      <item itemvalue="JUnit.TestExecutor.runSomeTest" />
-      <item itemvalue="JUnit.TestExecutor.runAWSTests" />
+      <item itemvalue="JUnit.*Tests*.java" />
+      <item itemvalue="JUnit.AssignableTests" />
+      <item itemvalue="JUnit.AssignableTests and 2 more" />
+      <item itemvalue="JUnit.TestSuiteTests" />
+      <item itemvalue="JUnit.AssignableTests2" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestExecutor.runAllTests" />
-        <item itemvalue="Application.Main" />
-        <item itemvalue="JUnit.TestExecutor.runAWSTests" />
-        <item itemvalue="JUnit.TestExecutor.runAWSFile" />
-        <item itemvalue="JUnit.TestExecutor.runSomeTest" />
+        <item itemvalue="JUnit.TestSuiteTests" />
+        <item itemvalue="JUnit.AssignableTests2" />
+        <item itemvalue="JUnit.*Tests*.java" />
+        <item itemvalue="JUnit.AssignableTests and 2 more" />
+        <item itemvalue="JUnit.AssignableTests" />
       </list>
     </recent_temporary>
   </component>
@@ -149,360 +127,38 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1ad70b56-aa69-4a1a-ba43-099ad2522bc2" name="Default Changelist" comment="" />
-      <created>1556281966719</created>
+      <changelist id="d71aa112-5685-44c1-b21f-bd1faf5ec8bb" name="Default Changelist" comment="" />
+      <created>1578662440984</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1556281966719</updated>
+      <updated>1578662440984</updated>
     </task>
-    <task id="LOCAL-00001" summary="now original BeanCan is working">
-      <created>1558699520989</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1558699520989</updated>
-    </task>
-    <task id="LOCAL-00002" summary="testInfrastructure restored">
-      <created>1558707438276</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1558707438276</updated>
-    </task>
-    <task id="LOCAL-00003" summary="some more fixes">
-      <created>1558708734048</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1558708734048</updated>
-    </task>
-    <task id="LOCAL-00004" summary="all tests running again">
-      <created>1559121315476</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1559121315476</updated>
-    </task>
-    <task id="LOCAL-00005" summary="handling constructors">
-      <created>1559570070161</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1559570070161</updated>
-    </task>
-    <task id="LOCAL-00006" summary="towards more openjml examples">
-      <created>1559663952388</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1559663952388</updated>
-    </task>
-    <task id="LOCAL-00007" summary="now all tests and jmlexamples working">
-      <created>1559741879043</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1559741879043</updated>
-    </task>
-    <task id="LOCAL-00008" summary="now multiple classes in 1 file supported. minor fixes">
-      <created>1559744611972</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1559744611972</updated>
-    </task>
-    <task id="LOCAL-00009" summary="added LoopExamples (openjml)">
-      <created>1559809221454</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1559809221456</updated>
-    </task>
-    <task id="LOCAL-00010" summary="towards working normalization visitor">
-      <created>1560264096957</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1560264096957</updated>
-    </task>
-    <task id="LOCAL-00011" summary="all openjml examples working again">
-      <created>1560267151286</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1560267151287</updated>
-    </task>
-    <task id="LOCAL-00012" summary="taxpayer example now working aswell">
-      <created>1560335045660</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1560335045680</updated>
-    </task>
-    <task id="LOCAL-00013" summary="fix bug which causes an exception to be thrown for classes which are not part of a package">
-      <created>1561470658517</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1561470658517</updated>
-    </task>
-    <task id="LOCAL-00014" summary="bugfixes">
-      <created>1569587327655</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1569587327655</updated>
-    </task>
-    <task id="LOCAL-00015" summary="adding to more case studies">
-      <created>1569589932486</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1569589932486</updated>
-    </task>
-    <task id="LOCAL-00016" summary="presentation updated for keysymposium 2019">
-      <created>1569589984327</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1569589984327</updated>
-    </task>
-    <task id="LOCAL-00017" summary="fixed one regex">
-      <created>1570545423252</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1570545423253</updated>
-    </task>
-    <task id="LOCAL-00018" summary="now better counterexample presentation">
-      <created>1570786707573</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1570786707573</updated>
-    </task>
-    <task id="LOCAL-00019" summary="counterexamples now support fields">
-      <created>1571401911482</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1571401911482</updated>
-    </task>
-    <task id="LOCAL-00020" summary="remove assignable bug. try tests">
-      <created>1571405310972</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1571405310972</updated>
-    </task>
-    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="now original BeanCan is working" />
-    <MESSAGE value="testInfrastructure restored" />
-    <MESSAGE value="some more fixes" />
-    <MESSAGE value="all tests running again" />
-    <MESSAGE value="handling constructors" />
-    <MESSAGE value="towards more openjml examples" />
-    <MESSAGE value="now all tests and jmlexamples working" />
-    <MESSAGE value="now multiple classes in 1 file supported. minor fixes" />
-    <MESSAGE value="added LoopExamples (openjml)" />
-    <MESSAGE value="towards working normalization visitor" />
-    <MESSAGE value="all openjml examples working again" />
-    <MESSAGE value="taxpayer example now working aswell" />
-    <MESSAGE value="fix bug which causes an exception to be thrown for classes which are not part of a package" />
-    <MESSAGE value="bugfixes" />
-    <MESSAGE value="adding to more case studies" />
-    <MESSAGE value="presentation updated for keysymposium 2019" />
-    <MESSAGE value="fixed one regex" />
-    <MESSAGE value="now better counterexample presentation" />
-    <MESSAGE value="counterexamples now support fields" />
-    <MESSAGE value="remove assignable bug. try tests" />
-    <MESSAGE value="now supporting overloaded methods but tests broken" />
-    <option name="LAST_COMMIT_MESSAGE" value="now supporting overloaded methods but tests broken" />
-  </component>
   <component name="WindowStateProjectService">
-    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1575392571271">
+    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578668807445">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog/70.27.1850.948@70.27.1850.948" timestamp="1575392571271" />
-    <state width="1804" height="241" key="GridCell.Tab.0.bottom" timestamp="1575393751419">
+    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog/70.27.1850.948@70.27.1850.948" timestamp="1578668807445" />
+    <state width="1804" height="241" key="GridCell.Tab.0.bottom" timestamp="1578668878636">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.bottom/70.27.1850.948@70.27.1850.948" timestamp="1575393751419" />
-    <state width="1804" height="241" key="GridCell.Tab.0.center" timestamp="1575393751418">
+    <state width="1804" height="241" key="GridCell.Tab.0.bottom/70.27.1850.948@70.27.1850.948" timestamp="1578668878636" />
+    <state width="1804" height="241" key="GridCell.Tab.0.center" timestamp="1578668878635">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.center/70.27.1850.948@70.27.1850.948" timestamp="1575393751418" />
-    <state width="1804" height="241" key="GridCell.Tab.0.left" timestamp="1575393751417">
+    <state width="1804" height="241" key="GridCell.Tab.0.center/70.27.1850.948@70.27.1850.948" timestamp="1578668878635" />
+    <state width="1804" height="241" key="GridCell.Tab.0.left" timestamp="1578668878635">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.left/70.27.1850.948@70.27.1850.948" timestamp="1575393751417" />
-    <state width="1804" height="241" key="GridCell.Tab.0.right" timestamp="1575393751418">
+    <state width="1804" height="241" key="GridCell.Tab.0.left/70.27.1850.948@70.27.1850.948" timestamp="1578668878635" />
+    <state width="1804" height="241" key="GridCell.Tab.0.right" timestamp="1578668878636">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.right/70.27.1850.948@70.27.1850.948" timestamp="1575393751418" />
-    <state width="1804" height="298" key="GridCell.Tab.1.bottom" timestamp="1575391673307">
+    <state width="1804" height="241" key="GridCell.Tab.0.right/70.27.1850.948@70.27.1850.948" timestamp="1578668878636" />
+    <state x="478" y="78" width="1022" height="852" key="SettingsEditor" timestamp="1578662888701">
       <screen x="70" y="27" width="1850" height="948" />
     </state>
-    <state width="1804" height="298" key="GridCell.Tab.1.bottom/70.27.1850.948@70.27.1850.948" timestamp="1575391673307" />
-    <state width="1804" height="298" key="GridCell.Tab.1.center" timestamp="1575391673306">
-      <screen x="70" y="27" width="1850" height="948" />
-    </state>
-    <state width="1804" height="298" key="GridCell.Tab.1.center/70.27.1850.948@70.27.1850.948" timestamp="1575391673306" />
-    <state width="1804" height="298" key="GridCell.Tab.1.left" timestamp="1575391673306">
-      <screen x="70" y="27" width="1850" height="948" />
-    </state>
-    <state width="1804" height="298" key="GridCell.Tab.1.left/70.27.1850.948@70.27.1850.948" timestamp="1575391673306" />
-    <state width="1804" height="298" key="GridCell.Tab.1.right" timestamp="1575391673307">
-      <screen x="70" y="27" width="1850" height="948" />
-    </state>
-    <state width="1804" height="298" key="GridCell.Tab.1.right/70.27.1850.948@70.27.1850.948" timestamp="1575391673307" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>64</line>
-          <option name="timeStamp" value="145" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>61</line>
-          <option name="timeStamp" value="146" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/JmlExpressionVisitor.java</url>
-          <line>754</line>
-          <option name="timeStamp" value="161" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>232</line>
-          <option name="timeStamp" value="169" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>226</line>
-          <option name="timeStamp" value="170" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>239</line>
-          <option name="timeStamp" value="171" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/tests/TestExecutor.java</url>
-          <line>279</line>
-          <option name="timeStamp" value="174" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/XmlParser.java</url>
-          <line>165</line>
-          <option name="timeStamp" value="185" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
-  <component name="masterDetails">
-    <states>
-      <state key="ArtifactsStructureConfigurable.UI">
-        <settings>
-          <artifact-editor />
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="FacetStructureConfigurable.UI">
-        <settings>
-          <last-edited>No facets are configured</last-edited>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="GlobalLibrariesConfigurable.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="JdkListConfigurable.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="ModuleStructureConfigurable.UI">
-        <settings>
-          <last-edited>openjmlToBMC</last-edited>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-                <option value="0.6" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="ProjectJDKs.UI">
-        <settings>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-      <state key="ProjectLibrariesConfigurable.UI">
-        <settings>
-          <last-edited>jmlbmc</last-edited>
-          <splitter-proportions>
-            <option name="proportions">
-              <list>
-                <option value="0.2" />
-              </list>
-            </option>
-          </splitter-proportions>
-        </settings>
-      </state>
-    </states>
+    <state x="478" y="78" width="1022" height="852" key="SettingsEditor/70.27.1850.948@70.27.1850.948" timestamp="1578662888701" />
   </component>
 </project>
