@@ -537,7 +537,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     private JCExpression makeDereasesStatement(JCVariableDecl oldD, JCExpression dExpr) {
-        JCExpression res = M.Binary(Tag.GT, dExpr, M.Literal(0));
+        JCExpression res = M.Binary(Tag.GE, dExpr, M.Literal(0));
         JCExpression snd = M.Binary(Tag.LT, dExpr, M.Ident(oldD.name));
         return M.Binary(Tag.AND, res, snd);
     }

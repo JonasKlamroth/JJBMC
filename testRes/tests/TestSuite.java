@@ -163,12 +163,13 @@ public class TestSuite {
     }
 
     @Unwind(number = 11)
-    @Verifyable
-    public void decreasesTest2() {
+    @Fails
+    public void decreasesTest6() {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
+        //@ decreases 11 + i;
         for(int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
@@ -176,7 +177,33 @@ public class TestSuite {
 
     @Unwind(number = 11)
     @Fails
+    public void decreasesTest4() {
+        int[] arr = new int[10];
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 9 - i;
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Verifyable
     public void decreasesTest3() {
+        int[] arr = new int[10];
+        //@ loop_invariant i > -1 && i <= 10;
+        //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
+        //@ loop_modifies arr[*];
+        //@ decreases 10 - i;
+        for(int i = 0; i < 10; ++i) {
+            arr[i] = i;
+        }
+    }
+
+    @Unwind(number = 11)
+    @Fails
+    public void decreasesTest5() {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
