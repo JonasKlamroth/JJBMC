@@ -11,6 +11,8 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
+sourceCompatibility = 1.8
+
 sourceSets {
    main {
       java {
@@ -24,6 +26,9 @@ sourceSets {
       java {
          srcDir 'tests'
       }
+      resources {
+          srcDir 'resources'
+      }
    }
 }
 // In this section you declare where to find the dependencies of your project
@@ -34,23 +39,17 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'lib')
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(include: ['*.jar'], dir: 'lib')
+    testCompileOnly 'junit:junit:4.12'
 }
 
 task fatJar(type: Jar) {
     manifest {
         attributes "Main-Class": "Main"
     }
-    baseName = 'fatJar'
+    archiveBaseName = 'fatJar'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
-}
-
-test {
-  beforeTest { descriptor ->
-     logger.lifecycle("Running test: ${descriptor}")
-  }
 }
 
 mainClassName = 'Main'
