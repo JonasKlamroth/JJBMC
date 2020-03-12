@@ -195,6 +195,7 @@ public class CLI implements Runnable {
             e.printStackTrace();
         }
         //cleanUp();
+        System.out.println("Complilation sucessfull.");
         return tmpFile;
     }
 
@@ -204,6 +205,7 @@ public class CLI implements Runnable {
             System.out.println("Error preparing translation.");
             return;
         }
+        System.out.println("Parse function names.");
         FunctionNameVisitor.parseFile(fileName);
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
@@ -215,6 +217,7 @@ public class CLI implements Runnable {
                 return;
             }
         }
+        System.out.println("Run jbmc for " +functionNames.size() + " functions.");
         for(String functionName : functionNames) {
             //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
             runJBMC(tmpFile, functionName);
@@ -347,6 +350,7 @@ public class CLI implements Runnable {
             Process proc = rt.exec(commandsChmod);
             proc.waitFor();
         } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
             System.out.println("Could not copy jbmc.");
             return false;
         }

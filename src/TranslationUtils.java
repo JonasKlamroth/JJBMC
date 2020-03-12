@@ -17,6 +17,8 @@ import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Utils;
+import org.smtlib.impl.Pos;
+
 import java.util.Collections;
 
 import static com.sun.tools.javac.tree.JCTree.*;
@@ -44,7 +46,7 @@ public class TranslationUtils {
     static JCTree.JCStatement makeAssumeStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
-        JCTree.JCExpression args[] = new JCTree.JCExpression[]{expr};
+        JCTree.JCExpression[] args = new JCTree.JCExpression[]{expr};
         com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.from(args);
         return M.Exec(
                 M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
@@ -69,8 +71,7 @@ public class TranslationUtils {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
         List<JCTree.JCExpression> largs = List.nil();
-        JCTree.JCVariableDecl quantVar = treeutils.makeVarDef(syms.intType, name, currentSymbol, M.Apply(List.nil(), nondetFunc, largs));
-        return quantVar;
+        return treeutils.makeVarDef(syms.intType, name, currentSymbol, M.Apply(List.nil(), nondetFunc, largs));
     }
 
     public JCTree.JCMethodInvocation makeNondetInt(Symbol currentSymbol) {
@@ -131,6 +132,11 @@ public class TranslationUtils {
 
     public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
         JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, M.Name(loopVarName), currentSymbol, init);
+        RangeExtractor re = new RangeExtractor(M, loopVar.sym);
+        re.extractRange(range);
+        JCExpression min = re.getMin();
+        JCExpression max = re.getMax();
+        range = M.Binary(Tag.AND, M.Binary(Tag.LE, min, treeutils.makeIdent(Position.NOPOS, loopVar.sym)), M.Binary(Tag.GE, max, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
         return makeStandardLoop(range, body, loopVar, currentSymbol);
     }
     public List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
@@ -369,7 +375,7 @@ public class TranslationUtils {
      *
      * @param ist the ifstatement to be inserted to
      * @param statement the statement to be inserted
-     * @return
+     * @return the new statements created by this operation
      */
     public List<JCStatement> insertIntoIf(JCIf ist, JCStatement statement) {
         List<JCStatement> newStatements = List.nil();
@@ -427,35 +433,43 @@ class RangeExtractor extends JmlTreeScanner {
     @Override
     public void visitBinary(JCTree.JCBinary tree) {
         if(tree.getKind() == Tree.Kind.GREATER_THAN) {
-            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
                 minResult = M.Binary(JCTree.Tag.PLUS, tree.getRightOperand(), M.Literal(1));
+                return;
             }
-            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
-                maxResult = M.Binary(JCTree.Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
-            }
-        }
-        if(tree.getKind() == Tree.Kind.LESS_THAN) {
-            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
-                maxResult = M.Binary(JCTree.Tag.PLUS, tree.getRightOperand(), M.Literal(1));
-            }
-            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
-                minResult = M.Binary(JCTree.Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
+                maxResult = M.Binary(Tag.MINUS, tree.getLeftOperand(), M.Literal(1));
+                return;
             }
         }
-        if(tree.getKind() == Tree.Kind.GREATER_THAN_EQUAL) {
-            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+        else if(tree.getKind() == Tree.Kind.LESS_THAN) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
+                maxResult = M.Binary(Tag.MINUS, tree.getRightOperand(), M.Literal(1));
+                return;
+            }
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
+                minResult = M.Binary(Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
+                return;
+            }
+        }
+        else if(tree.getKind() == Tree.Kind.GREATER_THAN_EQUAL) {
+            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
                 minResult = tree.getRightOperand();
+                return;
             }
-            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
                 maxResult = tree.getLeftOperand();
+                return;
             }
         }
-        if(tree.getKind() == Tree.Kind.LESS_THAN_EQUAL) {
-            if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).sym.equals(ident)) {
+        else if(tree.getKind() == Tree.Kind.LESS_THAN_EQUAL) {
+            if (tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent) tree.getLeftOperand()).name.equals(ident.name)) {
                 maxResult = tree.getRightOperand();
+                return;
             }
-            if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).sym.equals(ident)) {
+            if (tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent) tree.getRightOperand()).name.equals(ident.name)) {
                 minResult = tree.getLeftOperand();
+                return;
             }
         }
         super.visitBinary(tree);
@@ -474,6 +488,13 @@ class RangeExtractor extends JmlTreeScanner {
             throw new RuntimeException("No upper bound for quantified variable found.");
         }
         return maxResult;
+    }
+
+    public void extractRange(JCTree tree) {
+        super.scan(tree);
+        if(maxResult == null || minResult == null) {
+            throw new RuntimeException("Could not extract bound from range for expr: " + tree.toString());
+        }
     }
 }
 

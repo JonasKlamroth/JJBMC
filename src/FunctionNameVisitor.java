@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class FunctionNameVisitor extends JmlTreeScanner {
-    static private List<String> functionNames = new ArrayList();
+    static private List<String> functionNames = new ArrayList<>();
     static private List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static private List<String> unwinds = new ArrayList<>();
 
@@ -66,7 +66,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
     }
 
     static void parseFile(String fileName) {
-        functionNames = new ArrayList();
+        functionNames = new ArrayList<>();
         functionBehaviours = new ArrayList<>();
         unwinds = new ArrayList<>();
         try {

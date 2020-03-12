@@ -28,7 +28,7 @@ public class TestSuiteTests {
 
     @Test
     @junitparams.Parameters(method = "TestSuiteParameter")
-    public void runAssignableTests( String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
+    public void runTestSuite(String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 

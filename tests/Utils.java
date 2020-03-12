@@ -32,31 +32,33 @@ public class Utils {
     }
 
     public static Collection<Object[]> prepareParameters(String fileName) {
-        ArrayList<Object[]> params = new ArrayList();
-            createAnnotationsFolder(fileName);
-            CLI.keepTranslation = keepTmpFile;
-            File tmpFile = CLI.prepareForJBMC(fileName);
-            String classFile = tmpFile.getPath().replace(".java", ".class");
+        ArrayList<Object[]> params = new ArrayList<>();
+        createAnnotationsFolder(fileName);
+        CLI.keepTranslation = keepTmpFile;
+        File tmpFile = CLI.prepareForJBMC(fileName);
+        if(tmpFile == null) {
+            System.out.println("Someting went wrong. Test aborted.");
+            throw new RuntimeException();
+        }
+        String classFile = tmpFile.getPath().replace(".java", ".class");
 
-            if(tmpFile == null) {
-                System.out.println("Someting went wrong. Test aborted.");
-                throw new RuntimeException();
+        System.out.println("Parsing file for functions.");
+        FunctionNameVisitor.parseFile(fileName);
+        List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.getFunctionBehaviours();
+        List<String> functionNames = FunctionNameVisitor.getFunctionNames();
+        List<String> unwinds = FunctionNameVisitor.getUnwinds();
+        assert(functionNames.size() == testBehaviours.size());
+        assert(functionNames.size() == unwinds.size());
+        // System.out.println("Running " +
+        // (int) testBehaviours.stream().
+        //         filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).count() +
+        // " tests in file: " + tmpFile.getName());
+        for(int idx = 0; idx < functionNames.size(); ++idx) {
+            if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
+                params.add(new Object[]{classFile, functionNames.get(idx), unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParent()});
             }
-            FunctionNameVisitor.parseFile(tmpFile.getPath());
-            List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.getFunctionBehaviours();
-            List<String> functionNames = FunctionNameVisitor.getFunctionNames();
-            List<String> unwinds = FunctionNameVisitor.getUnwinds();
-            assert(functionNames.size() == testBehaviours.size());
-            assert(functionNames.size() == unwinds.size());
-            // System.out.println("Running " +
-            // (int) testBehaviours.stream().
-            //         filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).count() +
-            // " tests in file: " + tmpFile.getName());
-            for(int idx = 0; idx < functionNames.size(); ++idx) {
-                if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
-                    params.add(new Object[]{classFile, functionNames.get(idx), unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParent()});
-                }
-            }
+        }
+        System.out.println("Found " + params.size() + " functions.");
         return params;
     }
 

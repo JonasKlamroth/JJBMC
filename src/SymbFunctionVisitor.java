@@ -83,7 +83,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
         }
         expressionVisitor.inConstructor = this.inConstructor;
-        JCExpression copy = expressionVisitor.copy(that.expression);
+        JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
+        JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         oldVars = expressionVisitor.getOldVars();
@@ -140,8 +141,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 //Make it public
                 copy.mods.flags |= 1L;
                 //Make it not private and not protected
-                copy.mods.flags &= (0xffffffff ^ 2L);
-                copy.mods.flags &= (0xffffffff ^ 4L);
+                copy.mods.flags &= (~2L);
+                copy.mods.flags &= (~4L);
             }
             return copy;
         }
@@ -198,9 +199,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             bodyStats = bodyStats.prepend(variableDecl);
         }
         bodyStats = bodyStats.appendList(transUtils.havoc(currentAssignable, copy.sym, this));
-        if(copy.name.equals("<init")) {
-            //bodyStats = List.nil();
-        }
 
         if(hasReturn) {
             if(returnVar != null) {
@@ -248,8 +246,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             //Make it public
             copy.mods.flags |= 1L;
             //Make it not private and not protected
-            copy.mods.flags &= (0xffffffff ^ 2L);
-            copy.mods.flags &= (0xffffffff ^ 4L);
+            copy.mods.flags &= (~2L);
+            copy.mods.flags &= (~4L);
         } else {
             copy.name = M.Name(currentMethod.name.toString() + "Symb");
         }
@@ -328,7 +326,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             if(k.token == JmlTokenKind.BSNOTHING) {
                 return M.Literal(false);
             } else if(k.token == JmlTokenKind.BSEVERYTHING) {
-                return M.Literal(!currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword));
+                return M.Literal(currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword));
             } else {
                 throw new RuntimeException("Cannot handle assignment to " + e.toString());
             }
@@ -338,10 +336,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCIdent e) {
-        JCIdent lhs = e;
-        if(lhs.type.isPrimitive()) {
-            if(!currentAssignable.stream().filter(as -> as instanceof JCIdent)
-                    .anyMatch(as -> ((JCIdent)as).sym.equals(lhs.sym))) {
+        if(e.type.isPrimitive()) {
+            if(currentAssignable.stream().filter(as -> as instanceof JCIdent)
+                    .noneMatch(as -> ((JCIdent)as).sym.equals(e.sym))) {
                 return M.Literal(true);
             }
             return M.Literal(false);
@@ -355,21 +352,21 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             List<JCIdent> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
                     .map(as -> (JCIdent)as)
                     .filter(as -> !as.type.isPrimitive())
-                    .filter(as -> isSuperType(as.type , lhs.type) || isSuperType(lhs.type , as.type))
+                    .filter(as -> isSuperType(as.type , e.type) || isSuperType(e.type , as.type))
                     .collect(Collectors.toList()));
             if(pot.size() == 0) {
                 return M.Literal(true);
             }
-            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), lhs);
+            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), e);
             if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.")) {
-                expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), lhs);
+                expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), e);
             }
             for(int i = 1; i < pot.size(); ++i) {
                 if(!pot.get(i).sym.owner.equals(currentSymbol) && !pot.get(i).toString().startsWith("this.")) {
-                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(i)), lhs);
+                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(i)), e);
                     expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
                 } else {
-                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i), lhs);
+                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i), e);
                     expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
                 }
             }
@@ -387,15 +384,14 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCArrayAccess e) {
-        JCArrayAccess lhs = e;
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
                 .map(arr -> ((JmlStoreRefArrayRange)arr))
                 .collect(Collectors.toList()));
-        JCExpression expr = editAssignable(lhs.indexed);
+        JCExpression expr = editAssignable(e.indexed);
         if(pot.size() == 0) {
             return expr;
         }
-        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.indexed);
+        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, e.indexed);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
@@ -408,12 +404,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             if(lo == null) {
                 lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
             }
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.getIndex(), hi));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.getIndex(), lo));
         }
         expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
         for(int i = 1; i < pot.size(); ++i) {
-            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, lhs.indexed);
+            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, e.indexed);
             if(pot.get(i).lo != null || pot.get(0).hi != null) {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
@@ -423,8 +419,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 if(lo == null) {
                     lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
                 }
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.getIndex(), hi));
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.getIndex(), lo));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.getIndex(), hi));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.getIndex(), lo));
             }
             expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
         }
@@ -432,15 +428,14 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JmlStoreRefArrayRange e) {
-        JmlStoreRefArrayRange lhs = e;
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
                 .map(arr -> ((JmlStoreRefArrayRange)arr))
                 .collect(Collectors.toList()));
-        JCExpression expr = editAssignable(lhs.expression);
+        JCExpression expr = editAssignable(e.expression);
         if(pot.size() == 0) {
             return expr;
         }
-        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, lhs.expression);
+        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, e.expression);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
@@ -450,12 +445,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             if(lo == null) {
                 lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
             }
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.hi, hi));
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.lo, lo));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.hi, hi));
+            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.lo, lo));
         }
         expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
         for(int i = 1; i < pot.size(); ++i) {
-            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, lhs.expression);
+            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, e.expression);
             if(pot.get(i).lo != null || pot.get(0).hi != null) {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
@@ -465,8 +460,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 if(lo == null) {
                     lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
                 }
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, lhs.hi, hi));
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, lhs.lo, lo));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.hi, hi));
+                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.lo, lo));
             }
             expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
         }
@@ -515,7 +510,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     private JCExpression editAssignable(JCExpression lhs, JCExpression assignable) {
-        List tmp = currentAssignable;
+        List<JCExpression> tmp = currentAssignable;
         currentAssignable = List.of(assignable);
         JCExpression res = editAssignable(lhs, false);
         currentAssignable = tmp;
@@ -524,7 +519,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     private JCExpression editAssignable(JCExpression lhs, JCExpression assignable, boolean ignoreLocals) {
-        List tmp = currentAssignable;
+        List<JCExpression> tmp = currentAssignable;
         currentAssignable = List.of(assignable);
         JCExpression res = editAssignable(lhs, ignoreLocals);
         currentAssignable = tmp;
