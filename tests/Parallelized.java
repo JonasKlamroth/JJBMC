@@ -1,3 +1,5 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.runners.Parameterized;
 import org.junit.runners.model.RunnerScheduler;
 
@@ -9,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Parallelized extends Parameterized
 {
-
     private static class ThreadPoolScheduler implements RunnerScheduler
     {
         private ExecutorService executor;
@@ -17,7 +18,7 @@ public class Parallelized extends Parameterized
         public ThreadPoolScheduler(int numThreads)
         {
             executor = Executors.newFixedThreadPool(numThreads);
-            System.out.println("Parallelize test with " + numThreads + " threads.");
+            log.info("Parallelize test with " + numThreads + " threads.");
         }
 
         public ThreadPoolScheduler()
@@ -25,7 +26,7 @@ public class Parallelized extends Parameterized
             String threads = System.getProperty("junit.parallel.threads", "8");
             int numThreads = Integer.parseInt(threads);
             executor = Executors.newFixedThreadPool(numThreads);
-            System.out.println("Parallelize test with " + numThreads + " threads.");
+            log.info("Parallelize test with " + numThreads + " threads.");
         }
 
         @Override
@@ -49,6 +50,8 @@ public class Parallelized extends Parameterized
         }
     }
 
+    private static Logger log = LogManager.getLogger(Parallelized.class);
+
     public Parallelized(Class klass) throws Throwable
     {
         super(klass);
@@ -59,7 +62,7 @@ public class Parallelized extends Parameterized
                 int numThreads = fThreads.getInt(null);
                 tps = new ThreadPoolScheduler(numThreads);
             } else {
-                System.out.println("numThreads variable has to be static and final. Using default value.");
+                log.warn("numThreads variable has to be static and final. Using default value.");
                 tps = new ThreadPoolScheduler();
             }
         } catch (NoSuchFieldException e) {

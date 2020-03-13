@@ -1,5 +1,7 @@
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.Factory;
 import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class FunctionNameVisitor extends JmlTreeScanner {
+    private static Logger log = LogManager.getLogger(FunctionNameVisitor.class);
     static private List<String> functionNames = new ArrayList<>();
     static private List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static private List<String> unwinds = new ArrayList<>();
@@ -51,7 +54,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
                 try {
                     unwinds.add(((JCTree.JCAssign) annotation.args.get(0)).rhs.toString());
                 } catch (Exception e) {
-                    System.out.println("Cannot parse annotation " + annotation.toString());
+                    log.warn("Cannot parse annotation " + annotation.toString());
                 }
             } else {
                 functionBehaviours.add(TestBehaviour.Ignored);
@@ -79,7 +82,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
             for (JmlTree.JmlCompilationUnit it : cu) {
-                //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
+                //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
                 it.accept(fnv);
             }

@@ -13,6 +13,8 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -37,6 +39,7 @@ import static org.jmlspecs.openjml.ext.RequiresClause.requiresClauseKind;
  * Created by jklamroth on 11/14/18.
  */
 public class JmlExpressionVisitor extends JmlTreeCopier {
+    private static Logger log = LogManager.getLogger(JmlExpressionVisitor.class);
     private final Maker M;
     private final Names names;
     private final Symtab syms;
@@ -401,7 +404,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
         }
         if(empty) {
-            System.out.println("Warning: Found loop-spcification without modifies clause. Currently only specified variables are havoced.");
+            log.warn("Found loop-spcification without modifies clause. Currently only specified variables are havoced.");
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
@@ -941,7 +944,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 //        newStatements = List.nil();
 //        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
 //        return M.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
-        System.out.println("Warning: Blockcontracts are currently not supported (ignored).");
+        log.warn("Blockcontracts are currently not supported (ignored).");
         return null;
     }
 

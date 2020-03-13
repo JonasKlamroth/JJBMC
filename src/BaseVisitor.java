@@ -4,6 +4,8 @@ import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
@@ -18,6 +20,7 @@ import static org.jmlspecs.openjml.JmlTree.*;
  * Created by jklamroth on 11/13/18.
  */
 public class BaseVisitor extends FilterVisitor {
+    private static Logger log = LogManager.getLogger(BaseVisitor.class);
     private boolean used = false;
     private JCTree.JCClassDecl returnExcClass;
     private final ClassReader reader;
@@ -48,7 +51,7 @@ public class BaseVisitor extends FilterVisitor {
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
         if(that.sym.flatname.toString().contains("$")) {
-            System.out.println("Inner classes currently only copied.");
+            log.warn("Inner classes currently only copied.");
             return that;
         }
         Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);

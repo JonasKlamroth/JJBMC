@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.logging.log4j.*;
 
 import static picocli.CommandLine.*;
 
@@ -25,6 +26,7 @@ import static picocli.CommandLine.*;
 
 @Command(name = "openJBMC", header = "@|bold openJBMC Bounded Model checking for JML|@")
 public class CLI implements Runnable {
+    private static Logger log = LogManager.getLogger(CLI.class);
 
     public static final String RESET = "\033[0m";  // Text Reset
     public static final String RED_BOLD = "\033[1;31m";    // RED
@@ -80,14 +82,14 @@ public class CLI implements Runnable {
         java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
         int a = api.typecheck(cu);
         if(a > 0) {
-            System.out.println("OpenJml parser Error.");
+            log.warn("OpenJml parser Error.");
             return null;
         }
         Context ctx = api.context();
 
 
         for (JmlTree.JmlCompilationUnit it : cu) {
-            //System.out.println(api.prettyPrint(rewriteRAC(it, ctx)));
+            //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
             JCTree t = rewriteAssert(it, ctx);
             return api.prettyPrint(t);
         }
@@ -126,7 +128,7 @@ public class CLI implements Runnable {
         try {
             File f = new File(fileName);
             if(!f.exists()) {
-                System.out.println("Could not find file " + f);
+                log.error("Could not find file " + f);
                 return null;
             }
             tmpFolder = new File(f.getParentFile(), "tmp");
@@ -161,7 +163,7 @@ public class CLI implements Runnable {
             commands[0] = "javac";
             commands[1] = tmpFile.getAbsolutePath();
             System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
-            System.out.println("Compiling translated file: " + Arrays.toString(commands));
+            log.debug("Compiling translated file: " + Arrays.toString(commands));
             Process proc = rt.exec(commands);
             proc.waitFor();
 
@@ -175,18 +177,18 @@ public class CLI implements Runnable {
             // read the output from the command
             String s = stdInput.readLine();
             if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.getPath());
+                log.error("Error compiling file: " + tmpFile.getPath());
                 while (s != null) {
-                    System.out.println(s);
+                    log.debug(s);
                     s = stdInput.readLine();
                 }
                 return null;
             }
             s = stdError.readLine();
             if (s != null) {
-                System.out.println("Error compiling file: " + tmpFile.getPath());
+                log.error("Error compiling file: " + tmpFile.getPath());
                 while (s != null) {
-                    System.out.println(s);
+                    log.debug(s);
                     s = stdError.readLine();
                 }
                 return null;
@@ -194,33 +196,33 @@ public class CLI implements Runnable {
 
 
         } catch (IOException | InterruptedException e) {
-            System.out.println("Error during preparation.");
+            log.error("Error during preparation.");
             e.printStackTrace();
         }
         //cleanUp();
-        System.out.println("Complilation sucessfull.");
+        log.debug("Complilation sucessfull.");
         return tmpFile;
     }
 
     static public void translateAndRunJBMC() {
         File tmpFile = prepareForJBMC();
         if(tmpFile == null) {
-            System.out.println("Error preparing translation.");
+            log.error("Error preparing translation.");
             return;
         }
-        System.out.println("Parse function names.");
+        log.debug("Parse function names.");
         FunctionNameVisitor.parseFile(fileName);
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
             functionNames = functionNames.stream().filter(f -> f.contains("." + functionName)).collect(Collectors.toList());
             if(functionNames.size() == 0) {
-                System.out.println("Function " + functionName + " could not be found in the specified file.");
-                System.out.println("Found the following functions: " + allFunctionNames.toString());
+                log.warn("Function " + functionName + " could not be found in the specified file.");
+                log.warn("Found the following functions: " + allFunctionNames.toString());
                 return;
             }
         }
-        System.out.println("Run jbmc for " +functionNames.size() + " functions.");
+        log.info("Run jbmc for " +functionNames.size() + " functions.");
         int NTHREADS = 4;
         ExecutorService executerService = Executors.newFixedThreadPool(NTHREADS);
         for(String functionName : functionNames) {
@@ -270,7 +272,7 @@ public class CLI implements Runnable {
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
-            System.out.println(out + "\n" + Arrays.toString( commands ));
+            log.debug(out + "\n" + Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
             Process proc = rt.exec(commands, null, tmpFolder);
@@ -319,10 +321,10 @@ public class CLI implements Runnable {
             } else {
                 out += "JBMC terminated normally." + "\n";
             }
-            System.out.println(out);
+            log.info(out);
 
        } catch (Exception e) {
-            System.out.println("Error running jbmc.");
+            log.error("Error running jbmc.");
             e.printStackTrace();
         }
     }
@@ -330,7 +332,7 @@ public class CLI implements Runnable {
     static private void createCProverFolder(String fileName) {
         File f = new File(fileName);
         File dir = new File(f.getParent() + File.separator + "org" + File.separator + "cprover");
-        System.out.println("Copying CProver.java to " + dir.getAbsolutePath());
+        log.debug("Copying CProver.java to " + dir.getAbsolutePath());
         dir.mkdirs();
         try {
             InputStream is = Main.class.getResourceAsStream("CProver.java");
@@ -370,7 +372,7 @@ public class CLI implements Runnable {
             proc.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            System.out.println("Could not copy jbmc.");
+            log.error("Could not copy jbmc.");
             return false;
         }
         return true;
@@ -391,7 +393,7 @@ public class CLI implements Runnable {
       //                  Files.delete(tmpFolder.toPath());
       //              }
       //          } catch (IOException e) {
-      //              //System.out.println("Could not delete tmp folder.");
+      //              //log.info("Could not delete tmp folder.");
       //          }
       //      }
       //  }
@@ -411,7 +413,7 @@ public class CLI implements Runnable {
                         Files.delete(f.toPath());
                     }
                 } catch (IOException ex) {
-                    //System.out.println("Could not delete temporary file: " + f.getAbsolutePath());
+                    //log.info("Could not delete temporary file: " + f.getAbsolutePath());
                 }
             }
         }

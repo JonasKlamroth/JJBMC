@@ -1,3 +1,5 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class XmlParser {
+    private static Logger log = LogManager.getLogger(XmlParser.class);
 
     public static JBMCOutput parse(String xmlFile, String sourceFile) {
         File xmlF = new File(xmlFile);
@@ -79,7 +82,7 @@ public class XmlParser {
             try {
                 lines = Files.readAllLines(f1.toPath());
             } catch (IOException e) {
-                System.out.println("Error reading file: " + f1.getAbsolutePath());
+                log.error("Error reading file: " + f1.getAbsolutePath());
                 return null;
             }
             Document doc = xmlDoc;
@@ -165,7 +168,7 @@ public class XmlParser {
                                                     for (int k = 0; k < m.groupCount(); ++k) {
                                                         if (k % 3 == 2 && m.group(k + 1) != null && !m.group(k + 1).equals("")) {
                                                             args.add(m.group(k + 1));
-                                                            //System.out.println("Found arg " + args.get(args.size() - 1));
+                                                            //log.info("Found arg " + args.get(args.size() - 1));
                                                         }
                                                     }
                                                 }
@@ -178,15 +181,15 @@ public class XmlParser {
                                                 if (argNum >= 0 && argNum < args.size()) {
                                                     guess = args.get(argNum);
                                                 } else {
-                                                    //System.out.println("argNum to big.");
+                                                    //log.info("argNum to big.");
                                                 }
                                             }
                                             references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
                                         }
                                     }
-                                    //  System.out.println("in Line " + aLocation.getAttribute("line") + ": " + lhs.getTextContent() + " = " + value.getTextContent());
-                                    //  System.out.println(lines.get(Integer.parseInt(aLocation.getAttribute("line")) - 1));
-                                    //  System.out.println("guess " + guess);
+                                    log.debug("in Line " + aLocation.getAttribute("line") + ": " + lhs.getTextContent() + " = " + value.getTextContent());
+                                    log.debug(lines.get(Integer.parseInt(aLocation.getAttribute("line")) - 1));
+                                    //  log.info("guess " + guess);
                                 }
                             }
                         }
@@ -200,7 +203,7 @@ public class XmlParser {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error parsing xml file.");
+            log.info("Error parsing xml file.");
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = null;
             try {
@@ -217,7 +220,7 @@ public class XmlParser {
                 ex.printStackTrace();
             }
             String output = writer.toString();
-            System.out.println(output);
+            log.info(output);
             e.printStackTrace();
         }
 

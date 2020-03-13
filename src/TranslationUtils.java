@@ -10,6 +10,8 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -32,6 +34,7 @@ import static com.sun.tools.javac.util.List.*;
  * A utils class which provides several helper methods for the translation.
  */
 public class TranslationUtils {
+    private static Logger log = LogManager.getLogger(TranslationUtils.class);
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final JmlTree.Maker M;
@@ -288,14 +291,14 @@ public class TranslationUtils {
                     if(fexpr.selected.toString().equals("this")) {
                         throw new RuntimeException("havocing this.* is not supported.");
                     }
-                    System.out.println("havocing o.* is currently not translated soundly.");
+                    log.warn("havocing o.* is currently not translated soundly.");
                     res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
                 } else {
                     res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(fexpr.type, currentSymbol))));
                 }
             } else if(expr instanceof JmlStoreRefKeyword) {
                 if(((JmlStoreRefKeyword) expr).token.equals(JmlTokenKind.BSEVERYTHING)) {
-                    System.out.println("NOTE: Havoc of \\everything is currently not supported. In method: " + currentSymbol.toString());
+                    log.warn("NOTE: Havoc of \\everything is currently not supported. In method: " + currentSymbol.toString());
                 }
             } else {
                 throw new RuntimeException("Havoc for expression " + expr + " not supported");
