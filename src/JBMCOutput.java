@@ -65,51 +65,59 @@ public class JBMCOutput {
         Collections.reverse(newTrace);
         return newTrace;
     }
-    public void printTrace(String property, boolean printGuesses) {
+    public String printTrace(String property, boolean printGuesses) {
+        StringBuilder sb = new StringBuilder();
         int idx = properties.indexOf(property);
         if(idx == -1) {
-            return;
+            return "";
         }
         List<Assignment> trace = traces.get(idx);
         if(trace == null) {
-            return;
+            return "";
         }
 
-        System.out.println("Trace for PVC: " + property + " in line " + lineNumbers.get(idx));
+        sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx));
         List<Assignment> filteredTrace = filterTrace(trace);
         if(printGuesses) {
             for (Assignment a : filteredTrace) {
-                System.out.println(a);
+                sb.append(a);
             }
         } else {
             for (Assignment a: filteredTrace) {
-                a.toString1();
+                sb.append(a.toString1());
             }
         }
-        System.out.println("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")");
+        sb.append("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")");
+        return sb.toString();
     }
 
-    public void printTrace(String property) {
-        printTrace(property, true);
+    public String printTrace(String property) {
+        return printTrace(property, true);
     }
 
-    public void printErrors() {
+    public String printErrors() {
+        StringBuilder sb = new StringBuilder();
         for(String e : errors) {
-            System.out.println(e);
+            sb.append(e);
         }
+        return sb.toString();
     }
-    public void printAllTraces() {
+    public String printAllTraces() {
+        StringBuilder sb = new StringBuilder();
         for(String s : properties) {
-            printTrace(s);
+            sb.append(printTrace(s));
         }
+        return sb.toString();
     }
 
-    public void printStatus() {
-        System.out.println(proverStatus);
+    public String printStatus() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(proverStatus);
         if(errors.size() > 0) {
             for(String error : errors) {
-                System.out.println(error);
+                sb.append(error);
             }
         }
+        return sb.toString();
     }
 }

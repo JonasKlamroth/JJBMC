@@ -12,7 +12,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static picocli.CommandLine.*;
 
@@ -218,9 +221,24 @@ public class CLI implements Runnable {
             }
         }
         System.out.println("Run jbmc for " +functionNames.size() + " functions.");
+        int NTHREADS = 4;
+        ExecutorService executerService = Executors.newFixedThreadPool(NTHREADS);
         for(String functionName : functionNames) {
             //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
-            runJBMC(tmpFile, functionName);
+            Runnable worker = new Runnable() {
+                @Override
+                public void run() {
+                    runJBMC(tmpFile, functionName);
+                }
+            };
+            //runJBMC(tmpFile, functionName);
+            executerService.execute(worker);
+        }
+        executerService.shutdown();
+        try {
+            executerService.awaitTermination(10000, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -234,7 +252,7 @@ public class CLI implements Runnable {
 
     static public void runJBMC(File tmpFile, String functionName) {
         try {
-            System.out.println("Running jbmc for function: " + functionName);
+            String out  = "Running jbmc for function: " + functionName;
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
             String classFile = tmpFile.getName().replace(".java", ".class");
 
@@ -252,7 +270,7 @@ public class CLI implements Runnable {
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
-            System.out.println(Arrays.toString( commands ));
+            System.out.println(out + "\n" + Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
             Process proc = rt.exec(commands, null, tmpFolder);
@@ -288,19 +306,20 @@ public class CLI implements Runnable {
             if(output == null) {
                 throw new RuntimeException("Error parsing xml-output of JBMC.");
             }
+            out = "Result for function " + functionName + ":";
             if(output.errors.size() == 0) {
-                output.printAllTraces();
-                output.printStatus();
+                out += output.printAllTraces() + "\n";
+                out += output.printStatus() + "\n";
             } else {
-                output.printErrors();
+                out += output.printErrors() + "\n";
             }
 
             if(proc.exitValue() != 0 && proc.exitValue() != 10) {
-                System.out.println("JBMC did not terminate as expected.");
+                out += "JBMC did not terminate as expected." + "\n";
             } else {
-                System.out.println("JBMC terminated normally.");
+                out += "JBMC terminated normally." + "\n";
             }
-
+            System.out.println(out);
 
        } catch (Exception e) {
             System.out.println("Error running jbmc.");

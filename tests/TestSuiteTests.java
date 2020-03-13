@@ -1,14 +1,26 @@
-import junitparams.JUnitParamsRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.util.Collection;
 
-@RunWith(JUnitParamsRunner.class)
+@RunWith(Parallelized.class)
 public class TestSuiteTests {
+    public static final int numThreads = 16;
+
+    @Parameterized.Parameter(value = 0)
+    public String classFile;
+    @Parameterized.Parameter(value = 1)
+    public String function;
+    @Parameterized.Parameter(value = 2)
+    public String unwind;
+    @Parameterized.Parameter(value = 3)
+    public FunctionNameVisitor.TestBehaviour behaviour;
+    @Parameterized.Parameter(value = 4)
+    public String parentFolder;
 
     @BeforeClass
     public static void init() {
@@ -21,14 +33,14 @@ public class TestSuiteTests {
         CLI.cleanUp();
     }
 
-    public static Collection<Object[]> TestSuiteParameter() {
+    @Parameterized.Parameters
+    public static Collection<Object[]> getParameters() {
         init();
         return Utils.prepareParameters(Utils.baseTestFolder + "tests/TestSuite.java");
     }
 
     @Test
-    @junitparams.Parameters(method = "TestSuiteParameter")
-    public void runTestSuite(String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
+    public void runTestSuite() throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 
