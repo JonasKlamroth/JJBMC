@@ -136,7 +136,10 @@ public class CLI implements Runnable {
             tmpFile = new File(tmpFolder, f.getName());
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+            long start = System.currentTimeMillis();
             String translation = translate(tmpFile, apiArgs);
+            long finish = System.currentTimeMillis();
+            log.debug("Translation took: " + (finish - start) + "ms");
             if(translation != null) {
                 if (tmpFile.exists()) {
                     Files.delete(tmpFile.toPath());
@@ -227,12 +230,7 @@ public class CLI implements Runnable {
         ExecutorService executerService = Executors.newFixedThreadPool(NTHREADS);
         for(String functionName : functionNames) {
             //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
-            Runnable worker = new Runnable() {
-                @Override
-                public void run() {
-                    runJBMC(tmpFile, functionName);
-                }
-            };
+            Runnable worker = () -> runJBMC(tmpFile, functionName);
             //runJBMC(tmpFile, functionName);
             executerService.execute(worker);
         }
