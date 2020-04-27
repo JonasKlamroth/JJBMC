@@ -977,15 +977,21 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //newStatements = newStatements.append(ifst);
 
             if (currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                Symbol oldSymbol = currentSymbol;
-                currentSymbol = ((JCIdent) copy.meth).sym;
-                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
-                for (JCExpression a : assignables) {
-                    JCExpression cond = editAssignable(a);
-                    cond = treeutils.makeNot(Position.NOPOS, cond);
-                    newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
-                }
-                currentSymbol = oldSymbol;
+                log.warn("Framecondition for method invocations not yet supported.");
+//                Symbol oldSymbol = currentSymbol;
+//                currentSymbol = ((JCIdent) copy.meth).sym;
+//                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+//                for (JCExpression a : assignables) {
+//                    JCExpression cond = editAssignable(a);
+//                    cond = treeutils.makeNot(Position.NOPOS, cond);
+//                    JCStatement ass = transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT);
+//                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
+//                    for(int i = 0; i < sym.params.length(); ++i) {
+//                        ass = transUtils.replaceVarName(sym.params.get(i).name.toString(), copy.ar)
+//                    }
+//                    newStatements = newStatements.append(ass);
+//                }
+//                currentSymbol = oldSymbol;
             }
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
         }
