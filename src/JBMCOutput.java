@@ -76,18 +76,18 @@ public class JBMCOutput {
             return "";
         }
 
-        sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx));
+        sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
         List<Assignment> filteredTrace = filterTrace(trace);
         if(printGuesses) {
             for (Assignment a : filteredTrace) {
-                sb.append(a);
+                sb.append(a + "\n");
             }
         } else {
             for (Assignment a: filteredTrace) {
-                sb.append(a.toString1());
+                sb.append(a.toString1() + "\n");
             }
         }
-        sb.append("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")");
+        sb.append("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")\n");
         return sb.toString();
     }
 
@@ -112,7 +112,7 @@ public class JBMCOutput {
 
     public String printStatus() {
         StringBuilder sb = new StringBuilder();
-        sb.append(proverStatus);
+        sb.append(proverStatus + "\n");
         if(errors.size() > 0) {
             for(String error : errors) {
                 sb.append(error);

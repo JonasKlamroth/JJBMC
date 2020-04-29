@@ -252,7 +252,7 @@ public class CLI implements Runnable {
 
     static public void runJBMC(File tmpFile, String functionName) {
         try {
-            String out  = "Running jbmc for function: " + functionName;
+            log.debug("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
             String classFile = tmpFile.getName().replace(".java", ".class");
 
@@ -270,7 +270,7 @@ public class CLI implements Runnable {
             String[] commands = new String[tmp.size()];
             commands = tmp.toArray(commands);
 
-            log.debug(out + "\n" + Arrays.toString( commands ));
+            log.debug(Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
             Process proc = rt.exec(commands, null, tmpFolder);
@@ -306,20 +306,23 @@ public class CLI implements Runnable {
             if(output == null) {
                 throw new RuntimeException("Error parsing xml-output of JBMC.");
             }
-            out = "Result for function " + functionName + ":";
+            log.info("Result for function " + functionName + ":");
             if(output.errors.size() == 0) {
-                out += output.printAllTraces() + "\n";
-                out += output.printStatus() + "\n";
+                String traces = output.printAllTraces();
+                if(!traces.isEmpty()) {
+                    log.info(traces);
+                }
+                //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
+                log.info(output.printStatus());
             } else {
-                out += output.printErrors() + "\n";
+                log.error(output.printErrors());
             }
 
             if(proc.exitValue() != 0 && proc.exitValue() != 10) {
-                out += "JBMC did not terminate as expected." + "\n";
+                log.error("JBMC did not terminate as expected.");
             } else {
-                out += "JBMC terminated normally." + "\n";
+                log.debug("JBMC terminated normally.");
             }
-            log.info(out);
 
        } catch (Exception e) {
             log.error("Error running jbmc.");
