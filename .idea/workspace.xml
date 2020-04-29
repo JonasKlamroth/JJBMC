@@ -1,20 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d71aa112-5685-44c1-b21f-bd1faf5ec8bb" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/AssignableTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/AssignableTests2.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/TestSuiteTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/Utils.java" afterDir="false" />
+    <list default="true" id="d71aa112-5685-44c1-b21f-bd1faf5ec8bb" name="Default Changelist" comment="Adapting trace printing to the logger">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenJML/OpenJMLTest/test/gitbug672/commons-collections4-4.3-sources/META-INF/maven/org.apache.commons/commons-collections4/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/OpenJML/OpenJMLTest/test/gitbug672/commons-collections4-4.3-sources/META-INF/maven/org.apache.commons/commons-collections4/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/TestExecutor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/VerifyFunctionVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/BubbleSort.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/BubbleSort.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/tests/AssignableTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/AssignableTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testRes/tests/TestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/testRes/tests/TestSuite.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="64" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="openjmlToBMC" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="openjmlToBMC" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="openjmlToBMC" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="application" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="openjmlToBMC" type="f1a62948:ProjectNode" />
+                <item name="Run Configurations" type="7b0102dc:RunConfigurationsNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -30,97 +74,132 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="project.structure.last.edited" value="Facets" />
+    <property name="last.edited.regexp" value="Sample Text" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/testRes" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
+    <property name="show.unlinked.gradle.project.popup" value="true" />
   </component>
-  <component name="RunManager" selected="JUnit.TestSuiteTests">
-    <configuration name="AssignableTests and 2 more" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="TEST_OBJECT" value="pattern" />
-      <patterns>
-        <pattern testClass="AssignableTests" />
-        <pattern testClass="AssignableTests2" />
-        <pattern testClass="TestSuiteTests" />
-      </patterns>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/testRes" />
+      <recent name="$PROJECT_DIR$/testRes/tests/tmp" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.Tests in 'openjmlToBMC.test'">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="openjmlToBMC.main" />
+      <option name="PROGRAM_PARAMETERS" value="./testRes/BubbleSort.java -j=&quot;--unwind 7&quot; -j=--trace" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AssignableTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="AssignableTests" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="CaseStudies.runBubbleSortCS" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;CaseStudies.runBubbleSortCS&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
     </configuration>
-    <configuration name="AssignableTests2" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="AssignableTests2" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="TestSuiteTests" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests &quot;TestSuiteTests&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":cleanTest" />
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
     </configuration>
-    <configuration name="TestSuiteTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TestSuiteTests" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="Tests in 'openjmlToBMC.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="--tests *" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":cleanTest" />
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>false</GradleScriptDebugEnabled>
+      <method v="2" />
     </configuration>
-    <configuration name="*Tests*.java" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="openjmlToBMC" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="pattern" />
-      <option name="PARAMETERS" value="" />
-      <patterns>
-        <pattern testClass="*Tests*.java" />
-      </patterns>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="openjmlToBMC [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="./testRes/Gcd.java -j=&quot;--unwind 6&quot;" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="run" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
+      <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="JUnit.*Tests*.java" />
-      <item itemvalue="JUnit.AssignableTests" />
-      <item itemvalue="JUnit.AssignableTests and 2 more" />
-      <item itemvalue="JUnit.TestSuiteTests" />
-      <item itemvalue="JUnit.AssignableTests2" />
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Gradle.Tests in 'openjmlToBMC.test'" />
+      <item itemvalue="Gradle.TestSuiteTests" />
+      <item itemvalue="Gradle.openjmlToBMC [run]" />
+      <item itemvalue="Gradle.CaseStudies.runBubbleSortCS" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.TestSuiteTests" />
-        <item itemvalue="JUnit.AssignableTests2" />
-        <item itemvalue="JUnit.*Tests*.java" />
-        <item itemvalue="JUnit.AssignableTests and 2 more" />
-        <item itemvalue="JUnit.AssignableTests" />
+        <item itemvalue="Gradle.Tests in 'openjmlToBMC.test'" />
+        <item itemvalue="Gradle.CaseStudies.runBubbleSortCS" />
+        <item itemvalue="Gradle.openjmlToBMC [run]" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Gradle.TestSuiteTests" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -133,32 +212,253 @@
       <option name="presentableId" value="Default" />
       <updated>1578662440984</updated>
     </task>
+    <task id="LOCAL-00001" summary="updated gradle build (now no deprecated warnings)">
+      <created>1584019674661</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1584019674661</updated>
+    </task>
+    <task id="LOCAL-00002" summary="better debug output + fixing RangeExtractor + some refactoring">
+      <created>1584021333464</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1584021333465</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added gcd example + fixiing decreases translation (with tests)">
+      <created>1584026237536</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1584026237536</updated>
+    </task>
+    <task id="LOCAL-00004" summary="added isola abstract">
+      <created>1584026271070</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1584026271070</updated>
+    </task>
+    <task id="LOCAL-00005" summary="running jbmc now parallelized for multiple methods (test and normal)">
+      <created>1584104613632</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1584104613632</updated>
+    </task>
+    <task id="LOCAL-00006" summary="logging introduced.">
+      <created>1584116079537</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1584116079537</updated>
+    </task>
+    <task id="LOCAL-00007" summary="introducing time measure for translation">
+      <created>1587472593948</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1587472593948</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Adapting trace printing to the logger">
+      <created>1588171762344</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1588171762344</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/OpenJML" />
+    </ignored-roots>
+    <MESSAGE value="updated gradle build (now no deprecated warnings)" />
+    <MESSAGE value="better debug output + fixing RangeExtractor" />
+    <MESSAGE value="better debug output + fixing RangeExtractor + some refactoring" />
+    <MESSAGE value="added gcd example + fixiing decreases translation (with tests)" />
+    <MESSAGE value="added isola abstract" />
+    <MESSAGE value="running jbmc now parallelized for multiple methods (test and normal)" />
+    <MESSAGE value="logging introduced." />
+    <MESSAGE value="introducing time measure for translation" />
+    <MESSAGE value="Adapting trace printing to the logger" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adapting trace printing to the logger" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578668807445">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="555" y="215" width="800" height="684" key="#Inspections" timestamp="1584020971513">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="453" y="159" key="#com.intellij.execution.impl.EditConfigurationsDialog/70.27.1850.948@70.27.1850.948" timestamp="1578668807445" />
-    <state width="1804" height="241" key="GridCell.Tab.0.bottom" timestamp="1578668878636">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="555" y="215" width="800" height="684" key="#Inspections/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584020971513" />
+    <state x="308" y="21" width="740" height="698" key="#Main" timestamp="1587471663374">
+      <screen x="67" y="27" width="1213" height="692" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.bottom/70.27.1850.948@70.27.1850.948" timestamp="1578668878636" />
-    <state width="1804" height="241" key="GridCell.Tab.0.center" timestamp="1578668878635">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="308" y="21" width="740" height="698" key="#Main/67.27.1213.692@67.27.1213.692" timestamp="1587471663374" />
+    <state x="555" y="215" width="800" height="684" key="#Plugins" timestamp="1583858929366">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.center/70.27.1850.948@70.27.1850.948" timestamp="1578668878635" />
-    <state width="1804" height="241" key="GridCell.Tab.0.left" timestamp="1578668878635">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="555" y="215" width="800" height="684" key="#Plugins/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583858929366" />
+    <state x="135" y="24" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588060696240">
+      <screen x="67" y="27" width="1213" height="692" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.left/70.27.1850.948@70.27.1850.948" timestamp="1578668878635" />
-    <state width="1804" height="241" key="GridCell.Tab.0.right" timestamp="1578668878636">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="617" y="308" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584021520397" />
+    <state x="0" y="21" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.960.513/960.0.960.540@0.27.960.513" timestamp="1583925070958" />
+    <state x="135" y="24" key="#com.intellij.execution.impl.EditConfigurationsDialog/67.27.1213.692@67.27.1213.692" timestamp="1588060696240" />
+    <state x="768" y="266" width="374" height="582" key="#com.intellij.ide.util.MemberChooser" timestamp="1583942667009">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state width="1804" height="241" key="GridCell.Tab.0.right/70.27.1850.948@70.27.1850.948" timestamp="1578668878636" />
-    <state x="478" y="78" width="1022" height="852" key="SettingsEditor" timestamp="1578662888701">
-      <screen x="70" y="27" width="1850" height="948" />
+    <state x="768" y="266" width="374" height="582" key="#com.intellij.ide.util.MemberChooser/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583942667009" />
+    <state x="413" y="158" width="525" height="429" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1587471456888">
+      <screen x="67" y="27" width="1213" height="692" />
     </state>
-    <state x="478" y="78" width="1022" height="852" key="SettingsEditor/70.27.1850.948@70.27.1850.948" timestamp="1578662888701" />
+    <state x="413" y="158" width="525" height="429" key="#com.intellij.ide.util.TreeClassChooserDialog/67.27.1213.692@67.27.1213.692" timestamp="1587471456888" />
+    <state x="801" y="445" width="308" height="223" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1583857613493">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="801" y="445" width="308" height="223" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583857613493" />
+    <state x="901" y="385" width="699" height="695" key="#xdebugger.evaluate" timestamp="1584104160308">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="901" y="385" width="699" height="695" key="#xdebugger.evaluate/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584104160308" />
+    <state x="696" y="390" width="518" height="333" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1584020889687">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="696" y="390" width="518" height="333" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584020889687" />
+    <state x="364" y="37" width="916" height="604" key="CommitChangelistDialog2" timestamp="1588171762189">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state x="470" y="97" width="969" height="919" key="CommitChangelistDialog2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116079404" />
+    <state x="364" y="37" width="916" height="604" key="CommitChangelistDialog2/67.27.1213.692@67.27.1213.692" timestamp="1588171762189" />
+    <state width="445" height="568" key="DebuggerActiveHint" timestamp="1583933029890">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="445" height="568" key="DebuggerActiveHint/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583933029890" />
+    <state x="459" y="64" width="499" height="638" key="FileChooserDialogImpl" timestamp="1587472297344">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state x="459" y="64" width="499" height="638" key="FileChooserDialogImpl/67.27.1213.692@67.27.1213.692" timestamp="1587472297344" />
+    <state width="1167" height="199" key="GridCell.Tab.0.bottom" timestamp="1588173129730">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="346" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133631" />
+    <state width="1234" height="156" key="GridCell.Tab.0.bottom/0.27.960.513/960.0.960.540@0.27.960.513" timestamp="1583925073577" />
+    <state width="1167" height="199" key="GridCell.Tab.0.bottom/67.27.1213.692@67.27.1213.692" timestamp="1588173129730" />
+    <state width="1167" height="199" key="GridCell.Tab.0.center" timestamp="1588173129729">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="346" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133631" />
+    <state width="1234" height="156" key="GridCell.Tab.0.center/0.27.960.513/960.0.960.540@0.27.960.513" timestamp="1583925073577" />
+    <state width="1167" height="199" key="GridCell.Tab.0.center/67.27.1213.692@67.27.1213.692" timestamp="1588173129729" />
+    <state width="1167" height="199" key="GridCell.Tab.0.left" timestamp="1588173129728">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="346" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133631" />
+    <state width="1234" height="156" key="GridCell.Tab.0.left/0.27.960.513/960.0.960.540@0.27.960.513" timestamp="1583925073577" />
+    <state width="1167" height="199" key="GridCell.Tab.0.left/67.27.1213.692@67.27.1213.692" timestamp="1588173129728" />
+    <state width="1167" height="199" key="GridCell.Tab.0.right" timestamp="1588173129730">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="346" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133631" />
+    <state width="1234" height="156" key="GridCell.Tab.0.right/0.27.960.513/960.0.960.540@0.27.960.513" timestamp="1583925073577" />
+    <state width="1167" height="199" key="GridCell.Tab.0.right/67.27.1213.692@67.27.1213.692" timestamp="1588173129730" />
+    <state width="1167" height="196" key="GridCell.Tab.1.bottom" timestamp="1588172661709">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="342" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133627" />
+    <state width="1167" height="196" key="GridCell.Tab.1.bottom/67.27.1213.692@67.27.1213.692" timestamp="1588172661709" />
+    <state width="1167" height="196" key="GridCell.Tab.1.center" timestamp="1588172661709">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="342" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133627" />
+    <state width="1167" height="196" key="GridCell.Tab.1.center/67.27.1213.692@67.27.1213.692" timestamp="1588172661709" />
+    <state width="1167" height="196" key="GridCell.Tab.1.left" timestamp="1588172661709">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="342" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133627" />
+    <state width="1167" height="196" key="GridCell.Tab.1.left/67.27.1213.692@67.27.1213.692" timestamp="1588172661709" />
+    <state width="1167" height="196" key="GridCell.Tab.1.right" timestamp="1588172661709">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="1874" height="342" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116133627" />
+    <state width="1167" height="196" key="GridCell.Tab.1.right/67.27.1213.692@67.27.1213.692" timestamp="1588172661709" />
+    <state x="603" y="215" width="704" height="683" key="RollbackChangesDialog" timestamp="1584026184774">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="603" y="215" width="704" height="683" key="RollbackChangesDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584026184774" />
+    <state x="334" y="21" width="900" height="692" key="SettingsEditor" timestamp="1587472329514">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state x="423" y="84" key="SettingsEditor/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583856314934" />
+    <state x="334" y="21" width="900" height="692" key="SettingsEditor/67.27.1213.692@67.27.1213.692" timestamp="1587472329514" />
+    <state x="418" y="193" width="514" height="352" key="Vcs.Push.Dialog.v2" timestamp="1587472595924">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584116086764" />
+    <state x="418" y="193" width="514" height="352" key="Vcs.Push.Dialog.v2/67.27.1213.692@67.27.1213.692" timestamp="1587472595924" />
+    <state width="606" height="349" key="XDebugger.FullValuePopup" timestamp="1588062565930">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state width="606" height="349" key="XDebugger.FullValuePopup/67.27.1213.692@67.27.1213.692" timestamp="1588062565930" />
+    <state x="616" y="381" key="com.intellij.ide.util.TipDialog" timestamp="1583858941848">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="616" y="381" key="com.intellij.ide.util.TipDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1583858941848" />
+    <state x="439" y="149" width="709" height="570" key="find.popup" timestamp="1588171148888">
+      <screen x="67" y="27" width="1213" height="692" />
+    </state>
+    <state x="589" y="244" width="1122" height="646" key="find.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584115479824" />
+    <state x="439" y="149" width="709" height="570" key="find.popup/67.27.1213.692@67.27.1213.692" timestamp="1588171148888" />
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1584096204360">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="623" y="259" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1584096204360" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/TranslationUtils.java</url>
+          <line>498</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/tests/Parallelized.java</url>
+          <line>26</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/tests/Parallelized.java</url>
+          <line>61</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/tests/CaseStudies.java</url>
+          <line>27</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CLI.java</url>
+          <line>314</line>
+          <properties>
+            <option name="lambda-ordinal" value="-1" />
+          </properties>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CLI.java</url>
+          <line>182</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/CLI.java</url>
+          <line>191</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/openjmlToBMC$TestSuiteTests.ic" NAME="TestSuiteTests Coverage Results" MODIFIED="1583943387042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

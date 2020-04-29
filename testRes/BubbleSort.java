@@ -1,9 +1,9 @@
 public class BubbleSort {
     /*@
-  @ requires arr != null && arr.length <= 5;
-  @ ensures (\forall int v; v >= 0 && v <= \result.length - 1; (\forall int w; w >= 0 && w <= v - 1; \result[v] >= \result[w]));
-  @ assignable arr[*];
-  @*/
+      @ requires arr != null && arr.length <= 5;
+      @ ensures (\forall int v; v >= 0 && v <= \result.length - 1; (\forall int w; w >= 0 && w <= v - 1; \result[v] >= \result[w]));
+      @ assignable arr[*];
+      @*/
     static int[] sort(int arr[]) {
         for(int j = arr.length - 1; j >= 0; --j) {
             for (int i = 0; i < j; ++i) {

@@ -443,6 +443,7 @@ public class AssignableTests {
         return 56;
     }
 
+    /*
     //@ assignable pubInt;
     @Fails
     private void methodInvAss(int i) {
@@ -485,7 +486,7 @@ public class AssignableTests {
     @Fails
     private void methodInvAss6(int i) {
         test3();
-    }
+    }*/
 
     //@ assignable \everything;
     private void test() {}

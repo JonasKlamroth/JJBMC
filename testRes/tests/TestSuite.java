@@ -689,6 +689,13 @@ public class TestSuite {
         pubInt += c;
     }
 
+    //@requires arr != null && arr.length > 0;
+    //@requires arr[0] != 0;
+    @Verifyable
+    private void oldTest2() {
+        arr[0] = 1;
+    }
+
     //@ ensures pubInt == \old(pubInt) + c;
     @Verifyable
     private void oldTest(int c) {

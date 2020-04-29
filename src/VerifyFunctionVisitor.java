@@ -172,6 +172,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if(combinedNewReqStatements.size() > 0) {
             l = l.appendList(combinedNewReqStatements);
         }
+
+        //adding the variable for old clauses
+        for(JCVariableDecl variableDecl : oldVars.values()) {
+            l = l.append(variableDecl);
+        }
+
         if(returnVar != null) {
             l = l.append(returnVar);
         }
@@ -181,9 +187,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             l = l.append(returnStmt);
         }
 
-        for(JCVariableDecl variableDecl : oldVars.values()) {
-            l = l.prepend(variableDecl);
-        }
+
         currentMethod.body = M.Block(0L, l);
 
         currentMethod.methodSpecsCombined = null;
