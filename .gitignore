@@ -1,0 +1,16 @@
+#ignore tmp files
+*~
+*.swp
+*tmp.java
+/testRes/tests/tmp/
+
+#Java
+*.class
+
+#Gradle
+build/
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
