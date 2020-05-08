@@ -50,8 +50,11 @@ task fatJar(type: Jar) {
     manifest {
         attributes "Main-Class": "Main"
     }
-    archiveBaseName = 'fatJar'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    archiveBaseName = 'JJBMC'
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
     with jar
 }
 
