@@ -43,11 +43,16 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
             if(that.list.stream().anyMatch(loc -> loc instanceof JmlTree.JmlStoreRefKeyword
                     && ((JmlTree.JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
                 if(that.list.size() + assignables.size() > 1) {
-                    throw new RuntimeException("Assignable containing \\nothing and something else is not valid.");
+                    throw new RuntimeException("Assignable containing \\nothing and something else is not valid " +
+                            "for method " + currentMethod.getName());
                 }
                 foundNothing = true;
             } else {
-                assignables = assignables.appendList(that.list);
+                for(JCTree.JCExpression e : that.list) {
+                    if (!assignables.contains(e)) {
+                        assignables = assignables.append(e);
+                    }
+                }
             }
         }
         return super.visitJmlMethodClauseStoreRef(that, p);

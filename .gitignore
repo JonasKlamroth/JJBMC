@@ -2,10 +2,13 @@
 *~
 *.swp
 *tmp.java
-/testRes/tests/tmp/
+**/tmp
 
 #Java
 *.class
+
+#IntelliJ
+.idea/
 
 #Gradle
 build/

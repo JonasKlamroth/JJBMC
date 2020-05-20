@@ -9,9 +9,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
@@ -35,9 +37,6 @@ public class CLI implements Runnable {
     @Option(names = {"-kt", "-keepTranslation"}, description = "Keep the temporary file which contains the translation of the given file.")
     static boolean keepTranslation = false;
 
-    @Option(names = {"-va", "-verifyAll"}, description = "Verify all functions not just one.")
-    static boolean verifyAll = false;
-
     @Parameters(index="0", arity = "1", description = "The file containing methods to be verified.")
     static String fileName = null;
 
@@ -54,11 +53,32 @@ public class CLI implements Runnable {
             description = "Print usage help and exit.")
     static boolean usageHelpRequested;
 
+
+    @Option(names = {"-fi", "-forceInlining"},
+            description = "Inline methods and unroll loops even if a contract is available")
+    public static boolean forceInlining;
+
+    @Option(names = {"-fil", "-forceInliningLoopsOnly"},
+            description = "Unroll loops even if a loop contract is available")
+    public static boolean forceInliningLoops;
+
+    @Option(names = {"-fim", "-forceInliningMethodsOnly"},
+            description = "Inline methods even if a method contract is available")
+    public static boolean forceInliningMethods;
+
+    @Option(names = {"-t", "-timed"},
+            description = "Print out timing information.")
+    public static boolean timed;
+
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
 
     @Override
     public void run() {
+        if(forceInlining) {
+            forceInliningLoops = true;
+            forceInliningMethods = true;
+        }
         translateAndRunJBMC();
     }
 
@@ -273,6 +293,7 @@ public class CLI implements Runnable {
             log.debug(Arrays.toString( commands ));
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
+            long start = System.currentTimeMillis();
             Process proc = rt.exec(commands, null, tmpFolder);
 
             BufferedReader stdInput = new BufferedReader(new
@@ -300,6 +321,7 @@ public class CLI implements Runnable {
 
             //Has to stay down here otherwise not reading the output may block the process
             proc.waitFor();
+            long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
             JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile);
@@ -307,6 +329,9 @@ public class CLI implements Runnable {
                 throw new RuntimeException("Error parsing xml-output of JBMC.");
             }
             log.info("Result for function " + functionName + ":");
+            if(timed) {
+                log.info("JBMC took " + (end - start) + "ms.");
+            }
             if(output.errors.size() == 0) {
                 String traces = output.printAllTraces();
                 if(!traces.isEmpty()) {

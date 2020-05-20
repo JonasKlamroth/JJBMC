@@ -13,6 +13,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 
 sourceCompatibility = 1.8
+test.testLogging.showStandardStreams = true
 
 sourceSets {
    main {

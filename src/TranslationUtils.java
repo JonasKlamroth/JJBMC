@@ -280,7 +280,9 @@ public class TranslationUtils {
                         JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
                         Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                         List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
-                        res = res.append(makeStandardLoop(range, body, loopVar, currentSymbol));
+                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit), M));
+                        JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, body, loopVar, currentSymbol))), null);
+                        res = res.append(ifst);
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("Cant havoc expression " + expr);
                     }

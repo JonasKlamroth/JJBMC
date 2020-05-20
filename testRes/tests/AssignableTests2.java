@@ -36,4 +36,6 @@ public class AssignableTests2 {
     private void assignableTest15() {
         t2.objects[2].t2 = new TestSuite();
     }
+
+
 }

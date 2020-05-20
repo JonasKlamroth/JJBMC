@@ -40,7 +40,7 @@ public class Utils {
         File tmpFile = CLI.prepareForJBMC(fileName);
         if(tmpFile == null) {
             log.error("Someting went wrong. Test aborted.");
-            throw new RuntimeException();
+            throw new RuntimeException("Tmpfile was not created. abort test.");
         }
         String classFile = tmpFile.getPath().replace(".java", ".class");
 

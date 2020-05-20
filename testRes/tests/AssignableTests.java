@@ -443,7 +443,7 @@ public class AssignableTests {
         return 56;
     }
 
-    /*
+
     //@ assignable pubInt;
     @Fails
     private void methodInvAss(int i) {
@@ -486,7 +486,29 @@ public class AssignableTests {
     @Fails
     private void methodInvAss6(int i) {
         test3();
-    }*/
+    }
+
+    //@ assignable arr;
+    @Verifyable
+    private void methodInvAss8() {
+        this.arr = new int[5];
+        test4(this.arr);
+    }
+
+    //@ assignable arr;
+    @Verifyable
+    private void methodInvAss9() {
+        int[] array = new int[3];
+        test4(array);
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void methodInvAss7() {
+        this.arr = new int[5];
+        test4(this.arr);
+    }
+
 
     //@ assignable \everything;
     private void test() {}
@@ -499,6 +521,9 @@ public class AssignableTests {
 
     //@ assignable objects;
     private void test3() {}
+
+    //@ assignable arr[*];
+    private void test4(int[] arr) {}
 
     //@ assignable privInt;
     @Verifyable

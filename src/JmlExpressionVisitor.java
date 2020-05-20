@@ -1,29 +1,21 @@
 import com.sun.source.tree.*;
-import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.comp.JmlAttr;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
-import org.jmlspecs.openjml.Nowarns;
-import org.jmlspecs.openjml.Strings;
 import org.jmlspecs.openjml.Utils;
-import org.jmlspecs.openjml.ext.TypeRWClauseExtension;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +24,6 @@ import java.util.stream.Collectors;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
-import static org.jmlspecs.openjml.ext.MethodExprClauseExtensions.ensuresClauseKind;
-import static org.jmlspecs.openjml.ext.RequiresClause.requiresClauseKind;
 
 /**
  * Created by jklamroth on 11/14/18.
@@ -461,7 +451,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlForLoop(JmlTree.JmlForLoop that, Void p) {
-        if(that.loopSpecs == null) {
+        if(that.loopSpecs == null || CLI.forceInliningLoops) {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             ArrayList<JCStatement> inits = new ArrayList<>();
@@ -637,7 +627,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCExpression e) {
-        return editAssignable(e, false);
+        JCExpression copy = this.copy(e);
+        return editAssignable(copy, false);
     }
 
     public JCExpression editAssignable(JCExpression e, boolean ignoreLocals) {
@@ -965,6 +956,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
+        if(CLI.forceInliningMethods) {
+            return copy;
+        }
         String functionName = "";
         if(copy.meth instanceof JCIdent) {
             functionName = ((JCIdent) copy.meth).name.toString();
@@ -977,23 +971,42 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //newStatements = newStatements.append(ifst);
 
             if (currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                log.warn("Framecondition for method invocations not yet supported.");
-//                Symbol oldSymbol = currentSymbol;
-//                currentSymbol = ((JCIdent) copy.meth).sym;
-//                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
-//                for (JCExpression a : assignables) {
-//                    JCExpression cond = editAssignable(a);
-//                    cond = treeutils.makeNot(Position.NOPOS, cond);
-//                    JCStatement ass = transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT);
-//                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
-//                    for(int i = 0; i < sym.params.length(); ++i) {
-//                        ass = transUtils.replaceVarName(sym.params.get(i).name.toString(), copy.ar)
-//                    }
-//                    newStatements = newStatements.append(ass);
-//                }
-//                currentSymbol = oldSymbol;
+                //log.warn("Framecondition for method invocations not yet supported.");
+                Symbol oldSymbol = currentSymbol;
+                currentSymbol = ((JCIdent) copy.meth).sym;
+                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+                List<JCExpression> newargs = List.nil();
+                for(JCExpression e : copy.args) {
+                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + copy.args.indexOf(e)), oldSymbol, e);
+                    newStatements = newStatements.append(saveParam);
+                    newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
+                }
+                copy.args = newargs;
+                for (JCExpression a : assignables) {
+                    JCExpression cond = editAssignable(a);
+                    cond = treeutils.makeNot(Position.NOPOS, cond);
+                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
+                    for(int i = 0; i < sym.params.length(); ++i) {
+                        cond = transUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + i, cond);
+                    }
+                    newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+                }
+
+                //for (JCExpression a : assignables) {
+
+                //    JCExpression cond = editAssignable(a);
+                //    cond = treeutils.makeNot(Position.NOPOS, cond);
+                //    JCStatement ass = transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT);
+                //    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
+                //    for(int i = 0; i < sym.params.length(); ++i) {
+                //        ass = transUtils.replaceVarName(sym.params.get(i).name.toString(), copy.args.get(i));
+                //    }
+                //    newStatements = newStatements.append(ass);
+                //}
+                currentSymbol = oldSymbol;
             }
             copy.meth = M.Ident(copy.meth.toString() + "Symb");
+
         }
 
         return copy;
