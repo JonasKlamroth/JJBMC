@@ -1,5 +1,5 @@
-#JJBMC
-JJBMC is a tool develop at the FZI/KIT which enables the bounded model checker [https://github.com/mre/jbmc](JBMC) to verify JML contracts. To run the tool you can either build it manually or use a prebuild docker image. 
+# JJBMC
+JJBMC is a tool develop at the FZI/KIT which enables the bounded model checker [JBMC](https://github.com/mre/jbmc) to verify JML contracts. To run the tool you can either build it manually or use a prebuild docker image. 
 
 # Use docker
 - install docker if not already installed (e.g. sudo curl -sSL https://get.docker.com/ | sh)
