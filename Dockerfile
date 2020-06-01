@@ -1,9 +1,14 @@
-FROM ubuntu
-RUN apt update && apt install -y \
-    openjdk-8-jdk 
+FROM gradle:jdk8
 
 
-COPY . /JJBMC
+COPY ./src /JJBMC/src
+COPY ./resources /JJBMC/resources
+COPY ./tests /JJBMC/tests
+COPY ./testRes /JJBMC/testRes
+COPY ./build.gradle /JJBMC/build.gradle
+COPY ./lib /JJBMC/lib
+COPY ./settings.gradle /JJBMC/settings.gradle
+
 WORKDIR /JJBMC
 
-RUN ./gradlew fatJar
+CMD /bin/sh
