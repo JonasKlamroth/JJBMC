@@ -17,6 +17,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 - Make sure that **JAVA_HOME** points to a valid installation of Java 8 (tested for openjdk).
 - Checkout the source code via ``git clone git@github.com:JonasKlamroth/JJBMC.git`` (for a checkout using SSH).
 - Build the jar file via ``./gradlew fatJar``.
+- Optional: copy the JJBMC.jar file to another location (like the root folder of the project as used in the exmaples)
 - If the previous step does not work, first create a gradle wrapper via ``gradle wrapper``.
 
 # Running JJBMC
@@ -34,7 +35,7 @@ java -jar JJBMC.jar testRes/BubbleSortBroken.java -j="--unwind 6"
 ```
 - You can analze a non-modular version of the Bubblesort example via
 ```
-java -jar JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"
+java -jar JJBMC.jar testRes/BubbleSort.java -fi -j="--unwind 6"
 ```
 - You can analze the Hammingweight example via
 ```
