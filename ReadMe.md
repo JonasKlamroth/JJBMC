@@ -21,7 +21,19 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 
 # Run the Case Studies
 - You can see the available command-line options via ``java -jar build/libs/JJBMC.jar``
-- You can analyze a correct modular Bubblesort example via ``java -jar build/libs/JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"``
-- You can analyze the same Bubblesort example, however with a wrong specification via ``java -jar build/libs/JJBMC.jar testRes/BubbleSortBroken.java -j="--unwind 6"``
-- You can analze a non-modular version of the Bubblesort example via ``java -jar build/libs/JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"``
-- You can analze the Hammingweight example via ``java -jar build/libs/JJBMC.jar testRes/NormalHammingWeight.java -j="--unwind 33"``
+- You can analyze a correct modular Bubblesort example via
+```
+java -jar build/libs/JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"
+```
+- You can analyze the same Bubblesort example, however with a wrong specification via
+```
+java -jar build/libs/JJBMC.jar testRes/BubbleSortBroken.java -j="--unwind 6"
+```
+- You can analze a non-modular version of the Bubblesort example via
+```
+java -jar build/libs/JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"
+```
+- You can analze the Hammingweight example via
+```
+java -jar build/libs/JJBMC.jar testRes/NormalHammingWeight.java -j="--unwind 33"
+```
