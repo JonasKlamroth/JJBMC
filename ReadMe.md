@@ -1,5 +1,5 @@
 # JJBMC
-JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](https://www.kit.edu), which enables the software bounded model checker [JBMC](https://www.cprover.org/jbmc/) to verify contracts written in the [Java Modeling Language (JML)](http://jmlspecs.org/index.shtml). In order to run the tool, you can either build it manually or use our prebuilt docker image.
+JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](https://www.kit.edu), which enables the software bounded model checker [JBMC](https://www.cprover.org/jbmc/) to verify contracts written in the [Java Modeling Language (JML)](http://jmlspecs.org/index.shtml). In order to run the tool, you can either build it manually or use our prebuilt docker image. Notice however that proofs will take significantly longer in the docker version.
 
 ## Using the Docker Image
 - Install docker if you do not have it already installed (e.g., via ``sudo curl -sSL https://get.docker.com/ | sh``).
@@ -16,8 +16,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 ### Compiling JJBMC
 - Make sure that **JAVA_HOME** points to a valid installation of Java 8 (tested for openjdk).
 - Checkout the source code via ``git clone git@github.com:JonasKlamroth/JJBMC.git`` (for a checkout using SSH).
-- Build the jar file via ``./gradlew fatJar``.
-- Optional: Copy the file ``JJBMC.jar`` to another location (e.g., the root folder of the project as used in the examples below).
+- Build the jar file via ``./gradlew fatJar`` (JJBMC.jar will be appear in the root folder of your project).
 - If the previous step does not work, first create a gradle wrapper via ``gradle wrapper``.
 
 ## Running JJBMC
