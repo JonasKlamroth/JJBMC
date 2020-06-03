@@ -1,5 +1,7 @@
-# JJBMC
-JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](https://www.kit.edu), which enables the software bounded model checker [JBMC](https://www.cprover.org/jbmc/) to verify contracts written in the [Java Modeling Language (JML)](http://jmlspecs.org/index.shtml). In order to run the tool, you can either build it manually or use our prebuilt docker image. Notice however that proofs will take significantly longer in the docker version.
+JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](https://www.kit.edu), which enables the software bounded model checker [JBMC](https://www.cprover.org/jbmc/) to verify contracts written in the [Java Modeling Language (JML)](http://jmlspecs.org/index.shtml). In order to run the tool, you have 3 options:
+- build it manually 
+- use our prebuilt docker image(Notice however that proofs will take significantly longer in the docker version)
+- use the [prebuilt version](https://github.com/JonasKlamroth/JJBMC/releases/download/ISoLa/JJBMC.jar)
 
 ## Using the Docker Image
 - Install docker if you do not have it already installed (e.g., via ``sudo curl -sSL https://get.docker.com/ | sh``).
