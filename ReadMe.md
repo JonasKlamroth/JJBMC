@@ -21,7 +21,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 
 ## Running JJBMC
 - You can see the available command-line options via ``java -jar JJBMC.jar``.
-- In general, you can run JJBMC via ``java -jar JJBMC.jar JAVA_FILE -j="JBMC_OPTIONS"``, where **JAVA_FILE** should be replaced by the JML-specified Java file that you want to analyze, and **JBMC_OPTIONS** shoould be replaced by the JBMC options you want to set, e.g., a bound for loop unrollings via ``--unwind BOUND`` (**BOUND** should be replaced by the size of the desired bound). For examples, see the section below.
+- In general, you can run JJBMC via ``java -jar JJBMC.jar JAVA_FILE -j="JBMC_OPTIONS"``, where **JAVA_FILE** should be replaced by the JML-specified Java file that you want to analyze, and **JBMC_OPTIONS** should be replaced by the JBMC options that you want to set, e.g., a bound for loop unrollings via ``--unwind BOUND`` (**BOUND** should be replaced by the size of the desired bound). For examples, see the section below.
 
 ## Examples
 - You can analyze a correct modular Bubblesort example via
