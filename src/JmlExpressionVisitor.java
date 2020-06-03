@@ -93,13 +93,18 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
-    public JCTree visitJmlMethodClauseConditional(JmlMethodClauseConditional that, Void p) {
+    public JCTree visitConditionalExpression(ConditionalExpressionTree node, Void p) {
+        JCConditional that = (JCConditional)node;
         VerifyFunctionVisitor.TranslationMode oldTranslationMode = translationMode;
         translationMode = VerifyFunctionVisitor.TranslationMode.DEMONIC;
-        JmlMethodClause copy = this.copy(that);
+        JCExpression cond = this.copy(that.cond);
         translationMode = oldTranslationMode;
-        return copy;
+        JCExpression ifpart = this.copy(that.truepart);
+        JCExpression elsepart = this.copy(that.falsepart);
+        JCConditional res = M.Conditional(cond, ifpart, elsepart);
+        return res;
     }
+
 
     @Override
     public JCTree visitJmlStatementExpr(JmlStatementExpr that, Void p) {
@@ -181,7 +186,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 return res;
-            } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
+            } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(copy.value);
@@ -207,7 +212,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
             }
         } else if(copy.op == JmlTokenKind.BSEXISTS) {
-            if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
+            if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(copy.value);

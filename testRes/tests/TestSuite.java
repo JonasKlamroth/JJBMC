@@ -701,4 +701,19 @@ public class TestSuite {
     private void oldTest(int c) {
         pubInt += c;
     }
+
+    //@ ensures ((\forall int i; i >= 0 && i < 5; i == 3) ? 5 : 3) == 3;
+    @Verifyable
+    public void ternaryTest() {
+    }
+
+    //@ ensures ((\forall int i; i >= 0 && i < 5; i == 3) ? 5 : 3) != 3;
+    @Fails
+    public void ternaryTest1() {
+    }
+
+    //@ ensures ((\exists int i; i >= 0 && i < 5; i == 3) ? 5 : 3) != 3;
+    @Verifyable
+    public void ternaryTest2() {
+    }
 }
