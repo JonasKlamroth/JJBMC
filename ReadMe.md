@@ -3,7 +3,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 
 ## Using the Docker Image
 - Install docker if you do not have it already installed (e.g., via ``sudo curl -sSL https://get.docker.com/ | sh``).
-- for the following step, you might need to prefix the call with ``sudo `` if you are not member of the docker group
+- For the following step, you might need to prefix the call with ``sudo `` if you are not a member of the docker group.
 - Run the interactive container via ``docker run -it jonasklamroth/jjbmc``.
 - Run JJBMC as shown below in the section **Running JJBMC**.
 
@@ -16,7 +16,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 ### Compiling JJBMC
 - Make sure that **JAVA_HOME** points to a valid installation of Java 8 (tested for openjdk).
 - Checkout the source code via ``git clone git@github.com:JonasKlamroth/JJBMC.git`` (for a checkout using SSH).
-- Build the jar file via ``./gradlew fatJar`` (JJBMC.jar will be appear in the root folder of your project).
+- Build the jar file via ``./gradlew fatJar`` (**JJBMC.jar** will appear in the root folder of your project).
 - If the previous step does not work, first create a gradle wrapper via ``gradle wrapper``.
 
 ## Running JJBMC
