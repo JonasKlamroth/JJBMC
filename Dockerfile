@@ -11,4 +11,7 @@ COPY ./settings.gradle /JJBMC/settings.gradle
 
 WORKDIR /JJBMC
 
+RUN gradle wrapper
+RUN ./gradlew fatJar
+
 CMD /bin/sh

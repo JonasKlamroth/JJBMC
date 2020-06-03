@@ -57,6 +57,12 @@ task fatJar(type: Jar) {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
     with jar
+    doLast {
+        copy {
+            from 'build/libs/JJBMC.jar'
+            into '.'
+        }
+    }
 }
 
 mainClassName = 'Main'
