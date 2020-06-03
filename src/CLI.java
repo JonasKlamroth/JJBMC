@@ -338,7 +338,12 @@ public class CLI implements Runnable {
                     log.info(traces);
                 }
                 //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
-                log.info(output.printStatus());
+                String status = output.printStatus();
+                if(status.contains("SUCC")) {
+                    log.info(GREEN_BOLD + status + RESET);
+                } else {
+                    log.info(RED_BOLD + status + RESET);
+                }
             } else {
                 log.error(output.printErrors());
             }
