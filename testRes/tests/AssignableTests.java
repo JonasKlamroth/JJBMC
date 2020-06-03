@@ -525,6 +525,14 @@ public class AssignableTests {
     //@ assignable arr[*];
     private void test4(int[] arr) {}
 
+    //@ requires t2 != null && t3 != null;
+    //@ assignable t2, t2.t2;
+    @Fails
+    private void testOld(){
+        t2 = t3;
+        t2.t2 = new TestSuite();
+    }
+
     //@ assignable privInt;
     @Verifyable
     private void assignableTest30() {
