@@ -57,7 +57,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
 
-    public enum TranslationMode {ASSUME, ASSERT, JAVA}
+    public enum TranslationMode {ASSUME, ASSERT, JAVA, DEMONIC}
 
     public VerifyFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
         super(context, maker);
