@@ -34,11 +34,11 @@ java -jar JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"
 ```
 java -jar JJBMC.jar testRes/BubbleSortBroken.java -j="--unwind 6"
 ```
-- You can analze a non-modular version of the Bubblesort example via
+- You can analyze a non-modular version of the Bubblesort example via
 ```
 java -jar JJBMC.jar testRes/BubbleSort.java -fi -j="--unwind 6"
 ```
-- You can analze the Hammingweight example via
+- You can analyze the Hammingweight example via
 ```
 java -jar JJBMC.jar testRes/NormalHammingWeight.java -j="--unwind 33"
 ```
