@@ -3,8 +3,8 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 
 ## Using the Docker Image
 - Install docker if you do not have it already installed (e.g., via ``sudo curl -sSL https://get.docker.com/ | sh``).
-- Obtain the docker image via ``docker pull jonasklamroth/jjbmc:small`` (for this and the following step, you might need to prefix the call with ``sudo `` if you are not member of the docker group).
-- Run the interactive container via ``docker run -it jonasklamroth/jjbmc:small``.
+- for the following step, you might need to prefix the call with ``sudo `` if you are not member of the docker group
+- Run the interactive container via ``docker run -it jonasklamroth/jjbmc``.
 - Run JJBMC as shown below in the section **Running JJBMC**.
 
 ## Building JJBMC Manually 
