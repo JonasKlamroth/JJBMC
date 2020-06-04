@@ -179,14 +179,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
-                JCExpression value = super.copy(copy.value);
+                JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), copy.value);
+                JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), value);
                 }
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
-                JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), value);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
-                return res;
+                return value;
             } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
@@ -245,14 +245,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
-                JCExpression value = super.copy(copy.value);
+                JCExpression res = treeutils.makeAnd(Position.NOPOS, cond, copy.value);
+                JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), value);
                 }
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
-                JCExpression res = treeutils.makeAnd(Position.NOPOS, cond, value);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
-                return res;
+                return value;
             } else {
                 throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
             }
@@ -281,10 +281,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression lhs = (JCExpression)this.copy((JCTree)b.lhs, p);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
-            VerifyFunctionVisitor.TranslationMode old = translationMode;
-            translationMode = VerifyFunctionVisitor.TranslationMode.DEMONIC;
             JCExpression rhs = (JCExpression)this.copy((JCTree)b.rhs, p);
-            translationMode = old;
             if(newStatements.size() != 0) {
                 JCIf ifst = M.If(treeutils.makeNot(Position.NOPOS, lhs), M.Block(0L, newStatements), null);
                 newStatements = tmp.append(ifst);
@@ -299,10 +296,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression lhs = (JCExpression)this.copy((JCTree)b.lhs, p);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
-            VerifyFunctionVisitor.TranslationMode old = translationMode;
-            translationMode = VerifyFunctionVisitor.TranslationMode.DEMONIC;
             JCExpression rhs = (JCExpression)this.copy((JCTree)b.rhs, p);
-            translationMode = old;
             if(newStatements.size() != 0) {
                 JCIf ifst = M.If(lhs, M.Block(0L, newStatements), null);
                 newStatements = tmp.append(ifst);
