@@ -281,7 +281,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression lhs = (JCExpression)this.copy((JCTree)b.lhs, p);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            VerifyFunctionVisitor.TranslationMode old = translationMode;
+            translationMode = VerifyFunctionVisitor.TranslationMode.DEMONIC;
             JCExpression rhs = (JCExpression)this.copy((JCTree)b.rhs, p);
+            translationMode = old;
             if(newStatements.size() != 0) {
                 JCIf ifst = M.If(treeutils.makeNot(Position.NOPOS, lhs), M.Block(0L, newStatements), null);
                 newStatements = tmp.append(ifst);
@@ -296,7 +299,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression lhs = (JCExpression)this.copy((JCTree)b.lhs, p);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            VerifyFunctionVisitor.TranslationMode old = translationMode;
+            translationMode = VerifyFunctionVisitor.TranslationMode.DEMONIC;
             JCExpression rhs = (JCExpression)this.copy((JCTree)b.rhs, p);
+            translationMode = old;
             if(newStatements.size() != 0) {
                 JCIf ifst = M.If(lhs, M.Block(0L, newStatements), null);
                 newStatements = tmp.append(ifst);
