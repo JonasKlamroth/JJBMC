@@ -261,10 +261,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
-    @Override
-    public JCTree visitThrow(ThrowTree node, Void p) {
-        throw new RuntimeException("Throwing exceptions is currently not supported.");
-    }
+//    @Override
+//    public JCTree visitThrow(ThrowTree node, Void p) {
+//        throw new RuntimeException("Throwing exceptions is currently not supported.");
+//    }
 
     @Override
     public JCTree visitJmlBinary(JmlBinary that, Void p) {
@@ -395,6 +395,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(that.loopSpecs == null || CLI.forceInliningLoops) {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            if(!(that.body instanceof JCBlock)) {
+                that.body = M.Block(0l, List.of(that.body));
+            }
             JmlWhileLoop copy = (JmlWhileLoop)super.visitJmlWhileLoop(that, p);
             assert(newStatements.size() == 1);
             copy.body = newStatements.get(0);
@@ -431,6 +434,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCStatement assumefalse = TranslationUtils.makeAssumeStatement(treeutils.makeLit(Position.NOPOS, syms.booleanType, false), M);
         List<JCStatement> ifbodystatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
+        if(!(that.body instanceof JCBlock)) {
+            that.body = M.Block(0l, List.of(that.body));
+        }
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
             if(newStatements.size() == 0) {
@@ -456,6 +462,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(that.loopSpecs == null) {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            if(!(that.body instanceof JCBlock)) {
+                that.body = M.Block(0l, List.of(that.body));
+            }
             JmlDoWhileLoop copy = (JmlDoWhileLoop)super.visitJmlDoWhileLoop(that, p);
             assert(newStatements.size() == 1);
             copy.body = newStatements.get(0);
@@ -522,6 +531,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCStatement assumefalse = TranslationUtils.makeAssumeStatement(treeutils.makeLit(Position.NOPOS, syms.booleanType, false), M);
         List<JCStatement> ifbodystatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
+        if(!(that.body instanceof JCBlock)) {
+            that.body = M.Block(0l, List.of(that.body));
+        }
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
             if(newStatements.size() == 0) {
@@ -618,7 +630,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitCompoundAssignment(CompoundAssignmentTree node, Void p) {
         JCAssignOp copy = (JCAssignOp)super.visitCompoundAssignment(node, p);
-        if(copy.getTag() == Tag.PLUS_ASG || copy.getTag() == Tag.MINUS_ASG) {
+        if(copy.getTag() == Tag.PLUS_ASG ||
+                copy.getTag() == Tag.MINUS_ASG ||
+                copy.getTag() == Tag.BITAND_ASG ||
+                copy.getTag() == Tag.BITOR_ASG ||
+                copy.getTag() == Tag.BITXOR_ASG ||
+                copy.getTag() == Tag.DIV_ASG ||
+                copy.getTag() == Tag.MOD_ASG ||
+                copy.getTag() == Tag.MUL_ASG ||
+                copy.getTag() == Tag.SL_ASG ||
+                copy.getTag() == Tag.SR_ASG ||
+                copy.getTag() == Tag.USR_ASG) {
             if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
                 return copy;
             }
@@ -993,7 +1015,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         if(translationMode != VerifyFunctionVisitor.TranslationMode.JAVA) {
-            throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
+            //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
+            log.info("Method calls in specifications only supported experimentally.");
+            return super.copy((JCMethodInvocation)node);
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
         if(CLI.forceInliningMethods) {
