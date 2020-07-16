@@ -164,7 +164,23 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlChained(JmlChained that, Void p) {
+        assert(that.conjuncts.size() >= 1);
+        JCExpression expression = super.copy(that.conjuncts.head);
+        for(int i = 1; i < that.conjuncts.size(); ++i) {
+            expression = treeutils.makeAnd(Position.NOPOS, expression, super.copy(that.conjuncts.get(i)));
+        }
+        return expression;
+    }
+
+    @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
+        if(that.decls.size() > 1 || that.decls.size() == 0) {
+            throw new RuntimeException("Quntifiers only supported with exactly one declaration. (" + that.toString() + ")");
+        }
+        if(!that.decls.get(0).type.isNumeric()) {
+            throw new RuntimeException("Only quntifiers with numeric variables support for now. (" + that.toString() + ")");
+        }
         JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         variableReplacements.put(that.decls.get(0).getName().toString(), "quantVar" + numQuantvars++ + that.decls.get(0).getName().toString());
 
@@ -372,7 +388,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitTry(TryTree node, Void p) {
-        throw new RuntimeException("Try-Catch-Statements are currently not supported.");
+        //throw new RuntimeException("Try-Catch-Statements are currently not supported.");
+        log.warn("Try-Catch-Statements are currently supported experimentally only.");
+        return super.visitTry(node, p);
     }
 
     @Override
@@ -472,6 +490,21 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         }
         throw new RuntimeException("While-Loops with invariants currently not supported.");
+    }
+
+    @Override
+    public JCTree visitJmlEnhancedForLoop(JmlEnhancedForLoop that, Void p) {
+        if(that.loopSpecs != null) {
+            throw new RuntimeException("Enhanced for loops with specifications are currently not supported.");
+        }
+        List<JCStatement> tmp = newStatements;
+        newStatements = List.nil();
+        JCStatement body = super.copy(that.body);
+        assert(newStatements.size() == 1);
+        that.body = newStatements.head;
+        newStatements = tmp;
+        newStatements = newStatements.append(that);
+        return that;
     }
 
     @Override
@@ -1016,8 +1049,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         if(translationMode != VerifyFunctionVisitor.TranslationMode.JAVA) {
             //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
-            log.info("Method calls in specifications only supported experimentally.");
-            return super.copy((JCMethodInvocation)node);
+            log.warn("Method calls in specifications only supported experimentally.");
+            return (JCMethodInvocation)node;
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
         if(CLI.forceInliningMethods) {
@@ -1037,8 +1070,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if (currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
                 //log.warn("Framecondition for method invocations not yet supported.");
                 Symbol oldSymbol = currentSymbol;
-                currentSymbol = ((JCIdent) copy.meth).sym;
-                List<JCExpression> assignables = baseVisitor.getAssignablesForName(copy.meth.toString());
+                if (copy.meth instanceof JCFieldAccess) {
+                    currentSymbol = ((JCFieldAccess) copy.meth).sym;
+                } else if(copy.meth instanceof JCIdent) {
+                    currentSymbol = ((JCIdent) copy.meth).sym;
+                } else {
+                    throw new RuntimeException("method call that could not be handled " + copy.meth.toString());
+                }
+                List<JCExpression> assignables = baseVisitor.getAssignablesForName(functionName);
+                assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {
                     JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + copy.args.indexOf(e)), oldSymbol, e);
@@ -1049,9 +1089,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 for (JCExpression a : assignables) {
                     JCExpression cond = editAssignable(a);
                     cond = treeutils.makeNot(Position.NOPOS, cond);
-                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
-                    for(int i = 0; i < sym.params.length(); ++i) {
-                        cond = transUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + i, cond);
+                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol) currentSymbol;
+                    if (sym.params != null) {
+                        for (int i = 0; i < sym.params.length(); ++i) {
+                            cond = transUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + i, cond);
+                        }
                     }
                     newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
                 }

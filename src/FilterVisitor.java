@@ -154,7 +154,7 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly that, Void p) {
-        if(that.list.size() > 1) {
+        if(!that.defaultClause) {
             throw new RuntimeException("Not supported: " + that.toString());
         } else {
             return super.visitJmlMethodClauseSigOnly(that, p);

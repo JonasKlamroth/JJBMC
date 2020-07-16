@@ -66,6 +66,8 @@ public class BaseVisitor extends FilterVisitor {
         returnExcClass.type = classSymbol.type;
         //make it static
         returnExcClass.mods.flags |= 8L;
+        //make it public
+        returnExcClass.mods.flags |= 1L;
         JmlClassDecl copy = that;
         List<JCTree> newDefs = List.nil();
         FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
