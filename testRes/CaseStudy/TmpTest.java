@@ -12,7 +12,7 @@ public class TmpTest {
     TmpTest[] objects;
 
     private void blockContractTest(int i, int j, int k) {
-        //@ assume i >= 0 && i < j && j < k && k <= 2;
+        //@ assume 0 <= i && i < j && j < k && k <= 2;
         assert false;
     }
 }

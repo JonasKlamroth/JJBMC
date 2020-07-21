@@ -9,13 +9,13 @@ import TestAnnotations.Verifyable;
 class BubbleSort {
     /*@
       @ requires arr != null && arr.length <= 5;
-      @ ensures (\forall int v; v >= 0 && v <= \result.length - 1; (\forall int w; w >= 0 && w <= v - 1; \result[v] >= \result[w]));
+      @ ensures (\forall int v; 0 <= v && v <= \result.length - 1; (\forall int w; 0 <= w && w <= v - 1; \result[w] <= \result[v]));
       @ assignable arr[*];
       @*/
     @Verifyable
     @Unwind(number = 7)
     static int[] sort(int arr[]) {
-        for(int j = arr.length - 1; j >= 0; --j) {
+        for (int j = arr.length - 1; j >= 0; --j) {
             for (int i = 0; i < j; ++i) {
                 if (arr[i] > arr[i + 1]) {
                     swap(arr, i, i + 1);
@@ -26,9 +26,9 @@ class BubbleSort {
     }
 
     /*@
-      @ requires array != null && array.length >= 2;
-      @ requires first < array.length && first >= 0;
-      @ requires second < array.length && second >= 0;
+      @ requires array != null && 2 <= array.length;
+      @ requires first < array.length && 0 <= first;
+      @ requires second < array.length && 0 <= second;
       @ requires first != second;
       @ ensures \old(array[first]) == array[second] && \old(array[second]) == array[first];
       @ assignable array[first], array[second];
