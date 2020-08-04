@@ -11,8 +11,11 @@ public class TmpTest {
     private int privInt;
     TmpTest[] objects;
 
-    private void blockContractTest(int i, int j, int k) {
-        //@ assume 0 <= i && i < j && j < k && k <= 2;
-        assert false;
+    private void blockContractTest() {
+        int sum = 0;
+        while(sum < 10) {
+            sum += 3;
+        }
+        assert sum == 12;
     }
 }

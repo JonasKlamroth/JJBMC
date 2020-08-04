@@ -35,16 +35,6 @@ public class TestSuite {
         assert privInt == 1;
     }
 
-//    //@ ensures \result == 12;
-//    @Unwind(number = 5)
-//    @Verifyable
-//    private int unspecifiedWhileLoop() {
-//        int sum = 0;
-//        while(sum < 10) {
-//            sum += 3;
-//        }
-//        return sum;
-//    }
 
     //@ ensures this.t2.pubInt == 10;
     @Verifyable
@@ -85,6 +75,17 @@ public class TestSuite {
     @Verifyable
     public void quantTest() {
         //this is basically a lemma
+    }
+
+    //@ ensures \result == 12;
+    @Unwind(number = 6)
+    @Verifyable
+    private int unspecifiedWhileLoop() {
+        int sum = 0;
+        while(sum < 10) {
+            sum += 3;
+        }
+        return sum;
     }
 
     //@ requires (\forall int i; i > 0 && i < 10; 3 + 10 > i);
@@ -337,13 +338,16 @@ public class TestSuite {
     public void havocTest4(int[] arr) {
     }
 
-    /*
-    //@ requires arr != null && arr.length == 10;
-    //@ requires (\forall int i; i >= 0 && i < 10; arr[i] == i);
-    //@ ensures false;
-    @Fails
+    //@ requires arr != null && arr.length == 4;
+    //@ requires (\forall int i; i >= 0 && i < 4; arr[i] == i);
+    //@ ensures (\forall int i; i >= 0 && i < 4; arr[i] == i + 1);
+    @Unwind(number = 6)
+    @Verifyable
     public void havocTest5(int[] arr) {
-    }*/
+        for(int i = 0; i < arr.length; ++i) {
+            arr[i]++;
+        }
+    }
 
     //@ requires arr != null && arr.length == 5;
     //@ requires (\forall int i; i >= 0 && i < 10; arr[i] == i);
