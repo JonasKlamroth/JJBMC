@@ -102,8 +102,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         translationMode = oldTranslationMode;
         JCExpression ifpart = this.copy(that.truepart);
         JCExpression elsepart = this.copy(that.falsepart);
-        JCConditional res = M.Conditional(cond, ifpart, elsepart);
-        return res;
+        return M.Conditional(cond, ifpart, elsepart);
     }
 
 
@@ -175,7 +174,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
-        if(that.decls.size() > 1 || that.decls.size() == 0) {
+        if(that.decls.size() != 1) {
             throw new RuntimeException("Quntifiers only supported with exactly one declaration. (" + that.toString() + ")");
         }
         if(!that.decls.get(0).type.isNumeric()) {
@@ -414,7 +413,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             if(!(that.body instanceof JCBlock)) {
-                that.body = M.Block(0l, List.of(that.body));
+                that.body = M.Block(0L, List.of(that.body));
             }
             JmlWhileLoop copy = (JmlWhileLoop)super.visitJmlWhileLoop(that, p);
             assert(newStatements.size() == 1);
@@ -453,7 +452,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JCStatement> ifbodystatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         if(!(that.body instanceof JCBlock)) {
-            that.body = M.Block(0l, List.of(that.body));
+            that.body = M.Block(0L, List.of(that.body));
         }
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
@@ -481,7 +480,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
             if(!(that.body instanceof JCBlock)) {
-                that.body = M.Block(0l, List.of(that.body));
+                that.body = M.Block(0L, List.of(that.body));
             }
             JmlDoWhileLoop copy = (JmlDoWhileLoop)super.visitJmlDoWhileLoop(that, p);
             assert(newStatements.size() == 1);
@@ -565,7 +564,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JCStatement> ifbodystatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         if(!(that.body instanceof JCBlock)) {
-            that.body = M.Block(0l, List.of(that.body));
+            that.body = M.Block(0L, List.of(that.body));
         }
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
@@ -1048,6 +1047,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         if(translationMode != VerifyFunctionVisitor.TranslationMode.JAVA) {
+            if(inConstructor) {
+                JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
+                if(copy.meth instanceof JCIdent) {
+                    copy.meth = treeutils.makeSelect(Position.NOPOS, M.Ident(returnVar), ((JCIdent) copy.meth).name);
+                }
+                return copy;
+            }
             //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
             log.warn("Method calls in specifications only supported experimentally.");
             return (JCMethodInvocation)node;

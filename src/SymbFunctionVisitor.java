@@ -1,3 +1,4 @@
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -161,6 +162,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             hasReturn = true;
             this.returnVar = returnVar.sym;
         } else if(that.name.toString().equals("<init>")) {
+            this.inConstructor = true;
             List<JCExpression> l = List.nil();
             for(JCVariableDecl vd : currentMethod.params) {
                 l = l.append(M.Ident(vd));
@@ -257,6 +259,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         if(copy.mods.getFlags().contains(Modifier.ABSTRACT)) {
             copy.mods.flags ^= 1024;
         }
+        inConstructor = false;
         return copy;
     }
 

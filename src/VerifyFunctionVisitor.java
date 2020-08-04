@@ -164,11 +164,30 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if(that.body != null) {
             body = transformBody(that.body.getStatements());
         }
+
+        //If this is a constructor and this() or super() is called they have to be the first statement
+        if(body.size() > 0) {
+            if(body.get(0) instanceof JCExpressionStatement) {
+                JCExpressionStatement stmt = (JCExpressionStatement)body.get(0);
+                if(stmt.expr instanceof JCMethodInvocation) {
+                    JCMethodInvocation thisCall = (JCMethodInvocation)stmt.expr;
+                    if(thisCall.meth instanceof JCIdent) {
+                        Name name = ((JCIdent) thisCall.meth).getName();
+                        if(name.toString().equals("this") || name.toString().equals("super")) {
+                            l = l.append(body.head);
+                            body = body.tail;
+                        }
+                    }
+                }
+            }
+        }
+
         JCTry bodyTry = M.Try(M.Block(0L, body),
                 List.of(
                         M.Catch(catchVarb, M.Block(0L, List.nil()))
                 ),
                 null);
+
         if(combinedNewReqStatements.size() > 0) {
             l = l.appendList(combinedNewReqStatements);
         }
