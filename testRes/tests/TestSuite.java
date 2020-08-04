@@ -29,7 +29,10 @@ public class TestSuite {
     //@ ensures pubInt == i;
     @Verifyable
     public TestSuite(int i) {
+        this();
         this.pubInt = i;
+        setPrivInt(1);
+        assert privInt == 1;
     }
 
 //    //@ ensures \result == 12;
@@ -715,5 +718,9 @@ public class TestSuite {
     //@ ensures ((\exists int i; i >= 0 && i < 5; i == 3) ? 5 : 3) != 3;
     @Verifyable
     public void ternaryTest2() {
+    }
+
+    public void setPrivInt(int i) {
+        this.privInt = i;
     }
 }
