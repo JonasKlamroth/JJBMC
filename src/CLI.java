@@ -29,7 +29,7 @@ import static picocli.CommandLine.*;
 @Command(name = "openJBMC", header = "@|bold openJBMC Bounded Model checking for JML|@")
 public class CLI implements Runnable {
     private static Logger log = LogManager.getLogger(CLI.class);
-    private static final boolean debugMode = true;
+    public static final boolean debugMode = true;
 
     public static final String RESET = "\033[0m";  // Text Reset
     public static final String RED_BOLD = "\033[1;31m";    // RED
@@ -209,7 +209,6 @@ public class CLI implements Runnable {
                     log.debug(s);
                     s = stdInput.readLine();
                 }
-                return null;
             }
             s = stdError.readLine();
             if (s != null) {
@@ -218,10 +217,10 @@ public class CLI implements Runnable {
                     log.debug(s);
                     s = stdError.readLine();
                 }
+            }
+            if(proc.exitValue() != 0) {
                 return null;
             }
-
-
         } catch (IOException | InterruptedException e) {
             log.error("Error during preparation.");
             e.printStackTrace();

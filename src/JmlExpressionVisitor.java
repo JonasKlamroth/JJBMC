@@ -20,6 +20,7 @@ import org.jmlspecs.openjml.Utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.sun.tools.javac.tree.JCTree.*;
@@ -386,10 +387,33 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitCatch(CatchTree node, Void p) {
+        List<JCStatement> tmp = newStatements;
+        JCBlock body = (JCBlock)super.visitBlock(node.getBlock(), p);
+        newStatements = tmp;
+        return M.Catch((JCVariableDecl)node.getParameter(), body);
+    }
+
+    @Override
     public JCTree visitTry(TryTree node, Void p) {
-        //throw new RuntimeException("Try-Catch-Statements are currently not supported.");
-        log.warn("Try-Catch-Statements are currently supported experimentally only.");
-        return super.visitTry(node, p);
+        if(node.getFinallyBlock() != null) {
+            throw new RuntimeException("Finally blocks currently not supported: " + node.toString());
+        }
+        JCExpression ty = M.Type(baseVisitor.getExceptionClass().type);
+        JCCatch returnCatch = treeutils.makeCatcher(currentSymbol, ty.type);
+        JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.nil(), null));
+        returnCatch.body = M.Block(0L, List.of(throwStmt));
+        List<JCCatch> catchers = List.nil();
+        catchers = catchers.append(returnCatch);
+        for(CatchTree c : node.getCatches()) {
+            catchers = catchers.append((JCCatch)this.visitCatch(c, p));
+        }
+        List<JCStatement> tmp = newStatements;
+        JCBlock body = (JCBlock)super.visitBlock(node.getBlock(), p);
+        JCTry newTry = M.Try(body, catchers, null);
+        newStatements = tmp;
+        newStatements = newStatements.append(newTry);
+        return newTry;
     }
 
     @Override
@@ -1065,7 +1089,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         String functionName = "";
         if(copy.meth instanceof JCIdent) {
             functionName = ((JCIdent) copy.meth).name.toString();
-        } else if(copy.meth instanceof JCFieldAccess) {
+        } else if(copy.meth instanceof JCFieldAccess &&
+                Objects.equals(copy.meth.type, currentSymbol.owner.type)) {
             functionName = ((JCFieldAccess) copy.meth).name.toString();
         }
         if(baseVisitor.hasSymbolicVersion(functionName) || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {

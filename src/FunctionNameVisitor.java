@@ -87,6 +87,9 @@ class FunctionNameVisitor extends JmlTreeScanner {
                 it.accept(fnv);
             }
         } catch (Exception e) {
+            if(CLI.debugMode) {
+                e.printStackTrace();
+            }
             throw new RuntimeException("Error parsing for function names.");
         }
     }
@@ -127,7 +130,13 @@ class FunctionNameVisitor extends JmlTreeScanner {
         } else if (type instanceof JCTree.JCArrayTypeTree) {
             return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
         } else if (type != null) {
-            return "L" + ((JCTree.JCIdent) type).sym.toString().replace(".", "/") + ";";
+            if(type instanceof JCTree.JCIdent) {
+                return "L" + ((JCTree.JCIdent) type).sym.toString().replace(".", "/") + ";";
+            } else if (type instanceof JCTree.JCFieldAccess) {
+                return "L" + ((JCTree.JCFieldAccess) type).sym.toString().replace(".", "/") + ";";
+            } else {
+                throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+            }
         }
         return "V";
     }
