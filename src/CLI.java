@@ -9,15 +9,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 import org.apache.logging.log4j.*;
 
 import static picocli.CommandLine.*;
@@ -28,12 +26,13 @@ import static picocli.CommandLine.*;
 
 @Command(name = "openJBMC", header = "@|bold openJBMC Bounded Model checking for JML|@")
 public class CLI implements Runnable {
-    private static Logger log = LogManager.getLogger(CLI.class);
+    private static final Logger log = LogManager.getLogger(CLI.class);
     public static final boolean debugMode = true;
 
     public static final String RESET = "\033[0m";  // Text Reset
     public static final String RED_BOLD = "\033[1;31m";    // RED
     public static final String GREEN_BOLD = "\033[1;32m";  // GREEN
+    public static final String YELLOW_BOLD = "\033[1;33m"; // YELLOW
 
     @Option(names = {"-kt", "-keepTranslation"}, description = "Keep the temporary file which contains the translation of the given file.")
     static boolean keepTranslation = false;
@@ -54,7 +53,6 @@ public class CLI implements Runnable {
             description = "Print usage help and exit.")
     static boolean usageHelpRequested;
 
-
     @Option(names = {"-fi", "-forceInlining"},
             description = "Inline methods and unroll loops even if a contract is available")
     public static boolean forceInlining;
@@ -67,12 +65,18 @@ public class CLI implements Runnable {
             description = "Inline methods even if a method contract is available")
     public static boolean forceInliningMethods;
 
-    @Option(names = {"-t", "-timed"},
+    @Option(names = {"-c", "-clock"},
             description = "Print out timing information.")
     public static boolean timed;
 
+    @Option(names = {"-t", "--timeout"},
+           description = "Provide a timeout in ms for each jbmc call. (default 10s)",
+            arity = "0..1")
+    public static int timeout = 10000;
+
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
+    private static Process jbmcProcess = null;
 
     @Override
     public void run() {
@@ -249,19 +253,21 @@ public class CLI implements Runnable {
             }
         }
         log.info("Run jbmc for " +functionNames.size() + " functions.");
-        int NTHREADS = 4;
-        ExecutorService executerService = Executors.newFixedThreadPool(NTHREADS);
         for(String functionName : functionNames) {
-            //functionName = tmpFile.getName().replace(".java", "") + "." + functionName;
+            ExecutorService executerService = Executors.newSingleThreadExecutor();
             Runnable worker = () -> runJBMC(tmpFile, functionName);
-            //runJBMC(tmpFile, functionName);
-            executerService.execute(worker);
-        }
-        executerService.shutdown();
-        try {
-            executerService.awaitTermination(10000, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+            final Future handler = executerService.submit(worker);
+            try {
+                handler.get(timeout, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                handler.cancel(true);
+                jbmcProcess.destroyForcibly();
+                log.info(YELLOW_BOLD + "JBMC call for function " + functionName + " timed out." + RESET + "\n");
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+            executerService.shutdownNow();
         }
     }
 
@@ -297,13 +303,13 @@ public class CLI implements Runnable {
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
             long start = System.currentTimeMillis();
-            Process proc = rt.exec(commands, null, tmpFolder);
+            jbmcProcess = rt.exec(commands, null, tmpFolder);
 
             BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(proc.getInputStream()));
+                    InputStreamReader(jbmcProcess.getInputStream()));
 
             BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(proc.getErrorStream()));
+                    InputStreamReader(jbmcProcess.getErrorStream()));
 
 
 
@@ -314,16 +320,13 @@ public class CLI implements Runnable {
                 sb.append(System.getProperty("line.separator"));
                 line = stdInput.readLine();
             }
-            StringBuilder esb = new StringBuilder();
-            String eline = stdError.readLine();
-            while (eline != null) {
-                esb.append(eline);
-                esb.append(System.getProperty("line.separator"));
-                eline = stdError.readLine();
+
+            if(Thread.interrupted()) {
+                return;
             }
 
             //Has to stay down here otherwise not reading the output may block the process
-            proc.waitFor();
+            jbmcProcess.waitFor();
             long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
@@ -335,6 +338,13 @@ public class CLI implements Runnable {
             if(timed) {
                 log.info("JBMC took " + (end - start) + "ms.");
             }
+
+            if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+                log.error("JBMC did not terminate as expected.");
+            } else {
+                log.debug("JBMC terminated normally.");
+            }
+
             if(output.errors.size() == 0) {
                 String traces = output.printAllTraces();
                 if(!traces.isEmpty()) {
@@ -351,11 +361,6 @@ public class CLI implements Runnable {
                 log.error(output.printErrors());
             }
 
-            if(proc.exitValue() != 0 && proc.exitValue() != 10) {
-                log.error("JBMC did not terminate as expected.");
-            } else {
-                log.debug("JBMC terminated normally.");
-            }
 
        } catch (Exception e) {
             log.error("Error running jbmc.");
@@ -419,18 +424,18 @@ public class CLI implements Runnable {
     }
 
     public static void cleanUp() {
-      //  if(!didCleanUp) {
-      //      deleteFolder(tmpFolder);
-      //      if (!keepTranslation) {
-      //          try {
-      //              if (tmpFolder.exists()) {
-      //                  Files.delete(tmpFolder.toPath());
-      //              }
-      //          } catch (IOException e) {
-      //              //log.info("Could not delete tmp folder.");
-      //          }
-      //      }
-      //  }
+        if(!didCleanUp && !keepTranslation) {
+            deleteFolder(tmpFolder);
+            if (!keepTranslation) {
+                try {
+                    if (tmpFolder.exists()) {
+                        Files.delete(tmpFolder.toPath());
+                    }
+                } catch (IOException e) {
+                    //log.info("Could not delete tmp folder.");
+                }
+            }
+        }
         didCleanUp = true;
     }
 
