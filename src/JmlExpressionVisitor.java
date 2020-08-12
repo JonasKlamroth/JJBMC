@@ -48,8 +48,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
-    private List<JCStatement> combinedNewReqStatements = List.nil();
-    private List<JCStatement> combinedNewEnsStatements = List.nil();
     private Map<String, String> variableReplacements = new HashMap<>();
     private List<Tag> supportedBinaryTags = List.of(Tag.PLUS, Tag.MINUS, Tag.MUL, Tag.DIV, Tag.MOD,
             Tag.BITXOR, Tag.BITOR, Tag.BITAND, Tag.SL, Tag.SR, Tag.AND, Tag.OR, Tag.EQ, Tag.NE,
@@ -176,10 +174,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         if(that.decls.size() != 1) {
-            throw new RuntimeException("Quntifiers only supported with exactly one declaration. (" + that.toString() + ")");
+            throw new RuntimeException("Quantifiers only supported with exactly one declaration. (" + that.toString() + ")");
         }
         if(!that.decls.get(0).type.isNumeric()) {
-            throw new RuntimeException("Only quntifiers with numeric variables support for now. (" + that.toString() + ")");
+            throw new RuntimeException("Only quantifiers with numeric variables support for now. (" + that.toString() + ")");
         }
         JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         variableReplacements.put(that.decls.get(0).getName().toString(), "quantVar" + numQuantvars++ + that.decls.get(0).getName().toString());
@@ -190,7 +188,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 neededVariableDefs = neededVariableDefs.append(quantVar);
                 JCExpression cond = super.copy(copy.range);
                 if(cond == null) {
-                    throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
+                    throw new RuntimeException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     transUtils.replaceVarName(e.getKey(), e.getValue(), cond);
@@ -1187,6 +1185,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     public List<JCStatement> getNewStatements() {
         return newStatements;
+    }
+
+    public void reset() {
+        newStatements = List.nil();
+        oldVars = new HashMap<>();
     }
 
     public Map<JCExpression, JCVariableDecl> getOldVars() {

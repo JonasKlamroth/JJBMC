@@ -86,7 +86,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
-        oldVars = expressionVisitor.getOldVars();
+        oldVars.putAll(expressionVisitor.getOldVars());
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
@@ -132,6 +132,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             return currentMethod;
         }
         hasReturn = false;
+        oldVars = new HashMap<>();
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
         if(!(t instanceof Type.JCVoidType)) {
@@ -152,6 +153,27 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 //                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
 
         JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
+
+        List<JCStatement> invariantAssert = List.nil();
+        for(JCExpression expression : baseVisitor.getInvariants()) {
+            expression = NormalizeVisitor.normalize(expression, context, M);
+            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVar, currentMethod);
+            JCExpression invCopy = ev.copy(expression);
+            oldVars.putAll(ev.getOldVars());
+            invariantAssert = invariantAssert.prependList(ev.getNeededVariableDefs());
+            invariantAssert = invariantAssert.appendList(ev.getNewStatements());
+            invariantAssert = invariantAssert.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSERT));
+        }
+        List<JCStatement> invariantAssume = List.nil();
+        for(JCExpression expression : baseVisitor.getInvariants()) {
+            expression = NormalizeVisitor.normalize(expression, context, M);
+            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVar, currentMethod);
+            JCExpression invCopy = ev.copy(expression);
+            oldVars.putAll(ev.getOldVars());
+            invariantAssume = invariantAssume.prependList(ev.getNeededVariableDefs());
+            invariantAssume = invariantAssume.appendList(ev.getNewStatements());
+            invariantAssume = invariantAssume.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSUME));
+        }
 
         List< JCStatement> l = List.nil();
 
@@ -188,6 +210,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 ),
                 null);
 
+        //assume invariants
+        l = l.append(M.Block(0L, invariantAssume));
+
         if(combinedNewReqStatements.size() > 0) {
             l = l.appendList(combinedNewReqStatements);
         }
@@ -205,6 +230,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if(returnStmt != null) {
             l = l.append(returnStmt);
         }
+
+        //assert invariants
+        l = l.append(M.Block(0L, invariantAssert));
 
 
         currentMethod.body = M.Block(0L, l);

@@ -1,5 +1,6 @@
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
+import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
@@ -7,7 +8,6 @@ import com.sun.tools.javac.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.JmlTreeCopier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +27,7 @@ public class BaseVisitor extends FilterVisitor {
     private final Symtab syms;
     private final Map<String, List<JCExpression>> functionsByNames = new HashMap<>();
     private final ArrayList<String> calledFunctions = new ArrayList<>();
+    private List<JCExpression> invariants = List.nil();
 
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
@@ -34,6 +35,11 @@ public class BaseVisitor extends FilterVisitor {
         this.syms = Symtab.instance(context);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
+    }
+
+    @Override
+    public JCTree visitJmlTypeClauseExpr(JmlTypeClauseExpr that, Void p) {
+        return super.visitJmlTypeClauseExpr(that, p);
     }
 
     @Override
@@ -47,6 +53,8 @@ public class BaseVisitor extends FilterVisitor {
             return null;
         }
     }
+
+
 
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
@@ -68,10 +76,16 @@ public class BaseVisitor extends FilterVisitor {
         returnExcClass.mods.flags |= 8L;
         //make it public
         returnExcClass.mods.flags |= 1L;
-        JmlClassDecl copy = that;
+        for(JmlTypeClause cl : that.typeSpecs.clauses) {
+            if(cl instanceof JmlTypeClauseExpr) {
+                invariants = invariants.append(((JmlTypeClauseExpr) cl).expression);
+            } else {
+                throw new RuntimeException("Unsupported type specification: " + cl.toString());
+            }
+        }
         List<JCTree> newDefs = List.nil();
         FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
-        for (JCTree def : copy.defs) {
+        for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
                 fcv.copy(def);
                 functionsByNames.put(((JmlMethodDecl) def).getName().toString(), fcv.getAssignables());
@@ -80,7 +94,7 @@ public class BaseVisitor extends FilterVisitor {
 
         }
         calledFunctions.addAll(fcv.getCalledFunctions());
-        for (JCTree def : copy.defs) {
+        for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
                 newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
                 if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
@@ -95,9 +109,9 @@ public class BaseVisitor extends FilterVisitor {
             }
         }
         newDefs = newDefs.append(returnExcClass);
-        copy.defs = newDefs;
+        that.defs = newDefs;
 
-        return copy;
+        return that;
 
     }
 
@@ -111,5 +125,9 @@ public class BaseVisitor extends FilterVisitor {
 
     public boolean hasSymbolicVersion(String meth) {
         return calledFunctions.contains(meth);
+    }
+
+    public List<JCExpression> getInvariants() {
+        return invariants;
     }
 }

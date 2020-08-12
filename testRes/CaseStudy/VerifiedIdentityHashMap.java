@@ -137,7 +137,7 @@ public class VerifiedIdentityHashMap
 	
 	//@ private ghost boolean initialised;
 	
-    /* invariant
+    /*@ public invariant
       @   table != null &&
       @   MINIMUM_CAPACITY == 4 && MAXIMUM_CAPACITY == 1 << 29 &&
       @   MINIMUM_CAPACITY <= table.length && table.length <= MAXIMUM_CAPACITY && 
@@ -154,17 +154,17 @@ public class VerifiedIdentityHashMap
       @       !(\exists int j;
       @           i + 2 <= j < table.length - 1 && j % 2 == 0;
       @           table[i] == table[j])) &&
-      @   size == (\num_of int i;
-      @       0 <= i < table.length - 1 ;
-      @       i % 2 == 0 ==> table[i] != null) &&
-      @   threshold == table.length / (int)3 &&
-      @   entrySet != null ==> 
-      @       (\forall Map.Entry e; 
-      @           entrySet.contains(e); 
-      @           (\exists int i;
-      @               0 <= i < table.length - 1 ;
-      @               i % 2 == 0 ==> table[i] == e.getKey() && table[i+1] == e.getValue()))
-      @   ;
+      @   //size == (\num_of int i;
+      @   //    0 <= i < table.length - 1 ;
+      @   //    i % 2 == 0 ==> table[i] != null) &&
+      @   threshold == table.length / (int)3; //&&
+      @   //entrySet != null ==>
+      @   //    (\forall Map.Entry e;
+      @   //        entrySet.contains(e);
+      @   //        (\exists int i;
+      @   //            0 <= i < table.length - 1 ;
+      @   //            i % 2 == 0 ==> table[i] == e.getKey() && table[i+1] == e.getValue()))
+      @   //;
       @*/
 	
     /**
