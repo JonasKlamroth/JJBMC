@@ -227,13 +227,13 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         l = l.append(bodyTry);
         l = l.appendList(combinedNewEnsStatements);
-        if(returnStmt != null) {
-            l = l.append(returnStmt);
-        }
 
         //assert invariants
         l = l.append(M.Block(0L, invariantAssert));
 
+        if(returnStmt != null) {
+            l = l.append(returnStmt);
+        }
 
         currentMethod.body = M.Block(0L, l);
 
