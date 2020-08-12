@@ -195,34 +195,15 @@ public class CLI implements Runnable {
             commands[1] = tmpFile.getAbsolutePath();
             System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
             log.debug("Compiling translated file: " + Arrays.toString(commands));
-            Process proc = rt.exec(commands);
+            ProcessBuilder pb = new ProcessBuilder().command(commands)
+                    .redirectOutput(new File(tmpFolder, "compilationErrors.txt"))
+                    .redirectErrorStream(true)
+                    .directory(tmpFolder);
+            Process proc = pb.start();
+
             proc.waitFor();
-
-
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(proc.getInputStream()));
-
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(proc.getErrorStream()));
-
-            // read the output from the command
-            String s = stdInput.readLine();
-            if (s != null) {
-                log.error("Error compiling file: " + tmpFile.getPath());
-                while (s != null) {
-                    log.debug(s);
-                    s = stdInput.readLine();
-                }
-            }
-            s = stdError.readLine();
-            if (s != null) {
-                log.error("Error compiling file: " + tmpFile.getPath());
-                while (s != null) {
-                    log.debug(s);
-                    s = stdError.readLine();
-                }
-            }
             if(proc.exitValue() != 0) {
+                log.error("Compilation failed. See compilationErrors.txt for javac output.");
                 return null;
             }
         } catch (IOException | InterruptedException e) {
