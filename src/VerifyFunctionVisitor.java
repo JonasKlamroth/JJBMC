@@ -211,7 +211,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 null);
 
         //assume invariants
-        l = l.append(M.Block(0L, invariantAssume));
+        long check = that.getModifiers().flags & 8L;
+        if(check == 0) {
+            l = l.append(M.Block(0L, invariantAssume));
+        }
 
         if(combinedNewReqStatements.size() > 0) {
             l = l.appendList(combinedNewReqStatements);
@@ -229,7 +232,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         l = l.appendList(combinedNewEnsStatements);
 
         //assert invariants
-        l = l.append(M.Block(0L, invariantAssert));
+        if(check == 0) {
+            l = l.append(M.Block(0L, invariantAssert));
+        }
 
         if(returnStmt != null) {
             l = l.append(returnStmt);

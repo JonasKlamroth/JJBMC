@@ -39,9 +39,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private final ClassReader reader;
     private final Utils utils;
     private Symbol currentSymbol;
-    private JmlMethodDecl currentMethod;
-    private int boolVarCounter = 0;
+    private static int boolVarCounter = 0;
     private static int intVarCounter = 0;
+    private static int paramVarCounter = 0;
     private List<JCStatement> newStatements = List.nil();
     private Symbol returnVar;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -80,7 +80,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         this.oldVars = oldVars;
         this.returnVar = returnVar;
         this.currentSymbol = currentMethod.sym;
-        this.currentMethod = currentMethod;
     }
 
     @Override
@@ -1067,6 +1066,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlVariableDecl(JmlVariableDecl that, Void p) {
+        JmlVariableDecl copy = (JmlVariableDecl)super.visitJmlVariableDecl(that, p);
+        newStatements = newStatements.append(copy);
+        return copy;
+    }
+
+    @Override
     public JCTree visitMethodInvocation(MethodInvocationTree node, Void p) {
         if(translationMode != VerifyFunctionVisitor.TranslationMode.JAVA) {
             if(inConstructor) {
@@ -1110,7 +1116,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {
-                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + copy.args.indexOf(e)), oldSymbol, e);
+                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, e);
                     newStatements = newStatements.append(saveParam);
                     newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
                 }
@@ -1121,7 +1127,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     Symbol.MethodSymbol sym = (Symbol.MethodSymbol) currentSymbol;
                     if (sym.params != null) {
                         for (int i = 0; i < sym.params.length(); ++i) {
-                            cond = transUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + i, cond);
+                            cond = transUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + (paramVarCounter - sym.params.length() + i), cond);
                         }
                     }
                     newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
