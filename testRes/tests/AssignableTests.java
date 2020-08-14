@@ -533,6 +533,12 @@ public class AssignableTests {
         t2.t2 = new TestSuite();
     }
 
+    //@ assignable arr;
+    @Fails
+    private void testArray() {
+        this.arr[0] = 0;
+    }
+
     //@ assignable privInt;
     @Verifyable
     private void assignableTest30() {

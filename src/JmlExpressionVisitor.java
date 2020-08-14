@@ -327,15 +327,16 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodInvocation(JmlMethodInvocation that, Void p) {
         if (that.token == JmlTokenKind.BSOLD) {
-            JCExpression arg = super.copy(that.getArguments().get(0));
+            JCExpression argCopy = super.copy(that.getArguments().get(0));
+            JCExpression arg = that.getArguments().get(0);
             JCVariableDecl oldVar;
             if (arg instanceof JCIdent) {
                 if (!oldVars.containsKey(arg)) {
                     if (arg.type instanceof Type.JCPrimitiveType || forceOld) {
-                        oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, arg);
+                        oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, argCopy);
                     } else {
                         if (arg.type == null) {
-                            Symbol fieldSym = utils.findMember(currentSymbol.owner.type.tsym, ((JCIdent) arg).name.toString());
+                            Symbol fieldSym = utils.findMember(currentSymbol.owner.type.tsym, ((JCIdent) argCopy).name.toString());
                             oldVar = treeutils.makeVarDef(fieldSym.type, M.Name("old" + oldVars.size()), currentSymbol, treeutils.makeIdent(Position.NOPOS, fieldSym));
                             arg = treeutils.makeIdent(Position.NOPOS, fieldSym);
                         } else {
@@ -348,7 +349,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
             } else {
                 if (arg.type instanceof Type.JCPrimitiveType || forceOld) {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, arg);
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, argCopy);
                 } else {
                     throw new RuntimeException("\\old of non primitive types currently not supported.");
                 }

@@ -709,6 +709,15 @@ public class TestSuite {
         pubInt += c;
     }
 
+    //@ ensures pubInt == \old(pubInt + \old(privInt));
+    //@ ensures privInt == \old(privInt + 1);
+    @Verifyable
+    private void oldTest5(int c) {
+        int i = privInt;
+        privInt++;
+        pubInt += i;
+    }
+
     //@ ensures ((\forall int i; i >= 0 && i < 5; i == 3) ? 5 : 3) == 3;
     @Verifyable
     public void ternaryTest() {
