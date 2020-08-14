@@ -495,7 +495,8 @@ public class VerifiedIdentityHashMap
       @     \result != null <==>
       @         (\exists int i;
       @             0 <= i < table.length - 1 ;
-      @             i % 2 == 0 && table[i] == key && \result == table[i + 1]) &&
+      @             i % 2 == 0 && table[i] == key && \result == table[i + 1]);
+      @   ensures
       @     \result == null <==>
       @         (!(\exists int i;
       @             0 <= i < table.length - 1 ;
@@ -503,13 +504,15 @@ public class VerifiedIdentityHashMap
       @         (\exists int i;
       @             0 <= i < table.length - 1 ;
       @             i % 2 == 0 && table[i] == key && table[i + 1] == null)
-      @         ); 
+      @         );      
       @*/
     public /*@ pure @*/ /*@ nullable @*/ java.lang.Object get(Object key) {
         Object k =  maskNull(key);
         Object[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
+	//+key@ ghost int initialI = i;
+ 	//+key@ decreases (table.length + i - initialI) % table.length; ????
         while (true) {
             Object item =  tab[i];
             if (item == k)
@@ -519,6 +522,19 @@ public class VerifiedIdentityHashMap
             i = nextKeyIndex(i, len);
         }
     }
+    
+    /* +key@ ensures table[\result] == null;
+      @ ensures 0 <= result < table.length; // 
+      @ ensures \result % 2 == 0;
+      @ (\forall int i; i%2==0 && .....; table[(2*hash(k, len) + i) % table.length] != null) 
+      @ assignable \strictly_nothing;
+      @*/
+    private int theKeyIndex(Object k) {
+        int i = hash(maskNull(k), table.length);
+        while(table[i] != null && table[i] != k)
+	   i = nextKeyIndex(i, len);
+	return i;
+    }   
 
     /**
      * Tests whether the specified object reference is a key in this identity
@@ -637,19 +653,18 @@ public class VerifiedIdentityHashMap
     /*@ also
       @ public normal_behavior
       @   assignable
-      @     size, table, threshold, modCount;
+      @     size, table, table[*], threshold, modCount;
       @   ensures 
-      @     ((\exists int i;
+      @     ((\forall int i;
       @         0 <= i < \old(table.length) - 1 ;
-      @         i % 2 == 0 && table[i] == key)
-      @         ==> size == \old(size) && modCount == \old(modCount) && 
-      @         (\forall int j;
-      @             0 <= j < \old(table.length) - 1 && j % 2 == 0;
-      @             table[j] == key ==> \result == table[j + 1])) &&
+      @         i % 2 == 0 && table[i] == key
+      @         ==> size == \old(size) && modCount == \old(modCount) && \result == table[i+1]);
+      @   ensures
       @     ((\forall int i;
       @         0 <= i < \old(table.length) - 1;
       @         i % 2 == 0 ==> table[i] != key)
-      @         ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == null) &&
+      @ ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == null) &&
+      @      table[theKeyIndex(key)] == key && table[...+1] == value
       @     (\exists int i;
       @         0 <= i < table.length - 1 ;
       @         i % 2 == 0 && table[i] == key && table[i + 1] == value);
@@ -670,7 +685,13 @@ public class VerifiedIdentityHashMap
             i = nextKeyIndex(i, len);
         }
 
-        modCount++;
+        /*+KeY@ ensures modCount != \old(modCount); 
+	  @ ensures \dl_inInt(modCount);  // perhaps needed
+	  @ assignable modCount;
+	  @*/
+	{
+            modCount++;
+	}
         tab[i] = k;
         tab[i + 1] = value;
         if (++size >= threshold)
