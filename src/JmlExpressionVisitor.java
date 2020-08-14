@@ -327,7 +327,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodInvocation(JmlMethodInvocation that, Void p) {
         if (that.token == JmlTokenKind.BSOLD) {
-            JCExpression arg = that.getArguments().get(0);
+            JCExpression arg = super.copy(that.getArguments().get(0));
             JCVariableDecl oldVar;
             if (arg instanceof JCIdent) {
                 if (!oldVars.containsKey(arg)) {
