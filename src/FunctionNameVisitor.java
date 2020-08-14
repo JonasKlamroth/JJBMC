@@ -36,6 +36,10 @@ class FunctionNameVisitor extends JmlTreeScanner {
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
+        //not interested in methods of inner classes
+        if(that.sym.owner.flatName().toString().contains("$")) {
+            return;
+        }
         String f = that.sym.owner.toString() + "." + that.getName().toString();
         String rtString = returnTypeString(that.restype);
         String paramString = getParamString(that.params);
