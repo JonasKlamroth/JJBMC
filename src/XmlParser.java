@@ -144,7 +144,8 @@ public class XmlParser {
                                         if (lhs.getTextContent().contains(".")) {
                                             String dynObject = lhs.getTextContent().substring(0, lhs.getTextContent().indexOf('.'));
                                             if (dynamicObjectsMap.containsKey(dynObject)) {
-                                                guess = lhs.getTextContent().replaceAll("dynamic_object(\\d)*", dynamicObjectsMap.get(dynObject));
+                                                String replacement = dynamicObjectsMap.get(dynObject).replace("$", "\\$");
+                                                guess = lhs.getTextContent().replaceAll("dynamic_object(\\d)*", replacement);
                                             }
                                         } else {
                                             //guess = lhs.getTextContent();
@@ -220,7 +221,7 @@ public class XmlParser {
                 ex.printStackTrace();
             }
             String output = writer.toString();
-            log.info(output);
+            log.debug(output);
             e.printStackTrace();
         }
 
@@ -241,7 +242,8 @@ public class XmlParser {
                     dynObject = a.jbmcVarname;
                 }
                 if (dynObjectsMap.containsKey(dynObject)) {
-                    String guess = a.jbmcVarname.replaceAll("dynamic_object(\\d)*", dynObjectsMap.get(dynObject));
+                    String replacement = dynObjectsMap.get(dynObject).replace("$", "\\$");
+                    String guess = a.jbmcVarname.replaceAll("dynamic_object(\\d)*", replacement);
                     res.add(new JBMCOutput.Assignment(a.lineNumber, a.jbmcVarname, guess, a.value));
                 }
             } else {
