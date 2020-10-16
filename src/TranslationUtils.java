@@ -133,7 +133,7 @@ public class TranslationUtils {
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCStatement makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
+    public JCTree.JCForLoop makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
         JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, M.Name(loopVarName), currentSymbol, init);
         RangeExtractor re = new RangeExtractor(M, loopVar.sym);
         re.extractRange(range);
@@ -156,7 +156,7 @@ public class TranslationUtils {
         return ReplaceVisitor.replace(oldName, newName, expr, M);
     }
 
-    public JCTree.JCStatement makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
+    public JCTree.JCForLoop makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
         JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVarName.sym)));
         List<JCTree.JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
         JCTree.JCBlock loopBodyBlock = M.Block(0L, List.from(body));

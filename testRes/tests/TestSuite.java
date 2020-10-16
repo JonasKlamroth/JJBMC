@@ -709,7 +709,7 @@ public class TestSuite {
         pubInt += c;
     }
 
-    //@ ensures pubInt == \old(pubInt + \old(privInt));
+    //@ ensures pubInt == \old(pubInt) + \old(privInt);
     //@ ensures privInt == \old(privInt + 1);
     @Verifyable
     private void oldTest5(int c) {

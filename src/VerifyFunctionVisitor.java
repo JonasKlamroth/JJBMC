@@ -54,6 +54,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
+    private List<JCStatement> oldInits = List.nil();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
 
@@ -87,6 +88,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         oldVars.putAll(expressionVisitor.getOldVars());
+        oldInits = oldInits.appendList(expressionVisitor.getOldInits());
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
@@ -133,6 +135,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         hasReturn = false;
         oldVars = new HashMap<>();
+        oldInits = List.nil();
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
         if(!(t instanceof Type.JCVoidType)) {
@@ -160,6 +163,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVar, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVars.putAll(ev.getOldVars());
+            oldInits = oldInits.appendList(ev.getOldInits());
             invariantAssert = invariantAssert.prependList(ev.getNeededVariableDefs());
             invariantAssert = invariantAssert.appendList(ev.getNewStatements());
             invariantAssert = invariantAssert.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSERT));
@@ -170,6 +174,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVar, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVars.putAll(ev.getOldVars());
+            oldInits = oldInits.appendList(ev.getOldInits());
             invariantAssume = invariantAssume.prependList(ev.getNeededVariableDefs());
             invariantAssume = invariantAssume.appendList(ev.getNewStatements());
             invariantAssume = invariantAssume.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSUME));
@@ -223,6 +228,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         //adding the variable for old clauses
         for(JCVariableDecl variableDecl : oldVars.values()) {
             l = l.append(variableDecl);
+        }
+
+        for(JCStatement oldInit : oldInits) {
+            l = l.append(oldInit);
         }
 
         if(returnVar != null) {
