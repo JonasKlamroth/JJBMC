@@ -188,13 +188,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
         JCExpression range = super.copy(copy.range);
         re.extractRange(range);
+        JCExpression cond = super.copy(copy.range);
         quantifierVars.put(that.decls.get(0).sym, new Pair<>(re.getMin(), re.getMax()));
 
         if(copy.op == JmlTokenKind.BSFORALL) {
             if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
-                JCExpression cond = super.copy(copy.range);
                 if(cond == null) {
                     throw new RuntimeException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
@@ -255,7 +255,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
                 JCVariableDecl quantVar = transUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
-                JCExpression cond = super.copy(copy.range);
                 if(cond == null) {
                     throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
