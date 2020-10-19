@@ -155,8 +155,14 @@ public class CLI implements Runnable {
     public static File prepareForJBMC(String[] apiArgs) {
         File tmpFile;
         didCleanUp = false;
+
+        if(unwinds < 0) {
+            log.info("No unwind argument found. Default to 5.");
+            unwinds = 5;
+        }
+
         try {
-            File f = new File(fileName);
+        File f = new File(fileName);
             if(!f.exists()) {
                 log.error("Could not find file " + f);
                 return null;
@@ -277,12 +283,7 @@ public class CLI implements Runnable {
             tmp.add("--function");
             tmp.add(functionName);
             tmp.add("--unwind");
-            if(unwinds >= 0) {
-                tmp.add(String.valueOf(unwinds));
-            } else {
-                log.info("No unwind argument found. Default to 5.");
-                tmp.add(String.valueOf(5));
-            }
+            tmp.add(String.valueOf(unwinds));
 
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
             tmp.addAll(jbmcOptions);
