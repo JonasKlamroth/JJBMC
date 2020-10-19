@@ -69,10 +69,15 @@ public class CLI implements Runnable {
             description = "Print out timing information.")
     public static boolean timed;
 
-    @Option(names = {"-t", "--timeout"},
+    @Option(names = {"-t", "-timeout"},
            description = "Provide a timeout in ms for each jbmc call. (default 10s)",
             arity = "0..1")
     public static int timeout = 10000;
+
+    @Option(names = {"-u", "-unwind"},
+            description = "Number of times loops are unwound. (default 5)",
+            arity = "0..1")
+    public static int unwinds = -1;
 
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
@@ -271,6 +276,14 @@ public class CLI implements Runnable {
             tmp.add(classFile);
             tmp.add("--function");
             tmp.add(functionName);
+            tmp.add("--unwind");
+            if(unwinds >= 0) {
+                tmp.add(String.valueOf(unwinds));
+            } else {
+                log.info("No unwind argument found. Default to 5.");
+                tmp.add(String.valueOf(5));
+            }
+
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
             tmp.addAll(jbmcOptions);
             tmp.add("--xml-ui");
