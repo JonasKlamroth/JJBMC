@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -177,16 +178,18 @@ public class Utils {
     }
 
     public static void runTests( String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
-        log.debug("Running test for function: " + function);
+        log.info("Running test for function: " + function);
         //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
         String[] commands;
         if(unwind != null) {
+            log.info("unwind set to " + unwind);
             commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function, "--unwind", unwind, "--unwinding-assertions", "--trace"};
         } else {
             commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function};
         }
 
         Runtime rt = Runtime.getRuntime();
+        log.info("Run jbmc with commands: " + Arrays.toString(commands));
         Process proc = rt.exec(commands);
         proc.waitFor();
 
