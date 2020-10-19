@@ -576,7 +576,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = transUtils.diff(newStatements, List.from(inits));
             tmp = tmp.appendList(newStatements);
             newStatements = List.nil();
-            JCStatement bodyCopy = super.copy(that.body);
+            if(that.body instanceof JCBlock) {
+                super.copy(that.body);
+            } else {
+                JCBlock body = M.Block(0L, List.of(that.body));
+                super.copy(body);
+            }
             assert(newStatements.size() == 1);
             JmlForLoop copy = M.ForLoop(List.from(inits), super.copy(that.cond), List.from(steps), newStatements.get(0));
             newStatements = tmp.append(copy);
