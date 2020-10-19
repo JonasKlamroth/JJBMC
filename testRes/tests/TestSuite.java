@@ -718,6 +718,81 @@ public class TestSuite {
         pubInt += i;
     }
 
+    //@ requires t2 != null;
+    //@ ensures t2 == \old(t2);
+    @Verifyable
+    private void oldTest6() {
+        t2.pubInt = 5;
+    }
+
+    //@ requires t2 != null;
+    //@ ensures t2 == \old(t2);
+    @Fails
+    private void oldTest7() {
+        t2 = new TestSuite();
+    }
+
+    //@ requires arr != null;
+    //@ requires arr.length < 4;
+    //@ ensures (\forall int i; 0 <= i && i < arr.length; arr[i] == \old(arr[i]));
+    @Unwind(number = 10)
+    @Verifyable
+    private void oldTest8() {
+    }
+
+
+    //@ requires arr != null;
+    //@ requires arr.length >= 1;
+    //@ requires arr.length < 4;
+    //@ ensures (\forall int i; 0 <= i && i < arr.length; arr[i] == \old(arr[i]));
+    @Fails
+    @Unwind(number = 10)
+    private void oldTest9() {
+        arr[0] += 1;
+    }
+
+
+    //@ requires arr != null;
+    //@ requires arr.length >= 1;
+    //@ requires arr.length < 4;
+    //@ requires pubInt == 0;
+    //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    @Fails
+    @Unwind(number = 10)
+    private void oldTest13() {
+        arr[0] += 1;
+    }
+
+    //@ requires arr != null;
+    //@ requires arr.length == 1 && arr[0] == 0;
+    //@ requires pubInt == 0;
+    //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    @Verifyable
+    @Unwind(number = 10)
+    private void oldTest12() {
+        arr[0] += 1;
+    }
+
+    //@ requires arr != null;
+    //@ requires arr.length == 1 && arr[0] == 0;
+    //@ requires pubInt == 0;
+    //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    @Fails
+    @Unwind(number = 10)
+    private void oldTest11() {
+        pubInt = 1;
+    }
+
+    //@ requires arr != null;
+    //@ requires arr.length == 1 && arr[0] == 0;
+    //@ requires pubInt == 0;
+    //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    @Verifyable
+    @Unwind(number = 10)
+    private void oldTest10() {
+        arr = new int[3];
+    }
+
     //@ ensures ((\forall int i; i >= 0 && i < 5; i == 3) ? 5 : 3) == 3;
     @Verifyable
     public void ternaryTest() {
