@@ -116,7 +116,16 @@ public class XmlParser {
                         Element failure = (Element) propertyElemnt.getElementsByTagName("failure").item(0);
                         reason = failure.getAttribute("reason");
                         Element location = (Element) failure.getElementsByTagName("location").item(0);
-                        lineNumber = Integer.parseInt(location.getAttribute("line"));
+                        if(location == null) {
+                            if(propertyElemnt.getAttribute("property").contains("unwind")) {
+                                res.addProperty("Unwinding assertion", new ArrayList<>(), -1, null, "Try to increase the unwinding parameter.");
+                                return res;
+                            } else {
+                                throw new Exception("location was null.");
+                            }
+                        } else {
+                            lineNumber = Integer.parseInt(location.getAttribute("line"));
+                        }
                         NodeList assignmentList = ((Element) propertyNode).getElementsByTagName("assignment");
                         for (int j = 0; j < assignmentList.getLength(); ++j) {
                             Element assignment = (Element) assignmentList.item(j);
@@ -130,7 +139,7 @@ public class XmlParser {
                                     continue;
                                 }
                                 String l = lines.get(line);
-                                if (lhs.getTextContent().contains("dynamic_object") || lhs.getTextContent().contains("tmp_object_factory") || lhs.getTextContent().contains("anonlocal") || lhs.getTextContent().contains("arg")) {
+                                if (lhs.getTextContent().contains("dynamic_") || lhs.getTextContent().contains("tmp_object_factory") || lhs.getTextContent().contains("anonlocal") || lhs.getTextContent().contains("arg")) {
                                     Pattern p = Pattern.compile("(\\w*) ?= ?.*?;");
                                     Matcher m = p.matcher(l);
                                     String guess = null;
@@ -152,6 +161,11 @@ public class XmlParser {
                                             guess = null;
                                         }
                                         references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
+                                    } else if(lhs.getTextContent().startsWith("dynamic_") && lhs.getTextContent().contains("array")) {
+                                        if(value.getTextContent().contains("{")) {
+                                            dynamicObjectsMap.put(lhs.getTextContent(), value.getTextContent());
+                                            references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), value.getTextContent(), value.getTextContent()));
+                                        }
                                     } else {
                                         if (m.find()) {
                                             guess = m.group(1);
@@ -234,7 +248,7 @@ public class XmlParser {
             return null;
         }
         for(JBMCOutput.Assignment a : references) {
-            if (a.jbmcVarname.startsWith("dynamic_object")) {
+            if (a.jbmcVarname.startsWith("dynamic_")) {
                 String dynObject = "";
                 if (a.jbmcVarname.contains(".")) {
                     dynObject = a.jbmcVarname.substring(0, a.jbmcVarname.indexOf('.'));
