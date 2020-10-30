@@ -25,6 +25,7 @@ import org.jmlspecs.openjml.Utils;
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
+    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;

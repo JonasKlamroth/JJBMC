@@ -47,7 +47,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private List<JCStatement> newStatements = List.nil();
     private Symbol returnVar;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
+    //Has to perserve order (e.g. LinkedHashMap)
+    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Map<String, String> variableReplacements = new HashMap<>();
@@ -67,7 +68,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JmlExpressionVisitor(Context context, Maker maker,
                                 BaseVisitor base,
                                 VerifyFunctionVisitor.TranslationMode translationMode,
-                                Map<JCExpression, JCVariableDecl> oldVars,
+                                LinkedHashMap<JCExpression, JCVariableDecl> oldVars,
                                 Symbol returnVar,
                                 JmlMethodDecl currentMethod) {
         super(context, maker);
@@ -1235,10 +1236,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     public void reset() {
         newStatements = List.nil();
-        oldVars = new HashMap<>();
+        oldVars = new LinkedHashMap<>();
     }
 
-    public Map<JCExpression, JCVariableDecl> getOldVars() {
+    public LinkedHashMap<JCExpression, JCVariableDecl> getOldVars() {
         return oldVars;
     }
 

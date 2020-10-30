@@ -26,6 +26,7 @@ import org.jmlspecs.openjml.ext.RequiresClause;
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +54,8 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private Map<JCExpression, JCVariableDecl> oldVars = new HashMap<>();
+    //Has to perserve order (e.g. LinkedHashMap)
+    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
@@ -134,7 +136,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             return currentMethod;
         }
         hasReturn = false;
-        oldVars = new HashMap<>();
+        oldVars = new LinkedHashMap<>();
         oldInits = List.nil();
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
