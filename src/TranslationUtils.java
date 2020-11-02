@@ -35,18 +35,16 @@ import static com.sun.tools.javac.util.List.*;
  */
 public class TranslationUtils {
     private static Logger log = LogManager.getLogger(TranslationUtils.class);
-    private final Symtab syms;
-    private final JmlTreeUtils treeutils;
-    private final JmlTree.Maker M;
-    private final Names names;
+    private static Maker M;
+    private static Symtab syms;
+    private static JmlTreeUtils treeutils;
 
-    public TranslationUtils(Context context, JmlTree.Maker maker) {
-        this.M = JmlTree.Maker.instance(context);
-        this.syms = Symtab.instance(context);
-        this.treeutils = JmlTreeUtils.instance(context);
-        this.names = Names.instance(context);
+    public static void init(Context context) {
+        TranslationUtils.M = JmlTree.Maker.instance(context);
+        TranslationUtils.syms = Symtab.instance(context);
+        TranslationUtils.treeutils = JmlTreeUtils.instance(context);
     }
-    static JCTree.JCStatement makeAssumeStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
+    static JCTree.JCStatement makeAssumeStatement(JCTree.JCExpression expr) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
         JCTree.JCExpression[] args = new JCTree.JCExpression[]{expr};
@@ -55,11 +53,32 @@ public class TranslationUtils {
                 M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
     }
 
-    static JCTree.JCStatement makeAssertStatement(JCTree.JCExpression expr, JmlTree.Maker M) {
-        return M.at(Position.NOPOS).Assert(expr, null);
+
+    static List<JCTree.JCStatement> makeAssertStatementList(JCTree.JCExpression expr) {
+        if(CLI.splitAssertions) {
+            expr = unwrapExpression(expr);
+            if(expr instanceof JCBinary) {
+                JCBinary binary = (JCBinary) expr;
+                if(binary.opcode == Tag.AND) {
+                    List<JCStatement> l = List.nil();
+                    l = l.appendList(makeAssertStatementList(binary.lhs));
+                    l = l.appendList(makeAssertStatementList(binary.rhs));
+                    return l;
+                }
+            }
+        }
+        return List.of(M.at(Position.NOPOS).Assert(expr, null));
     }
 
-    static JCExpression getConjunction(List<JCExpression> exprs, Maker M) {
+    static JCStatement makeAssertStatement(JCExpression expr) {
+        List<JCStatement> l = makeAssertStatementList(expr);
+        if(l.size() == 1) {
+            return l.get(0);
+        }
+        return M.Block(0L, l);
+    }
+
+    static JCExpression getConjunction(List<JCExpression> exprs) {
         if(exprs.size() > 0) {
             JCTree.JCExpression ifexpr = exprs.get(0);
             for(int idx = 1; idx < exprs.size(); ++idx) {
@@ -70,70 +89,70 @@ public class TranslationUtils {
         return null;
     }
 
-    public JCTree.JCVariableDecl makeNondetIntVar(Name name, Symbol currentSymbol) {
+    public static JCTree.JCVariableDecl makeNondetIntVar(Name name, Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
         List<JCTree.JCExpression> largs = List.nil();
         return treeutils.makeVarDef(syms.intType, name, currentSymbol, M.Apply(List.nil(), nondetFunc, largs));
     }
 
-    public JCTree.JCMethodInvocation makeNondetInt(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetInt(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetInt"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetFloat(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetFloat(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetFloat"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetDouble(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetDouble(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetDouble"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetLong(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetLong(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetLong"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetChar(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetChar(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetChar"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetShort(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetShort(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetShort"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetWithNull(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetWithNull(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithNull"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCMethodInvocation makeNondetBoolean(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetBoolean(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetBoolean"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCTree.JCForLoop makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
+    public static JCTree.JCForLoop makeStandardLoopFromRange(JCTree.JCExpression range, List<JCTree.JCStatement> body, String loopVarName, Symbol currentSymbol, JCExpression init) {
         JCTree.JCVariableDecl loopVar = treeutils.makeVarDef(syms.intType, M.Name(loopVarName), currentSymbol, init);
         RangeExtractor re = new RangeExtractor(M, loopVar.sym);
         re.extractRange(range);
@@ -142,21 +161,21 @@ public class TranslationUtils {
         range = M.Binary(Tag.AND, M.Binary(Tag.LE, min, treeutils.makeIdent(Position.NOPOS, loopVar.sym)), M.Binary(Tag.GE, max, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
         return makeStandardLoop(range, body, loopVar, currentSymbol);
     }
-    public List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
+    public static List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
         for(JCStatement st : expr) {
             ReplaceVisitor.replace(oldName, newName, st, M);
         }
         return expr;
     }
-    public JCStatement replaceVarName(String oldName, String newName, JCStatement expr) {
+    public static JCStatement replaceVarName(String oldName, String newName, JCStatement expr) {
         return ReplaceVisitor.replace(oldName, newName, expr, M);
     }
 
-    public JCExpression replaceVarName(String oldName, String newName, JCExpression expr) {
+    public static JCExpression replaceVarName(String oldName, String newName, JCExpression expr) {
         return ReplaceVisitor.replace(oldName, newName, expr, M);
     }
 
-    public JCTree.JCForLoop makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
+    public static JCTree.JCForLoop makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
         JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVarName.sym)));
         List<JCTree.JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
         JCTree.JCBlock loopBodyBlock = M.Block(0L, List.from(body));
@@ -164,14 +183,14 @@ public class TranslationUtils {
         return M.ForLoop(loopVarl, cond, loopStepl, loopBodyBlock);
     }
 
-    public JCTree.JCMethodInvocation makeNondetWithoutNull(Symbol currentSymbol) {
+    public static JCTree.JCMethodInvocation makeNondetWithoutNull(Symbol currentSymbol) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess nondetFunc = M.Select(classCProver, M.Name("nondetWithoutNull"));
         List<JCTree.JCExpression> largs = List.nil();
         return M.Apply(List.nil(), nondetFunc, largs);
     }
 
-    public JCExpression checkConformAssignables(List<JCExpression> calleeAssignables, List<JCExpression> calledAssignables) {
+    public static JCExpression checkConformAssignables(List<JCExpression> calleeAssignables, List<JCExpression> calledAssignables) {
         if(calledAssignables.size() == 0) {
             return M.Literal(true);
         }
@@ -198,7 +217,7 @@ public class TranslationUtils {
     }
 
     //expr1 < expr2
-    private JCExpression checkConformAssignables(JCExpression expr1, JCExpression expr2) {
+    private static JCExpression checkConformAssignables(JCExpression expr1, JCExpression expr2) {
         Symbol symb1 = null;
         Symbol symb2 = null;
         if(expr1 instanceof JCIdent) {
@@ -246,12 +265,12 @@ public class TranslationUtils {
         return treeutils.makeBooleanLiteral(Position.NOPOS, false);
     }
 
-    public List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
+    public static List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
         List<JCStatement> res = List.nil();
         for(JCExpression expr : storerefs) {
             if(expr instanceof JCIdent) {
-                if(((JCIdent) expr).type.isPrimitive()) {
-                    res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(((JCIdent) expr).type, currentSymbol))));
+                if(expr.type.isPrimitive()) {
+                    res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(expr.type, currentSymbol))));
                 } else {
                     res = res.append(M.Exec(M.Assign(expr, makeNondetWithNull(currentSymbol))));
                 }
@@ -280,7 +299,7 @@ public class TranslationUtils {
                         JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
                         Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
                         List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
-                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit), M));
+                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit)));
                         JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, body, loopVar, currentSymbol))), null);
                         res = res.append(ifst);
                     } catch (NumberFormatException e) {
@@ -309,7 +328,7 @@ public class TranslationUtils {
         return res;
     }
 
-    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol, boolean withNull) {
+    public static JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol, boolean withNull) {
         if(type.equals(syms.intType)) {
             return makeNondetInt(currentSymbol);
         } else if(type.equals(syms.floatType)) {
@@ -336,11 +355,11 @@ public class TranslationUtils {
         throw new RuntimeException("Nondet for type " + type + " not supported.");
     }
 
-    public JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
+    public static JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
         return getNondetFunctionForType(type, currentSymbol, true);
     }
 
-    public List<JCStatement> diff(List<JCStatement> l1, List<JCStatement> l2) {
+    public static List<JCStatement> diff(List<JCStatement> l1, List<JCStatement> l2) {
         List<JCStatement> res = List.nil();
         for(JCStatement s1 : l1) {
             boolean found = false;
@@ -357,7 +376,7 @@ public class TranslationUtils {
         return res;
     }
 
-    public JCExpression unwrapExpression(JCExpression expr) {
+    public static JCExpression unwrapExpression(JCExpression expr) {
         JCExpression res = expr;
         while(res instanceof JCParens) {
             res = ((JCParens) res).expr;
@@ -365,12 +384,12 @@ public class TranslationUtils {
         return res;
     }
 
-    public List<JCStatement> assumeOrAssertInIf(JCIf ist, JCExpression expr, VerifyFunctionVisitor.TranslationMode transMode) {
+    public static List<JCStatement> assumeOrAssertInIf(JCIf ist, JCExpression expr, VerifyFunctionVisitor.TranslationMode transMode) {
         List<JCStatement> newStatements = List.nil();
         if(transMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            newStatements = insertIntoIf(ist, makeAssumeStatement(expr, M));
+            newStatements = insertIntoIf(ist, makeAssumeStatement(expr));
         } else if (transMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
-            newStatements = insertIntoIf(ist, makeAssertStatement(expr, M));
+            newStatements = insertIntoIf(ist, makeAssertStatement(expr));
         }
         return newStatements;
     }
@@ -382,7 +401,7 @@ public class TranslationUtils {
      * @param statement the statement to be inserted
      * @return the new statements created by this operation
      */
-    public List<JCStatement> insertIntoIf(JCIf ist, JCStatement statement) {
+    public static List<JCStatement> insertIntoIf(JCIf ist, JCStatement statement) {
         List<JCStatement> newStatements = List.nil();
         if (ist != null) {
             if (ist.thenpart == null) {
@@ -398,7 +417,7 @@ public class TranslationUtils {
         return newStatements;
     }
 
-    public List<JCStatement> insertIntoElse(JCIf ist, JCStatement st) {
+    public static List<JCStatement> insertIntoElse(JCIf ist, JCStatement st) {
         List<JCStatement> newStatements = List.nil();
         if (ist != null) {
             if (ist.elsepart == null) {
@@ -414,11 +433,11 @@ public class TranslationUtils {
         return newStatements;
     }
 
-    public JCStatement makeAssumeOrAssertStatement(JCExpression expr, VerifyFunctionVisitor.TranslationMode mode) {
+    public static JCStatement makeAssumeOrAssertStatement(JCExpression expr, VerifyFunctionVisitor.TranslationMode mode) {
         if(mode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
-            return makeAssertStatement(expr, M);
+            return makeAssertStatement(expr);
         } else if(mode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            return makeAssumeStatement(expr, M);
+            return makeAssumeStatement(expr);
         }
         throw new RuntimeException("Cant create assume or assert in java mode.");
     }

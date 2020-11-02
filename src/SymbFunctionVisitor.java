@@ -44,7 +44,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private final Context context;
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
-    private final TranslationUtils transUtils;
     private final ClassReader reader;
     private Set<JCExpression> ensuresList = new HashSet<>();
     private Set<JCExpression> requiresList = new HashSet<>();
@@ -56,6 +55,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private List<JCStatement> oldInits = List.nil();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;
@@ -68,7 +68,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         this.M = Maker.instance(context);
         this.syms = Symtab.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
-        this.transUtils = new TranslationUtils(context, M);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
     }
@@ -90,11 +89,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         newStatements = expressionVisitor.getNewStatements();
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         oldVars = expressionVisitor.getOldVars();
+        oldInits = expressionVisitor.getOldInits();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssumeStatement(copy, M))));
+            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssumeStatement(copy))));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
-            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssertStatement(copy, M))));
+            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssertStatement(copy))));
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
@@ -159,7 +159,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         Type t = that.sym.getReturnType();
 
         if(!(t instanceof Type.JCVoidType)) {
-            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, transUtils.getNondetFunctionForType(t, currentMethod.sym));
+            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, TranslationUtils.getNondetFunctionForType(t, currentMethod.sym));
             hasReturn = true;
             this.returnVar = returnVar.sym;
         } else if(that.name.toString().equals("<init>")) {
@@ -199,9 +199,14 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         List< JCStatement> l = List.nil();
         List<JCStatement> bodyStats = List.nil();
         for(JCVariableDecl variableDecl : oldVars.values()) {
-            bodyStats = bodyStats.prepend(variableDecl);
+            bodyStats = bodyStats.append(variableDecl);
         }
-        bodyStats = bodyStats.appendList(transUtils.havoc(currentAssignable, copy.sym, this));
+
+        for(JCStatement oldInit : oldInits) {
+            bodyStats = bodyStats.append(oldInit);
+        }
+
+        bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 
         if(hasReturn) {
             if(returnVar != null) {
@@ -217,7 +222,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
                 l = l.append(returnVar);
                 if(copy.name.toString().equals("<init>")) {
-                    l = l.append(transUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
+                    l = l.append(TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
                 }
                 l = l.appendList(bodyStats).appendList(l1);
             } else {

@@ -26,7 +26,6 @@ public class NormalizeVisitor extends JmlTreeCopier {
 
     public NormalizeVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
-        transUtils = new TranslationUtils(context, maker);
         this.treeutils = JmlTreeUtils.instance(context);
     }
 
@@ -205,7 +204,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
                 return copy;
             } else {
                 negated = true;
-                JCExpression e = transUtils.unwrapExpression(unary.arg);
+                JCExpression e = TranslationUtils.unwrapExpression(unary.arg);
                 JCExpression sub = super.copy(e);
                 if(selfNegated) {
                     selfNegated = false;
@@ -228,7 +227,6 @@ public class NormalizeVisitor extends JmlTreeCopier {
 
     public static JCExpression normalize(JCExpression expression, Context context, Maker maker) {
         NormalizeVisitor normalizeVisitor = new NormalizeVisitor(context, maker);
-        JCExpression ex = normalizeVisitor.copy(expression);
-        return ex;
+        return normalizeVisitor.copy(expression);
     }
 }

@@ -783,6 +783,14 @@ public class TestSuite {
         pubInt = 1;
     }
 
+    //no assertions but should compile
+    private void testSymbOldTest() {
+        oldTest10();
+        oldTest11();
+        oldTest12();
+        oldTest13();
+    }
+
     //@ requires arr != null;
     //@ requires arr.length == 1 && arr[0] == 0;
     //@ requires pubInt == 0;

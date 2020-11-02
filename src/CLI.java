@@ -69,6 +69,10 @@ public class CLI implements Runnable {
             description = "Print out timing information.")
     public static boolean timed;
 
+    @Option(names = {"-dsa", "-dontsplitasserts"},
+            description = "Split assertions if possible.")
+    public static boolean splitAssertions = true;
+
     @Option(names = {"-t", "-timeout"},
            description = "Provide a timeout in ms for each jbmc call. (default 10s)",
             arity = "0..1")
@@ -237,7 +241,7 @@ public class CLI implements Runnable {
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
-            functionNames = functionNames.stream().filter(f -> f.contains("." + functionName)).collect(Collectors.toList());
+            functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
             if(functionNames.size() == 0) {
                 log.warn("Function " + functionName + " could not be found in the specified file.");
                 log.warn("Found the following functions: " + allFunctionNames.toString());

@@ -43,7 +43,6 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private final Context context;
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
-    private final TranslationUtils transUtils;
     private final ClassReader reader;
     private Set<JCExpression> ensuresList = new HashSet<>();
     private Set<JCExpression> requiresList = new HashSet<>();
@@ -69,7 +68,6 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         this.M = Maker.instance(context);
         this.syms = Symtab.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
-        this.transUtils = new TranslationUtils(context, M);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
     }
@@ -92,7 +90,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         oldVars.putAll(expressionVisitor.getOldVars());
         oldInits = oldInits.appendList(expressionVisitor.getOldInits());
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
-        newStatements = newStatements.append(transUtils.makeAssumeOrAssertStatement(copy, translationMode));
+        newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if(translationMode == TranslationMode.ASSERT) {
             combinedNewEnsStatements = combinedNewEnsStatements.append(M.Block(0L, newStatements));
         } else if(translationMode == TranslationMode.ASSUME) {
@@ -168,7 +166,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             oldInits = oldInits.appendList(ev.getOldInits());
             invariantAssert = invariantAssert.prependList(ev.getNeededVariableDefs());
             invariantAssert = invariantAssert.appendList(ev.getNewStatements());
-            invariantAssert = invariantAssert.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSERT));
+            invariantAssert = invariantAssert.append(TranslationUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSERT));
         }
         List<JCStatement> invariantAssume = List.nil();
         for(JCExpression expression : baseVisitor.getInvariants()) {
@@ -179,7 +177,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             oldInits = oldInits.appendList(ev.getOldInits());
             invariantAssume = invariantAssume.prependList(ev.getNeededVariableDefs());
             invariantAssume = invariantAssume.appendList(ev.getNewStatements());
-            invariantAssume = invariantAssume.append(transUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSUME));
+            invariantAssume = invariantAssume.append(TranslationUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSUME));
         }
 
         List< JCStatement> l = List.nil();
