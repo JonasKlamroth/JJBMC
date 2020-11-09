@@ -60,7 +60,7 @@ public class BaseVisitor extends FilterVisitor {
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
         if(that.sym.flatname.toString().contains("$")) {
-            log.warn("Inner classes currently only copied.");
+            ErrorLogger.warn("Inner classes currently only copied.");
             return that;
         }
         Symbol.ClassSymbol classSymbol = reader.defineClass(M.Name("ReturnException"), that.sym);

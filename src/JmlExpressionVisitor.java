@@ -1084,7 +1084,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 //        newStatements = List.nil();
 //        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
 //        return M.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
-        log.warn("Blockcontracts are currently not supported (ignored).");
+        ErrorLogger.warn("Blockcontracts are currently not supported (ignored).");
         return null;
     }
 
@@ -1117,7 +1117,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return copy;
             }
             //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
-            log.warn("Method calls in specifications only supported experimentally.");
+            ErrorLogger.warn("Method calls in specifications only supported experimentally.");
             return (JCMethodInvocation)node;
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);

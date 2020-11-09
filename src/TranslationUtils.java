@@ -312,7 +312,7 @@ public class TranslationUtils {
                     if(fexpr.selected.toString().equals("this")) {
                         throw new RuntimeException("havocing this.* is not supported.");
                     }
-                    log.warn("havocing o.* is currently not translated soundly.");
+                    ErrorLogger.warn("havocing o.* is currently not translated soundly.");
                     res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
                 } else {
                     res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(fexpr.type, currentSymbol))));
