@@ -59,7 +59,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             Tag.GE, Tag.GT, Tag.LE, Tag.LT, Tag.USR);
     private List<JCStatement> neededVariableDefs = List.nil();
     public boolean inConstructor = false;
-    private int numQuantvars = 0;
+    private static int numQuantvars = 0;
     private boolean forceOld = false;
 
 

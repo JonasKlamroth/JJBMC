@@ -7,8 +7,6 @@ import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,7 +60,12 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodDecl(JmlTree.JmlMethodDecl that, Void p) {
         currentMethod = that;
         foundNothing = false;
+
+        if(that.methodSpecsCombined.cases.cases.size() > 1) {
+            throw new RuntimeException("Currently only 1 specification case supported but found more for method " + that.name);
+        }
         JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
+
         copy.sourcefile = that.sourcefile;
         copy.specsDecl = that.specsDecl;
         if(copy.specsDecl.cases != null) {
