@@ -107,6 +107,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return M.Conditional(cond, ifpart, elsepart);
     }
 
+    @Override
+    public JCTree visitJmlStatement(JmlStatement that, Void p) {
+        if(that.keyword.equals("set")) {
+            ErrorLogger.warn("Jml set statements only supported experimentally.");
+            return that.statement;
+        }
+        throw new RuntimeException("Unsupported JmlStatement : " + that.toString());
+    }
 
     @Override
     public JCTree visitJmlStatementExpr(JmlStatementExpr that, Void p) {
