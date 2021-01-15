@@ -441,6 +441,58 @@ public class TranslationUtils {
         }
         throw new RuntimeException("Cant create assume or assert in java mode.");
     }
+
+    public static boolean isAssumeStatement(JCStatement jcStatement) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
+        //JCTree.JCExpression[] args = new JCTree.JCExpression[]{expr};
+        //com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.from(args);
+        //return M.Exec(
+                //M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
+
+        if(!(jcStatement instanceof JCExpressionStatement)) {
+            return false;
+        }
+        JCExpressionStatement exprStmt = (JCExpressionStatement) jcStatement;
+        if(!(exprStmt.expr instanceof JCMethodInvocation)) {
+            return false;
+        }
+        JCMethodInvocation method = (JCMethodInvocation) exprStmt.expr;
+        if(!(method.meth instanceof JCFieldAccess)) {
+            return false;
+        }
+        JCFieldAccess fa = (JCFieldAccess) method.meth;
+        if(fa.name.toString().equals("assume") && fa.selected.toString().equals("CProver")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static JCExpression extractAssumeExpr(JCStatement jcStatement) {
+        JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
+        JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
+        //JCTree.JCExpression[] args = new JCTree.JCExpression[]{expr};
+        //com.sun.tools.javac.util.List<JCTree.JCExpression> largs = com.sun.tools.javac.util.List.from(args);
+        //return M.Exec(
+        //M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
+
+        if(!(jcStatement instanceof JCExpressionStatement)) {
+            return null;
+        }
+        JCExpressionStatement exprStmt = (JCExpressionStatement) jcStatement;
+        if(!(exprStmt.expr instanceof JCMethodInvocation)) {
+            return null;
+        }
+        JCMethodInvocation method = (JCMethodInvocation) exprStmt.expr;
+        if(!(method.meth instanceof JCFieldAccess)) {
+            return null;
+        }
+        JCFieldAccess fa = (JCFieldAccess) method.meth;
+        if(fa.name.toString().equals("assume") && fa.selected.toString().equals("CProver")) {
+            return method.args.get(0);
+        }
+        return null;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {

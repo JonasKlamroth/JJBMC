@@ -45,12 +45,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final ClassReader reader;
-    private Set<JCExpression> ensuresList = new HashSet<>();
-    private Set<JCExpression> requiresList = new HashSet<>();
     private JmlMethodDecl currentMethod;
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
+    private List<List<JCStatement>> reqCases = List.nil();
+    private List<List<JCStatement>> ensCases = List.nil();
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -73,6 +73,17 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
 
     @Override
+    public JCTree visitJmlSpecificationCase(JmlSpecificationCase that, Void p) {
+        combinedNewEnsStatements = List.nil();
+        combinedNewReqStatements = List.nil();
+        JCTree copy = super.visitJmlSpecificationCase(that, p);
+        reqCases = reqCases.append(combinedNewReqStatements);
+        ensCases = ensCases.append(combinedNewEnsStatements);
+        combinedNewEnsStatements = List.nil();
+        combinedNewReqStatements = List.nil();
+        return copy;
+    }
+    @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
@@ -91,10 +102,15 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         oldVars = expressionVisitor.getOldVars();
         oldInits = expressionVisitor.getOldInits();
         if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
-            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssumeStatement(copy))));
+            newStatements = newStatements.append(TranslationUtils.makeAssumeStatement(copy));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT){
-            newStatements = List.of(M.Block(0L, newStatements.append(TranslationUtils.makeAssertStatement(copy))));
+            JCStatement st = TranslationUtils.makeAssertStatement(copy);
+            if(st instanceof JmlBlock) {
+                newStatements = newStatements.appendList(((JmlBlock) st).stats);
+            } else {
+                newStatements = newStatements.append(TranslationUtils.makeAssertStatement(copy));
+            }
             combinedNewReqStatements = combinedNewReqStatements.appendList(newStatements);
         }
         newStatements = List.nil();
@@ -116,8 +132,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
         currentSymbol = that.sym;
-        requiresList.clear();
-        ensuresList.clear();
         currentAssignable = List.nil();
         currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
@@ -149,8 +163,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             return copy;
         }
         currentSymbol = that.sym;
-        requiresList.clear();
-        ensuresList.clear();
         currentAssignable = List.nil();
         currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
@@ -191,12 +203,11 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
         List<JCExpression> assignables = baseVisitor.getAssignablesForName(that.getName().toString());
         List<JCStatement> assignableConditions = List.nil();
-        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
-                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
-        JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
-                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
+        //JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
+        //        List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
+        //JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
+        //        List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
 
-        List< JCStatement> l = List.nil();
         List<JCStatement> bodyStats = List.nil();
         for(JCVariableDecl variableDecl : oldVars.values()) {
             bodyStats = bodyStats.append(variableDecl);
@@ -208,40 +219,57 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
         bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 
-        if(hasReturn) {
-            if(returnVar != null) {
-                List< JCStatement> l1 = List.nil();
-                JCReturn returnStmt = M.Return(M.Ident(returnVar));
-                if(combinedNewEnsStatements.size() > 0) {
-                    l1 = l1.append(ensTry);
+        List< JCStatement> l = List.nil();
+        List<JCExpression> asserts = List.nil();
+        if(reqCases.size() > 1) {
+            JCExpression reqExpr = M.Literal(false);
+            for(int i = 0; i < reqCases.size(); ++i) {
+                JCExpression innerReqExpr = M.Literal(true);
+                for(int j = 0; j < reqCases.get(i).size(); ++j) {
+                    if(reqCases.get(i).get(j) instanceof JCAssert) {
+                        JCAssert assertStmt = (JCAssert) reqCases.get(i).get(j);
+                        innerReqExpr = treeutils.makeAnd(Position.NOPOS, innerReqExpr, assertStmt.cond);
+                    } else {
+                        l = l.append(reqCases.get(i).get(j));
+                    }
                 }
-                l1 = l1.append(returnStmt);
-                if(combinedNewReqStatements.size() > 0) {
-                    l = l.append(reqTry);
-                }
+                reqExpr = treeutils.makeOr(Position.NOPOS, reqExpr, innerReqExpr);
+                asserts = asserts.append(innerReqExpr);
+            }
+            l = l.append(TranslationUtils.makeAssertStatement(reqExpr));
+        } else if (reqCases.size() == 1) {
+            l = l.appendList(reqCases.get(0));
+        }
 
-                l = l.append(returnVar);
-                if(copy.name.toString().equals("<init>")) {
-                    l = l.append(TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
+        if(hasReturn && returnVar != null) {
+            l = l.append(returnVar);
+        }
+        l = l.appendList(bodyStats);
+
+        if(ensCases.size() > 1) {
+            for(int i = 0; i < ensCases.size(); ++i) {
+                JCExpression innerReqExpr = M.Literal(true);
+                for(int j = 0; j < ensCases.get(i).size(); ++j) {
+                    JCExpression expr = TranslationUtils.extractAssumeExpr(ensCases.get(i).get(j));
+                    if(expr != null) {
+                        innerReqExpr = treeutils.makeAnd(Position.NOPOS, innerReqExpr, expr);
+                    } else {
+                        l = l.append(ensCases.get(i).get(j));
+                    }
                 }
-                l = l.appendList(bodyStats).appendList(l1);
-            } else {
-                if(combinedNewEnsStatements.size() > 0) {
-                    l = l.append(reqTry).append(ensTry);
-                } else {
-                    l = bodyStats;
-                    l = l.prepend(reqTry);
-                }
+                JCIf ifstmt = M.If(asserts.get(i), TranslationUtils.makeAssumeStatement(innerReqExpr), null);
+                l = l.append(ifstmt);
             }
-        } else {
-            //l = copy.body.getStatements();
-            l = bodyStats;
-            if(combinedNewEnsStatements.size() > 0) {
-                l = l.append(ensTry);
-            }
-            if(combinedNewReqStatements.size() > 0) {
-                l = l.prepend(reqTry);
-            }
+        } else if (ensCases.size() == 1) {
+            l = l.appendList(ensCases.get(0));
+        }
+
+        if(copy.name.toString().equals("<init>")) {
+            l = l.append(TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
+        }
+        if(hasReturn && returnVar != null) {
+            JCReturn returnStmt = M.Return(M.Ident(returnVar));
+            l = l.append(returnStmt);
         }
         copy.body = M.Block(0L, l);
 

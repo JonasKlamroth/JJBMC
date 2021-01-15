@@ -437,12 +437,12 @@ public class VerifiedIdentityHashMap
       @       \dl_pow(2,i) == \result); // result is a power of two
       @*/
     /*+OPENJML@ // JML specifically for JJBMC
-      @ //private normal_behavior
-      @ //  requires
-      @ //    MAXIMUM_CAPACITY == 4 &&
-      @ //    ((3 * expectedMaxSize) / 2) < 0;
-      @ //  ensures
-      @ //    \result == MAXIMUM_CAPACITY;
+      @ private normal_behavior
+      @   requires
+      @     MAXIMUM_CAPACITY == 4 &&
+      @     ((3 * expectedMaxSize) / 2) < 0;
+      @   ensures
+      @     \result == MAXIMUM_CAPACITY;
       @
       @ //also
       @ //private normal_behavior
@@ -452,7 +452,7 @@ public class VerifiedIdentityHashMap
       @ //  ensures
       @ //    \result == MAXIMUM_CAPACITY;
       @
-      @ //also
+      @ also
       @ private normal_behavior
       @   requires
       @     MINIMUM_CAPACITY == 4 &&

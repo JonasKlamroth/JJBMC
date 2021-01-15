@@ -1,34 +1,20 @@
 import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;
-import com.sun.tools.javac.code.Types;
-import com.sun.tools.javac.comp.JmlAttr;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.Log;
-import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
-import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
-import org.jmlspecs.openjml.Nowarns;
-import org.jmlspecs.openjml.Strings;
-import org.jmlspecs.openjml.Utils;
-import org.jmlspecs.openjml.ext.RequiresClause;
 
 import javax.lang.model.element.Modifier;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
@@ -44,12 +30,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final ClassReader reader;
-    private Set<JCExpression> ensuresList = new HashSet<>();
-    private Set<JCExpression> requiresList = new HashSet<>();
     protected JmlMethodDecl currentMethod;
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
     private List<JCStatement> combinedNewEnsStatements = List.nil();
+    private List<List<JCStatement>> reqCases = List.nil();
+    private List<List<JCStatement>> ensCases = List.nil();
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -125,9 +111,19 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     }
 
     @Override
+    public JCTree visitJmlSpecificationCase(JmlSpecificationCase that, Void p) {
+        combinedNewEnsStatements = List.nil();
+        combinedNewReqStatements = List.nil();
+        JCTree copy = super.visitJmlSpecificationCase(that, p);
+        ensCases = ensCases.append(combinedNewEnsStatements);
+        reqCases = reqCases.append(combinedNewReqStatements);
+        combinedNewEnsStatements = List.nil();
+        combinedNewReqStatements = List.nil();
+        return copy;
+    }
+
+    @Override
     public JCTree visitJmlMethodDecl(JmlMethodDecl that, Void p) {
-        requiresList.clear();
-        ensuresList.clear();
         currentAssignable = null;
         currentMethod = (JmlMethodDecl)that.clone();
         if(currentMethod.mods.getFlags().contains(Modifier.ABSTRACT)) {
@@ -145,6 +141,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         } else {
             this.returnVar = null;
         }
+        JCVariableDecl specCaseID = TranslationUtils.makeNondetIntVar(M.Name("specCaseId"), currentMethod.sym);
         JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
         JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
@@ -188,6 +185,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
 
         List<JCStatement> body = List.nil();
+
         if(that.body != null) {
             body = transformBody(that.body.getStatements());
         }
@@ -221,8 +219,17 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             l = l.append(M.Block(0L, invariantAssume));
         }
 
-        if(combinedNewReqStatements.size() > 0) {
-            l = l.appendList(combinedNewReqStatements);
+        if(reqCases.size() > 1) {
+            l = l.append(specCaseID);
+            for(int i = 0; i < reqCases.size(); ++i) {
+                if (reqCases.get(i).size() > 0) {
+                    JCBlock b = M.Block(0L, reqCases.get(i));
+                    JCIf ifstatement = M.If(treeutils.makeEquality(Position.NOPOS, M.Literal(i), M.Ident(specCaseID)), b, null);
+                    l = l.append(ifstatement);
+                }
+            }
+        } else if (reqCases.size() == 1) {
+            l = l.appendList(reqCases.get(0));
         }
 
         //adding the variable for old clauses
@@ -238,7 +245,19 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             l = l.append(returnVar);
         }
         l = l.append(bodyTry);
-        l = l.appendList(combinedNewEnsStatements);
+
+
+        if(ensCases.size() > 1) {
+            for(int i = 0; i < ensCases.size(); ++i) {
+                if (ensCases.get(i).size() > 0) {
+                    JCBlock b = M.Block(0L, ensCases.get(i));
+                    JCIf ifstatement = M.If(treeutils.makeEquality(Position.NOPOS, M.Literal(i), M.Ident(specCaseID)), b, null);
+                    l = l.append(ifstatement);
+                }
+            }
+        } else if (ensCases.size() == 1) {
+            l = l.appendList(ensCases.get(0));
+        }
 
         //assert invariants
         if(check == 0) {
@@ -253,8 +272,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
         currentMethod.methodSpecsCombined = null;
         currentMethod.cases = null;
-        combinedNewReqStatements = List.nil();
+        ensCases = List.nil();
+        reqCases = List.nil();
         combinedNewEnsStatements = List.nil();
+        combinedNewReqStatements = List.nil();
 
         return currentMethod;
     }
