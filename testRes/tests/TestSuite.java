@@ -819,4 +819,75 @@ public class TestSuite {
     public void setPrivInt(int i) {
         this.privInt = i;
     }
+
+    /*@
+      @ private normal_behaviour
+      @ requires i >= 0 && i < 10;
+      @ ensures \result == i;
+      @ also
+      @ private normal_behaviour
+      @ requires i < 0 && i > -10;
+      @ ensures \result == -1 * i;
+      @*/
+    @Verifyable
+    private int abs(int i) {
+        if (i >= 0) {
+            return i;
+        } else {
+            return i * -1;
+        }
+    }
+
+    /*@
+      @ private normal_behaviour
+      @ requires i < 0 && i > -10;
+      @ ensures \result == i;
+      @ also
+      @ private normal_behaviour
+      @ requires i >= 0 && i < 10;
+      @ ensures \result == -1 * i;
+      @*/
+    @Fails
+    private int abs2(int i) {
+        if (i >= 0) {
+            return i;
+        } else {
+            return i * -1;
+        }
+    }
+
+    //@ requires i >= 0 && i < 10;
+    //@ ensures \result == i;
+    @Verifyable
+    private int InvocingAbs(int i) {
+        return abs(i);
+    }
+
+    //@ requires i < 0 && i > -10;
+    //@ ensures \result == -i;
+    @Verifyable
+    private int InvocingAbs5(int i) {
+        return abs(i);
+    }
+
+    //@ requires i < 0 && i > -10;
+    //@ ensures \result == i;
+    @Fails
+    private int InvocingAbs2(int i) {
+        return abs(i);
+    }
+
+    //@ requires i < 0 && i > -10;
+    //@ ensures \result == i;
+    @Verifyable
+    private int InvocingAbs3(int i) {
+        return abs2(i);
+    }
+
+    //@ requires i >= 0 && i < 10;
+    //@ ensures \result == i;
+    @Fails
+    private int InvocingAbs4(int i) {
+        return abs2(i);
+    }
 }

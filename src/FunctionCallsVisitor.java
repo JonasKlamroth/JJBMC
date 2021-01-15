@@ -61,9 +61,6 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         currentMethod = that;
         foundNothing = false;
 
-        if(that.methodSpecsCombined.cases.cases.size() > 1) {
-            throw new RuntimeException("Currently only 1 specification case supported but found more for method " + that.name);
-        }
         JmlTree.JmlMethodDecl copy = (JmlTree.JmlMethodDecl)super.visitJmlMethodDecl(that, p);
 
         copy.sourcefile = that.sourcefile;
