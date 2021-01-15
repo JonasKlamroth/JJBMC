@@ -316,7 +316,7 @@ public class VerifiedIdentityHashMap
       @     key == null ==> \result == NULL_KEY &&
       @     key != null ==> \result == key;
       @*/
-    private static /*@ pure @*/ Object maskNull(Object key) {
+    public static /*@ pure @*/ Object maskNull(Object key) {
         return (key == null ? NULL_KEY : key);
     }
 
