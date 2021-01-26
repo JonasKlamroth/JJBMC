@@ -356,6 +356,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     List<JCExpression> dims = List.nil();
                     for(Symbol.VarSymbol e : quantifierVars.keySet()) {
                         JCExpression dim = M.Binary(Tag.PLUS, M.Binary(Tag.MINUS, quantifierVars.get(e).snd, quantifierVars.get(e).fst), M.Literal(1));
+                        dim = M.Binary(Tag.PLUS, dim, quantifierVars.get(e).fst);
                         dims = dims.append(dim);
                     }
                     for(int i = 0; i < quantifierVars.size() - 1; ++i) {

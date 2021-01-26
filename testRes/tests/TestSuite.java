@@ -890,4 +890,31 @@ public class TestSuite {
     private int InvocingAbs4(int i) {
         return abs2(i);
     }
+
+    //@ requires arr != null;
+    //@ ensures (\forall int i; i >= 2 && i < arr.length; arr[i] == \old(arr[i] + 1));
+    @Verifyable
+    @Unwind(number = 7)
+    private void oldArrayTest() {
+        for(int i = 0; i < arr.length; ++i) {
+            arr[i]++;
+        }
+    }
+
+    //@ requires arr != null && arr.length >= 2 && arr.length < 5;
+    //@ ensures (\forall int i; i >= 1 && i < arr.length; arr[i] == \old(arr[i] + 1));
+    @Verifyable
+    @Unwind(number = 7)
+    private void oldArrayTest3() {
+        int[] b = new int[arr.length];
+
+        /*@ loop_invariant i >= 1 && i <= arr.length && (\forall int j; j >= 1 && j < i; b[j] == arr[j] + 1);
+          @ loop_modifies i, b[1..arr.length - 1];
+          @ decreases arr.length - i;
+         */
+        for(int i = 1; i < arr.length; ++i) {
+            b[i] = arr[i] + 1;
+        }
+        arr = b;
+    }
 }
