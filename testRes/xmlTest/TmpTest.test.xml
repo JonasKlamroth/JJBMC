@@ -1,0 +1,1803 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cprover>
+    <program>JBMC 5.22.0 (cbmc-5.22.0)</program>
+    <message type="STATUS-MESSAGE">
+        <text>JBMC version 5.22.0 (cbmc-5.22.0) 64-bit x86_64 linux</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Parsing ...</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Trying to load Java main class: TmpTest</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Found Java main class: TmpTest</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Converting</text>
+    </message>
+
+    <message type="WARNING">
+        <text>stub class symbol java::java.lang.Object already exists</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Java: added 35 String or Class constant symbols</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Generating GOTO Program</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Running GOTO functions transformation passes</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Running with 16 object bits, 48 offset bits (default)</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Starting Bounded Model Checking</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 1 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 2 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 3 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 4 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 5 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 6 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 7 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 8 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.0 iteration 9 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Not unwinding loop java::TmpTest.test:([I)V.0 iteration 10 file TmpTest.java line 35 function java::TmpTest.test:([I)V bytecode-index 37 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.1 iteration 1 file TmpTest.java line 43 function java::TmpTest.test:([I)V bytecode-index 85 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding loop java::TmpTest.test:([I)V.1 iteration 2 file TmpTest.java line 43 function java::TmpTest.test:([I)V bytecode-index 85 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Unwinding recursion java::TmpTest.&lt;clinit_wrapper&gt; iteration 1</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>aborting path on assume(false) at file TmpTest.java line 58 function java::TmpTest.test:([I)V bytecode-index 137 thread 0</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime Symex: 0.0245446s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>size of program expression: 757 steps</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>simple slicing removed 7 assignments</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Generated 140 VCC(s), 57 remaining after simplification</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime Postprocess Equation: 2.725e-05s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Passing problem to string refinement loop with MiniSAT 2.2.1 without simplifier</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>converting SSA</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime Convert SSA: 0.00346697s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Running string refinement loop with MiniSAT 2.2.1 without simplifier</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>BV-Refinement: post-processing</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>BV-Refinement: iteration 1</text>
+    </message>
+
+    <refinement-iteration>1</refinement-iteration>
+
+    <message type="STATUS-MESSAGE">
+        <text>9512 variables, 20484 clauses</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>SAT checker: instance is SATISFIABLE</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>
+            BV-Refinement: got SAT, and it simulates =&gt; SAT</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Total iterations: 1</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime Solver: 0.00344655s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime decision procedure: 0.00700197s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Building error trace</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Running string refinement loop with MiniSAT 2.2.1 without simplifier</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>BV-Refinement: post-processing</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>BV-Refinement: iteration 1</text>
+    </message>
+
+    <refinement-iteration>1</refinement-iteration>
+
+    <message type="STATUS-MESSAGE">
+        <text>9512 variables, 17922 clauses</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>SAT checker: instance is UNSATISFIABLE</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>
+            BV-Refinement: got UNSAT, and the proof passes =&gt; UNSAT</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Total iterations: 1</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime Solver: 0.000349748s</text>
+    </message>
+
+    <message type="STATUS-MESSAGE">
+        <text>Runtime decision procedure: 0.000364438s</text>
+    </message>
+
+    <result property="java::TmpTest.test:([I)V.1" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.9" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.8" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.7" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.6" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.5" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.4" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.3" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.2" status="SUCCESS"/>
+
+    <result property="array-create-negative-size.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.&lt;clinit&gt;:()V.null-pointer-exception.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.assertion.1" status="FAILURE">
+        <goto_trace>
+            <function_call hidden="false" step_nr="2" thread="0">
+                <function display_name="__CPROVER_initialize" identifier="__CPROVER_initialize">
+                    <location/>
+                </function>
+            </function_call>
+            <assignment assignment_type="state" base_name="__CPROVER_rounding_mode" display_name="__CPROVER_rounding_mode" hidden="false" identifier="__CPROVER_rounding_mode" mode="C" step_nr="3" thread="0">
+                <type>signed int</type>
+                <full_lhs>__CPROVER_rounding_mode</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="$assertionsDisabled" display_name="TmpTest.$assertionsDisabled" hidden="false" identifier="java::TmpTest.$assertionsDisabled" mode="java" step_nr="4" thread="0">
+                <type>const boolean</type>
+                <full_lhs>$assertionsDisabled</full_lhs>
+                <full_lhs_value binary="00000000">false</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="TmpTest@class_model" display_name="java::TmpTest@class_model" hidden="false" identifier="java::TmpTest@class_model" mode="java" step_nr="5" thread="0">
+                <type>struct java.lang.Class</type>
+                <full_lhs>TmpTest@class_model.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="@inflight_exception" display_name="java::@inflight_exception" hidden="true" identifier="java::@inflight_exception" mode="java" step_nr="6" thread="0">
+                <type>void *</type>
+                <full_lhs>@inflight_exception</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="java::TmpTest::clinit_already_run" display_name="java::TmpTest::clinit_already_run" hidden="false" identifier="java::TmpTest::clinit_already_run" mode="java" step_nr="7" thread="0">
+                <type>__CPROVER_bool</type>
+                <full_lhs>java$$TmpTest$$clinit_already_run</full_lhs>
+                <full_lhs_value>false</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="8" thread="0">
+                <function display_name="__CPROVER_initialize" identifier="__CPROVER_initialize">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="uncaught_exception'" display_name="uncaught_exception'" hidden="true" identifier="uncaught_exception'" mode="java" step_nr="9" thread="0">
+                <type>void *</type>
+                <full_lhs>uncaught_exception'</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="malloc_site" display_name="__CPROVER__start::malloc_site" hidden="true" identifier="__CPROVER__start::malloc_site" mode="java" step_nr="10" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>malloc_site</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="malloc_site$0" display_name="__CPROVER__start::malloc_site$0" hidden="true" identifier="__CPROVER__start::malloc_site$0" mode="java" step_nr="11" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>malloc_site$0</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="malloc_site$1" display_name="__CPROVER__start::malloc_site$1" hidden="true" identifier="__CPROVER__start::malloc_site$1" mode="java" step_nr="12" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>malloc_site$1</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="malloc_site$2" display_name="__CPROVER__start::malloc_site$2" hidden="true" identifier="__CPROVER__start::malloc_site$2" mode="java" step_nr="13" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>malloc_site$2</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="this" display_name="__CPROVER__start::this" hidden="true" identifier="__CPROVER__start::this" mode="java" step_nr="14" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="15" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .privInt=0, .tt=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="16" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="17" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="18" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="malloc_site" display_name="__CPROVER__start::malloc_site" hidden="true" identifier="__CPROVER__start::malloc_site" mode="java" step_nr="19" thread="0">
+                <type>struct TmpTest *</type>
+                <full_lhs>malloc_site</full_lhs>
+                <full_lhs_value binary="0000000000000010000000000000000000000000000000000000000000000000">&amp;dynamic_object1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="this" display_name="__CPROVER__start::this" hidden="true" identifier="__CPROVER__start::this" mode="java" step_nr="20" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000000010000000000000000000000000000000000000000000000000">&amp;dynamic_object1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="21" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::TmpTest"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="22" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="23" thread="0">
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="24" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="26" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <input hidden="false" step_nr="28" thread="0">
+                <input_id>this</input_id>
+                <value>&amp;dynamic_object1</value>
+                <value_expression>
+                    <pointer binary="0000000000000010000000000000000000000000000000000000000000000000"/>
+                </value_expression>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+            </input>
+            <assignment assignment_type="state" base_name="nondet_array_length" display_name="__CPROVER__start::nondet_array_length" hidden="true" identifier="__CPROVER__start::nondet_array_length" mode="java" step_nr="29" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int</type>
+                <full_lhs>nondet_array_length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="array_data_init" display_name="__CPROVER__start::array_data_init" hidden="true" identifier="__CPROVER__start::array_data_init" mode="java" step_nr="30" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int (*)[5]</type>
+                <full_lhs>array_data_init</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="arg1a" display_name="__CPROVER__start::arg1a" hidden="true" identifier="__CPROVER__start::arg1a" mode="java" step_nr="31" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>arg1a</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="nondet_array_length" display_name="__CPROVER__start::nondet_array_length" hidden="true" identifier="__CPROVER__start::nondet_array_length" mode="java" step_nr="33" thread="0">
+                <type>int</type>
+                <full_lhs>nondet_array_length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="nondet_array_length" display_name="__CPROVER__start::nondet_array_length" hidden="true" identifier="__CPROVER__start::nondet_array_length" mode="java" step_nr="34" thread="0">
+                <type>int</type>
+                <full_lhs>nondet_array_length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000101">5</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="37" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .length=0, .data=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="38" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="39" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="40" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="arg1a" display_name="__CPROVER__start::arg1a" hidden="true" identifier="__CPROVER__start::arg1a" mode="java" step_nr="41" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>arg1a</full_lhs>
+                <full_lhs_value binary="0000000000000110000000000000000000000000000000000000000000000000">&amp;dynamic_object5</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="42" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::array[int]"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="43" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="44" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="45" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000101">5</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array" display_name="__CPROVER__start::tmp_new_data_array" hidden="true" identifier="__CPROVER__start::tmp_new_data_array" mode="java" step_nr="46" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array" display_name="__CPROVER__start::tmp_new_data_array" hidden="true" identifier="__CPROVER__start::tmp_new_data_array" mode="java" step_nr="47" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array</full_lhs>
+                <full_lhs_value binary="0000000000000111000000000000000000000000000000000000000000000000">dynamic_6_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="48" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.data</full_lhs>
+                <full_lhs_value binary="0000000000000111000000000000000000000000000000000000000000000000">dynamic_6_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="49" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array</full_lhs>
+                <full_lhs_value>{ 0, 0, 0, 0, 0 }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="50" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="51" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="52" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array[2L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="53" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array[3L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_6_array" display_name="symex_dynamic::dynamic_6_array" hidden="false" identifier="symex_dynamic::dynamic_6_array" mode="java" step_nr="54" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_6_array[4L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="55" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7</full_lhs>
+                <full_lhs_value>{ 0, 0, 0, 0, 0 }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="56" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="57" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="58" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[2L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="59" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[3L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="60" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[4L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="array_data_init" display_name="__CPROVER__start::array_data_init" hidden="true" identifier="__CPROVER__start::array_data_init" mode="java" step_nr="61" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int (*)[5]</type>
+                <full_lhs>array_data_init</full_lhs>
+                <full_lhs_value binary="0000000000001000000000000000000000000000000000000000000000000000">&amp;dynamic_object7</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="62" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7</full_lhs>
+                <full_lhs_value>{ 0, 2, 524288, 524289, 536879104 }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="63" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="64" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="65" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[2L]</full_lhs>
+                <full_lhs_value binary="00000000000010000000000000000000">524288</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="66" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[3L]</full_lhs>
+                <full_lhs_value binary="00000000000010000000000000000001">524289</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object7" display_name="symex_dynamic::dynamic_object7" hidden="false" identifier="symex_dynamic::dynamic_object7" mode="java" step_nr="67" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int [5]</type>
+                <full_lhs>dynamic_object7[4L]</full_lhs>
+                <full_lhs_value binary="00100000000000000010000000000000">536879104</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object5" display_name="symex_dynamic::dynamic_object5" hidden="false" identifier="symex_dynamic::dynamic_object5" mode="java" step_nr="68" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object5.data</full_lhs>
+                <full_lhs_value binary="0000000000001000000000000000000000000000000000000000000000000000">dynamic_object7</full_lhs_value>
+            </assignment>
+            <input hidden="false" step_nr="69" thread="0">
+                <input_id>arg1a</input_id>
+                <value>&amp;dynamic_object5</value>
+                <value_expression>
+                    <pointer binary="0000000000000110000000000000000000000000000000000000000000000000"/>
+                </value_expression>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+            </input>
+            <function_call hidden="false" step_nr="71" thread="0">
+                <function display_name="TmpTest.test(int[])" identifier="java::TmpTest.test:([I)V">
+                    <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::TmpTest.test:([I)V::this" hidden="false" identifier="java::TmpTest.test:([I)V::this" mode="java" step_nr="72" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000000010000000000000000000000000000000000000000000000000">&amp;dynamic_object1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="actual_parameter" base_name="arg1a" display_name="java::TmpTest.test:([I)V::arg1a" hidden="false" identifier="java::TmpTest.test:([I)V::arg1a" mode="java" step_nr="73" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>arg1a</full_lhs>
+                <full_lhs_value binary="0000000000000110000000000000000000000000000000000000000000000000">&amp;dynamic_object5</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2a" display_name="TmpTest.test:([I)V::anonlocal::2a" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2a" mode="java" step_nr="74" thread="0">
+                <type>void *</type>
+                <full_lhs>anonlocal::2a</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="75" thread="0">
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="$stack_tmp1" display_name="java::TmpTest.test:([I)V::$stack_tmp1" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp1" mode="java" step_nr="76" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp1</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="77" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="33"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="78" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="34"/>
+            </location-only>
+            <location-only hidden="false" step_nr="80" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="34"/>
+            </location-only>
+            <location-only hidden="false" step_nr="81" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="34"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="82" thread="0">
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="$stack_tmp0" display_name="java::TmpTest.test:([I)V::$stack_tmp0" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp0" mode="java" step_nr="83" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp0</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="84" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <loop-head hidden="false" step_nr="85" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </loop-head>
+            <location-only hidden="false" step_nr="87" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="88" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="89" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="91" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="93" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="95" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="97" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="98" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp0" display_name="java::TmpTest.test:([I)V::$stack_tmp0" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp0" mode="java" step_nr="99" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp0</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="100" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="101" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="102" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="103" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <loop-head hidden="false" step_nr="104" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </loop-head>
+            <location-only hidden="false" step_nr="106" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="107" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="108" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="110" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="112" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="114" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="116" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="117" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp0" display_name="java::TmpTest.test:([I)V::$stack_tmp0" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp0" mode="java" step_nr="118" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp0</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="119" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="120" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="121" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="122" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <loop-head hidden="false" step_nr="123" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </loop-head>
+            <location-only hidden="false" step_nr="125" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="126" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="127" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="129" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="131" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="133" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="135" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="136" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp0" display_name="java::TmpTest.test:([I)V::$stack_tmp0" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp0" mode="java" step_nr="137" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp0</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="138" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="139" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="140" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000011">3</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="141" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <loop-head hidden="false" step_nr="142" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </loop-head>
+            <location-only hidden="false" step_nr="144" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="145" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="146" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="148" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="150" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="152" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="154" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <location-only hidden="false" step_nr="155" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp0" display_name="java::TmpTest.test:([I)V::$stack_tmp0" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp0" mode="java" step_nr="156" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp0</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="157" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="158" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="36"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3i" display_name="TmpTest.test:([I)V::anonlocal::3i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3i" mode="java" step_nr="159" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+                <type>int</type>
+                <full_lhs>anonlocal::3i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000100">4</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="160" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <loop-head hidden="false" step_nr="161" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </loop-head>
+            <location-only hidden="false" step_nr="163" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="164" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="35"/>
+            </location-only>
+            <location-only hidden="false" step_nr="165" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <location-only hidden="false" step_nr="166" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <location-only hidden="false" step_nr="168" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <location-only hidden="false" step_nr="169" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <location-only hidden="false" step_nr="170" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp1" display_name="java::TmpTest.test:([I)V::$stack_tmp1" hidden="true" identifier="java::TmpTest.test:([I)V::$stack_tmp1" mode="java" step_nr="171" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp1</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="172" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <location-only hidden="false" step_nr="173" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="39"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="newarray_tmp2" display_name="java::TmpTest.test:([I)V::newarray_tmp2" hidden="true" identifier="java::TmpTest.test:([I)V::newarray_tmp2" mode="java" step_nr="174" thread="0">
+                <type>struct java::array[int] *</type>
+                <full_lhs>newarray_tmp2</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="175" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .length=0, .data=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="176" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="177" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="178" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="newarray_tmp2" display_name="java::TmpTest.test:([I)V::newarray_tmp2" hidden="true" identifier="java::TmpTest.test:([I)V::newarray_tmp2" mode="java" step_nr="179" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>newarray_tmp2</full_lhs>
+                <full_lhs_value binary="0000000000001001000000000000000000000000000000000000000000000000">&amp;dynamic_object8</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="180" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::array[int]"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="181" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="182" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="183" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array" display_name="java::TmpTest.test:([I)V::tmp_new_data_array" hidden="true" identifier="java::TmpTest.test:([I)V::tmp_new_data_array" mode="java" step_nr="184" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array" display_name="java::TmpTest.test:([I)V::tmp_new_data_array" hidden="true" identifier="java::TmpTest.test:([I)V::tmp_new_data_array" mode="java" step_nr="185" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array</full_lhs>
+                <full_lhs_value binary="0000000000001010000000000000000000000000000000000000000000000000">dynamic_9_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object8" display_name="symex_dynamic::dynamic_object8" hidden="false" identifier="symex_dynamic::dynamic_object8" mode="java" step_nr="186" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object8.data</full_lhs>
+                <full_lhs_value binary="0000000000001010000000000000000000000000000000000000000000000000">dynamic_9_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="187" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array</full_lhs>
+                <full_lhs_value>{ 0, 0 }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="188" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="189" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="191" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+            </location-only>
+            <location-only hidden="false" step_nr="193" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="194" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="196" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+            </location-only>
+            <location-only hidden="false" step_nr="198" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="199" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="arg1a" display_name="java::TmpTest.test:([I)V::arg1a" hidden="false" identifier="java::TmpTest.test:([I)V::arg1a" mode="java" step_nr="200" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="42"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>arg1a</full_lhs>
+                <full_lhs_value binary="0000000000001001000000000000000000000000000000000000000000000000">&amp;dynamic_object8</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="201" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="202" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+            </location-only>
+            <location-only hidden="false" step_nr="203" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="44"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="204" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="45"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="205" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="206" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+            </location-only>
+            <location-only hidden="false" step_nr="207" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+            </location-only>
+            <location-only hidden="false" step_nr="208" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="44"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="dynamic_9_array" display_name="symex_dynamic::dynamic_9_array" hidden="false" identifier="symex_dynamic::dynamic_9_array" mode="java" step_nr="209" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="45"/>
+                <type>int [2]</type>
+                <full_lhs>dynamic_9_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000011">3</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::2i" display_name="TmpTest.test:([I)V::anonlocal::2i" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2i" mode="java" step_nr="210" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+                <type>int</type>
+                <full_lhs>anonlocal::2i</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="211" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+            </location-only>
+            <location-only hidden="false" step_nr="212" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="43"/>
+            </location-only>
+            <location-only hidden="false" step_nr="213" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="48"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="214" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="48"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="215" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="49"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="216" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="50"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000011">3</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="new_tmp3" display_name="java::TmpTest.test:([I)V::new_tmp3" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp3" mode="java" step_nr="217" thread="0">
+                <type>struct TmpTest *</type>
+                <full_lhs>new_tmp3</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="218" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+            </location-only>
+            <function_call hidden="false" step_nr="219" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+            </function_call>
+            <assignment assignment_type="state" base_name="java::TmpTest::clinit_already_run" display_name="java::TmpTest::clinit_already_run" hidden="false" identifier="java::TmpTest::clinit_already_run" mode="java" step_nr="221" thread="0">
+                <type>__CPROVER_bool</type>
+                <full_lhs>java$$TmpTest$$clinit_already_run</full_lhs>
+                <full_lhs_value>true</full_lhs_value>
+            </assignment>
+            <function_call hidden="false" step_nr="223" thread="0">
+                <function display_name="TmpTest.&lt;clinit&gt;()" identifier="java::TmpTest.&lt;clinit&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+                </function>
+            </function_call>
+            <assignment assignment_type="state" base_name="$stack_tmp1" display_name="java::TmpTest.&lt;clinit&gt;:()V::$stack_tmp1" hidden="true" identifier="java::TmpTest.&lt;clinit&gt;:()V::$stack_tmp1" mode="java" step_nr="224" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp1</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="return_tmp0" display_name="java::TmpTest.&lt;clinit&gt;:()V::return_tmp0" hidden="true" identifier="java::TmpTest.&lt;clinit&gt;:()V::return_tmp0" mode="java" step_nr="225" thread="0">
+                <type>boolean</type>
+                <full_lhs>return_tmp0</full_lhs>
+                <full_lhs_value binary="00000000">false</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="226" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </location-only>
+            <function_call hidden="false" step_nr="227" thread="0">
+                <function display_name="java.lang.Class.desiredAssertionStatus()" identifier="java::java.lang.Class.desiredAssertionStatus:()Z">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::java.lang.Class.desiredAssertionStatus:()Z::this" hidden="false" identifier="java::java.lang.Class.desiredAssertionStatus:()Z::this" mode="java" step_nr="228" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+                <type>struct java.lang.Class *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000001011000000000000000000000000000000000000000000000000">&amp;TmpTest@class_model</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="to_return" display_name="java::java.lang.Class.desiredAssertionStatus:()Z::to_return" hidden="true" identifier="java::java.lang.Class.desiredAssertionStatus:()Z::to_return" mode="java" step_nr="229" thread="0">
+                <type>boolean</type>
+                <full_lhs>to_return</full_lhs>
+                <full_lhs_value binary="00000001">true</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="desiredAssertionStatus#return_value" display_name="java::java.lang.Class.desiredAssertionStatus:()Z#return_value" hidden="true" identifier="java::java.lang.Class.desiredAssertionStatus:()Z#return_value" mode="java" step_nr="230" thread="0">
+                <type>boolean</type>
+                <full_lhs>java.lang.Class.desiredAssertionStatus:()Z#return_value</full_lhs>
+                <full_lhs_value binary="00000001">true</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="231" thread="0">
+                <function display_name="java.lang.Class.desiredAssertionStatus()" identifier="java::java.lang.Class.desiredAssertionStatus:()Z">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="return_tmp0" display_name="java::TmpTest.&lt;clinit&gt;:()V::return_tmp0" hidden="true" identifier="java::TmpTest.&lt;clinit&gt;:()V::return_tmp0" mode="java" step_nr="232" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+                <type>boolean</type>
+                <full_lhs>return_tmp0</full_lhs>
+                <full_lhs_value binary="00000001">true</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="233" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </location-only>
+            <location-only hidden="false" step_nr="234" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="$stack_tmp1" display_name="java::TmpTest.&lt;clinit&gt;:()V::$stack_tmp1" hidden="true" identifier="java::TmpTest.&lt;clinit&gt;:()V::$stack_tmp1" mode="java" step_nr="235" thread="0">
+                <type>int</type>
+                <full_lhs>$stack_tmp1</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="236" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </location-only>
+            <function_call hidden="false" step_nr="237" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+            </function_call>
+            <function_return hidden="false" step_nr="239" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="$assertionsDisabled" display_name="TmpTest.$assertionsDisabled" hidden="false" identifier="java::TmpTest.$assertionsDisabled" mode="java" step_nr="240" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+                <type>const boolean</type>
+                <full_lhs>$assertionsDisabled</full_lhs>
+                <full_lhs_value binary="00000000">false</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="241" thread="0">
+                <function display_name="TmpTest.&lt;clinit&gt;()" identifier="java::TmpTest.&lt;clinit&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;clinit&gt;:()V" line="4"/>
+                </function>
+            </function_return>
+            <function_return hidden="false" step_nr="242" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="243" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .privInt=0, .tt=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="244" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="245" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="246" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="new_tmp3" display_name="java::TmpTest.test:([I)V::new_tmp3" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp3" mode="java" step_nr="247" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>new_tmp3</full_lhs>
+                <full_lhs_value binary="0000000000001100000000000000000000000000000000000000000000000000">&amp;dynamic_object10</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="248" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::TmpTest"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="249" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="250" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="251" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+            </location-only>
+            <function_call hidden="false" step_nr="252" thread="0">
+                <function display_name="TmpTest()" identifier="java::TmpTest.&lt;init&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::TmpTest.&lt;init&gt;:()V::this" hidden="false" identifier="java::TmpTest.&lt;init&gt;:()V::this" mode="java" step_nr="253" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000001100000000000000000000000000000000000000000000000000">&amp;dynamic_object10</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="254" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+            </location-only>
+            <function_call hidden="false" step_nr="255" thread="0">
+                <function display_name="java.lang.Object.&lt;init&gt;()" identifier="java::java.lang.Object.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::java.lang.Object.&lt;init&gt;:()V::this" hidden="false" identifier="java::java.lang.Object.&lt;init&gt;:()V::this" mode="java" step_nr="256" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                <type>struct java.lang.Object *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000001100000000000000000000000000000000000000000000000000">&amp;dynamic_object10.@java.lang.Object</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="to_construct" display_name="java::java.lang.Object.&lt;init&gt;:()V::to_construct" hidden="true" identifier="java::java.lang.Object.&lt;init&gt;:()V::to_construct" mode="java" step_nr="257" thread="0">
+                <type>struct java.lang.Object *</type>
+                <full_lhs>to_construct</full_lhs>
+                <full_lhs_value binary="0000000000001100000000000000000000000000000000000000000000000000">&amp;dynamic_object10.@java.lang.Object</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="258" thread="0">
+                <function display_name="java.lang.Object.&lt;init&gt;()" identifier="java::java.lang.Object.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="259" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="24"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="260" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="26"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="261" thread="0">
+                <function display_name="TmpTest()" identifier="java::TmpTest.&lt;init&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="dynamic_object1" display_name="symex_dynamic::dynamic_object1" hidden="false" identifier="symex_dynamic::dynamic_object1" mode="java" step_nr="262" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="51"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object1.tt</full_lhs>
+                <full_lhs_value binary="0000000000001100000000000000000000000000000000000000000000000000">&amp;dynamic_object10</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object10" display_name="symex_dynamic::dynamic_object10" hidden="false" identifier="symex_dynamic::dynamic_object10" mode="java" step_nr="263" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="52"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object10.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="new_tmp4" display_name="java::TmpTest.test:([I)V::new_tmp4" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp4" mode="java" step_nr="264" thread="0">
+                <type>struct TmpTest *</type>
+                <full_lhs>new_tmp4</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="265" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+            </location-only>
+            <function_call hidden="false" step_nr="266" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+            </function_call>
+            <function_return hidden="false" step_nr="268" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="269" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .privInt=0, .tt=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="270" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="271" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="272" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="new_tmp4" display_name="java::TmpTest.test:([I)V::new_tmp4" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp4" mode="java" step_nr="273" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>new_tmp4</full_lhs>
+                <full_lhs_value binary="0000000000001101000000000000000000000000000000000000000000000000">&amp;dynamic_object11</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="274" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::TmpTest"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="275" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="276" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="277" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+            </location-only>
+            <function_call hidden="false" step_nr="278" thread="0">
+                <function display_name="TmpTest()" identifier="java::TmpTest.&lt;init&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::TmpTest.&lt;init&gt;:()V::this" hidden="false" identifier="java::TmpTest.&lt;init&gt;:()V::this" mode="java" step_nr="279" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>struct TmpTest *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000001101000000000000000000000000000000000000000000000000">&amp;dynamic_object11</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="280" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+            </location-only>
+            <function_call hidden="false" step_nr="281" thread="0">
+                <function display_name="java.lang.Object.&lt;init&gt;()" identifier="java::java.lang.Object.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::java.lang.Object.&lt;init&gt;:()V::this" hidden="false" identifier="java::java.lang.Object.&lt;init&gt;:()V::this" mode="java" step_nr="282" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                <type>struct java.lang.Object *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000001101000000000000000000000000000000000000000000000000">&amp;dynamic_object11.@java.lang.Object</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="to_construct" display_name="java::java.lang.Object.&lt;init&gt;:()V::to_construct" hidden="true" identifier="java::java.lang.Object.&lt;init&gt;:()V::to_construct" mode="java" step_nr="283" thread="0">
+                <type>struct java.lang.Object *</type>
+                <full_lhs>to_construct</full_lhs>
+                <full_lhs_value binary="0000000000001101000000000000000000000000000000000000000000000000">&amp;dynamic_object11.@java.lang.Object</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="284" thread="0">
+                <function display_name="java.lang.Object.&lt;init&gt;()" identifier="java::java.lang.Object.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="285" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="24"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="286" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="26"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.tt</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="287" thread="0">
+                <function display_name="TmpTest()" identifier="java::TmpTest.&lt;init&gt;:()V">
+                    <location file="TmpTest.java" function="java::TmpTest.&lt;init&gt;:()V" line="6"/>
+                </function>
+            </function_return>
+            <assignment assignment_type="state" base_name="anonlocal::2a" display_name="TmpTest.test:([I)V::anonlocal::2a" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::2a" mode="java" step_nr="288" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="54"/>
+                <type>void *</type>
+                <full_lhs>anonlocal::2a</full_lhs>
+                <full_lhs_value binary="0000000000001101000000000000000000000000000000000000000000000000">(void *)&amp;dynamic_object11.@java.lang.Object.@class_identifier</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object11" display_name="symex_dynamic::dynamic_object11" hidden="false" identifier="symex_dynamic::dynamic_object11" mode="java" step_nr="289" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="55"/>
+                <type>struct TmpTest</type>
+                <full_lhs>dynamic_object11.privInt</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="newarray_tmp5" display_name="java::TmpTest.test:([I)V::newarray_tmp5" hidden="true" identifier="java::TmpTest.test:([I)V::newarray_tmp5" mode="java" step_nr="290" thread="0">
+                <type>struct java::array[int] *</type>
+                <full_lhs>newarray_tmp5</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="291" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12</full_lhs>
+                <full_lhs_value>{ .@java.lang.Object={ .@class_identifier="java::java.lang.Class" },
+                    .length=0, .data=null }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="292" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="293" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="294" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="newarray_tmp5" display_name="java::TmpTest.test:([I)V::newarray_tmp5" hidden="true" identifier="java::TmpTest.test:([I)V::newarray_tmp5" mode="java" step_nr="295" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int] *</type>
+                <full_lhs>newarray_tmp5</full_lhs>
+                <full_lhs_value binary="0000000000001110000000000000000000000000000000000000000000000000">&amp;dynamic_object12</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="296" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.@java.lang.Object.@class_identifier</full_lhs>
+                <full_lhs_value>"java::array[int]"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="297" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="298" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.data</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="299" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.length</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000011">3</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array$0" display_name="java::TmpTest.test:([I)V::tmp_new_data_array$0" hidden="true" identifier="java::TmpTest.test:([I)V::tmp_new_data_array$0" mode="java" step_nr="300" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array$0</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="tmp_new_data_array$0" display_name="java::TmpTest.test:([I)V::tmp_new_data_array$0" hidden="true" identifier="java::TmpTest.test:([I)V::tmp_new_data_array$0" mode="java" step_nr="301" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int *</type>
+                <full_lhs>tmp_new_data_array$0</full_lhs>
+                <full_lhs_value binary="0000000000001111000000000000000000000000000000000000000000000000">dynamic_13_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object12" display_name="symex_dynamic::dynamic_object12" hidden="false" identifier="symex_dynamic::dynamic_object12" mode="java" step_nr="302" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>struct java::array[int]</type>
+                <full_lhs>dynamic_object12.data</full_lhs>
+                <full_lhs_value binary="0000000000001111000000000000000000000000000000000000000000000000">dynamic_13_array</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="303" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array</full_lhs>
+                <full_lhs_value>{ 0, 0, 0 }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="304" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="305" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="306" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[2L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="307" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[0L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000000">0</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="308" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[1L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000001">1</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_13_array" display_name="symex_dynamic::dynamic_13_array" hidden="false" identifier="symex_dynamic::dynamic_13_array" mode="java" step_nr="309" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>int [3]</type>
+                <full_lhs>dynamic_13_array[2L]</full_lhs>
+                <full_lhs_value binary="00000000000000000000000000000010">2</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3a" display_name="TmpTest.test:([I)V::anonlocal::3a" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3a" mode="java" step_nr="310" thread="0">
+                <type>void *</type>
+                <full_lhs>anonlocal::3a</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="anonlocal::3a" display_name="TmpTest.test:([I)V::anonlocal::3a" hidden="false" identifier="java::TmpTest.test:([I)V::anonlocal::3a" mode="java" step_nr="311" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="57"/>
+                <type>void *</type>
+                <full_lhs>anonlocal::3a</full_lhs>
+                <full_lhs_value binary="0000000000001110000000000000000000000000000000000000000000000000">(void *)&amp;dynamic_object12.@java.lang.Object.@class_identifier</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="312" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </location-only>
+            <function_call hidden="false" step_nr="313" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </function_call>
+            <function_return hidden="false" step_nr="315" thread="0">
+                <function display_name="java::TmpTest.&lt;clinit_wrapper&gt;" identifier="java::TmpTest.&lt;clinit_wrapper&gt;">
+                    <location/>
+                </function>
+            </function_return>
+            <location-only hidden="false" step_nr="316" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </location-only>
+            <assignment assignment_type="state" base_name="new_tmp6" display_name="java::TmpTest.test:([I)V::new_tmp6" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp6" mode="java" step_nr="317" thread="0">
+                <type>struct java.lang.AssertionError *</type>
+                <full_lhs>new_tmp6</full_lhs>
+                <full_lhs_value binary="0000000000000000000000000000000000000000000000000000000000000000">null</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object14" display_name="symex_dynamic::dynamic_object14" hidden="false" identifier="symex_dynamic::dynamic_object14" mode="java" step_nr="318" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+                <type>struct java.lang.AssertionError</type>
+                <full_lhs>dynamic_object14</full_lhs>
+                <full_lhs_value>{ .@class_identifier="java::java.lang.Class" }</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object14" display_name="symex_dynamic::dynamic_object14" hidden="false" identifier="symex_dynamic::dynamic_object14" mode="java" step_nr="319" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+                <type>struct java.lang.AssertionError</type>
+                <full_lhs>dynamic_object14.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.Class"</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="new_tmp6" display_name="java::TmpTest.test:([I)V::new_tmp6" hidden="true" identifier="java::TmpTest.test:([I)V::new_tmp6" mode="java" step_nr="320" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+                <type>struct java.lang.AssertionError *</type>
+                <full_lhs>new_tmp6</full_lhs>
+                <full_lhs_value binary="0000000000010000000000000000000000000000000000000000000000000000">&amp;dynamic_object14</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="dynamic_object14" display_name="symex_dynamic::dynamic_object14" hidden="false" identifier="symex_dynamic::dynamic_object14" mode="java" step_nr="321" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+                <type>struct java.lang.AssertionError</type>
+                <full_lhs>dynamic_object14.@class_identifier</full_lhs>
+                <full_lhs_value>"java::java.lang.AssertionError"</full_lhs_value>
+            </assignment>
+            <location-only hidden="false" step_nr="322" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </location-only>
+            <function_call hidden="false" step_nr="323" thread="0">
+                <function display_name="java.lang.AssertionError.&lt;init&gt;()" identifier="java::java.lang.AssertionError.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </function_call>
+            <assignment assignment_type="actual_parameter" base_name="this" display_name="java::java.lang.AssertionError.&lt;init&gt;:()V::this" hidden="false" identifier="java::java.lang.AssertionError.&lt;init&gt;:()V::this" mode="java" step_nr="324" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+                <type>struct java.lang.AssertionError *</type>
+                <full_lhs>this</full_lhs>
+                <full_lhs_value binary="0000000000010000000000000000000000000000000000000000000000000000">&amp;dynamic_object14</full_lhs_value>
+            </assignment>
+            <assignment assignment_type="state" base_name="to_construct" display_name="java::java.lang.AssertionError.&lt;init&gt;:()V::to_construct" hidden="true" identifier="java::java.lang.AssertionError.&lt;init&gt;:()V::to_construct" mode="java" step_nr="325" thread="0">
+                <type>struct java.lang.AssertionError *</type>
+                <full_lhs>to_construct</full_lhs>
+                <full_lhs_value binary="0000000000010000000000000000000000000000000000000000000000000000">&amp;dynamic_object14</full_lhs_value>
+            </assignment>
+            <function_return hidden="false" step_nr="326" thread="0">
+                <function display_name="java.lang.AssertionError.&lt;init&gt;()" identifier="java::java.lang.AssertionError.&lt;init&gt;:()V">
+                    <location/>
+                </function>
+            </function_return>
+            <failure hidden="false" property="java::TmpTest.test:([I)V.assertion.1" reason="assertion at file TmpTest.java line 58 function java::TmpTest.test:([I)V bytecode-index 137" step_nr="327" thread="0">
+                <location file="TmpTest.java" function="java::TmpTest.test:([I)V" line="58"/>
+            </failure>
+        </goto_trace>
+    </result>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.7" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.6" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.6" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.9" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.5" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.5" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.8" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.4" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.4" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.7" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.3" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.3" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.6" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.10" status="SUCCESS"/>
+
+    <result property="java::TmpTest.&lt;init&gt;:()V.null-pointer-exception.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.11" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.2" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.11" status="SUCCESS"/>
+
+    <result property="java::TmpTest.&lt;init&gt;:()V.null-pointer-exception.2" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.28" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.5" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.7" status="SUCCESS"/>
+
+    <result property="java::TmpTest.&lt;init&gt;:()V.null-pointer-exception.3" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.12" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.29" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.2" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.3" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.4" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.2" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-create-negative-size.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.integer-divide-by-zero.1" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.12" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.8" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.8" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.13" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.9" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.9" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.14" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.15" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.16" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.17" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.18" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.19" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.20" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.21" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.22" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.23" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.24" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.25" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-create-negative-size.2" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.26" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.10" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.10" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.null-pointer-exception.27" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-low.11" status="SUCCESS"/>
+
+    <result property="java::TmpTest.test:([I)V.array-index-out-of-bounds-high.12" status="SUCCESS"/>
+
+    <message type="STATUS-MESSAGE">
+        <text>VERIFICATION FAILED</text>
+    </message>
+
+    <cprover-status>FAILURE</cprover-status>
+
+</cprover>

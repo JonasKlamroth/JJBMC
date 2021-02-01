@@ -12,8 +12,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.*;
@@ -27,7 +30,6 @@ import static picocli.CommandLine.*;
 @Command(name = "openJBMC", header = "@|bold openJBMC Bounded Model checking for JML|@")
 public class CLI implements Runnable {
     private static final Logger log = LogManager.getLogger(CLI.class);
-    public static final boolean debugMode = true;
 
     public static final String RESET = "\033[0m";  // Text Reset
     public static final String RED_BOLD = "\033[1;31m";    // RED
@@ -82,6 +84,12 @@ public class CLI implements Runnable {
             description = "Number of times loops are unwound. (default 5)",
             arity = "0..1")
     public static int unwinds = -1;
+
+    @Option(names= {"-tr", "-trace"},
+           description = "Prints out traces for failing pvcs.")
+    public static boolean runWithTrace = true;
+
+    public static final boolean debugMode = true;
 
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
@@ -172,20 +180,40 @@ public class CLI implements Runnable {
                 return null;
             }
             tmpFolder = new File(f.getParentFile(), "tmp");
+            deleteFolder(tmpFolder, true);
             tmpFolder.mkdirs();
             tmpFile = new File(tmpFolder, f.getName());
+            File tmpClassFile = new File(tmpFolder, f.getName().replace(".java", ".class"));
+            if(tmpFile.exists()) {
+                tmpFile.delete();
+            }
+            if(tmpClassFile.exists()) {
+                tmpClassFile.delete();
+            }
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             long start = System.currentTimeMillis();
             String translation = translate(tmpFile, apiArgs);
+
+            Matcher m = Pattern.compile("package (.*?);").matcher(translation);
+            String packageName = "";
+            if(m.find()) {
+                packageName = m.group(1);
+            }
             long finish = System.currentTimeMillis();
             log.debug("Translation took: " + (finish - start) + "ms");
             if(translation != null) {
                 if (tmpFile.exists()) {
                     Files.delete(tmpFile.toPath());
                 }
+                if(packageName != null) {
+                    packageName = packageName.replace(".", "/");
+                }
+                File packageFolder = new File(tmpFolder, packageName);
+                packageFolder.mkdirs();
+                tmpFile = new File(packageFolder, tmpFile.getName());
                 Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
-                createCProverFolder(tmpFile.getAbsolutePath());
+                createCProverFolder(tmpFolder.getAbsolutePath());
                 if (!copyJBMC()) {
                     cleanUp();
                     return null;
@@ -203,8 +231,6 @@ public class CLI implements Runnable {
         }
 
         try {
-            Runtime rt = Runtime.getRuntime();
-
             String[] commands = new String[apiArgs.length + 2];
             commands[0] = "javac";
             commands[1] = tmpFile.getAbsolutePath();
@@ -239,6 +265,7 @@ public class CLI implements Runnable {
         log.debug("Parse function names.");
         FunctionNameVisitor.parseFile(fileName);
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
+        Map<String, List<String>> paramMap = FunctionNameVisitor.getParamMap();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
             functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
@@ -251,7 +278,7 @@ public class CLI implements Runnable {
         log.info("Run jbmc for " +functionNames.size() + " functions.");
         for(String functionName : functionNames) {
             ExecutorService executerService = Executors.newSingleThreadExecutor();
-            Runnable worker = () -> runJBMC(tmpFile, functionName);
+            Runnable worker = () -> runJBMC(tmpFile, functionName, paramMap);
 
             final Future handler = executerService.submit(worker);
             try {
@@ -275,11 +302,13 @@ public class CLI implements Runnable {
         return res;
     }
 
-    static public void runJBMC(File tmpFile, String functionName) {
+    static public void runJBMC(File tmpFile, String functionName, Map<String, List<String>> paramMap) {
         try {
             log.debug("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-            String classFile = tmpFile.getName().replace(".java", ".class");
+            String classFile = tmpFile.getAbsolutePath().replace(".java", "");
+            classFile = classFile.substring(classFile.indexOf("/tmp") + 5);
+            //classFile = "." + classFile;
 
             ArrayList<String> tmp = new ArrayList<>();
             tmp.add("./jbmc");
@@ -329,47 +358,51 @@ public class CLI implements Runnable {
             long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
-            JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile);
-            if(output == null) {
-                throw new RuntimeException("Error parsing xml-output of JBMC.");
-            }
-            log.info("Result for function " + functionName + ":");
-            if(timed) {
-                log.info("JBMC took " + (end - start) + "ms.");
-            }
-
-            if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
-                log.error("JBMC did not terminate as expected.");
-            } else {
-                log.debug("JBMC terminated normally.");
-            }
-
-            if(output.errors.size() == 0) {
-                String traces = output.printAllTraces();
-                if(!traces.isEmpty()) {
-                    log.info(traces);
-                }
-                //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
-                String status = output.printStatus();
-                if(status.contains("SUCC")) {
-                    log.info(GREEN_BOLD + status + RESET);
-                } else {
-                    log.info(RED_BOLD + status + RESET);
-                }
-            } else {
-                log.error(output.printErrors());
-            }
-
-
+            JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap);
+            printOutput(output, end - start, functionName);
        } catch (Exception e) {
             log.error("Error running jbmc.");
             e.printStackTrace();
         }
     }
 
+    public static void printOutput(JBMCOutput output, long time, String functionName) {
+        if(output == null) {
+            throw new RuntimeException("Error parsing xml-output of JBMC.");
+        }
+        log.info("Result for function " + functionName + ":");
+        if(timed) {
+            log.info("JBMC took " + time + "ms.");
+        }
+
+        if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+            log.error("JBMC did not terminate as expected.");
+        } else {
+            log.debug("JBMC terminated normally.");
+        }
+
+        if(output.errors.size() == 0) {
+            if(runWithTrace) {
+                String traces = output.printAllTraces();
+                if (!traces.isEmpty()) {
+                    log.info(traces);
+                }
+            }
+            //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
+            String status = output.printStatus();
+            if(status.contains("SUCC")) {
+                log.info(GREEN_BOLD + status + RESET);
+            } else {
+                log.info(RED_BOLD + status + RESET);
+            }
+        } else {
+            log.error(output.printErrors());
+        }
+    }
+
     static private void createCProverFolder(String fileName) {
         File f = new File(fileName);
-        File dir = new File(f.getParent() + File.separator + "org" + File.separator + "cprover");
+        File dir = new File(f.getAbsolutePath() + File.separator + "org" + File.separator + "cprover");
         log.debug("Copying CProver.java to " + dir.getAbsolutePath());
         dir.mkdirs();
         try {
@@ -424,7 +457,7 @@ public class CLI implements Runnable {
 
     public static void cleanUp() {
         if(!didCleanUp && !keepTranslation) {
-            deleteFolder(tmpFolder);
+            deleteFolder(tmpFolder, false);
             if (!keepTranslation) {
                 try {
                     if (tmpFolder.exists()) {
@@ -438,20 +471,24 @@ public class CLI implements Runnable {
         didCleanUp = true;
     }
 
-    public static void deleteFolder(File folder) {
+    public static void deleteFolder(File folder, boolean all) {
         File[] tmpFiles = folder.listFiles();
         assert tmpFiles != null;
-        for(File f : tmpFiles) {
-            if(!keepTranslation || !f.getName().endsWith(new File(fileName).getName())) {
-                if (f.isDirectory()) {
-                    deleteFolder(f);
-                }
-                try {
-                    if(f.exists()) {
-                        Files.delete(f.toPath());
+        if(tmpFiles != null) {
+            for (File f : tmpFiles) {
+                if (!keepTranslation || !f.getName().endsWith(new File(fileName).getName()) || all) {
+                    if (f.isDirectory()) {
+                        if(!f.getName().contains("TestAnnotations")) {
+                            deleteFolder(f, all);
+                        }
                     }
-                } catch (IOException ex) {
-                    //log.info("Could not delete temporary file: " + f.getAbsolutePath());
+                    try {
+                        if (f.exists()) {
+                            Files.delete(f.toPath());
+                        }
+                    } catch (IOException ex) {
+                        //log.info("Could not delete temporary file: " + f.getAbsolutePath());
+                    }
                 }
             }
         }

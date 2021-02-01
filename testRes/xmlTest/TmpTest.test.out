@@ -1,0 +1,54 @@
+Result for function TmpTest.test:([I)V:
+Trace for PVC: java::TmpTest.test:([I)V.assertion.1 in line 58
+in line 33: this.privInt = 0
+in line 33: this.tt = null
+in line 33: a = &dynamic_object5
+in line 33: a.length = 5
+in line 33: a[0L] = 0
+in line 33: a[1L] = 2
+in line 33: a[2L] = 524288
+in line 33: a[3L] = 524289
+in line 33: a[4L] = 536879104
+in line 33: b_0 = 1
+in line 35: quantVar0i = 0
+in line 36: b_0 = 1
+in line 35: quantVar0i = 1
+in line 36: b_0 = 1
+in line 35: quantVar0i = 2
+in line 36: b_0 = 1
+in line 35: quantVar0i = 3
+in line 36: b_0 = 1
+in line 35: quantVar0i = 4
+in line 42: a = &dynamic_object8
+in line 42: a.length = 2
+in line 42: a[0L] = 0
+in line 42: a[1L] = 2
+in line 43: i = 0
+in line 45: a[0L] = 1
+in line 43: i = 1
+in line 45: a[1L] = 3
+in line 43: i = 2
+in line 48: this.privInt = 0
+in line 49: this.privInt = 1
+in line 50: this.privInt = 3
+in line 51: this.tt = "java::TmpTest"
+in line 51: this.tt.privInt = 0
+in line 51: this.tt.tt = null
+in line 24: this.tt.privInt = 0
+in line 26: this.tt.tt = null
+in line 51: this.tt = &dynamic_object10
+in line 52: this.tt.privInt = 1
+in line 54: t = "java::TmpTest"
+in line 54: t.privInt = 0
+in line 54: t.tt = null
+in line 24: anonlocal::2a.privInt = 0
+in line 26: anonlocal::2a.tt = null
+in line 54: t = (void *)&dynamic_object11.@java.lang.Object.@class_identifier
+in line 55: t.privInt = 2
+in line 57: b = (void *)&dynamic_object12.@java.lang.Object.@class_identifier
+in line 57: b.length = 3
+in line 57: b[0L] = 0
+in line 57: b[1L] = 1
+in line 57: b[2L] = 2
+Fail in line 58:            assert false; (assertion at file TmpTest.java line 58 function java::TmpTest.test:([I)V bytecode-index 137)
+

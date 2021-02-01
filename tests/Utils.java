@@ -22,7 +22,7 @@ public class Utils {
     private static Logger log = LogManager.getLogger(Utils.class);
 
     public static final String baseTestFolder = "testRes" + File.separator;
-    static private boolean keepTmpFile = true;
+    static private boolean keepTmpFile = false;
     private static boolean filterOutput = true;
     private boolean doCleanup = false;
 
@@ -43,7 +43,7 @@ public class Utils {
             log.error("Someting went wrong. Test aborted.");
             throw new RuntimeException("Tmpfile was not created. abort test.");
         }
-        String classFile = tmpFile.getPath().replace(".java", ".class");
+        String classFile = "tests/" + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
         FunctionNameVisitor.parseFile(fileName);
@@ -58,107 +58,28 @@ public class Utils {
         // " tests in file: " + tmpFile.getName());
         for(int idx = 0; idx < functionNames.size(); ++idx) {
             if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
-                params.add(new Object[]{classFile, functionNames.get(idx), unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParent()});
+                params.add(new Object[]{classFile, functionNames.get(idx), unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()});
             }
         }
         log.debug("Found " + params.size() + " functions.");
         return params;
     }
 
-    //@org.junit.Test
-    //public void runBubbleSortSymbCaseStudy() throws IOException, InterruptedException {
-    //    fileNames = new String[]{baseTestFolder + "CaseStudy/BubbleSortSymb.java"};
-    //    //runAllTests();
-    //}
-
-    //@org.junit.Test
-    //public void runOpenJMLDemos() {
-    //    File folder = new File("./testRes/openJMLDemo");
-    //    File[] files = folder.listFiles(File::isFile);
-    //    assert files != null;
-    //    String[] fileNames = new String[files.length];
-    //    for(int i = 0; i < files.length; ++i) {
-    //        if(files[i].isFile()) {
-    //            fileNames[i] = files[i].getPath();
-    //        }
-    //    }
-    //    runCaseStudies(fileNames);
-    //}
-
-    //@org.junit.Test
-    //public void runOpenJMLDemo() {
-    //    String[] fileNames = new String[]{"./testRes/openJMLDemo/Taxpayer.java"};
-    //    runCaseStudies(fileNames);
-    //}
-
-    //@org.junit.Test
-    //public void runPairInsertionSortCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/PairInsertionSort.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runPairInsertionSortSymbCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/PairInsertionSortSymb.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runMultCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/MultExample.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runBitMagicCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/BitMagicCollection.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runDualPivotQSCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/DualPivotQuicksort.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runBubbleSortCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/BubbleSort.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runHammingWeightCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/HammingWeight.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runBigIntCaseStudy() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/BigInt.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runTmpTest() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "CaseStudy/TmpTest.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runSomeTest() {
-    //    runCaseStudies(new String[]{baseTestFolder + "tests/JBMCTests.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runFailingTests() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "FailingTests.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runAssignableTests() throws IOException, InterruptedException {
-    //    runTests(new String[]{baseTestFolder + "tests/AssignableTests.java", baseTestFolder + "tests/AssignableTests2.java"});
-    //}
-
-    //@org.junit.Test
-    //public void runAWSTests() {
-    //    runCaseStudies(new String[]{baseTestFolder + "AWS/CipherBlockHeaders.java"});
-    //}
-
     static private void createAnnotationsFolder(String fileName) {
         File f = new File(fileName);
         File dir = new File(f.getParent(),"tmp" + File.separator + "TestAnnotations" );
+        log.debug("Copying Annotation files to " + dir.getAbsolutePath());
+        dir.mkdirs();
+        try {
+            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error trying to copy TestAnnotations");
+        }
+        f = new File(fileName);
+        dir = new File(f.getParent(),"tmp" + File.separator + "tests" + File.separator + "TestAnnotations" );
         log.debug("Copying Annotation files to " + dir.getAbsolutePath());
         dir.mkdirs();
         try {
@@ -188,10 +109,12 @@ public class Utils {
             commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function};
         }
 
-        Runtime rt = Runtime.getRuntime();
         log.info("Run jbmc with commands: " + Arrays.toString(commands));
-        Process proc = rt.exec(commands);
+
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(commands, null, new File("./testRes/tests/tmp"));
         proc.waitFor();
+
 
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));

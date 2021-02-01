@@ -1,0 +1,7 @@
+Result for function TmpTest.test2:(I)V:
+Trace for PVC: java::TmpTest.test2:(I)V.assertion.1 in line 73
+in line 68: i0 = 0
+in line 68: i = 0
+in line 71: j = 0
+Fail in line 73:            assert false; (assertion at file TmpTest.java line 73 function java::TmpTest.test2:(I)V bytecode-index 9)
+

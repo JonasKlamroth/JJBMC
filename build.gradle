@@ -65,4 +65,9 @@ task fatJar(type: Jar) {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+        options.deprecation = true
+}
+
 mainClassName = 'Main'

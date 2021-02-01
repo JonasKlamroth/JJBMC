@@ -1,31 +1,24 @@
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.JmlTypes;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Types;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Position;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
-import org.jmlspecs.openjml.Utils;
-import org.smtlib.impl.Pos;
 
 import java.util.Collections;
 
 import static com.sun.tools.javac.tree.JCTree.*;
 import static org.jmlspecs.openjml.JmlTree.*;
-import static com.sun.tools.javac.util.List.*;
 
 
 /**
@@ -38,6 +31,7 @@ public class TranslationUtils {
     private static Maker M;
     private static Symtab syms;
     private static JmlTreeUtils treeutils;
+    private static int counter = 0;
 
     public static void init(Context context) {
         TranslationUtils.M = JmlTree.Maker.instance(context);
@@ -76,6 +70,19 @@ public class TranslationUtils {
             return l.get(0);
         }
         return M.Block(0L, l);
+    }
+
+    static JCStatement makeAssertStatementWithDebugAssignments(JCExpression expr) {
+        List<JCIdent> idents = IdentifierVisitor.getIdents(expr);
+        List<JCStatement> stmts = List.nil();
+        for(JCIdent ident : idents) {
+            if(ident.type instanceof Type.JCPrimitiveType) {
+                JCVariableDecl variableDecl = treeutils.makeVariableDecl(M.Name("_" + counter++ + ident.name), ident.type, ident, Position.NOPOS);
+                stmts = stmts.append(variableDecl);
+            }
+        }
+        stmts = stmts.append(makeAssertStatement(expr));
+        return M.Block(0L, stmts);
     }
 
     static JCExpression getConjunction(List<JCExpression> exprs) {
@@ -435,7 +442,7 @@ public class TranslationUtils {
 
     public static JCStatement makeAssumeOrAssertStatement(JCExpression expr, VerifyFunctionVisitor.TranslationMode mode) {
         if(mode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
-            return makeAssertStatement(expr);
+            return makeAssertStatementWithDebugAssignments(expr);
         } else if(mode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
             return makeAssumeStatement(expr);
         }
@@ -578,12 +585,14 @@ class ReplaceVisitor extends JmlTreeScanner {
     static String oldName = null;
     static String newName = null;
     private final JmlTree.Maker M;
+
     public ReplaceVisitor(JmlTree.Maker maker) {
         this.M = maker;
     }
+
     @Override
     public void visitIdent(JCIdent tree) {
-        if(tree.name.toString().equals(oldName)) {
+        if (tree.name.toString().equals(oldName)) {
             tree.name = M.Name(newName);
         }
         super.visitIdent(tree);
@@ -591,7 +600,7 @@ class ReplaceVisitor extends JmlTreeScanner {
 
     @Override
     public void visitVarDef(JCVariableDecl tree) {
-        if(tree.name.toString().equals(oldName)) {
+        if (tree.name.toString().equals(oldName)) {
             tree.name = M.Name(newName);
         }
         super.visitVarDef(tree);
@@ -612,6 +621,27 @@ class ReplaceVisitor extends JmlTreeScanner {
         rv.scan(expr);
         return expr;
     }
-
-
 }
+
+class IdentifierVisitor extends JmlTreeScanner {
+    private List<JCIdent> idents = List.nil();
+
+    @Override
+    public void visitIdent(JCIdent ident) {
+        idents = idents.append(ident);
+        super.visitIdent(ident);
+    }
+
+    private IdentifierVisitor() {
+        super();
+    }
+
+    public static List<JCIdent> getIdents(JCExpression expr) {
+        IdentifierVisitor visitor = new IdentifierVisitor();
+        visitor.scan(expr);
+        return visitor.idents;
+    }
+}
+
+
+

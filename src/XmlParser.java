@@ -1,3 +1,4 @@
+import com.sun.tools.javac.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -17,18 +18,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class XmlParser {
     private static Logger log = LogManager.getLogger(XmlParser.class);
 
-    public static JBMCOutput parse(String xmlFile, String sourceFile) {
+    public static JBMCOutput parse(String xmlFile, String sourceFile, Map<String, List<String>> paramMap) {
         File xmlF = new File(xmlFile);
         File sourceF = new File(sourceFile);
         DocumentBuilder dBuilder = null;
@@ -45,10 +44,10 @@ public class XmlParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return parse(doc, sourceF);
+        return parse(doc, sourceF, paramMap);
     }
 
-    public static JBMCOutput parse(String xmlContent, File sourceFile) {
+    public static JBMCOutput parse(String xmlContent, File sourceFile, Map<String, List<String>> paramMap) {
         DocumentBuilder dBuilder = null;
         JBMCOutput res = new JBMCOutput();
         try {
@@ -69,14 +68,16 @@ public class XmlParser {
             return null;
         }
         doc.getDocumentElement().normalize();
-        return parse(doc, sourceFile);
+        return parse(doc, sourceFile, paramMap);
     }
 
-    public static JBMCOutput parse(Document xmlDoc, File sourceFile) {
+    public static JBMCOutput parse(Document xmlDoc, File sourceFile, Map<String, List<String>> paramMap) {
         JBMCOutput res = new JBMCOutput();
         try {
-            List<JBMCOutput.Assignment> references = new ArrayList<>();
-            Map<String, String> dynamicObjectsMap = new HashMap<>();
+            JBMCOutput.Trace references = null;
+            List<Pair<String, String>> assignments = new ArrayList<>();
+            List<Integer> lineNumbers = new ArrayList<>();
+            List<String> sourceLines = new ArrayList<>();
             File f1 = sourceFile;
             List<String> lines = new ArrayList<>();
             try {
@@ -85,6 +86,7 @@ public class XmlParser {
                 log.error("Error reading file: " + f1.getAbsolutePath());
                 return null;
             }
+            String joined = String.join("\n", lines);
             Document doc = xmlDoc;
             doc.getDocumentElement().normalize();
             NodeList messageList = doc.getElementsByTagName("message");
@@ -112,13 +114,13 @@ public class XmlParser {
                     Element propertyElemnt = (Element) propertyNode;
                     int lineNumber = -1;
                     if (propertyElemnt.getAttribute("status").equals("FAILURE")) {
-                        references = new ArrayList<>();
+
                         Element failure = (Element) propertyElemnt.getElementsByTagName("failure").item(0);
                         reason = failure.getAttribute("reason");
                         Element location = (Element) failure.getElementsByTagName("location").item(0);
                         if(location == null) {
                             if(propertyElemnt.getAttribute("property").contains("unwind")) {
-                                res.addProperty("Unwinding assertion", new ArrayList<>(), -1, null, "Try to increase the unwinding parameter.");
+                                res.addProperty("Unwinding assertion", new JBMCOutput.Trace(new ArrayList<>(), new HashSet<>()), -1, null, "Try to increase the unwinding parameter.");
                                 return res;
                             } else {
                                 throw new Exception("location was null.");
@@ -139,77 +141,14 @@ public class XmlParser {
                                     continue;
                                 }
                                 String l = lines.get(line);
-                                if (lhs.getTextContent().contains("dynamic_") || lhs.getTextContent().contains("tmp_object_factory") || lhs.getTextContent().contains("anonlocal") || lhs.getTextContent().contains("arg")) {
-                                    Pattern p = Pattern.compile("(\\w*) ?= ?.*?;");
-                                    Matcher m = p.matcher(l);
-                                    String guess = null;
-                                    if (lhs.getTextContent().contains("tmp_object_factory")) {
-                                        guess = lhs.getTextContent().replace("tmp_object_factory.", "");
-                                        //references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
-                                        if (value.getTextContent().startsWith("&dynamic_object")) {
-                                            dynamicObjectsMap.put(value.getTextContent().substring(1, value.getTextContent().indexOf('.')), guess);
-                                        }
-                                    } else if (lhs.getTextContent().startsWith("dynamic_object")) {
-                                        if (lhs.getTextContent().contains(".")) {
-                                            String dynObject = lhs.getTextContent().substring(0, lhs.getTextContent().indexOf('.'));
-                                            if (dynamicObjectsMap.containsKey(dynObject)) {
-                                                String replacement = dynamicObjectsMap.get(dynObject).replace("$", "\\$");
-                                                guess = lhs.getTextContent().replaceAll("dynamic_object(\\d)*", replacement);
-                                            }
-                                        } else {
-                                            //guess = lhs.getTextContent();
-                                            guess = null;
-                                        }
-                                        references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
-                                    } else if(lhs.getTextContent().startsWith("dynamic_") && lhs.getTextContent().contains("array")) {
-                                        if(value.getTextContent().contains("{")) {
-                                            dynamicObjectsMap.put(lhs.getTextContent(), value.getTextContent());
-                                            references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), value.getTextContent(), value.getTextContent()));
-                                        }
-                                    } else {
-                                        if (m.find()) {
-                                            guess = m.group(1);
-                                            references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
-                                        } else {
-                                            if (lhs.getTextContent().contains("arg")) {
-                                                String text = lines.stream().reduce("", String::concat);
-                                                p = Pattern.compile("\\(((\\/\\*@ non_null \\*\\/)?\\s*[\\w\\[\\]]*\\s*(\\w*)\\s*)?(\\s*,\\s*(\\/\\*@ non_null \\*\\/)?\\s*[\\w\\[\\]]*\\s*(\\w*))*\\)\\s*[{]");
-                                                m = p.matcher(text);
-                                                List<String> args = new ArrayList<>();
-                                                int linenNum = Integer.parseInt(aLocation.getAttribute("line"));
-                                                int numChars = lines.subList(0, linenNum).stream().reduce("", String::concat).length();
-                                                while (m.find() && m.start() < numChars) {
-                                                    args.clear();
-                                                    for (int k = 0; k < m.groupCount(); ++k) {
-                                                        if (k % 3 == 2 && m.group(k + 1) != null && !m.group(k + 1).equals("")) {
-                                                            args.add(m.group(k + 1));
-                                                            //log.info("Found arg " + args.get(args.size() - 1));
-                                                        }
-                                                    }
-                                                }
-                                                int argNum = -1;
-                                                try {
-                                                    argNum = Integer.parseInt("" + lhs.getTextContent().charAt(lhs.getTextContent().length() - 2));
-                                                } catch (NumberFormatException ex) {
-                                                    //TODO this should not happend
-                                                }
-                                                if (argNum >= 0 && argNum < args.size()) {
-                                                    guess = args.get(argNum);
-                                                } else {
-                                                    //log.info("argNum to big.");
-                                                }
-                                            }
-                                            references.add(new JBMCOutput.Assignment(aLocation.getAttribute("line"), lhs.getTextContent(), guess, value.getTextContent()));
-                                        }
-                                    }
-                                    log.debug("in Line " + aLocation.getAttribute("line") + ": " + lhs.getTextContent() + " = " + value.getTextContent());
-                                    log.debug(lines.get(Integer.parseInt(aLocation.getAttribute("line")) - 1));
-                                    //  log.info("guess " + guess);
-                                }
+                                assignments.add(new Pair<String, String>(lhs.getTextContent(), value.getTextContent()));
+                                lineNumbers.add(line);
+                                sourceLines.add(l);
+
                             }
                         }
+                        references = extractTrace(assignments, sourceLines, lineNumbers, paramMap, propertyElemnt.getAttribute("property"));
                     }
-                    references = checkDynamicObjectAssignments(dynamicObjectsMap, references);
                     if (lineNumber < 0) {
                         res.addProperty(propertyElemnt.getAttribute("property"), references, lineNumber, null, null);
                     } else {
@@ -242,28 +181,145 @@ public class XmlParser {
         return res;
     }
 
-    public static List<JBMCOutput.Assignment> checkDynamicObjectAssignments(Map<String, String> dynObjectsMap, List <JBMCOutput.Assignment> references) {
-        List<JBMCOutput.Assignment> res = new ArrayList<>();
-        if(references == null) {
-            return null;
-        }
-        for(JBMCOutput.Assignment a : references) {
-            if (a.jbmcVarname.startsWith("dynamic_")) {
-                String dynObject = "";
-                if (a.jbmcVarname.contains(".")) {
-                    dynObject = a.jbmcVarname.substring(0, a.jbmcVarname.indexOf('.'));
-                } else {
-                    dynObject = a.jbmcVarname;
-                }
-                if (dynObjectsMap.containsKey(dynObject)) {
-                    String replacement = dynObjectsMap.get(dynObject).replace("$", "\\$");
-                    String guess = a.jbmcVarname.replaceAll("dynamic_object(\\d)*", replacement);
-                    res.add(new JBMCOutput.Assignment(a.lineNumber, a.jbmcVarname, guess, a.value));
-                }
-            } else {
-                res.add(a);
+    public static JBMCOutput.Trace extractTrace(List<Pair<String, String>> assignments, List<String> sourceLines, List<Integer> lineNumbers, Map<String, List<String>> paramMap, String propertyName) {
+        for(int i = assignments.size() - 1; i >= 0; --i) {
+            if(!(assignments.get(i).fst.startsWith("tmp_object_factory") || assignments.get(i).fst.startsWith("dynamic") || assignments.get(i).fst.startsWith("arg") || assignments.get(i).fst.startsWith("anonlocal") || assignments.get(i).fst.startsWith("this"))) {
+                assignments.remove(i);
+                sourceLines.remove(i);
+                lineNumbers.remove(i);
+            }
+            if(assignments.get(i).fst.endsWith("class_identifier")) {
+                assignments.set(i, new Pair<>(assignments.get(i).fst.substring(0, assignments.get(i).fst.indexOf(".")), assignments.get(i).snd));
+            }
+            if(assignments.get(i).fst.contains(".data")) {
+                assignments.set(i, new Pair<>(assignments.get(i).fst.replace(".data", ""), assignments.get(i).snd));
             }
         }
+        Map<String, String> nameMap = new HashMap<>();
+        nameMap.put("tmp_object_factory", "this");
+        for(int i = 0; i < assignments.size(); ++i) {
+            String var = assignments.get(i).fst;
+            String val = assignments.get(i).snd;
+            if(val.startsWith("(void *)&dynamic_object")) {
+                val = val.substring(9, val.indexOf("."));
+            }
+            if(val.startsWith("&dynamic_object")) {
+                val = val.substring(1);
+            }
+            try {
+                Integer.parseInt(val);
+                continue;
+            } catch (NumberFormatException e) {
+            }
+            if(!val.equals("null")) {
+                nameMap.put(val, var);
+            }
+        }
+
+        List<JBMCOutput.Assignment> trace = new ArrayList<>();
+        Set<JBMCOutput.Trace.Guess> guesses = new HashSet<>();
+        for(int i = 0; i < assignments.size(); ++i) {
+            String var = assignments.get(i).fst;
+            String[] split = var.split("((?<=(\\.|\\[|\\])|(?=(\\.|\\[|\\]))))");
+            var = getOriginalName(split, nameMap);
+            String guess = guessVarName(var, sourceLines.get(i), paramMap, propertyName);
+            if(guess != null) {
+                guesses.add(new JBMCOutput.Trace.Guess(var, guess, lineNumbers.get(i)));
+            }
+            trace.add(new JBMCOutput.Assignment(lineNumbers.get(i) + 1, var, assignments.get(i).snd, sourceLines.get(i)));
+        }
+        return new JBMCOutput.Trace(trace, guesses);
+    }
+
+    private static String guessVarName(String var, String sourceLine, Map<String, List<String>> paramMap, String propertyName) {
+        String ident_regex = "[A-Za-z0-9_]+";
+        if(var.startsWith("anonlocal")) {
+            String postfix = "";
+            if(var.contains(".")) {
+                postfix = var.substring(var.indexOf(".") + 1);
+                ident_regex = "(" + ident_regex + ")\\." + postfix;
+                postfix = "." + postfix;
+            } else if (var.contains("[")){
+                postfix = var.substring(var.indexOf("[") + 1);
+                ident_regex = "(" + ident_regex + ")\\[.*?\\]\\S*?";
+                postfix = "[" + postfix;
+            } else {
+                ident_regex = "(" + ident_regex + ")";
+            }
+            List<String> allMatches = new ArrayList<String>();
+            Matcher m = Pattern.compile(".*?" + ident_regex + " ?(\\+|\\*|-|~|/)?= ?.*?")
+                    .matcher(sourceLine);
+            while (m.find()) {
+                allMatches.add(m.group(1));
+            }
+            m = Pattern.compile(".*?" + ident_regex + "((\\+\\+)|(\\-\\-)).*")
+                    .matcher(sourceLine);
+            while (m.find()) {
+                allMatches.add(m.group(1));
+            }
+            m = Pattern.compile(".*?((\\-\\-)|(\\+\\+))" + ident_regex  + ".*")
+                    .matcher(sourceLine);
+            while (m.find()) {
+                allMatches.add(m.group(4));
+            }
+            if(allMatches.size() == 1) {
+                return allMatches.get(0) + postfix;
+            } else {
+                List<String> distinct = allMatches.stream().distinct().collect(Collectors.toList());
+                if(distinct.size() == 1) {
+                    return distinct.get(0) + postfix;
+                }
+            }
+        }
+        Matcher m = Pattern.compile("arg(\\d+)\\w(.*)")
+                .matcher(var);
+        if(m.find()) {
+            try {
+                int idx = Integer.parseInt(m.group(1)) ;
+                String postfix = m.group(2);
+                m = Pattern.compile("java::(.*?):")
+                        .matcher(propertyName);
+                if(m.find()) {
+                    String functionName = m.group(1);
+                    if(paramMap.containsKey(functionName)) {
+                        List<String> args = paramMap.get(functionName);
+                        idx -= 1;
+                        if(idx >= 0 && idx < args.size()) {
+                            return args.get(idx) + postfix;
+                            //return null;
+                        }
+                    }
+                    functionName = "$static_" + functionName;
+                    if(paramMap.containsKey(functionName)) {
+                        List<String> args = paramMap.get(functionName);
+                        if(idx >= 0 && idx < args.size()) {
+                            return args.get(idx) + postfix;
+                        }
+                    }
+                }
+            } catch (NumberFormatException e) {
+                //meh
+            }
+        }
+        return null;
+    }
+
+
+    private static String getOriginalName(String[] exprs, Map<String, String> exprMap) {
+        String res = "";
+        for(String s : exprs) {
+            res += getOriginalName(s, exprMap);
+        }
         return res;
+    }
+    private static String getOriginalName(String expr, Map<String, String> exprMap) {
+        while(exprMap.containsKey(expr)) {
+            expr = exprMap.get(expr);
+            String[] exprs = expr.split("((?<=(\\.|\\[|\\])|(?=(\\.|\\[|\\]))))");
+            if(exprs.length > 1) {
+                expr = getOriginalName(exprs, exprMap);
+            }
+        }
+        return expr;
     }
 }

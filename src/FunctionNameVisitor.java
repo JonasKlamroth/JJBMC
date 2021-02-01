@@ -8,13 +8,16 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class FunctionNameVisitor extends JmlTreeScanner {
     private static Logger log = LogManager.getLogger(FunctionNameVisitor.class);
     static private List<String> functionNames = new ArrayList<>();
     static private List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static private List<String> unwinds = new ArrayList<>();
+    private static Map<String, List<String>> paramMap = new HashMap<>();
 
     public enum TestBehaviour {
         Verifyable,
@@ -24,6 +27,10 @@ class FunctionNameVisitor extends JmlTreeScanner {
 
     public static List<String> getFunctionNames() {
         return functionNames;
+    }
+
+    public static Map<String, List<String>> getParamMap() {
+        return paramMap;
     }
 
     public static List<String> getUnwinds() {
@@ -44,6 +51,19 @@ class FunctionNameVisitor extends JmlTreeScanner {
         String rtString = returnTypeString(that.restype);
         String paramString = getParamString(that.params);
         functionNames.add(f + ":" + paramString + rtString);
+        for(JCTree.JCVariableDecl p : that.params) {
+            String name = f;
+            if((that.mods.flags & 8L) != 0) {
+                name = "$static_" + f;
+            }
+            if(paramMap.containsKey(name)) {
+                paramMap.get(name).add(p.name.toString());
+            } else {
+                List<String> list = new ArrayList<>();
+                list.add(p.name.toString());
+                paramMap.put(name, list);
+            }
+        }
         translateAnnotations(that.mods.annotations);
         super.visitJmlMethodDecl(that);
     }
