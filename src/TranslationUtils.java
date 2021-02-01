@@ -336,6 +336,10 @@ public class TranslationUtils {
     }
 
     public static JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol, boolean withNull) {
+        if(type instanceof Type.AnnotatedType) {
+            log.warn("Type annotations are currently being ignored! (nullable is the default for this tool)");
+            type = type.unannotatedType();
+        }
         if(type.equals(syms.intType)) {
             return makeNondetInt(currentSymbol);
         } else if(type.equals(syms.floatType)) {
