@@ -31,14 +31,12 @@ public class XmlParser {
         File xmlF = new File(xmlFile);
         File sourceF = new File(sourceFile);
         DocumentBuilder dBuilder = null;
-        try {
-            dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
         Document doc = null;
         try {
+            dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             doc = dBuilder.parse(xmlF);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -48,7 +46,7 @@ public class XmlParser {
     }
 
     public static JBMCOutput parse(String xmlContent, File sourceFile, Map<String, List<String>> paramMap) {
-        DocumentBuilder dBuilder = null;
+        DocumentBuilder dBuilder;
         JBMCOutput res = new JBMCOutput();
         try {
             dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -56,7 +54,7 @@ public class XmlParser {
             e.printStackTrace();
             return null;
         }
-        Document doc = null;
+        Document doc;
         try {
             InputSource is = new InputSource(new StringReader(xmlContent));
             doc = dBuilder.parse(is);
@@ -74,22 +72,20 @@ public class XmlParser {
     public static JBMCOutput parse(Document xmlDoc, File sourceFile, Map<String, List<String>> paramMap) {
         JBMCOutput res = new JBMCOutput();
         try {
-            JBMCOutput.Trace references = null;
+            JBMCOutput.Trace references;
             List<Pair<String, String>> assignments = new ArrayList<>();
             List<Integer> lineNumbers = new ArrayList<>();
             List<String> sourceLines = new ArrayList<>();
-            File f1 = sourceFile;
             List<String> lines = new ArrayList<>();
             try {
-                lines = Files.readAllLines(f1.toPath());
+                lines = Files.readAllLines(sourceFile.toPath());
             } catch (IOException e) {
-                log.error("Error reading file: " + f1.getAbsolutePath());
+                log.error("Error reading file: " + sourceFile.getAbsolutePath());
                 return null;
             }
             String joined = String.join("\n", lines);
-            Document doc = xmlDoc;
-            doc.getDocumentElement().normalize();
-            NodeList messageList = doc.getElementsByTagName("message");
+            xmlDoc.getDocumentElement().normalize();
+            NodeList messageList = xmlDoc.getElementsByTagName("message");
             for (int i = 0; i < messageList.getLength(); ++i) {
                 if(((Element)(messageList.item(i))).getAttribute("type").equals("ERROR")) {
                     res.errors.add(messageList.item(i).getTextContent());
@@ -101,10 +97,10 @@ public class XmlParser {
                 res.proverStatus = "ERROR";
                 return res;
             }
-            NodeList statusList = doc.getElementsByTagName("cprover-status");
+            NodeList statusList = xmlDoc.getElementsByTagName("cprover-status");
             assert statusList.getLength() == 1;
             res.proverStatus = statusList.item(0).getTextContent();
-            NodeList propertyNodeList = doc.getElementsByTagName("result");
+            NodeList propertyNodeList = xmlDoc.getElementsByTagName("result");
             String reason = null;
             for (int i = 0; i < propertyNodeList.getLength(); ++i) {
                 reason = null;
@@ -162,19 +158,17 @@ public class XmlParser {
             Transformer transformer = null;
             try {
                 transformer = tf.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                transformer.setOutputProperty(OutputKeys.INDENT, "no");
+                StringWriter writer = new StringWriter();
+                transformer.transform(new DOMSource(xmlDoc), new StreamResult(writer));
+                String output = writer.toString();
+                log.debug(output);
             } catch (TransformerConfigurationException ex) {
                 ex.printStackTrace();
+            } catch (TransformerException transformerException) {
+                transformerException.printStackTrace();
             }
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "no");
-            StringWriter writer = new StringWriter();
-            try {
-                transformer.transform(new DOMSource(xmlDoc), new StreamResult(writer));
-            } catch (TransformerException ex) {
-                ex.printStackTrace();
-            }
-            String output = writer.toString();
-            log.debug(output);
             e.printStackTrace();
         }
 
@@ -187,31 +181,33 @@ public class XmlParser {
                 assignments.remove(i);
                 sourceLines.remove(i);
                 lineNumbers.remove(i);
-            }
-            if(assignments.get(i).fst.endsWith("class_identifier")) {
-                assignments.set(i, new Pair<>(assignments.get(i).fst.substring(0, assignments.get(i).fst.indexOf(".")), assignments.get(i).snd));
-            }
-            if(assignments.get(i).fst.contains(".data")) {
-                assignments.set(i, new Pair<>(assignments.get(i).fst.replace(".data", ""), assignments.get(i).snd));
+            } else {
+                if (assignments.get(i).fst.endsWith("class_identifier")) {
+                    assignments.set(i, new Pair<>(assignments.get(i).fst.substring(0, assignments.get(i).fst.indexOf(".")), assignments.get(i).snd));
+                }
+                if (assignments.get(i).fst.contains(".data")) {
+                    assignments.set(i, new Pair<>(assignments.get(i).fst.replace(".data", ""), assignments.get(i).snd));
+                }
             }
         }
         Map<String, String> nameMap = new HashMap<>();
         nameMap.put("tmp_object_factory", "this");
-        for(int i = 0; i < assignments.size(); ++i) {
-            String var = assignments.get(i).fst;
-            String val = assignments.get(i).snd;
-            if(val.startsWith("(void *)&dynamic_object")) {
+        for (Pair<String, String> assignment : assignments) {
+            String var = assignment.fst;
+            String val = assignment.snd;
+            if (val.startsWith("(void *)&dynamic_object")) {
                 val = val.substring(9, val.indexOf("."));
             }
-            if(val.startsWith("&dynamic_object")) {
+            if (val.startsWith("&dynamic_object")) {
                 val = val.substring(1);
             }
             try {
                 Integer.parseInt(val);
                 continue;
             } catch (NumberFormatException e) {
+                //Intentionally left empty as it is not actually an error
             }
-            if(!val.equals("null")) {
+            if (!val.equals("null")) {
                 nameMap.put(val, var);
             }
         }
@@ -220,7 +216,7 @@ public class XmlParser {
         Set<JBMCOutput.Trace.Guess> guesses = new HashSet<>();
         for(int i = 0; i < assignments.size(); ++i) {
             String var = assignments.get(i).fst;
-            String[] split = var.split("((?<=(\\.|\\[|\\])|(?=(\\.|\\[|\\]))))");
+            String[] split = var.split("((?<=([.\\[\\]])|(?=(\\.|\\[|\\]))))");
             var = getOriginalName(split, nameMap);
             String guess = guessVarName(var, sourceLines.get(i), paramMap, propertyName);
             if(guess != null) {
@@ -306,16 +302,16 @@ public class XmlParser {
 
 
     private static String getOriginalName(String[] exprs, Map<String, String> exprMap) {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for(String s : exprs) {
-            res += getOriginalName(s, exprMap);
+            res.append(getOriginalName(s, exprMap));
         }
-        return res;
+        return res.toString();
     }
     private static String getOriginalName(String expr, Map<String, String> exprMap) {
         while(exprMap.containsKey(expr)) {
             expr = exprMap.get(expr);
-            String[] exprs = expr.split("((?<=(\\.|\\[|\\])|(?=(\\.|\\[|\\]))))");
+            String[] exprs = expr.split("((?<=([.\\[\\]])|(?=([.\\[\\]]))))");
             if(exprs.length > 1) {
                 expr = getOriginalName(exprs, exprMap);
             }
