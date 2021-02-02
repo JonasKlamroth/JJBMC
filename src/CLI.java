@@ -89,6 +89,10 @@ public class CLI implements Runnable {
            description = "Prints out traces for failing pvcs.")
     public static boolean runWithTrace = true;
 
+    @Option(names= {"-jc", "-javac"},
+            description = "allows to set the javac binary that is used for compilation of source files manually")
+    public static String javacBin = null;
+
     public static final boolean debugMode = true;
 
     static File tmpFolder = null;
@@ -236,11 +240,17 @@ public class CLI implements Runnable {
 
         try {
             String[] commands = new String[apiArgs.length + 2];
-            String javacBinary = findJavaVersion();
-            if(javacBinary == null) {
+            if(javacBin == null) {
+                javacBin = findJavaVersion();
+            } else {
+                if(!verifyJavaVersion(javacBin)) {
+                    return null;
+                }
+            }
+            if(javacBin == null) {
                 return null;
             }
-            commands[0] = javacBinary;
+            commands[0] = javacBin;
             commands[1] = tmpFile.getAbsolutePath();
             System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
             log.debug("Compiling translated file: " + Arrays.toString(commands));
@@ -530,7 +540,7 @@ public class CLI implements Runnable {
             if(line != null) {
                 if(!line.contains("1.8")) {
                     log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-                    log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+                    log.info("To manually provide a path to a javac binary use -javac option.");
                     log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
                     return false;
                 } else {
@@ -539,12 +549,12 @@ public class CLI implements Runnable {
             }
         } catch (IOException e) {
             log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-            log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+            log.info("To manually provide a path to a javac binary use -javac option.");
             log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
             return false;
         }
         log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-        log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+        log.info("To manually provide a path to a javac binary use -javac option.");
         log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
         return false;
     }
@@ -570,12 +580,12 @@ public class CLI implements Runnable {
 
         } catch (IOException e) {
             log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-            log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+            log.info("To manually provide a path to a javac binary use -javac option.");
             log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
             return null;
         }
         log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-        log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+        log.info("To manually provide a path to a javac binary use -javac option.");
         log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
         return null;
     }
