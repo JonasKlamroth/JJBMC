@@ -199,6 +199,9 @@ public class CLI implements Runnable {
             String packageName = "";
             if(m.find()) {
                 packageName = m.group(1);
+                if(packageName == null) {
+                    log.error("Error trying to figure out the package name of the provided source file.");
+                }
             }
             long finish = System.currentTimeMillis();
             log.debug("Translation took: " + (finish - start) + "ms");
@@ -222,6 +225,7 @@ public class CLI implements Runnable {
                 return null;
             }
         } catch (Exception e) {
+            keepTranslation = true;
             cleanUp();
             if(debugMode) {
                 e.printStackTrace();
@@ -232,7 +236,11 @@ public class CLI implements Runnable {
 
         try {
             String[] commands = new String[apiArgs.length + 2];
-            commands[0] = "javac";
+            String javacBinary = findJavaVersion();
+            if(javacBinary == null) {
+                return null;
+            }
+            commands[0] = javacBinary;
             commands[1] = tmpFile.getAbsolutePath();
             System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
             log.debug("Compiling translated file: " + Arrays.toString(commands));
@@ -244,10 +252,12 @@ public class CLI implements Runnable {
 
             proc.waitFor();
             if(proc.exitValue() != 0) {
+                keepTranslation = true;
                 log.error("Compilation failed. See compilationErrors.txt for javac output.");
                 return null;
             }
         } catch (IOException | InterruptedException e) {
+            keepTranslation = true;
             log.error("Error during preparation.");
             e.printStackTrace();
         }
@@ -259,6 +269,7 @@ public class CLI implements Runnable {
     static public void translateAndRunJBMC() {
         File tmpFile = prepareForJBMC();
         if(tmpFile == null) {
+            keepTranslation = true;
             log.error("Error preparing translation.");
             return;
         }
@@ -362,6 +373,7 @@ public class CLI implements Runnable {
             printOutput(output, end - start, functionName);
        } catch (Exception e) {
             log.error("Error running jbmc.");
+            keepTranslation = true;
             e.printStackTrace();
         }
     }
@@ -376,6 +388,7 @@ public class CLI implements Runnable {
         }
 
         if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+            keepTranslation = true;
             log.error("JBMC did not terminate as expected.");
         } else {
             log.debug("JBMC terminated normally.");
@@ -396,6 +409,7 @@ public class CLI implements Runnable {
                 log.info(RED_BOLD + status + RESET);
             }
         } else {
+            keepTranslation = true;
             log.error(output.printErrors());
         }
     }
@@ -473,7 +487,6 @@ public class CLI implements Runnable {
 
     public static void deleteFolder(File folder, boolean all) {
         File[] tmpFiles = folder.listFiles();
-        assert tmpFiles != null;
         if(tmpFiles != null) {
             for (File f : tmpFiles) {
                 if (!keepTranslation || !f.getName().endsWith(new File(fileName).getName()) || all) {
@@ -503,6 +516,68 @@ public class CLI implements Runnable {
     static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
         context.dump();
         return cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
+    }
+
+    static private boolean verifyJavaVersion(String binary) {
+        String[] commands = new String[]{binary, "-version"};
+        Process p = null;
+        try {
+            ProcessBuilder pb = new ProcessBuilder().command(commands)
+                    .redirectErrorStream(true);
+            p = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = reader.readLine();
+            if(line != null) {
+                if(!line.contains("1.8")) {
+                    log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
+                    log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+                    log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
+            log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+            log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
+            return false;
+        }
+        log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
+        log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+        log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
+        return false;
+    }
+
+    static private String findJavaVersion() {
+        String[] commands = new String[]{"update-alternatives", "--list", "javac"};
+        Process p = null;
+        try {
+            ProcessBuilder pb = new ProcessBuilder().command(commands)
+                    .redirectErrorStream(true);
+            p = pb.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = reader.readLine();
+            List<String> options = new ArrayList<>();
+            while(line != null) {
+                options.add(line);
+                if(line.contains("8")) {
+                    verifyJavaVersion(line);
+                    return line;
+                }
+                line = reader.readLine();
+            }
+
+        } catch (IOException e) {
+            log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
+            log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+            log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
+            return null;
+        }
+        log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
+        log.info("To update your default java version use: sudo update-alternatives --config java and select the appropriate version.");
+        log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
+        return null;
     }
 }
 
