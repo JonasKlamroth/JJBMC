@@ -47,7 +47,6 @@ public class XmlParser {
 
     public static JBMCOutput parse(String xmlContent, File sourceFile, Map<String, List<String>> paramMap) {
         DocumentBuilder dBuilder;
-        JBMCOutput res = new JBMCOutput();
         try {
             dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (ParserConfigurationException e) {

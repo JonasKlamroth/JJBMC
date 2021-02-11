@@ -296,7 +296,7 @@ public class CLI implements Runnable {
                 return;
             }
         }
-        log.info("Run jbmc for " +functionNames.size() + " functions.");
+        log.info("Run jbmc for " + functionNames.size() + " functions.");
         for(String functionName : functionNames) {
             ExecutorService executerService = Executors.newSingleThreadExecutor();
             Runnable worker = () -> runJBMC(tmpFile, functionName, paramMap);
@@ -390,6 +390,7 @@ public class CLI implements Runnable {
 
     public static void printOutput(JBMCOutput output, long time, String functionName) {
         if(output == null) {
+            keepTranslation = true;
             throw new RuntimeException("Error parsing xml-output of JBMC.");
         }
         log.info("Result for function " + functionName + ":");
