@@ -917,4 +917,34 @@ public class TestSuite {
         }
         arr = b;
     }
+
+
+
+    //@ ensures \result == 3;
+    @Verifyable
+    private int test1() {
+        int res = 0;
+        for(int i = 0; i++ < 3; res = inc(res)) {
+        }
+        return res;
+    }
+
+    //@ ensures \result == i + 1;
+    private int inc(int i) {
+        return i+1;
+    }
+
+
+    private boolean boolFunct(int i) {
+        return true;
+    }
+
+    @Verifyable
+    public boolean shortcutTest4() {
+        if(true && boolFunct(0)) {
+            return true;
+        }
+        return false;
+    }
+
 }

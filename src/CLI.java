@@ -93,6 +93,11 @@ public class CLI implements Runnable {
             description = "allows to set the javac binary that is used for compilation of source files manually")
     public static String javacBin = null;
 
+    @Option(names= {"-ci", "-contractIndex"},
+            description = "Allows to specify which of the contracts is going to be specified index from 0 upwards",
+            arity = "0..1")
+    public static int caseIdx = 0;
+
     public static final boolean debugMode = true;
 
     static File tmpFolder = null;

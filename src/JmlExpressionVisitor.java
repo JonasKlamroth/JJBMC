@@ -572,20 +572,34 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = List.nil();
             ArrayList<JCStatement> inits = new ArrayList<>();
             that.init.stream().forEach(el -> inits.add(super.copy(el)));
-            ArrayList<JCExpressionStatement> steps = new ArrayList<>();
-            that.step.stream().forEach(el -> steps.add(super.copy(el)));
-            newStatements = TranslationUtils.diff(newStatements, List.from(steps));
+            List<JCStatement> tmp1 = newStatements;
+            newStatements = List.nil();
+            ArrayList<JCExpressionStatement> finalSteps = new ArrayList<>();
+            //that.step.stream().forEach(el -> finalSteps.add(super.copy(el)));
+            for(JCExpressionStatement st : that.step) {
+                finalSteps.add(super.copy(st));
+            }
+            if(newStatements.size() == 0) {
+                newStatements = List.from(finalSteps);
+            }
+            List<JCStatement> steps = newStatements;
+            newStatements = List.nil();
+            newStatements = tmp1;
             newStatements = TranslationUtils.diff(newStatements, List.from(inits));
             tmp = tmp.appendList(newStatements);
             newStatements = List.nil();
             if(that.body instanceof JCBlock) {
                 super.copy(that.body);
+                assert newStatements.size() == 1 && newStatements.get(0) instanceof JCBlock;
+                newStatements = List.of(M.Block(0L, ((JCBlock) newStatements.get(0)).getStatements().appendList(steps)));
             } else {
-                JCBlock body = M.Block(0L, List.of(that.body));
+                List<JCStatement> bodyStmts = List.of(that.body);
+                bodyStmts = bodyStmts.appendList(steps);
+                JCBlock body = M.Block(0L, bodyStmts);
                 super.copy(body);
             }
             assert(newStatements.size() == 1);
-            JmlForLoop copy = M.ForLoop(List.from(inits), super.copy(that.cond), List.from(steps), newStatements.get(0));
+            JmlForLoop copy = M.ForLoop(List.from(inits), super.copy(that.cond), List.nil(), newStatements.get(0));
             newStatements = tmp.append(copy);
             return copy;
         }
@@ -1159,8 +1173,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {
-                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, e);
-                    newStatements = newStatements.append(saveParam);
+                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, TranslationUtils.getLiteralForType(e.type));
+                    neededVariableDefs = neededVariableDefs.append(saveParam);
+                    JCStatement assign = M.Exec(M.Assign(M.Ident(saveParam), e));
+                    newStatements = newStatements.append(assign);
                     newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
                 }
                 copy.args = newargs;

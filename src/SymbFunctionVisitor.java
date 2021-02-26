@@ -308,25 +308,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         return copy;
     }
 
-    private JCLiteral getLiteralForType(Type t) {
-        if(t.getTag().equals(TypeTag.INT)) {
-            return M.Literal(0);
-        }
-        if(t.getTag().equals(TypeTag.LONG)) {
-            return M.Literal(0);
-        }
-        if(t.getTag().equals(TypeTag.DOUBLE)) {
-            return M.Literal(0.0);
-        }
-        if(t.getTag().equals(TypeTag.FLOAT)) {
-            return M.Literal(0.0f);
-        }
-        if(t.getTag().equals(TypeTag.SHORT)) {
-            return M.Literal(0);
-        }
-        return treeutils.nullLit;
-    }
-
     public JCExpression editAssignable(JCExpression e) {
         return editAssignable(e, false);
     }

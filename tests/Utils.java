@@ -22,7 +22,7 @@ public class Utils {
     private static Logger log = LogManager.getLogger(Utils.class);
 
     public static final String baseTestFolder = "testRes" + File.separator;
-    static private boolean keepTmpFile = false;
+    static private boolean keepTmpFile = true;
     private static boolean filterOutput = true;
     private boolean doCleanup = false;
 

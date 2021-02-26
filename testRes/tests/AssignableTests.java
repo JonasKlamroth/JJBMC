@@ -345,7 +345,7 @@ public class AssignableTests {
     //@ requires privInt == 0;
     //@ ensures privInt == 10;
     @Verifyable
-    @Unwind(number = 11)
+    @Unwind(number = 12)
     private void assignableTest19() {
         for(; privInt < 10; privInt++) {
             int i = 0;
