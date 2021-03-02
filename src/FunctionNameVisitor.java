@@ -155,7 +155,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
         } else if (type != null) {
             if(type instanceof JCTree.JCIdent) {
-                return "L" + ((JCTree.JCIdent) type).sym.toString().replace(".", "/") + ";";
+                return "L" + ((JCTree.JCIdent) type).sym.flatName().toString().replace(".", "/") + ";";
             } else if (type instanceof JCTree.JCFieldAccess) {
                 return "L" + ((JCTree.JCFieldAccess) type).sym.toString().replace(".", "/") + ";";
             } else {

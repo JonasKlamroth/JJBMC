@@ -1114,6 +1114,22 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitNewClass(NewClassTree node, Void p) {
         JCNewClass newClass = (JCNewClass)node;
+        if(newClass.def != null) {
+            //anonymous class definition
+            ErrorLogger.warn("Anonymous class definitions are only copied currently.");
+            List<JCTree> newDefs = List.nil();
+            for(JCTree d : newClass.def.defs) {
+                if(!(d instanceof JmlMethodDecl)) {
+                    newDefs = newDefs.append(d);
+                } else {
+                    if(!((JmlMethodDecl) d).name.toString().startsWith("<init>")) {
+                        newDefs = newDefs.append(d);
+                    }
+                }
+            }
+            newClass.def.defs = newDefs;
+            return newClass;
+        }
         if(baseVisitor.hasSymbolicVersion(newClass.getIdentifier().toString())) {
             JCExpression ex = M.Ident(M.Name(newClass.getIdentifier() + "." + newClass.getIdentifier() + "Symb"));
             ex.setType(newClass.type);
