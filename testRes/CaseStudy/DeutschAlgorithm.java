@@ -3,17 +3,21 @@ public class DeutschAlgorithm {
         Function f = new Function() {
             @java.lang.Override
             public boolean exec(boolean input) {
-                return true;
+                return input;
             }
         };
-        System.out.println(DeutschAlgorithm.isBalanced(f));
+        System.out.println(DeutschAlgorithm.isBalanced(DeutschAlgorithm.fToArray(f)));
     }
 
-    //@ requires f != null;
-    //@ ensures \result == (f.exec(false) != f.exec(true));
-    public static boolean isBalanced(Function f) {
-        double h = 0.707;
-        double[] q1 = new double[]{1.0, 0.0};
+    public static boolean[] fToArray(Function f) {
+        return new boolean[]{f.exec(false), f.exec(true)};
+    }
+
+    //@ requires f != null && f.length == 2;
+    //@ ensures \result <==> (f[0] != f[1]);
+    public static boolean isBalanced(boolean f[]) {
+        double h = 0.70710678118;
+        double[] q1 = new double[]{0.0, 1.0};
         double[] q2 = new double[]{h, -h};
 
         q1 = new double[]{1*h + 0*h, 1*h + 0*(-h)};
@@ -43,16 +47,18 @@ public class DeutschAlgorithm {
                 hm[3][0]*c[0] + hm[3][1]*c[1] + hm[3][2]*c[2] + hm[3][3]*c[3]
         };
 
-        return c[0]*c[0] + c[1]*c[1] < c[2]*c[2] + c[3]*c[3];
+        System.out.println(c[0]*c[0] + c[1]*c[1]);
+        System.out.println(c[2]*c[2] + c[3]*c[3]);
+        return c[0]*c[0] + c[1]*c[1]  + 2.0 < c[2]*c[2] + c[3]*c[3];
     }
 
-    //@ requires f != null;
-    private static double[][] getOperatorForFunction(Function f) {
+    //@ requires f != null && f.length == 2;
+    private static double[][] getOperatorForFunction(boolean f[]) {
         return new double[][] {
-                new double[]{boolToDouble(!f.exec(false)), boolToDouble(f.exec(false)), 0.f, 0.f},
-                new double[]{boolToDouble(f.exec(false)), boolToDouble(!f.exec(false)), 0.f, 0.f},
-                new double[]{0.f, 0.f, boolToDouble(!f.exec(true)), boolToDouble(f.exec(true))},
-                new double[]{0.f, 0.f, boolToDouble(f.exec(true)), boolToDouble(!f.exec(true))}
+                new double[]{boolToDouble(!f[0]), boolToDouble(f[0]), 0.f, 0.f},
+                new double[]{boolToDouble(f[0]), boolToDouble(!f[0]), 0.f, 0.f},
+                new double[]{0.f, 0.f, boolToDouble(!f[1]), boolToDouble(f[1])},
+                new double[]{0.f, 0.f, boolToDouble(f[1]), boolToDouble(!f[1])}
         };
     }
 
