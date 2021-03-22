@@ -367,7 +367,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     Type.ArrayType arrayType = new Type.ArrayType(argCopy.type, argCopy.type.tsym);
                     List<JCExpression> dims = List.nil();
                     for(Symbol.VarSymbol e : quantifierVars.keySet()) {
-                        JCExpression dim = M.Literal(CLI.unwinds);
+                        JCExpression dim = M.Literal(CLI.maxArraySize);
                         //dim = M.Binary(Tag.PLUS, dim, quantifierVars.get(e).fst);
                         dims = dims.append(dim);
                     }
@@ -380,7 +380,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
                     JCExpression bodyExp = M.Ident(oldVar);
                     for(Symbol.VarSymbol v : quantifierVars.keySet()) {
-                        bodyExp = treeutils.makeArrayElement(Position.NOPOS, bodyExp, treeutils.makeBinary(Position.NOPOS, Tag.MOD, treeutils.makeIdent(Position.NOPOS, v), M.Literal(CLI.unwinds)));
+                        bodyExp = treeutils.makeArrayElement(Position.NOPOS, bodyExp, treeutils.makeBinary(Position.NOPOS, Tag.MOD, treeutils.makeIdent(Position.NOPOS, v), M.Literal(CLI.maxArraySize)));
                     }
                     JCStatement body = treeutils.makeAssignStat(Position.NOPOS, bodyExp, argCopy);
                     JCStatement oldInit = null;

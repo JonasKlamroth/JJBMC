@@ -98,6 +98,11 @@ public class CLI implements Runnable {
             arity = "0..1")
     public static int caseIdx = 0;
 
+    @Option(names = {"-mas", "-maxArraySize"},
+            description = "Sets the maximum size more nondeterministic arrays.",
+            arity = "0..1")
+    public static int maxArraySize = -1;
+
     public static final boolean debugMode = true;
 
     static File tmpFolder = null;
@@ -178,8 +183,15 @@ public class CLI implements Runnable {
         didCleanUp = false;
 
         if(unwinds < 0) {
-            log.info("No unwind argument found. Default to 5.");
-            unwinds = 5;
+            log.info("No unwind argument found. Default to 7.");
+            unwinds = 7;
+        }
+        if(maxArraySize < 0) {
+            log.info("No maxArraySize argument found. Default to " + unwinds + ".");
+            maxArraySize = Math.max(unwinds - 2, 0);
+        }
+        if(maxArraySize >= unwinds - 2) {
+            log.warn("Unwinds is set to less than maxArraySize + 2. This may lead to unsound behaviour.");
         }
 
         try {
@@ -343,6 +355,8 @@ public class CLI implements Runnable {
             tmp.add(functionName);
             tmp.add("--unwind");
             tmp.add(String.valueOf(unwinds));
+            tmp.add("----max-nondet-array-length");
+            tmp.add(String.valueOf(maxArraySize));
 
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
             tmp.addAll(jbmcOptions);

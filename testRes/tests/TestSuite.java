@@ -948,13 +948,16 @@ public class TestSuite {
     }
 
 
-    //@ ensures (\forall int i; i > 0 && i < 4; true ==> (\exists int j; j > i + 1 && j < 4; j > i));
+    //@ ensures (\forall int i; i > 0 && i < 4; (\exists int j; j > i + 1 && j < 4; j > i));
+    @Fails
+    @Unwind(number = 6)
     private void nestedQunts() {
     }
 
 
     //@ requires array != null && array.length >= 4;
     //@ ensures (\forall int i; 0 < i < 3; (\forall int j; i < j < 4; \old(array[j]) == array[i]));
+    @Fails
     private int oldNestedQuantTest(int[] array) {
         return array[0];
     }
