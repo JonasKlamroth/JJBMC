@@ -363,12 +363,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(quantifierVars.size() == 0) {
                     oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, argCopy);
                 } else {
-                    //throw new RuntimeException("Not yet implemented.");
                     Type.ArrayType arrayType = new Type.ArrayType(argCopy.type, argCopy.type.tsym);
                     List<JCExpression> dims = List.nil();
                     for(Symbol.VarSymbol e : quantifierVars.keySet()) {
                         JCExpression dim = M.Literal(CLI.maxArraySize);
-                        //dim = M.Binary(Tag.PLUS, dim, quantifierVars.get(e).fst);
                         dims = dims.append(dim);
                     }
                     for(int i = 0; i < quantifierVars.size() - 1; ++i) {
@@ -403,8 +401,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return M.Ident(oldVar);
             } else {
                 JCExpression res = M.Ident(oldVar);
-                for(Symbol.VarSymbol v : quantifierVars.keySet()) {
-                    res = treeutils.makeArrayElement(Position.NOPOS, res, treeutils.makeIdent(Position.NOPOS, v));
+                List<Symbol.VarSymbol> quanVars = List.from(quantifierVars.keySet());
+                for(Symbol.VarSymbol v : quanVars) {
+                    res = treeutils.makeArrayElement(Position.NOPOS, res, treeutils.makeBinary(Position.NOPOS, Tag.MOD, treeutils.makeIdent(Position.NOPOS, v), M.Literal(CLI.maxArraySize)));
                 }
                 return res;
             }

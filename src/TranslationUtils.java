@@ -78,8 +78,8 @@ public class TranslationUtils {
         List<JCStatement> stmts = List.nil();
         for(JCIdent ident : idents) {
             if(ident.type instanceof Type.JCPrimitiveType) {
-                JCVariableDecl variableDecl = treeutils.makeVariableDecl(M.Name("_" + counter++ + ident.name), ident.type, ident, Position.NOPOS);
-                stmts = stmts.append(variableDecl);
+                //JCVariableDecl variableDecl = treeutils.makeVariableDecl(M.Name("_" + counter++ + ident.name), ident.type, ident, Position.NOPOS);
+                //stmts = stmts.append(variableDecl);
             }
         }
         stmts = stmts.append(makeAssertStatement(expr));
