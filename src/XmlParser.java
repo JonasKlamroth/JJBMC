@@ -26,6 +26,12 @@ import java.util.stream.Collectors;
 
 public class XmlParser {
     private static Logger log = LogManager.getLogger(XmlParser.class);
+    private static String jbmcBanner = "\n" +
+            "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
+            "* *                 Copyright (C) 2001-2018                 * *\n" +
+            "* *              Daniel Kroening, Edmund Clarke             * *\n" +
+            "* * Carnegie Mellon University, Computer Science Department * *\n" +
+            "* *                  kroening@kroening.com                  * *";
 
     public static JBMCOutput parse(String xmlFile, String sourceFile, Map<String, List<String>> paramMap) {
         File xmlF = new File(xmlFile);
@@ -58,6 +64,10 @@ public class XmlParser {
             InputSource is = new InputSource(new StringReader(xmlContent));
             doc = dBuilder.parse(is);
         } catch (SAXException e) {
+            if(xmlContent.startsWith(jbmcBanner)) {
+                log.error("Error calling jbmc. Possibly provided faulty jbmc-arguments?");
+                return null;
+            }
             e.printStackTrace();
             return null;
         } catch (IOException e) {

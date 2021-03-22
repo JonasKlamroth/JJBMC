@@ -187,10 +187,10 @@ public class CLI implements Runnable {
             unwinds = 7;
         }
         if(maxArraySize < 0) {
-            log.info("No maxArraySize argument found. Default to " + unwinds + ".");
+            log.info("No maxArraySize argument found. Default to " + (unwinds - 2) + ".");
             maxArraySize = Math.max(unwinds - 2, 0);
         }
-        if(maxArraySize >= unwinds - 2) {
+        if(maxArraySize > unwinds - 2) {
             log.warn("Unwinds is set to less than maxArraySize + 2. This may lead to unsound behaviour.");
         }
 
@@ -355,7 +355,7 @@ public class CLI implements Runnable {
             tmp.add(functionName);
             tmp.add("--unwind");
             tmp.add(String.valueOf(unwinds));
-            tmp.add("----max-nondet-array-length");
+            tmp.add("--max-nondet-array-length");
             tmp.add(String.valueOf(maxArraySize));
 
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
@@ -410,7 +410,8 @@ public class CLI implements Runnable {
     public static void printOutput(JBMCOutput output, long time, String functionName) {
         if(output == null) {
             keepTranslation = true;
-            throw new RuntimeException("Error parsing xml-output of JBMC.");
+            log.error("Error parsing xml-output of JBMC.");
+            return;
         }
         log.info("Result for function " + functionName + ":");
         if(timed) {
