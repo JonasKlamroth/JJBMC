@@ -947,4 +947,9 @@ public class TestSuite {
         return false;
     }
 
+
+    //@ ensures (\forall int i; i > 0 && i < 4; true ==> (\exists int j; j > i + 1 && j < 4; j > i));
+    private void nestedQunts() {
+    }
+
 }

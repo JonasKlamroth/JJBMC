@@ -224,14 +224,20 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, true));
                 neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
+                JCExpression init = super.copy(re.getMin());
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 //l = l.append(boolVar);
-                JCExpression init = super.copy(re.getMin());
-                JCForLoop forLoop =  TranslationUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init);
+                String loopVarName = that.decls.get(0).getName().toString();
+                if(variableReplacements.containsKey(that.decls.get(0).getName().toString())) {
+                    loopVarName = variableReplacements.get(that.decls.get(0).getName().toString());
+                }
+                JCForLoop forLoop =  TranslationUtils.makeStandardLoopFromRange(range, newStatements, loopVarName, currentSymbol, init);
                 l = l.append(forLoop);
                 TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
@@ -249,14 +255,20 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol, treeutils.makeLit(Position.NOPOS, syms.booleanType, false));
                 neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
+                JCExpression init = super.copy(re.getMin());
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
                 //l = l.append(boolVar);
-                JCExpression init = super.copy(re.getMin());
-                l = l.append(TranslationUtils.makeStandardLoopFromRange(range, newStatements, that.decls.get(0).getName().toString(), currentSymbol, init));
+                String loopVarName = that.decls.get(0).getName().toString();
+                if(variableReplacements.containsKey(that.decls.get(0).getName().toString())) {
+                    loopVarName = variableReplacements.get(that.decls.get(0).getName().toString());
+                }
+                l = l.append(TranslationUtils.makeStandardLoopFromRange(range, newStatements, loopVarName, currentSymbol, init));
                 TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
