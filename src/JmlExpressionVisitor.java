@@ -367,8 +367,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     Type.ArrayType arrayType = new Type.ArrayType(argCopy.type, argCopy.type.tsym);
                     List<JCExpression> dims = List.nil();
                     for(Symbol.VarSymbol e : quantifierVars.keySet()) {
-                        JCExpression dim = M.Binary(Tag.PLUS, M.Binary(Tag.MINUS, quantifierVars.get(e).snd, quantifierVars.get(e).fst), M.Literal(1));
-                        dim = M.Binary(Tag.PLUS, dim, quantifierVars.get(e).fst);
+                        JCExpression dim = M.Literal(CLI.unwinds);
+                        //dim = M.Binary(Tag.PLUS, dim, quantifierVars.get(e).fst);
                         dims = dims.append(dim);
                     }
                     for(int i = 0; i < quantifierVars.size() - 1; ++i) {
@@ -380,11 +380,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
                     JCExpression bodyExp = M.Ident(oldVar);
                     for(Symbol.VarSymbol v : quantifierVars.keySet()) {
-                        bodyExp = treeutils.makeArrayElement(Position.NOPOS, bodyExp, treeutils.makeIdent(Position.NOPOS, v));
+                        bodyExp = treeutils.makeArrayElement(Position.NOPOS, bodyExp, treeutils.makeBinary(Position.NOPOS, Tag.MOD, treeutils.makeIdent(Position.NOPOS, v), M.Literal(CLI.unwinds)));
                     }
                     JCStatement body = treeutils.makeAssignStat(Position.NOPOS, bodyExp, argCopy);
                     JCStatement oldInit = null;
-                    for(Symbol.VarSymbol v : quantifierVars.keySet()) {
+                    List<Symbol.VarSymbol> quanVars = List.from(quantifierVars.keySet());
+                    quanVars = quanVars.reverse();
+                    for(Symbol.VarSymbol v : quanVars) {
                         JCVariableDecl in = treeutils.makeVarDef(v.type, v.name, currentSymbol, quantifierVars.get(v).fst);
 
                         oldInit = M.ForLoop(List.of(in), M.Binary(Tag.LE, M.Ident(in.sym), quantifierVars.get(v).snd), List.of(M.Exec(M.Unary(Tag.PREINC, M.Ident(in.sym)))), body);

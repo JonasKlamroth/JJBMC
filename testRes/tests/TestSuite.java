@@ -952,4 +952,11 @@ public class TestSuite {
     private void nestedQunts() {
     }
 
+
+    //@ requires array != null && array.length >= 4;
+    //@ ensures (\forall int i; 0 < i < 3; (\forall int j; i < j < 4; \old(array[j]) == array[i]));
+    private int oldNestedQuantTest(int[] array) {
+        return array[0];
+    }
+
 }
