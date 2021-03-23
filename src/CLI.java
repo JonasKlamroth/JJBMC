@@ -89,6 +89,11 @@ public class CLI implements Runnable {
            description = "Prints out traces for failing pvcs.")
     public static boolean runWithTrace = true;
 
+    @Option(names= {"-jbmc", "-jbmcBinary"},
+            description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
+    public static String jbmcBin = "./jbmc";
+
+
     @Option(names= {"-jc", "-javac"},
             description = "allows to set the javac binary that is used for compilation of source files manually")
     public static String javacBin = null;
@@ -349,7 +354,7 @@ public class CLI implements Runnable {
             //classFile = "." + classFile;
 
             ArrayList<String> tmp = new ArrayList<>();
-            tmp.add("./jbmc");
+            tmp.add(jbmcBin);
             tmp.add(classFile);
             tmp.add("--function");
             tmp.add(functionName);
