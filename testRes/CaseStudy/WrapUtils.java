@@ -11,10 +11,9 @@ public class WrapUtils {
      */
     /*@ requires s != null && length > 0;
       @ ensures (\forall int i; i >= 0 && i < s.length; \old(s[i]) == s[i] || (\old(s[i]) == ' ' && s[i] == '\n'));
-      @ ensures (\forall int i; i >= 0 && i < s.length; (s[i] == '\n' || i == 0) ==>
-      @ ((\forall int j; j > i && j < i + length; j < s.length ==> s[j] != ' ') ||
-      @  (\exists int k; k > i && k < i + length; k < s.length ==> s[k] == '\n') ||
-      @ s.length - i <= length));
+      @ ensures (\forall int i; 0 <= i && i < s.length;
+      @             ((\forall int j; i <= j && j < i + length; j < s.length ==>  s[j] != '\n')
+      @         ==> (\forall int j; i <= j && j < i + length; j < s.length ==> s[j] != ' ')));
       @ ensures (\forall int i; 0 <= i < s.length;
       @     (\forall int j; i < j < s.length;
       @     (\forall int k; j < k < s.length;
@@ -27,20 +26,25 @@ public class WrapUtils {
         int lastSpace = -1;
 
 
+
         /*@ loop_invariant s != null;
           @ loop_invariant -1 <= lastSpace && lastSpace < s.length;
           @ loop_invariant -1 <= lastChange && lastChange <= lastSpace;
-          @ loop_invariant lastSpace >= 0 ==> (\old(s)[lastSpace] == ' ' || \old(s)[lastSpace] == '\n');
+          @ //loop_invariant lastSpace >= 0 ==> (\old(s)[lastSpace] == ' ' || \old(s)[lastSpace] == '\n');
           @ loop_invariant (\forall int i; 0 <= i && i < s.length;
-          @    s[i] == \old(s)[i] || (\old(s)[i] == ' ' && s[i] == '\n'));
+          @    s[i] == \old(s[i]) || (\old(s[i]) == ' ' && s[i] == '\n'));
           @ loop_invariant lastSpace - lastChange < length ||
           @    (\forall int l; lastChange < l && l < lastSpace; s[l] != ' ');
-          @ loop_invariant (\forall int i; 0 <= i && i < lastChange && i < s.length - length;
-          @             (\forall int j; i <= j && j < i + length; s[j] != '\n')
-          @         ==> (\forall int j; i <= j && j < i + length; s[j] != ' '));
+          @ loop_invariant (\forall int i; 0 <= i && i < lastChange; (i < s.length - length) ==>
+          @             ((\forall int j; i <= j && j < i + length; s[j] != '\n')
+          @         ==> (\forall int j; i <= j && j < i + length; s[j] != ' ')));
           @ loop_invariant lastChange == -1 || s[lastChange] == '\n';
+          @ loop_invariant (\forall int i; 0 <= i <= lastChange;
+          @     (\forall int j; i < j <= lastChange;
+          @     (\forall int k; j < k <= lastChange;
+          @         (s[i] == '\n' && s[j] == '\n' && \old(s[j]) == ' ' && \old(s[k]) == ' ') ==> k - i >= length)));
           @ decreases s.length - lastSpace;
-          @ loop_modifies s[*];
+          @ loop_modifies s[*], lastSpace, lastChange;
           @*/
         while(true) {
             int nextSpace = indexOf(s, ' ', lastSpace + 1);
