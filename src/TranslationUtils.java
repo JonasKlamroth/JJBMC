@@ -655,10 +655,12 @@ class ReplaceVisitor extends JmlTreeScanner {
 
 class IdentifierVisitor extends JmlTreeScanner {
     private List<JCIdent> idents = List.nil();
+    private List<Symbol> syms = List.nil();
 
     @Override
     public void visitIdent(JCIdent ident) {
         idents = idents.append(ident);
+        syms = syms.append(ident.sym);
         super.visitIdent(ident);
     }
 
@@ -670,6 +672,12 @@ class IdentifierVisitor extends JmlTreeScanner {
         IdentifierVisitor visitor = new IdentifierVisitor();
         visitor.scan(expr);
         return visitor.idents;
+    }
+
+    public static List<Symbol> getIdentSymbols(JCExpression expr) {
+        IdentifierVisitor visitor = new IdentifierVisitor();
+        visitor.scan(expr);
+        return visitor.syms;
     }
 }
 

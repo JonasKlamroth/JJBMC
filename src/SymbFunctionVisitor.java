@@ -54,7 +54,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();

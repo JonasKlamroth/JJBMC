@@ -962,4 +962,22 @@ public class TestSuite {
         return array[0];
     }
 
+
+    //@ requires array != null && array.length >= 4;
+    //@ ensures \old(array) == array;
+    //@ ensures (\forall int i; 0 < i < 3; \old(array)[i] == array[i]);
+    @Verifyable
+    private int testOldInQuntifier(int[] array) {
+        return array[0];
+    }
+
+    //@ requires array != null && array.length >= 4;
+    //@ ensures \old(array) == array;
+    //@ ensures (\forall int i; 0 < i < 3; (\forall int j; i - 1 < j < i + 1; \old(array[j]) == array[i]));
+    @Verifyable
+    private int testOldInQuntifier2(int[] array) {
+        return array[0];
+    }
+
+
 }
