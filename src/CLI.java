@@ -398,8 +398,13 @@ public class CLI implements Runnable {
             long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
-            JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap);
-            printOutput(output, end - start, functionName);
+            if(xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+                JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap);
+                printOutput(output, end - start, functionName);
+            } else {
+                log.error("Unexpected jbmc output:");
+                log.error(xmlOutput);
+            }
        } catch (Exception e) {
             log.error("Error running jbmc.");
             keepTranslation = true;
