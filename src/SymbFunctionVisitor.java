@@ -201,12 +201,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
-        List<JCExpression> assignables = baseVisitor.getAssignablesForName(that.getName().toString());
-        List<JCStatement> assignableConditions = List.nil();
-        //JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
-        //        List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
-        //JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
-        //        List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
 
         List<JCStatement> bodyStats = List.nil();
         for(JCVariableDecl variableDecl : oldVars.values()) {
@@ -217,6 +211,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             bodyStats = bodyStats.append(oldInit);
         }
 
+        if(currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
+            throw new RuntimeException("Havocing \\everything is not supported. For: " + that.name);
+        }
         bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 
         List< JCStatement> l = List.nil();

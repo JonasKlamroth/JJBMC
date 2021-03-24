@@ -104,7 +104,7 @@ public class Utils {
         String[] commands;
         if(unwind != null) {
             log.info("unwind set to " + unwind);
-            commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function, "--unwind", unwind, "--unwinding-assertions", "--trace"};
+            commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function, "--unwind", unwind, "--unwinding-assertions"};
         } else {
             commands = new String[]{new File(parentFolder, "jbmc").getAbsolutePath(), classFile, "--function", function};
         }

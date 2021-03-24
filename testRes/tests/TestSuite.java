@@ -65,6 +65,7 @@ public class TestSuite {
 
     //@ requires  i > 0 && i < 10000;
     //@ ensures \result == i + 1;
+    //@ assignable \nothing;
     @Verifyable
     public int test1(int i) {
         return i + 1;
@@ -356,6 +357,7 @@ public class TestSuite {
     private void havocTest6() {
     }
 
+    //@ assignable \nothing;
     //@ ensures \result == 5;
     private int fakeTest(int i) {
         return 0;
@@ -745,6 +747,7 @@ public class TestSuite {
     //@ requires arr.length >= 1;
     //@ requires arr.length < 4;
     //@ ensures (\forall int i; 0 <= i && i < arr.length; arr[i] == \old(arr[i]));
+    //@ assignable arr[0];
     @Fails
     @Unwind(number = 10)
     private void oldTest9() {
@@ -757,6 +760,7 @@ public class TestSuite {
     //@ requires arr.length < 4;
     //@ requires pubInt == 0;
     //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    //@ assignable arr[0];
     @Fails
     @Unwind(number = 10)
     private void oldTest13() {
@@ -767,6 +771,7 @@ public class TestSuite {
     //@ requires arr.length == 1 && arr[0] == 0;
     //@ requires pubInt == 0;
     //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    //@ assignable arr[0];
     @Verifyable
     @Unwind(number = 10)
     private void oldTest12() {
@@ -777,6 +782,7 @@ public class TestSuite {
     //@ requires arr.length == 1 && arr[0] == 0;
     //@ requires pubInt == 0;
     //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    //@ assignable pubInt;
     @Fails
     @Unwind(number = 10)
     private void oldTest11() {
@@ -795,6 +801,7 @@ public class TestSuite {
     //@ requires arr.length == 1 && arr[0] == 0;
     //@ requires pubInt == 0;
     //@ ensures (\forall int i; 0 <= i && i < \old(arr.length); pubInt == \old(pubInt + arr[i]));
+    //@ assignable arr;
     @Verifyable
     @Unwind(number = 10)
     private void oldTest10() {
@@ -824,10 +831,12 @@ public class TestSuite {
       @ private normal_behaviour
       @ requires i >= 0 && i < 10;
       @ ensures \result == i;
+      @ assignable \nothing;
       @ also
       @ private normal_behaviour
       @ requires i < 0 && i > -10;
       @ ensures \result == -1 * i;
+      @ assignable \nothing;
       @*/
     @Verifyable
     private int abs(int i) {
@@ -842,10 +851,12 @@ public class TestSuite {
       @ private normal_behaviour
       @ requires i < 0 && i > -10;
       @ ensures \result == i;
+      @ assignable \nothing;
       @ also
       @ private normal_behaviour
       @ requires i >= 0 && i < 10;
       @ ensures \result == -1 * i;
+      @ assignable \nothing;
       @*/
     @Fails
     private int abs2(int i) {
@@ -921,6 +932,7 @@ public class TestSuite {
 
 
     //@ ensures \result == 3;
+    //@ assignable \nothing;
     @Verifyable
     private int test1() {
         int res = 0;
@@ -930,6 +942,7 @@ public class TestSuite {
     }
 
     //@ ensures \result == i + 1;
+    //@ assignable \nothing;
     private int inc(int i) {
         return i+1;
     }
@@ -978,6 +991,47 @@ public class TestSuite {
     private int testOldInQuntifier2(int[] array) {
         return array[0];
     }
+
+    //@ ensures \result == 3;
+    @Verifyable
+    private int loopInvModTest2() {
+        int i = 0;
+        //@ loop_invariant 0 <= i <= 3;
+        while(i < 3) {
+            i++;
+        }
+        return i;
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 3;
+    @Verifyable
+    private void loopInvModTest3() {
+        //@ loop_invariant 0 <= privInt <= 3;
+        while(privInt < 3) {
+            incPrivInt();
+        }
+    }
+
+    //@ assignable privInt;
+    //@ ensures privInt == \old(privInt) + 1;
+    @Verifyable
+    private void incPrivInt() {
+        privInt++;
+    }
+
+
+    //@ ensures false;
+    @Fails
+    private int loopInvModTest() {
+        int i = 0;
+        //@ loop_invariant 0 <= i <= 3;
+        while(i < 3) {
+            i++;
+        }
+        return i;
+    }
+
 
 
 }

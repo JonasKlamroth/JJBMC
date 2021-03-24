@@ -17,8 +17,12 @@ import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.sun.tools.javac.tree.JCTree.*;
+import static com.sun.tools.javac.tree.JCTree.Tag.POSTDEC;
 import static org.jmlspecs.openjml.JmlTree.*;
 
 
@@ -530,6 +534,50 @@ public class TranslationUtils {
         }
         return null;
     }
+
+    public static List<JCExpression> filterAssignables(List<JCExpression> assignables) {
+        if(assignables.contains(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING))) {
+            return List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+        }
+        List<JCExpression> res = List.nil();
+        List<JCExpression> jmlArrayRanges = List.from(assignables.stream().filter(e -> e instanceof JmlStoreRefArrayRange).collect(Collectors.toList()));
+        jmlArrayRanges = List.from(jmlArrayRanges.stream().sorted((l, r) -> l.toString().contains("*") ? -1 : 1).collect(Collectors.toList()));
+        for(JCExpression e : jmlArrayRanges) {
+            JmlStoreRefArrayRange range = (JmlStoreRefArrayRange) e;
+            if(range.hi == null && range.lo == null) {
+                res = res.append(range);
+            } else {
+                if(!res.stream().anyMatch(r -> r instanceof JmlStoreRefArrayRange && ((JmlStoreRefArrayRange) r).expression.equals(range.expression))) {
+                    res = res.append(range);
+                }
+            }
+        }
+
+        List<JCExpression> arrayRanges = List.from(assignables.stream().filter(e -> e instanceof JCArrayAccess).collect(Collectors.toList()));
+        arrayRanges = List.from(arrayRanges.stream().sorted((l, r) -> l.toString().contains("*") ? -1 : 1).collect(Collectors.toList()));
+        for(JCExpression e : arrayRanges) {
+            JCArrayAccess range = (JCArrayAccess) e;
+            if(!res.stream().anyMatch(r -> r instanceof JmlStoreRefArrayRange && ((JmlStoreRefArrayRange) r).expression.toString().equals(range.indexed.toString()))) {
+                res = res.append(range);
+            }
+        }
+
+        List<JCExpression> fields = List.from(assignables.stream().filter(e -> e instanceof JCFieldAccess).collect(Collectors.toList()));
+        fields = List.from(fields.stream().sorted((l, r) -> ((JCFieldAccess)l).name == null ? -1 : 1).collect(Collectors.toList()));
+        for(JCExpression e : fields) {
+            JCFieldAccess field = (JCFieldAccess) e;
+            if(field.name == null) {
+                res = res.append(field);
+            } else {
+                if(!res.stream().anyMatch(r -> r instanceof JCFieldAccess && ((JCFieldAccess) r).selected.toString().equals(field.selected.toString()))) {
+                    res = res.append(field);
+                }
+            }
+        }
+        List<JCExpression> rest = List.from(assignables.stream().filter(e -> !(e instanceof JCFieldAccess) && !(e instanceof JmlStoreRefArrayRange) && !(e instanceof JCArrayAccess)).collect(Collectors.toList()));
+        res = res.appendList(rest);
+        return res;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {
@@ -654,14 +702,71 @@ class ReplaceVisitor extends JmlTreeScanner {
 }
 
 class IdentifierVisitor extends JmlTreeScanner {
+    private BaseVisitor baseVisitor;
     private List<JCIdent> idents = List.nil();
     private List<Symbol> syms = List.nil();
+    private List<JCExpression> locSets = List.nil();
+    private List<Tag> assignOps = List.of(Tag.BITOR_ASG,
+            Tag.BITXOR_ASG,
+            Tag.BITAND_ASG,
+            Tag.SL_ASG,
+            Tag.SR_ASG,
+            Tag.USR_ASG,
+            Tag.PLUS_ASG,
+            Tag.MINUS_ASG,
+            Tag.MUL_ASG,
+            Tag.DIV_ASG,
+            Tag.MOD_ASG,
+            Tag.PREINC,
+            Tag.PREDEC,
+            Tag.POSTINC,
+            Tag.POSTDEC);
+
+    public IdentifierVisitor(BaseVisitor baseVisitor) {
+        this.baseVisitor = baseVisitor;
+    }
 
     @Override
     public void visitIdent(JCIdent ident) {
         idents = idents.append(ident);
         syms = syms.append(ident.sym);
         super.visitIdent(ident);
+    }
+
+    @Override
+    public void visitApply(JCMethodInvocation tree) {
+        String functionName = "";
+        if(tree.meth instanceof JCIdent) {
+            functionName = ((JCIdent) tree.meth).name.toString();
+        } else if(tree.meth instanceof JCFieldAccess) {
+            functionName = ((JCFieldAccess) tree.meth).name.toString();
+        }
+        if(baseVisitor != null) {
+            List<JCExpression> assigns = baseVisitor.getAssignablesForName(functionName);
+            if(assigns != null) {
+                locSets = locSets.appendList(assigns);
+            }
+        }
+    }
+
+    @Override
+    public void visitUnary(JCUnary tree) {
+        if(assignOps.contains(tree.getTag())) {
+            locSets = locSets.append(tree.arg);
+        }
+        super.visitUnary(tree);
+    }
+
+    @Override
+    public void visitAssignop(JCAssignOp tree) {
+        locSets = locSets.append(tree.lhs);
+        super.visitAssignop(tree);
+    }
+
+    @Override
+    public void visitAssign(JCAssign tree) {
+        locSets = locSets.append(tree.lhs);
+        super.visitAssign(tree);
     }
 
     private IdentifierVisitor() {
@@ -678,6 +783,12 @@ class IdentifierVisitor extends JmlTreeScanner {
         IdentifierVisitor visitor = new IdentifierVisitor();
         visitor.scan(expr);
         return visitor.syms;
+    }
+
+    public static List<JCExpression> getAssignLocations(JCStatement st, BaseVisitor baseVisitor) {
+        IdentifierVisitor visitor = new IdentifierVisitor(baseVisitor);
+        visitor.scan(st);
+        return visitor.locSets;
     }
 }
 

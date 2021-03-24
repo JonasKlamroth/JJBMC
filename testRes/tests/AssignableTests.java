@@ -435,6 +435,7 @@ public class AssignableTests {
     }
 
     //@ ensures \result == 5;
+    //@ assignable \nothing;
     private int fakeTest(int i) {
         return 0;
     }
@@ -543,5 +544,20 @@ public class AssignableTests {
     @Verifyable
     private void assignableTest30() {
         privInt = 0;
+    }
+
+    //@ requires true;
+    //@ assignable is[*];
+    @Verifyable
+    private void someAssignTest(int[] is) {
+    }
+
+    //@ requires is != null;
+    //@ requires is.length < 5;
+    //@ ensures (\forall int i; 0 <= i < is.length; is[i] == \old(is[i]));
+    @Fails
+    @Unwind(number = 7)
+    private void someCallTest(int[] is) {
+        someAssignTest(is);
     }
 }
