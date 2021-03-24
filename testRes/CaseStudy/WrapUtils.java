@@ -1,11 +1,12 @@
 public class WrapUtils {
 
+
     /**
      * Given a non-null array s and a positive length, this
      * method replaces ' ' by '\n' characters such that the
      * length of each line never exceeps length characters.
      * However, it makes lines as long as possible.
-     * 
+     *
      * This method never throws an exception and always
      * terminates.
      */
@@ -69,7 +70,7 @@ public class WrapUtils {
                         s[lastSpace] = '\n';
                         lastChange = lastSpace;
                     }
-                } 
+                }
                 lastSpace = nextSpace;
             }
         }
@@ -88,9 +89,59 @@ public class WrapUtils {
         return -1;
     }
 
+    private static int indexBefore(char[] s, char c, int before) {
+        for(int k = before; k > 0; k--) {
+            if(s[k] == c) {
+                return k;
+            }
+        }
+        return -1;
+    }
+
     public static void main(String[] args) {
-        char[] a = new char[]{'a', ' ', 'b', 'c'};
-        WrapUtils.wrapLines(a, 3);
+        char[] a = "\n   \n".toCharArray();
+        WrapUtils.wrapLines(a, 4);
         System.out.println(a);
+        char[] a1 = "\n   \n".toCharArray();
+        WrapUtils.wrapLines2(a1, 4);
+        System.out.println(a1);
+    }
+
+    /*@ requires s != null && length > 0;
+      @ ensures (\forall int i; i >= 0 && i < s.length; \old(s[i]) == s[i] || (\old(s[i]) == ' ' && s[i] == '\n'));
+      @ ensures (\forall int i; -1 <= i && i < s.length; ((i == -1 || s[i] == '\n')  && i < s.length - length) ==>
+      @             ((\forall int j; i < j && j <= i + length; j <= s.length ==>  s[j] != '\n')
+      @         ==> (\forall int j; i < j && j <= i + length; j <= s.length ==> s[j] != ' ')));
+      @ ensures (\forall int i; 0 <= i < s.length;
+      @     (\forall int j; i < j < s.length;
+      @     (\forall int k; j < k < s.length;
+      @         (s[i] == '\n' && s[j] == '\n' && \old(s[j]) == ' ' && \old(s[k]) == ' ') ==> k - i >= length)));
+      @*/
+    public static void wrapLines2(char[] s, int length) {
+        int lastBreak = -1;
+        int nextBreak = lastBreak + length;
+        int origBreak = indexOf(s, '\n', 0);
+        while(nextBreak < s.length) {
+            if(origBreak > lastBreak && origBreak <= nextBreak) {
+                lastBreak = origBreak;
+                nextBreak = lastBreak + length;
+                origBreak = indexOf(s, '\n', lastBreak + 1);
+            } else {
+                int potBreak = indexBefore(s, ' ', nextBreak);
+                if (potBreak > lastBreak) {
+                    s[potBreak] = '\n';
+                    lastBreak = potBreak;
+                } else {
+                    potBreak = indexOf(s, ' ', lastBreak + 1);
+                    if (potBreak >= 0) {
+                        s[potBreak] = '\n';
+                        lastBreak = potBreak;
+                    } else {
+                        lastBreak = s.length;
+                    }
+                }
+                nextBreak = lastBreak + length;
+            }
+        }
     }
 }
