@@ -108,6 +108,11 @@ public class CLI implements Runnable {
             arity = "0..1")
     public static int maxArraySize = -1;
 
+    @Option(names = {"-sc", "-sanityCheck"},
+            description = "Adds a check for each method if assumptions are equals to false.",
+            arity = "0..1")
+    public static boolean doSanityCheck = false;
+
     public static final boolean debugMode = true;
 
     static File tmpFolder = null;
@@ -121,6 +126,10 @@ public class CLI implements Runnable {
             forceInliningMethods = true;
         }
         translateAndRunJBMC();
+        if(doSanityCheck) {
+            doSanityCheck = false;
+            translateAndRunJBMC();
+        }
     }
 
     public static String translate(File file) throws Exception {
@@ -422,6 +431,14 @@ public class CLI implements Runnable {
         if(output == null) {
             keepTranslation = true;
             log.error("Error parsing xml-output of JBMC.");
+            return;
+        }
+        if(doSanityCheck) {
+            if(output.printStatus().contains("SUCC")) {
+                log.warn("Sanity check failed for: " + functionName);
+            } else {
+                log.info("Sanity check ok for function: " + functionName);
+            }
             return;
         }
         log.info("Result for function " + functionName + ":");

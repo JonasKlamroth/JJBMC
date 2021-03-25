@@ -251,6 +251,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             l = l.append(M.Block(0L, invariantAssert));
         }
 
+        if(CLI.doSanityCheck) {
+            l = l.append(TranslationUtils.makeAssertStatement(M.Literal(false)));
+        }
         if (returnStmt != null) {
             l = l.append(returnStmt);
         }
