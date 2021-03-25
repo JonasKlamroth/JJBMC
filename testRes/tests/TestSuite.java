@@ -1032,6 +1032,24 @@ public class TestSuite {
         return i;
     }
 
+    //@ assignable \nothing;
+    @Verifyable
+    private void loopInvAssTest() {
+        int j = 0;
+        //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
+        while(j < 0) {
+            j = inc(j);
+        }
+    }
 
+
+    @Fails
+    private void assForLoopTest() {
+        int j = 0;
+        //@ loop_invariant j <= 1;
+        for(int i = 0; i < 3; ++i) {
+            j += 1;
+        }
+    }
 
 }

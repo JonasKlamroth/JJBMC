@@ -637,14 +637,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = newStatements.append(loopVar);
         }
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
-        if(loopVar != null) {
-            newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(loopVar), TranslationUtils.makeNondetInt(currentSymbol))));
-        }
+        List<JCExpression> assignables = List.nil();
+        assignables = assignables.append(M.Ident(loopVar));
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
-                newStatements = newStatements.appendList(TranslationUtils.havoc(((JmlStatementLoopModifies) spec).storerefs, currentSymbol, this));
+                assignables = assignables.appendList(((JmlStatementLoopModifies) spec).storerefs);
             }
         }
+        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body, baseVisitor));
+        assignables = TranslationUtils.filterAssignables(assignables);
+        newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
+
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;
