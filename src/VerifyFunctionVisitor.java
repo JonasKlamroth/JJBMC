@@ -263,6 +263,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         reqCases = List.nil();
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
+        if(!currentMethod.name.toString().equals("<init>")) {
+            currentMethod.name = M.Name(currentMethod.name.toString() + "Verf");
+        }
         return currentMethod;
     }
 

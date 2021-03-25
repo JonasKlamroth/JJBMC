@@ -101,6 +101,9 @@ public class BaseVisitor extends FilterVisitor {
                 if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                     newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                 }
+                if(!((JmlMethodDecl) def).name.toString().equals("<init>")) {
+                    newDefs = newDefs.append(def);
+                }
             } else if(def instanceof JmlClassDecl) {
                 BaseVisitor bv = new BaseVisitor(context, M);
                 JmlClassDecl copiedClass = bv.copy((JmlClassDecl)def);

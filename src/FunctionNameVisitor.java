@@ -48,6 +48,9 @@ class FunctionNameVisitor extends JmlTreeScanner {
             return;
         }
         String f = that.sym.owner.toString() + "." + that.getName().toString();
+        if(!that.getName().toString().equals("<init>")) {
+            f += "Verf";
+        }
         String rtString = returnTypeString(that.restype);
         String paramString = getParamString(that.params);
         functionNames.add(f + ":" + paramString + rtString);

@@ -311,6 +311,7 @@ public class CLI implements Runnable {
         Map<String, List<String>> paramMap = FunctionNameVisitor.getParamMap();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
+            functionName = functionName + "Verf";
             functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
             if(functionNames.size() == 0) {
                 log.warn("Function " + functionName + " could not be found in the specified file.");
