@@ -86,7 +86,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             } else if(annotation.annotationType.toString().contains(".Pure")) {
                 //do nothing
             } else {
-                log.warn("Found unknown annotation: " + annotation.toString());
+                ErrorLogger.warn("Found unknown annotation: " + annotation.toString());
             }
         }
         if (functionNames.size() != functionBehaviours.size()) {

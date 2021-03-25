@@ -578,14 +578,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(that.loopSpecs != null) {
             throw new RuntimeException("Enhanced for loops with specifications are currently not supported.");
         }
+        JmlEnhancedForLoop copy = (JmlEnhancedForLoop) that.clone();
         List<JCStatement> tmp = newStatements;
         newStatements = List.nil();
         JCStatement body = super.copy(that.body);
         assert(newStatements.size() == 1);
-        that.body = newStatements.head;
+        copy.body = newStatements.head;
         newStatements = tmp;
-        newStatements = newStatements.append(that);
-        return that;
+        newStatements = newStatements.append(copy);
+        return copy;
     }
 
     @Override
@@ -728,6 +729,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     private void assumeOrAssertAllInvs(List<JmlStatementLoop> invs, VerifyFunctionVisitor.TranslationMode mode) {
+        List<JCStatement> oldNeededVars = neededVariableDefs;
+        neededVariableDefs = List.nil();
         List<JCStatement> l = newStatements;
         newStatements = List.nil();
         VerifyFunctionVisitor.TranslationMode oldMode = translationMode;
@@ -744,6 +747,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             neededVariableDefs = List.nil();
         }
         translationMode = oldMode;
+        neededVariableDefs = oldNeededVars;
     }
 
 
@@ -1215,8 +1219,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {
-                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, e);
-                    newStatements = newStatements.append(saveParam);
+                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, TranslationUtils.getLiteralForType(e.type));
+                    neededVariableDefs = neededVariableDefs.append(saveParam);
+                    JCStatement assign = M.Exec(M.Assign(M.Ident(saveParam), e));
+                    newStatements = newStatements.append(assign);
                     newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
                 }
                 copy.args = newargs;

@@ -1066,4 +1066,17 @@ public class TestSuite {
         pureMethod();
     }
 
+
+    //@ requires arr != null && arr.length > 0;
+    //@ assignable t3;
+    private void EnhancedForTest() {
+        for(int i : arr) {
+            randomMeth();
+        }
+    }
+
+    //@ assignable t2;
+    private void randomMeth() {
+    }
+
 }
