@@ -1052,4 +1052,18 @@ public class TestSuite {
         }
     }
 
+
+    @Fails
+    private /*@ pure */ void pureMethod() {
+        privInt = 1;
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 0;
+    //@ assignable \nothing;
+    @Verifyable
+    private void testPureSymbMethod() {
+        pureMethod();
+    }
+
 }

@@ -68,6 +68,13 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         copy.methodSpecsCombined = JmlSpecs.copy(that.methodSpecsCombined, p, this);
         copy.cases = (JmlTree.JmlMethodSpecs)copy.methodSpecsCombined.cases.clone();
         copy.type = that.type;
+
+
+        if(TranslationUtils.isPure(currentMethod)) {
+            foundNothing = true;
+            specifiedFunctions.add(that.getName().toString());
+        }
+
         if(assignables.size() == 0 && !foundNothing) {
             assignables = assignables.append(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
         }

@@ -77,6 +77,11 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
         JCTree copy = super.visitJmlSpecificationCase(that, p);
+
+        if(TranslationUtils.isPure(currentMethod)) {
+            currentAssignable = currentAssignable.append(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING));
+        }
+
         reqCases = reqCases.append(combinedNewReqStatements);
         ensCases = ensCases.append(combinedNewEnsStatements);
         combinedNewEnsStatements = List.nil();
@@ -136,7 +141,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         currentMethod = (JmlMethodDecl)that.clone();
         hasReturn = false;
 
-        if(that.cases == null) {
+        if(that.cases == null && !TranslationUtils.isPure(that)) {
             JmlMethodDecl copy = (JmlMethodDecl)visitJmlMethodDeclBugfix(that, p);
             copy.name = M.Name(copy.name.toString() + "Symb");
             copy.mods.annotations = List.nil();
@@ -212,7 +217,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
 
         if(currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
-            throw new RuntimeException("Havocing \\everything is not supported. For: " + that.name);
+            throw new RuntimeException("Havocing \\everything is not supported. For invoked method: " + that.name);
         }
         bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 

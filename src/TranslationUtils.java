@@ -578,6 +578,19 @@ public class TranslationUtils {
         res = res.appendList(rest);
         return res;
     }
+
+    public static boolean isPure(JCMethodDecl meth) {
+        if(meth.mods.annotations != null) {
+            for(JCAnnotation a : meth.mods.annotations) {
+                if(a instanceof JmlAnnotation) {
+                    if(a.annotationType.toString().endsWith(".Pure")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
 
 class RangeExtractor extends JmlTreeScanner {

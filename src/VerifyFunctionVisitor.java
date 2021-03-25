@@ -97,6 +97,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if (that.list != null) {
             currentAssignable = currentAssignable.appendList(that.list);
         }
+
         return super.visitJmlMethodClauseStoreRef(that, p);
     }
 
@@ -111,6 +112,11 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         combinedNewReqStatements = List.nil();
         currentAssignable = List.nil();
         JCTree copy = super.visitJmlSpecificationCase(that, p);
+
+        if(TranslationUtils.isPure(currentMethod)) {
+            currentAssignable = currentAssignable.append(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING));
+        }
+
         ensCases = ensCases.append(combinedNewEnsStatements);
         reqCases = reqCases.append(combinedNewReqStatements);
         assCases = assCases.append(currentAssignable);
@@ -136,6 +142,17 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         } else {
             this.returnVar = null;
         }
+
+        if(that.mods.annotations != null) {
+            for(JCAnnotation a : that.mods.annotations) {
+                if(a instanceof JmlAnnotation) {
+                    if(a.annotationType.toString().endsWith(".Pure")) {
+                        ErrorLogger.warn("\"pure\" annotations a currently only translated as assignable \\nothing.");
+                    }
+                }
+            }
+        }
+
         oldVars = new LinkedHashMap<>();
         oldInits = List.nil();
         currentMethod = (JmlMethodDecl) visitJmlMethodDeclBugfix(that, p);
