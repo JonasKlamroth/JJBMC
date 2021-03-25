@@ -1212,10 +1212,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {
-                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, TranslationUtils.getLiteralForType(e.type));
-                    neededVariableDefs = neededVariableDefs.append(saveParam);
-                    JCStatement assign = M.Exec(M.Assign(M.Ident(saveParam), e));
-                    newStatements = newStatements.append(assign);
+                    JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, e);
+                    newStatements = newStatements.append(saveParam);
                     newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
                 }
                 copy.args = newargs;
