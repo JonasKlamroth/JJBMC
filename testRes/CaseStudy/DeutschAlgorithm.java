@@ -49,10 +49,11 @@ public class DeutschAlgorithm {
 
         System.out.println(c[0]*c[0] + c[1]*c[1]);
         System.out.println(c[2]*c[2] + c[3]*c[3]);
-        return c[0]*c[0] + c[1]*c[1]  + 2.0 < c[2]*c[2] + c[3]*c[3];
+        return c[0]*c[0] + c[1]*c[1]  < c[2]*c[2] + c[3]*c[3];
     }
 
     //@ requires f != null && f.length == 2;
+    //@ assignable \nothing;
     private static double[][] getOperatorForFunction(boolean f[]) {
         return new double[][] {
                 new double[]{boolToDouble(!f[0]), boolToDouble(f[0]), 0.f, 0.f},
