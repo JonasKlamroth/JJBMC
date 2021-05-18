@@ -193,6 +193,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         variableReplacements.put(that.decls.get(0).getName().toString(), "quantVar" + numQuantvars++ + that.decls.get(0).getName().toString());
         RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
+        if(copy.range == null) {
+            throw new RuntimeException("Only quantifiers with given ranges supported.");
+        }
         JCExpression range = super.copy(copy.range);
         re.extractRange(range);
         JCExpression cond = super.copy(copy.range);
@@ -395,7 +398,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     for(Symbol.VarSymbol v : quanVars) {
                         JCVariableDecl in = treeutils.makeVarDef(v.type, v.name, currentSymbol, quantifierVars.get(v).fst);
 
-                        oldInit = M.ForLoop(List.of(in), M.Binary(Tag.LE, M.Ident(in.sym), quantifierVars.get(v).snd), List.of(M.Exec(M.Unary(Tag.PREINC, M.Ident(in.sym)))), body);
+                        JCExpression c = super.copy(quantifierVars.get(v).snd);
+                        oldInit = M.ForLoop(List.of(in), M.Binary(Tag.LE, M.Ident(in.sym), c), List.of(M.Exec(M.Unary(Tag.PREINC, M.Ident(in.sym)))), body);
                         body = oldInit;
                     }
                     oldInits = oldInits.append(oldInit);
@@ -1187,7 +1191,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
             ErrorLogger.warn("Method calls in specifications only supported experimentally.");
-            return (JCMethodInvocation)node;
+          //  return (JCMethodInvocation)node;
         }
         JCMethodInvocation copy = (JCMethodInvocation)super.visitMethodInvocation(node, p);
         if(CLI.forceInliningMethods) {

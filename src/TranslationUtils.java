@@ -4,10 +4,7 @@ import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Position;
+import com.sun.tools.javac.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jmlspecs.openjml.JmlTokenKind;
@@ -287,37 +284,47 @@ public class TranslationUtils {
                     res = res.append(M.Exec(M.Assign(expr, makeNondetWithNull(currentSymbol))));
                 }
             } else if(expr instanceof  JmlStoreRefArrayRange) {
-                JmlStoreRefArrayRange aexpr = (JmlStoreRefArrayRange)expr;
-                if(aexpr.hi != null && aexpr.lo != null && aexpr.lo.toString().equals(aexpr.hi.toString())) {
-                    Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
-                    JCExpression elemExpr = M.Indexed(aexpr.expression, aexpr.lo);
-                    if(elemtype.isPrimitive()) {
-                        res = res.append(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
-                    } else {
-                        res = res.append(M.Exec(M.Assign(elemExpr, makeNondetWithNull(currentSymbol))));
-                    }
-                } else {
+                JmlStoreRefArrayRange arrayRange = (JmlStoreRefArrayRange) expr;
+                Type elemType = ((Type.ArrayType)arrayRange.expression.type).elemtype;
+                JCExpression inner = expr;
+                List<Pair<JCExpression, JCExpression>> dims = List.nil();
+                List<JCVariableDecl> loopVars = List.nil();
+                int idx = 0;
+                while (inner instanceof JmlStoreRefArrayRange) {
+                    dims = dims.append(new Pair<>(((JmlStoreRefArrayRange) inner).lo, ((JmlStoreRefArrayRange) inner).hi));
+                    loopVars = loopVars.append(treeutils.makeIntVarDef(M.Name("__tmpVar__" + idx++), ((JmlStoreRefArrayRange) inner).lo, currentSymbol));
+                    inner = ((JmlStoreRefArrayRange) inner).expression;
+                }
+                List<JCExpression> aExpr = List.nil();
+                JCExpression finalExpression = inner;
+                for(int i = loopVars.size() - 1; i >= 0; --i) {
+                    aExpr = aExpr.prepend(finalExpression);
+                    finalExpression =  M.Indexed(finalExpression, M.Ident(loopVars.get(i)));
+                }
+
+                JCStatement body = M.Exec(M.Assign(finalExpression, getNondetFunctionForType(elemType, currentSymbol)));
+                for(int i = 0; i < dims.size(); ++i) {
                     try {
-                        JCExpression lo = aexpr.lo;
-                        JCExpression hi = aexpr.hi;
+                        Pair<JCExpression, JCExpression> d = dims.get(i);
+                        JCVariableDecl loopVar = loopVars.get(i);
+                        JCExpression lo = d.fst;
+                        JCExpression hi = d.snd;
                         if(lo == null) {
                             lo = M.Literal(0);
+                            loopVar.init = lo;
                         }
                         if(hi == null) {
-                            hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr.expression), M.Literal(1));
+                            hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aExpr.get(i)), M.Literal(1));
                         }
-                        JCVariableDecl loopVar = treeutils.makeIntVarDef(M.Name("__tmpVar__"), jev.copy(lo), currentSymbol);
                         JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), jev.copy(hi));
-                        JCExpression elemExpr = M.Indexed(aexpr.expression, M.Ident(loopVar));
-                        Type elemtype = ((Type.ArrayType)aexpr.expression.type).elemtype;
-                        List<JCStatement> body = List.of(M.Exec(M.Assign(elemExpr, getNondetFunctionForType(elemtype, currentSymbol))));
                         //res = res.append(makeAssertStatement(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit)));
-                        JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, body, loopVar, currentSymbol))), null);
-                        res = res.append(ifst);
+                        JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
+                        body = ifst;
                     } catch (NumberFormatException e) {
                         throw new RuntimeException("Cant havoc expression " + expr);
                     }
                 }
+                res = res.append(body);
             } else if(expr instanceof JCFieldAccess) {
                 JCFieldAccess fexpr = (JCFieldAccess)expr;
                 if(fexpr.name == null) {
