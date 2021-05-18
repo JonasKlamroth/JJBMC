@@ -264,7 +264,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         l = l.appendList(ensCases.get(caseIdx));
 
         //assert invariants
-        if (check == 0) {
+        if (check == 0 && !TranslationUtils.isPure(currentMethod)) {
             l = l.append(M.Block(0L, invariantAssert));
         }
 
