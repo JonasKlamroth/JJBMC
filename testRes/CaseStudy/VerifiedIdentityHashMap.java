@@ -755,7 +755,7 @@ public class VerifiedIdentityHashMap
       @ //ensures 0 <= result < table.length; //
       @ //ensures \result % 2 == 0;
       @ //(\forall int i; i%2==0 && .....; table[(2*hash(k, len) + i) % table.length] != null)
-      @ //assignable \strictly_nothing;
+      @ //assignable \nothing;
       @ */
     private int theKeyIndex(Object k) {
         int len = table.length;
@@ -1372,7 +1372,7 @@ public class VerifiedIdentityHashMap
      *
      * @param d the index of a newly empty deleted slot
      */
-    /*@
+    /*+Key@
       @ private normal_behavior
       @   requires true;
       @   ensures
