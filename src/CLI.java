@@ -87,7 +87,7 @@ public class CLI implements Runnable {
 
     @Option(names= {"-tr", "-trace"},
            description = "Prints out traces for failing pvcs.")
-    public static boolean runWithTrace = true;
+    public static boolean runWithTrace = false;
 
     @Option(names= {"-jbmc", "-jbmcBinary"},
             description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
@@ -320,7 +320,9 @@ public class CLI implements Runnable {
         Map<String, List<String>> paramMap = FunctionNameVisitor.getParamMap();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if(functionName != null) {
-            functionName = functionName + "Verf";
+            if(!functionName.endsWith("Verf")) {
+                functionName = functionName + "Verf";
+            }
             functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
             if(functionNames.size() == 0) {
                 log.warn("Function " + functionName + " could not be found in the specified file.");
