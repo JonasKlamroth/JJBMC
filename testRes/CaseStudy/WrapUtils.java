@@ -12,7 +12,7 @@ public class WrapUtils {
       @
       @  ensures (\forall int a; 0 <= a < s.length;
       @     (\forall int b; a < b < s.length;
-      @         s[a] == '\n' && s[b] == '\n' ==> b-a >= lineLength));
+      @         (s[a] == '\n' || a == 0) && s[b] == '\n' ==> b-a >= lineLength));
       @
       @  assignable s[*];
       @*/    
@@ -28,7 +28,7 @@ public class WrapUtils {
           @    s[i] == \old(s[i]) || \old(s[i]) == ' ' && s[i] == '\n');
           @ loop_invariant (\forall int a; 0 <= a < s.length;
           @     (\forall int b; a < b < s.length;
-          @         s[a] == '\n' && s[b] == '\n' ==> b-a >= lineLength));
+          @         (s[a] == '\n' || a == 0) && s[b] == '\n' ==> b-a >= lineLength));
           @ loop_invariant (\forall int a; lastBreak < a && a < s.length;
           @    s[a] != '\n');
           @ loop_invariant lastSpace != -1 ==> s[lastSpace] == ' ';
