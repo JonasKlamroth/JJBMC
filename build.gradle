@@ -15,7 +15,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 test.testLogging.showStandardStreams = true
 
-sourceSets {
+/*sourceSets {
    main {
       java {
          srcDir 'src'
@@ -32,7 +32,7 @@ sourceSets {
           srcDir 'resources'
       }
    }
-}
+}*/
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
@@ -44,7 +44,6 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'lib')
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
-    testCompileOnly 'junit:junit:4.12'
 }
 
 task fatJar(type: Jar) {
@@ -52,6 +51,7 @@ task fatJar(type: Jar) {
         attributes "Main-Class": "Main"
     }
     archiveBaseName = 'JJBMC'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
