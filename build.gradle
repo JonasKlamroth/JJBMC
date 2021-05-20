@@ -15,7 +15,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 test.testLogging.showStandardStreams = true
 
-/*sourceSets {
+sourceSets {
    main {
       java {
          srcDir 'src'
@@ -32,7 +32,7 @@ test.testLogging.showStandardStreams = true
           srcDir 'resources'
       }
    }
-}*/
+}
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
