@@ -238,9 +238,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
                 ),
                 null);
 
-        //assume invariants
+        //assume invariants if its not a constructor
         long check = that.getModifiers().flags & 8L;
-        if (check == 0) {
+        if (check == 0 && !that.getName().toString().contains("<init>")) {
             l = l.append(M.Block(0L, invariantAssume));
         }
 

@@ -212,10 +212,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
                 JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), copy.value);
+                List<JCStatement> old = newStatements;
+                newStatements = List.nil();
                 JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
+                newStatements = newStatements.prependList(old);
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
@@ -287,10 +291,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
                 JCExpression res = treeutils.makeAnd(Position.NOPOS, cond, copy.value);
+                List<JCStatement> old = newStatements;
+                newStatements = List.nil();
                 JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
+                newStatements = newStatements.prependList(old);
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
@@ -1225,7 +1233,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 for(JCExpression e : copy.args) {
                     JCVariableDecl saveParam = treeutils.makeVarDef(e.type, M.Name("$$param" + paramVarCounter++), oldSymbol, TranslationUtils.getLiteralForType(e.type));
                     neededVariableDefs = neededVariableDefs.append(saveParam);
-                    JCStatement assign = M.Exec(M.Assign(M.Ident(saveParam), e));
+                    JCStatement assign = M.Exec(M.Assign(M.Ident(saveParam), this.copy(e)));
                     newStatements = newStatements.append(assign);
                     newargs = newargs.append(treeutils.makeIdent(Position.NOPOS, saveParam.sym));
                 }
