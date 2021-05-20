@@ -618,7 +618,7 @@ public class CLI implements Runnable {
                 }
                 line = reader.readLine();
             }
-            pb = new ProcessBuilder().command(commands)
+            pb = new ProcessBuilder().command(wcommands)
                     .redirectErrorStream(true);
             p = pb.start();
             reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
