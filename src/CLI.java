@@ -590,28 +590,20 @@ public class CLI implements Runnable {
             String line = reader.readLine();
             if(line != null) {
                 if(!line.contains("1.8")) {
-                    log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-                    log.info("To manually provide a path to a javac binary use -javac option.");
-                    log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
                     return false;
                 } else {
                     return true;
                 }
             }
         } catch (IOException e) {
-            log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-            log.info("To manually provide a path to a javac binary use -javac option.");
-            log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
             return false;
         }
-        log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-        log.info("To manually provide a path to a javac binary use -javac option.");
-        log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
         return false;
     }
 
     static private String findJavaVersion() {
         String[] commands = new String[]{"update-alternatives", "--list", "javac"};
+        String[] wcommands = new String[]{"which", "-a", "javac"};
         Process p = null;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(commands)
@@ -619,11 +611,20 @@ public class CLI implements Runnable {
             p = pb.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = reader.readLine();
-            List<String> options = new ArrayList<>();
             while(line != null) {
-                options.add(line);
                 if(line.contains("8")) {
                     verifyJavaVersion(line);
+                    return line;
+                }
+                line = reader.readLine();
+            }
+            pb = new ProcessBuilder().command(commands)
+                    .redirectErrorStream(true);
+            p = pb.start();
+            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            line = reader.readLine();
+            while(line != null) {
+                if(verifyJavaVersion(line)) {
                     return line;
                 }
                 line = reader.readLine();
