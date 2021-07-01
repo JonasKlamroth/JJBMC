@@ -28,6 +28,14 @@ import java.io.*;
 
 public class VerifiedIdentityHashMapInt {
 
+    public static class IntObject {
+        public final int hash;
+
+        public IntObject(int hash) {
+            this.hash = hash;
+        }
+    }
+
     //@ private ghost boolean initialised;
 
     /*+KEY@ // JML specifically for KeY
@@ -42,14 +50,14 @@ public class VerifiedIdentityHashMapInt {
       @ public invariant
       @   (\forall int i;
       @         0 <= i && i < table.length / 2;
-      @         (table[i * 2] == 0 ==> table[i * 2 + 1] == 0));
+      @         (table[i * 2] == null ==> table[i * 2 + 1] == null));
       @
       @ // Non-empty keys are unique
       @ public invariant
       @   (\forall int i; 0 <= i && i < table.length / 2;
       @       (\forall int j;
       @       i <= j && j < table.length / 2;
-      @       (table[2*i] != 0 && table[2*i] == table[2*j]) ==> i == j));
+      @       (table[2*i] != null && table[2*i] == table[2*j]) ==> i == j));
       @
       @ public invariant
       @   threshold < MAXIMUM_CAPACITY;
@@ -58,7 +66,7 @@ public class VerifiedIdentityHashMapInt {
       @ public invariant
       @   size == (\num_of int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] != 0);
+      @       table[2*i] != null);
       @
       @ // Table length is a power of two
       @ public invariant
@@ -71,27 +79,27 @@ public class VerifiedIdentityHashMapInt {
       @ public invariant
       @   (\exists int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] == 0);
+      @       table[2*i] == null);
       @
       @ // There are no gaps between a key's hashed index and its actual
       @ // index (if the key is at a higher index than the hash code)
       @ public invariant
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] != 0 && 2*i > hash(table[2*i], table.length) ==>
+      @       table[2*i] != null && 2*i > hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           hash(table[2*i], table.length) / 2 <= j < i;
-      @           table[2*j] != 0));
+      @           table[2*j] != null));
       @
       @ // There are no gaps between a key's hashed index and its actual
       @ // index (if the key is at a lower index than the hash code)
       @ public invariant
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] != 0 && 2*i < hash(table[2*i], table.length) ==>
+      @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           hash(table[2*i], table.length) <= 2*j < table.length || 0 <= 2*j < 2*i;
-      @           table[2*j] != 0));
+      @           table[2*j] != null));
       @*/
     /*+OPENJML@ // JML for non-KeY tools, i.e. JJBMC
       @ public invariant
@@ -106,14 +114,14 @@ public class VerifiedIdentityHashMapInt {
       @ public invariant
       @   (\forall int i;
       @         0 <= i && i < table.length / 2;
-      @         (table[i * 2] == 0 ==> table[i * 2 + 1] == 0));
+      @         (table[i * 2] == null ==> table[i * 2 + 1] == null));
       @
       @ // Non-empty keys are unique
       @ public invariant
       @ (\forall int i; 0 <= i && i < table.length / 2;
       @     (\forall int j;
       @     i <= j && j < table.length / 2;
-      @     (table[2*i] != 0 && table[2*i] == table[2*j]) ==> i == j));
+      @     (table[2*i] != null && table[2*i] == table[2*j]) ==> i == j));
       @
       @ public invariant
       @   threshold < MAXIMUM_CAPACITY;
@@ -127,27 +135,27 @@ public class VerifiedIdentityHashMapInt {
       @ public invariant
       @   (\exists int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] == 0);
+      @       table[2*i] == null);
       @
       @ // There are no gaps between a key's hashed index and its actual
       @ // index (if the key is at a higher index than the hash code)
       @ public invariant
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       table[2*i] != 0 && 2*i > hash(table[2*i], table.length) ==>
+      @       table[2*i] != null && 2*i > hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           hash(table[2*i], table.length) / 2 <= j < i;
-      @           table[2*j] != 0));
+      @           table[2*j] != null));
       @
       @ // There are no gaps between a key's hashed index and its actual
       @ // index (if the key is at a lower index than the hash code)
       @ public invariant
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       (table[2*i] != 0 && 2*i < hash(table[2*i], table.length)) ==>
+      @       (table[2*i] != null && 2*i < hash(table[2*i], table.length)) ==>
       @       (\forall int j;
       @           0 <= j < i;
-      @           table[2*j] != 0));
+      @           table[2*j] != null));
       @
       @*/
 
@@ -179,7 +187,7 @@ public class VerifiedIdentityHashMapInt {
     /**
      * The table, resized as necessary. Length MUST always be a power of two.
      */
-    private /*@ spec_public @*/ transient int[] table;
+    private /*@ spec_public @*/ transient IntObject[] table;
 
     /**
      * The number of key-value mappings contained in this identity hash map.
@@ -201,28 +209,28 @@ public class VerifiedIdentityHashMapInt {
     /**
      * Value representing null keys inside tables.
      */
-    private /*@ spec_public @*/ static final int NULL_KEY = 0;
+    private /*@ spec_public @*/ static final IntObject NULL_KEY = new IntObject(0);
 
     /**
      * Use NULL_KEY for key if it is null.
      */
     /*@ private normal_behavior
-      @   ensures key == 0 ==> \result == NULL_KEY;
-      @   ensures key != 0 ==> \result == key;
+      @   ensures key == null ==> \result == NULL_KEY;
+      @   ensures key != null ==> \result == key;
       @*/
-    public static /*@ pure @*/ int maskNull(int key) {
-        return key;
+    public static /*@ pure @*/ IntObject maskNull(IntObject key) {
+        return (key == null ? NULL_KEY : key);
     }
 
     /**
      * Returns internal representation of null key back to caller as null.
      */
     /*@ private normal_behavior
-      @   ensures key == NULL_KEY ==> \result == 0;
+      @   ensures key == NULL_KEY ==> \result == null;
       @   ensures key != NULL_KEY ==> \result == key;
       @*/
-    private /*@ spec_public @*/ static /*@ pure nullable @*/ int unmaskNull(int key) {
-        return (key == NULL_KEY ? 0 : key);
+    private /*@ spec_public @*/ static /*@ pure nullable @*/ IntObject unmaskNull(IntObject key) {
+        return (key == NULL_KEY ? null : key);
     }
 
     /**
@@ -435,7 +443,7 @@ public class VerifiedIdentityHashMapInt {
       @*/
     private void init(int initCapacity) {
         threshold = (initCapacity * 2) / 3;
-        table = new int[2 * initCapacity];
+        table = new IntObject[2 * initCapacity];
 
         //@ set initialised = true;
     }
@@ -471,21 +479,21 @@ public class VerifiedIdentityHashMapInt {
     }
 
     /**
-     * Returns index for int x.
+     * Returns index for IntObject x.
      */
     /*@ public normal_behavior
       @   ensures
-      @     (x != 0 ==> (\result == x &&
+      @     (x != null ==> (\result == x.hash &&
       @     \result < length &&
       @     \result > 0)) &&
       @     \result % 2 == 0 &&
-      @     (x == 0 ==> \result == 0);
+      @     (x == null ==> \result == 0);
       @*/
-    public static /*@ pure @*/ int hash(int x, int length) {
-        if(x == 0) {
+    public static /*@ pure @*/ int hash(IntObject x, int length) {
+        if(x == null) {
             return 0;
         }
-        int h =  x;
+        int h =  x.hash;
         // Multiply by -127, and left-shift to use least bit as part of hash
         return ((h << 1) - (h << 8)) & (length - 1);
     }
@@ -516,28 +524,28 @@ public class VerifiedIdentityHashMapInt {
      * The {@link #containsKey containsKey} operation may be used to
      * distinguish these two cases.
      *
-     * @see #put(int, int)
+     * @see #put(IntObject, IntObject)
      */
     /*@ 
       @ public normal_behavior
       @   ensures
-      @     \result != 0 <==>
+      @     \result != null <==>
       @         (\exists int i;
       @             0 <= i < table.length / 2;
       @             table[i*2] == maskNull(key) && \result == table[i*2 + 1]);
       @   ensures
-      @     \result == 0 <==>
+      @     \result == null <==>
       @         (!(\exists int i;
       @             0 <= i < table.length / 2;
       @             table[i*2] == maskNull(key)) ||
       @         (\exists int i;
       @             0 <= i < table.length / 2;
-      @             table[i*2] == maskNull(key) && table[i*2 + 1] == 0)
+      @             table[i*2] == maskNull(key) && table[i*2 + 1] == null)
       @         );
       @*/
-    public /*@ pure nullable @*/ int get(int key) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    public /*@ pure nullable @*/ IntObject get(IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
         /*+KEY@
@@ -546,19 +554,19 @@ public class VerifiedIdentityHashMapInt {
           @ assignable i;
           @*/
         while (true) {
-            int item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
-                return (int) tab[i + 1];
-            if (item == 0)
-                return 0;
+                return (IntObject) tab[i + 1];
+            if (item == null)
+                return null;
             i = nextKeyIndex(i, len);
         }
     }
 
-    private int theKeyIndex(int k) {
+    private int theKeyIndex(IntObject k) {
         int len = table.length;
         int i = hash(maskNull(k), len);
-        while(table[i] != 0 && table[i] != k)
+        while(table[i] != null && table[i] != k)
             i = nextKeyIndex(i, len);
         return i;
     }
@@ -570,7 +578,7 @@ public class VerifiedIdentityHashMapInt {
      * @param   key   possible key
      * @return  <code>true</code> if the specified object reference is a key
      *          in this map
-     * @see     #containsValue(int)
+     * @see     #containsValue(IntObject)
      */
     /*@ 
       @ public normal_behavior
@@ -579,9 +587,9 @@ public class VerifiedIdentityHashMapInt {
       @         0 <= i < table.length / 2;
       @         table[i*2] == maskNull(key));
       @*/
-    public /*@ pure @*/ boolean containsKey(int key) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    public /*@ pure @*/ boolean containsKey(IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
         /*+KEY@
@@ -590,10 +598,10 @@ public class VerifiedIdentityHashMapInt {
           @ assignable i;
           @*/
         while (true) {
-            int item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
                 return true;
-            if (item == 0)
+            if (item == null)
                 return false;
             i = nextKeyIndex(i, len);
         }
@@ -606,22 +614,22 @@ public class VerifiedIdentityHashMapInt {
      * @param value value whose presence in this map is to be tested
      * @return <tt>true</tt> if this map maps one or more keys to the
      *         specified object reference
-     * @see     #containsKey(int)
+     * @see     #containsKey(IntObject)
      */
     /*@ 
       @ public normal_behavior
       @   ensures
       @     \result <==> (\exists int i;
       @         0 <= i < table.length / 2;
-      @         table[i*2] != 0 && table[i*2 + 1] == value);
+      @         table[i*2] != null && table[i*2 + 1] == value);
       @*/
-    public /*@ pure @*/ boolean containsValue(int value) {
-        int[] tab =  table;
+    public /*@ pure @*/ boolean containsValue(IntObject value) {
+        IntObject[] tab =  table;
         /*+KEY@
           @ decreasing tab.length/2 - (i-1)/2;
           @*/
         for (int i =  1; i < tab.length; i += 2)
-            if (tab[i] == value && tab[i - 1] != 0)
+            if (tab[i] == value && tab[i - 1] != null)
                 return true;
 
         return false;
@@ -641,9 +649,9 @@ public class VerifiedIdentityHashMapInt {
       @         0 <= i < table.length / 2;
       @         table[i*2] == maskNull(key) && table[i*2 + 1] == value);
       @*/
-    private /*@ spec_public @*/ /*@ pure @*/ boolean containsMapping(int key, int value) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    private /*@ spec_public @*/ /*@ pure @*/ boolean containsMapping(IntObject key, IntObject value) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
         /*+KEY@
@@ -652,10 +660,10 @@ public class VerifiedIdentityHashMapInt {
           @ assignable i;
           @*/
         while (true) {
-            int item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
                 return tab[i + 1] == value;
-            if (item == 0)
+            if (item == null)
                 return false;
             i = nextKeyIndex(i, len);
         }
@@ -672,9 +680,9 @@ public class VerifiedIdentityHashMapInt {
      *         <tt>null</tt> if there was no mapping for <tt>key</tt>.
      *         (A <tt>null</tt> return can  indicate that the map
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
-     * @see     int#equals(int)
-     * @see     #get(int)
-     * @see     #containsKey(int)
+     * @see     IntObject#equals(IntObject)
+     * @see     #get(IntObject)
+     * @see     #containsKey(IntObject)
      */
     /*+KEY@
       @ 
@@ -711,7 +719,7 @@ public class VerifiedIdentityHashMapInt {
       @     (!(\exists int i;
       @         0 <= i < \old(table.length) - 1;
       @         i % 2 == 0 && \old(table[i]) == maskNull(key))
-      @         ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == 0) &&
+      @         ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == null) &&
       @
       @     // After execution, all old keys are still present
       @     (\forall int i;
@@ -742,7 +750,7 @@ public class VerifiedIdentityHashMapInt {
       @  // this is for JJBMC only. requiering that size is a reasonalbe value and that at least 2 entries are still free
       @   requires 0 <= size && size < table.length &&
       @             (\exists int i; 0 <= i < table.length/2;
-      @             (\exists int j; i <= j < table.length/2; i != j && table[i*2] == 0 && table[j*2] == 0));
+      @             (\exists int j; i <= j < table.length/2; i != j && table[i*2] == null && table[j*2] == null));
       @   ensures
       @     // If the key already exists, size must not change, modCount must not change,
       @     // and the old value associated with the key is returned
@@ -759,7 +767,7 @@ public class VerifiedIdentityHashMapInt {
       @     (!(\exists int i;
       @         0 <= i < \old(table.length) - 1;
       @         i % 2 == 0 && \old(table[i]) == maskNull(key))
-      @         ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == 0) &&
+      @         ==> (size == \old(size) + 1) && modCount != \old(modCount) && \result == null) &&
       @
       @     // After execution, all old keys are still present
       @     (\forall int i;
@@ -782,21 +790,21 @@ public class VerifiedIdentityHashMapInt {
       @         0 <= i < table.length / 2;
       @         table[i*2] == maskNull(key) && table[i*2 + 1] == value);
       @*/
-    public /*@ nullable @*/ int put(int key, int value) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    public /*@ nullable @*/ IntObject put(IntObject key, IntObject value) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
-        int item;
+        IntObject item;
         /*+KEY@
           @ ghost int initialI = i;
           @ decreasing len - (len + i - initialI) % len;
           @ assignable item, i, tab[*];
           @*/
-        while ( (item = tab[i]) != 0) {
+        while ( (item = tab[i]) != null) {
             if (item == k) {
-                int oldValue =  (int) tab[i + 1];
+                IntObject oldValue =  (IntObject) tab[i + 1];
                 tab[i + 1] = value;
                 return oldValue;
             }
@@ -816,7 +824,7 @@ public class VerifiedIdentityHashMapInt {
         size++;
         //if (++size >= threshold)
             //resize(len); // len == 2 * current capacity.
-        return 0;
+        return null;
     }
 
     /**
@@ -890,7 +898,7 @@ public class VerifiedIdentityHashMapInt {
     {
         int newLength =  newCapacity * 2;
 
-        int[] oldTable =  table;
+        IntObject[] oldTable =  table;
         int oldLength =  oldTable.length;
         if (oldLength == 2 * MAXIMUM_CAPACITY) { // can't expand any further
             if (threshold == MAXIMUM_CAPACITY - 1)
@@ -901,17 +909,17 @@ public class VerifiedIdentityHashMapInt {
         if (oldLength >= newLength)
             return;
 
-        int[] newTable =  new int[newLength];
+        IntObject[] newTable =  new IntObject[newLength];
         threshold = newLength / 3;
 
         for (int j =  0; j < oldLength; j += 2) {
-            int key =  oldTable[j];
-            if (key != 0) {
-                int value =  oldTable[j + 1];
-                oldTable[j] = 0;
-                oldTable[j + 1] = 0;
+            IntObject key =  oldTable[j];
+            if (key != null) {
+                IntObject value =  oldTable[j + 1];
+                oldTable[j] = null;
+                oldTable[j + 1] = null;
                 int i =  hash(key, newLength);
-                while (newTable[i] != 0)
+                while (newTable[i] != null)
                     i = nextKeyIndex(i, newLength);
                 newTable[i] = key;
                 newTable[i + 1] = value;
@@ -940,14 +948,12 @@ public class VerifiedIdentityHashMapInt {
       @   assignable
       @     \nothing;
       @   ensures
-      @     \result == 0 &&
+      @     \result == null &&
       @     table.length == \old(table.length);
       @*/
     /*@
       @ public normal_behavior
       @   requires
-      @     key != 0 &&
-      @
       @     // key exists in old table?
       @     (\exists int i;
       @        0 <= i < table.length / 2;
@@ -979,9 +985,9 @@ public class VerifiedIdentityHashMapInt {
       @        0 <= i < table.length / 2;
       @        table[i*2] == maskNull(key));
       @*/
-    public /*@ nullable @*/ int remove(int key) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    public /*@ nullable @*/ IntObject remove(IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i = hash(k, len);
 
@@ -991,18 +997,18 @@ public class VerifiedIdentityHashMapInt {
           @ assignable i, modCount, size, tab[*];
           @*/
         while (true) {
-            int item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k) {
                 modCount++;
                 size--;
-                int oldValue =  (int) tab[i + 1];
-                tab[i + 1] = 0;
-                tab[i] = 0;
+                IntObject oldValue =  (IntObject) tab[i + 1];
+                tab[i + 1] = null;
+                tab[i] = null;
                 closeDeletion(i);
                 return oldValue;
             }
-            if (item == 0)
-                return 0;
+            if (item == null)
+                return null;
             i = nextKeyIndex(i, len);
         }
     }
@@ -1017,11 +1023,11 @@ public class VerifiedIdentityHashMapInt {
      */
     /*@
       @ private normal_behavior
-      @   requires true;
+      @   requires
       @     // The element exists in the table
-      @     //((\exists int i;
-      @      //   0 <= i < table.length / 2;
-      @       //  table[i * 2] == maskNull(key) && table[i * 2 + 1] == value));
+      @     ((\exists int i;
+      @         0 <= i < table.length / 2;
+      @         table[i * 2] == maskNull(key) && table[i * 2 + 1] == value));
       @   assignable
       @     size, table, table[*], modCount;
       @   ensures
@@ -1058,9 +1064,9 @@ public class VerifiedIdentityHashMapInt {
       @          0 <= j < table.length / 2;
       @          table[j * 2] == \old(table[i * 2]) && table[j * 2+1] == \old(table[i * 2+1])));
       @*/
-    private boolean removeMapping(int key, int value) {
-        int k =  maskNull(key);
-        int[] tab =  table;
+    private boolean removeMapping(IntObject key, IntObject value) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
@@ -1070,18 +1076,18 @@ public class VerifiedIdentityHashMapInt {
           @ assignable i, modCount, size, tab, table;
           @*/
         while (true) {
-            int item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k) {
                 if (tab[i + 1] != value)
                     return false;
                 modCount++;
                 size--;
-                tab[i] = 0;
-                tab[i + 1] = 0;
+                tab[i] = null;
+                tab[i + 1] = null;
                 closeDeletion(i);
                 return true;
             }
-            if (item == 0)
+            if (item == null)
                 return false;
             i = nextKeyIndex(i, len);
         }
@@ -1098,7 +1104,7 @@ public class VerifiedIdentityHashMapInt {
       @ private normal_behavior
       @   assignable table[*];
       @   requires d >= 0 && d < table.length - 1 && d % 2 == 0;
-      @   requires table[d] == 0 && table[d+1] == 0;
+      @   requires table[d] == null && table[d+1] == null;
       @   ensures
       @     size == \old(size) &&
       @     threshold == \old(threshold) &&
@@ -1117,15 +1123,15 @@ public class VerifiedIdentityHashMapInt {
     private void closeDeletion(int d)
     // Adapted from Knuth Section 6.4 Algorithm R
     {
-        int[] tab =  table;
+        IntObject[] tab =  table;
         int len =  tab.length;
 
         // Look for items to swap into newly vacated slot
         // starting at index immediately following deletion,
         // and continuing until a null slot is seen, indicating
         // the end of a run of possibly-colliding keys.
-        int item;
-        for (int i =  nextKeyIndex(d, len); tab[i] != 0;
+        IntObject item;
+        for (int i =  nextKeyIndex(d, len); tab[i] != null;
              i = nextKeyIndex(i, len))
         // The following test triggers if the item at slot i (which
         // hashes to be at slot r) should take the spot vacated by d.
@@ -1139,8 +1145,8 @@ public class VerifiedIdentityHashMapInt {
             if ((i < r && (r <= d || d <= i)) || (r <= d && d <= i)) {
                 tab[d] = item;
                 tab[d + 1] = tab[i + 1];
-                tab[i] = 0;
-                tab[i + 1] = 0;
+                tab[i] = null;
+                tab[i + 1] = null;
                 d = i;
             }
         }
@@ -1160,23 +1166,23 @@ public class VerifiedIdentityHashMapInt {
       @     size == 0 &&
       @     (\forall int i;
       @        0 <= i < table.length;
-      @        table[i] == 0);
+      @        table[i] == null);
       @*/
     public void clear() {
         modCount++;
-        int[] tab =  table;
+        IntObject[] tab =  table;
         /*+KEY@
           @ maintaining
           @   0 <= i && i <= tab.length;
           @ maintaining
-          @   (\forall int j; 0 <= j < i; tab[j] == 0);
+          @   (\forall int j; 0 <= j < i; tab[j] == null);
           @ decreasing
           @   tab.length - i;
           @ assignable
           @   \nothing;
           @*/
         for (int i =  0; i < tab.length; i++)
-            tab[i] = 0;
+            tab[i] = null;
         size = 0;
     }
 
@@ -1195,7 +1201,7 @@ public class VerifiedIdentityHashMapInt {
      *
      * @param  o object to be compared for equality with this map
      * @return <tt>true</tt> if the specified object is equal to this map
-     * @see int#equals(int)
+     * @see IntObject#equals(IntObject)
      */
     /*@ also
       @ public normal_behavior
@@ -1212,10 +1218,10 @@ public class VerifiedIdentityHashMapInt {
             if (m.size() != size)
                 return false;
 
-            int[] tab =  m.table;
+            IntObject[] tab =  m.table;
             for (int i =  0; i < tab.length; i += 2) {
-                int k =  tab[i];
-                if (k != 0 && !containsMapping(k, tab[i + 1]))
+                IntObject k =  tab[i];
+                if (k != null && !containsMapping(k, tab[i + 1]))
                     return false;
             }
             return true;
@@ -1230,7 +1236,7 @@ public class VerifiedIdentityHashMapInt {
      * <tt>entrySet()</tt> view.  This ensures that <tt>m1.equals(m2)</tt>
      * implies that <tt>m1.hashCode()==m2.hashCode()</tt> for any two
      * <tt>VerifiedIdentityHashMap</tt> instances <tt>m1</tt> and <tt>m2</tt>, as
-     * required by the general contract of {@link int#hashCode}.
+     * required by the general contract of {@link IntObject#hashCode}.
      *
      * <p><b>Owing to the reference-equality-based semantics of the
      * <tt>Map.Entry</tt> instances in the set returned by this map's
@@ -1240,8 +1246,8 @@ public class VerifiedIdentityHashMapInt {
      * an <tt>VerifiedIdentityHashMap</tt> instance and the other is a normal map.</b>
      *
      * @return the hash code value for this map
-     * @see int#equals(int)
-     * @see #equals(int)
+     * @see IntObject#equals(IntObject)
+     * @see #equals(IntObject)
      */
     /*@ also
       @ public normal_behavior
@@ -1252,11 +1258,11 @@ public class VerifiedIdentityHashMapInt {
       @*/
     public /*@ pure @*/ int hashCode() {
         int result =  0;
-        int[] tab =  table;
+        IntObject[] tab =  table;
         for (int i =  0; i < tab.length; i += 2) {
-            int key =  tab[i];
-            if (key != 0) {
-                int k =  unmaskNull(key);
+            IntObject key =  tab[i];
+            if (key != null) {
+                IntObject k =  unmaskNull(key);
                 result += System.identityHashCode(k) ^
                         System.identityHashCode(tab[i + 1]);
             }

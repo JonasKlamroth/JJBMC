@@ -7,6 +7,7 @@ import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -415,6 +416,17 @@ public class CLI implements Runnable {
             long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
+
+
+            if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+                keepTranslation = true;
+                log.error("JBMC did not terminate as expected.");
+                Files.write(Paths.get(tmpFolder.getAbsolutePath(), "xmlout.xml"), xmlOutput.getBytes());
+                return;
+            } else {
+                log.debug("JBMC terminated normally.");
+            }
+
             if(xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
                 JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap);
                 printOutput(output, end - start, functionName);
@@ -448,12 +460,6 @@ public class CLI implements Runnable {
             log.info("JBMC took " + time + "ms.");
         }
 
-        if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
-            keepTranslation = true;
-            log.error("JBMC did not terminate as expected.");
-        } else {
-            log.debug("JBMC terminated normally.");
-        }
 
         if(output.errors.size() == 0) {
             if(runWithTrace) {
