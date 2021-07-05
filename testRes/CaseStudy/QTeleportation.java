@@ -5,8 +5,8 @@ public class QTeleportation {
 
     public static /*@ pure @*/ boolean isClose(float val, float to) {
         //float roundError = 1.1920929E-7f;
-        float roundError = 1.2E-7f;
-        //float roundError = 0.01f;
+        //float roundError = 1.2E-7f;
+        float roundError = 0.01f;
         return val < to + roundError && val > to - roundError;
     }
 
@@ -308,9 +308,61 @@ public class QTeleportation {
         return new float[]{q_res[0] + q_res[2] + q_res[4] + q_res[6], q_res[1] + q_res[3] + q_res[5] + q_res[7]};
     }
 
-    public static void main(String[] args) {
-        System.out.println(Math.nextUp(1.0f) - 1.0f);
+    /*@ requires isClose(a*a + b*b, 1.0f);
+      @ assignable \nothing;
+      @ ensures \result != null && \result.length == 2 && isClose(\result[0] * 2, a) && isClose(\result[1] * 2, b);
+      @*/
+    public static float[] generatedTp(float a, float b, boolean b_1, boolean b_2) {
 
-        tp_v2( 0.31622776601f, 0.94868329805f, false, false, false);
+        float[][] qStates = new float[3][2];
+        qStates[0] = new float[]{a, b};
+        qStates[1] = new float[]{1.0F, 0.0F};
+        qStates[2] = new float[]{1.0F, 0.0F};
+        float[][] q_state = new float[][]{new float[]{qStates[0][0] * qStates[1][0] * qStates[2][0]}, new float[]{qStates[0][0] * qStates[1][0] * qStates[2][1]}, new float[]{qStates[0][0] * qStates[1][1] * qStates[2][0]}, new float[]{qStates[0][0] * qStates[1][1] * qStates[2][1]}, new float[]{qStates[0][1] * qStates[1][0] * qStates[2][0]}, new float[]{qStates[0][1] * qStates[1][0] * qStates[2][1]}, new float[]{qStates[0][1] * qStates[1][1] * qStates[2][0]}, new float[]{qStates[0][1] * qStates[1][1] * qStates[2][1]}};
+        q_state = new float[][]{new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}};
+        q_state = new float[][]{new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}};
+        q_state = new float[][]{new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0])}, new float[]{0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1])}};
+        q_state = new float[][]{new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}};
+        boolean $$_tmp_measureVar1;
+        if (b_2) {
+            q_state = new float[][]{new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + 0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.0F}, new float[]{0.0F}, new float[]{0.0F}, new float[]{0.0F}};
+            $$_tmp_measureVar1 = false;
+        } else {
+            q_state = new float[][]{new float[]{0.0F}, new float[]{0.0F}, new float[]{0.0F}, new float[]{0.0F}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][1]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][1])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][0]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][0]))}, new float[]{0.70710677F * (0.70710677F * (qStates[0][0] * qStates[1][0] * qStates[2][0]) + -0.70710677F * (qStates[0][0] * qStates[1][1] * qStates[2][0])) + -0.70710677F * (0.70710677F * (qStates[0][1] * qStates[1][0] * qStates[2][1]) + 0.70710677F * (qStates[0][1] * qStates[1][1] * qStates[2][1]))}};
+            $$_tmp_measureVar1 = true;
+        }
+        boolean b0 = $$_tmp_measureVar1;
+        boolean $$_tmp_measureVar2;
+        if (b_1) {
+            q_state = new float[][]{new float[]{q_state[0][0]}, new float[]{q_state[1][0]}, new float[]{0.0F}, new float[]{0.0F}, new float[]{q_state[4][0]}, new float[]{q_state[5][0]}, new float[]{0.0F}, new float[]{0.0F}};
+            $$_tmp_measureVar2 = false;
+        } else {
+            q_state = new float[][]{new float[]{0.0F}, new float[]{0.0F}, new float[]{q_state[2][0]}, new float[]{q_state[3][0]}, new float[]{0.0F}, new float[]{0.0F}, new float[]{q_state[6][0]}, new float[]{q_state[7][0]}};
+            $$_tmp_measureVar2 = true;
+        }
+        boolean b1 = $$_tmp_measureVar2;
+        if (b1) {
+            q_state = new float[][]{new float[]{q_state[1][0]}, new float[]{q_state[0][0]}, new float[]{q_state[3][0]}, new float[]{q_state[2][0]}, new float[]{q_state[5][0]}, new float[]{q_state[4][0]}, new float[]{q_state[7][0]}, new float[]{q_state[6][0]}};
+        }
+        if (b0) {
+            q_state = new float[][]{new float[]{q_state[0][0]}, new float[]{-1.0F * q_state[1][0]}, new float[]{q_state[2][0]}, new float[]{-1.0F * q_state[3][0]}, new float[]{q_state[4][0]}, new float[]{-1.0F * q_state[5][0]}, new float[]{q_state[6][0]}, new float[]{-1.0F * q_state[7][0]}};
+        }
+        return new float[]{q_state[0][0] + q_state[2][0] + q_state[4][0] + q_state[6][0], q_state[1][0] + q_state[3][0] + q_state[5][0] + q_state[7][0]};
+    }
+
+
+    private static void printState(float[][] arr) {
+        System.out.print("[");
+        for(int i = 0; i < arr.length; ++i) {
+            System.out.print("" + arr[i][0] + ", ");
+        }
+        System.out.print("]\n");
+    }
+
+
+    public static void main(String[] args) {
+
+        tp_v2( 0.31622776601f, 0.94868329805f, true, false, false);
+        generatedTp( 0.31622776601f, 0.94868329805f, true, false);
     }
 }
