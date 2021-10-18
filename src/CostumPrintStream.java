@@ -18,6 +18,9 @@ class CostumPrintStream extends PrintStream {
             if(s.contains("/tmp/")) {
                 super.print(s.replaceAll("/tmp", ""));
             }
+            if(s.contains("signals () false")) {
+                return;
+            }
             super.print(s);
         } else {
             filtered = true;
@@ -30,6 +33,9 @@ class CostumPrintStream extends PrintStream {
             String s = new String(buf, StandardCharsets.UTF_8);
             if(s.contains("/tmp/")) {
                 super.print(s.replaceAll("/tmp", ""));
+            }
+            if(s.contains("signals () false")) {
+                return;
             }
             super.write(buf, off, len);
         } else {

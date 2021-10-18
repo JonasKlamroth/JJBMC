@@ -103,7 +103,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
         unwinds = new ArrayList<>();
         try {
             String[] args = {fileName};
-            IAPI api = Factory.makeAPI();
+            IAPI api = Factory.makeAPI(CLI.apiArgs);
             java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
             int a = api.typecheck(cu);
             //System.out.printf("a=%d", a);

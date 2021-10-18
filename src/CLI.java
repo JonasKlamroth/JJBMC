@@ -36,6 +36,7 @@ public class CLI implements Runnable {
     public static final String RED_BOLD = "\033[1;31m";    // RED
     public static final String GREEN_BOLD = "\033[1;32m";  // GREEN
     public static final String YELLOW_BOLD = "\033[1;33m"; // YELLOW
+    public static String[] apiArgs;
 
     @Option(names = {"-kt", "-keepTranslation"}, description = "Keep the temporary file which contains the translation of the given file.")
     static boolean keepTranslation = false;
@@ -119,6 +120,7 @@ public class CLI implements Runnable {
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
     private static Process jbmcProcess = null;
+    private static File tmpFile;
 
     @Override
     public void run() {
@@ -190,11 +192,11 @@ public class CLI implements Runnable {
 
     public static File prepareForJBMC() {
         File f = new File(fileName);
-        return prepareForJBMC(new String[]{"-cp", new File(f.getParentFile(), "tmp").getAbsolutePath()});
+        apiArgs = new String[]{"-cp", new File(f.getParentFile(), "tmp").getAbsolutePath()};
+        return prepareForJBMC(apiArgs);
     }
 
     public static File prepareForJBMC(String[] apiArgs) {
-        File tmpFile;
         didCleanUp = false;
 
         if(unwinds < 0) {
@@ -210,7 +212,7 @@ public class CLI implements Runnable {
         }
 
         try {
-        File f = new File(fileName);
+            File f = new File(fileName);
             if(!f.exists()) {
                 log.error("Could not find file " + f);
                 return null;
@@ -228,6 +230,7 @@ public class CLI implements Runnable {
             }
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+            createCProverFolder(tmpFolder.getAbsolutePath());
             long start = System.currentTimeMillis();
             String translation = translate(tmpFile, apiArgs);
 
@@ -252,7 +255,6 @@ public class CLI implements Runnable {
                 packageFolder.mkdirs();
                 tmpFile = new File(packageFolder, tmpFile.getName());
                 Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
-                createCProverFolder(tmpFolder.getAbsolutePath());
                 if (!copyJBMC()) {
                     cleanUp();
                     return null;
@@ -316,7 +318,7 @@ public class CLI implements Runnable {
             return;
         }
         log.debug("Parse function names.");
-        FunctionNameVisitor.parseFile(fileName);
+        FunctionNameVisitor.parseFile(tmpFile.getAbsolutePath());
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         Map<String, List<String>> paramMap = FunctionNameVisitor.getParamMap();
         List<String> allFunctionNames = new ArrayList<>(functionNames);
