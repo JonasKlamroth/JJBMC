@@ -422,7 +422,7 @@ public class CLI implements Runnable {
 
             if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
                 keepTranslation = true;
-                log.error("JBMC did not terminate as expected.");
+                log.error("JBMC did not terminate as expected for function: " + functionName);
                 Files.write(Paths.get(tmpFolder.getAbsolutePath(), "xmlout.xml"), xmlOutput.getBytes());
                 return;
             } else {
