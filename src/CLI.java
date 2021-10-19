@@ -1,5 +1,6 @@
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.jmlspecs.openjml.Factory;
 import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
@@ -115,7 +116,9 @@ public class CLI implements Runnable {
             arity = "0..1")
     public static boolean doSanityCheck = false;
 
-    public static final boolean debugMode = true;
+    @Option(names = {"-d", "-debug"},
+            description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
+    public static boolean debugMode = false;
 
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
@@ -124,6 +127,9 @@ public class CLI implements Runnable {
 
     @Override
     public void run() {
+        if(debugMode) {
+            Configurator.setRootLevel(Level.DEBUG);
+        }
         if(forceInlining) {
             forceInliningLoops = true;
             forceInliningMethods = true;
@@ -365,7 +371,7 @@ public class CLI implements Runnable {
             log.debug("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
             String classFile = tmpFile.getAbsolutePath().replace(".java", "");
-            classFile = classFile.substring(classFile.indexOf("/tmp") + 5);
+            classFile = classFile.substring(classFile.lastIndexOf("/tmp") + 5);
             //classFile = "." + classFile;
 
             ArrayList<String> tmp = new ArrayList<>();
@@ -422,7 +428,8 @@ public class CLI implements Runnable {
 
             if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
                 keepTranslation = true;
-                log.error("JBMC did not terminate as expected for function: " + functionName);
+                log.error("JBMC did not terminate as expected for function: " + functionName +
+                        "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
                 Files.write(Paths.get(tmpFolder.getAbsolutePath(), "xmlout.xml"), xmlOutput.getBytes());
                 return;
             } else {
