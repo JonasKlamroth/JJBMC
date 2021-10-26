@@ -209,15 +209,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     throw new RuntimeException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
+                    cond = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
                 JCExpression res = treeutils.makeOr(Position.NOPOS, treeutils.makeNot(Position.NOPOS, cond), copy.value);
                 List<JCStatement> old = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
+                    value = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+                    newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
                 newStatements = newStatements.prependList(old);
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
@@ -233,9 +233,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCBinary b = M.Binary(Tag.AND, M.Ident(boolVar), value);
                 JCExpression init = super.copy(re.getMin());
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+                    b = (JCBinary) TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
+                    range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+                    init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
@@ -246,7 +246,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 JCForLoop forLoop =  TranslationUtils.makeStandardLoopFromRange(range, newStatements, loopVarName, currentSymbol, init);
                 l = l.append(forLoop);
-                TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
+                l = TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
@@ -264,9 +264,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCBinary b = M.Binary(Tag.OR, M.Ident(boolVar), value);
                 JCExpression init = super.copy(re.getMin());
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+                    b = (JCBinary) TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
+                    range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+                    init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
@@ -276,7 +276,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     loopVarName = variableReplacements.get(that.decls.get(0).getName().toString());
                 }
                 l = l.append(TranslationUtils.makeStandardLoopFromRange(range, newStatements, loopVarName, currentSymbol, init));
-                TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
+                l = TranslationUtils.replaceVarName( that.decls.get(0).getName().toString(), variableReplacements.get(that.decls.get(0).getName().toString()), l);
                 newStatements = stmts.appendList(l);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
@@ -288,15 +288,15 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
+                    cond = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
                 }
                 JCExpression res = treeutils.makeAnd(Position.NOPOS, cond, copy.value);
                 List<JCStatement> old = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(res);
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
-                    TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
+                    value = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+                    newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
                 newStatements = newStatements.prependList(old);
 //                JCUnary nexpr = treeutils.makeNot(Position.NOPOS, cond);
@@ -524,6 +524,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body, baseVisitor));
         assignables = TranslationUtils.filterAssignables(assignables);
+        assignables = assignables.reverse();
         newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
 
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
@@ -659,6 +660,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body, baseVisitor));
         assignables = TranslationUtils.filterAssignables(assignables);
+        assignables = assignables.reverse();
         newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
 
         assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);

@@ -1,8 +1,5 @@
 package CaseStudy;
 
-import TestAnnotations.Unwind;
-import TestAnnotations.Verifyable;
-
 /**
  * Created by jklamroth on 2/1/19.
  */
@@ -25,11 +22,4 @@ public class MultExample {
         return res;
     }
 
-    //@ requires x1 < 256 &&  x2 < 256;
-    //@ requires 0 <= x2 && 0 <= x1;
-    //@ requires res == x1 * x2;
-    //@ ensures res + x2 == (x1 + 1) * x2;
-    @Verifyable
-    public void test(int x1, int x2, int res) {
-    }
 }

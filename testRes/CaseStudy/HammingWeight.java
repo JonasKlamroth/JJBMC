@@ -1,8 +1,5 @@
 package CaseStudy;
 
-import TestAnnotations.Unwind;
-import TestAnnotations.Verifyable;
-
 class HammingWeight {
 
     /*@  requires a != null;
@@ -10,8 +7,6 @@ class HammingWeight {
       @  ensures \result <= a.length * 32;
       @  assignable \nothing;
       @*/
-    @Verifyable
-    @Unwind(number = 6)
     int weight(int[] a) {
         int result = 0;
         //@ loop_invariant result <= i * 32;
@@ -34,8 +29,6 @@ class HammingWeight {
       @  ensures \result <= a.length * 32;
       @  assignable \nothing;
       @*/
-    @Verifyable
-    @Unwind(number = 6)
     int weight3(int[] a) {
         int result = 0;
         for (int i = 0; i < a.length; i++) {
@@ -55,8 +48,6 @@ class HammingWeight {
       @  ensures \result <= a.length * 32;
       @  assignable \nothing;
       @*/
-    @Verifyable
-    @Unwind(number = 33)
     int weight2(int[] a) {
         int result = 0;
         //@ loop_invariant result <= i * 32;

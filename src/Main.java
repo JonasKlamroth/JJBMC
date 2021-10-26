@@ -10,14 +10,11 @@ public class Main {
 
 
     public static final void main(String[] args) throws Exception {
-        System.setErr(new CostumPrintStream(System.err));
-        System.setOut(new CostumPrintStream(System.out));
+        if(!(System.err instanceof CostumPrintStream)) {
+            System.setErr(new CostumPrintStream(System.err));
+            System.setOut(new CostumPrintStream(System.out));
+        }
+        CLI.reset();
         CommandLine.run(new CLI(), args);
-        Function f = new Function() {
-            @Override
-            public Object apply(Object o) {
-                return null;
-            }
-        };
     }
 }

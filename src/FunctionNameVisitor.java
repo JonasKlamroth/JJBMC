@@ -18,6 +18,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
     static private List<TestBehaviour> functionBehaviours = new ArrayList<>();
     static private List<String> unwinds = new ArrayList<>();
     private static Map<String, List<String>> paramMap = new HashMap<>();
+    private boolean getAll = false;
 
     public enum TestBehaviour {
         Verifyable,
@@ -52,7 +53,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
 
         String rtString = returnTypeString(that.restype);
         String paramString = getParamString(that.params);
-        if(f.endsWith("Verf") || f.endsWith("<init>")) {
+        if(f.endsWith("Verf") || f.endsWith("<init>") || getAll) {
             functionNames.add(f + ":" + paramString + rtString);
         }
         for(JCTree.JCVariableDecl p : that.params) {
@@ -98,7 +99,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
         }
     }
 
-    static void parseFile(String fileName) {
+    static void parseFile(String fileName, boolean getAll) {
         functionNames = new ArrayList<>();
         functionBehaviours = new ArrayList<>();
         unwinds = new ArrayList<>();
@@ -111,6 +112,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
 
             Context ctx = api.context();
             FunctionNameVisitor fnv = new FunctionNameVisitor();
+            fnv.getAll = getAll;
             for (JmlTree.JmlCompilationUnit it : cu) {
                 //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
                 ctx.dump();
@@ -124,6 +126,10 @@ class FunctionNameVisitor extends JmlTreeScanner {
         }
     }
 
+
+    static void parseFile(String fileName) {
+        parseFile(fileName, false);
+    }
     private String returnTypeString(JCTree.JCExpression rtType) {
         return typeToString(rtType);
     }

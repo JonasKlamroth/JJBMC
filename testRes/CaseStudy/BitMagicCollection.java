@@ -1,18 +1,13 @@
 package CaseStudy;
 
-import TestAnnotations.Unwind;
-import TestAnnotations.Verifyable;
-
 /**
  * Created by jklamroth on 2/1/19.
  */
 class BitMagicCollection {
     //greatest Power of 2 less or equal to x
     /*@ requires x > 0;
-      @ ensures !(\exists int j; j > 0 && j < 33; Math.pow(2, j) < x && Math.pow(2, j) > \result);
+      @ ensures !(\exists int j; j > 0 && j < 33; 1 << j < x && 1 << j > \result);
      */
-    @Verifyable
-    @Unwind(number = 35)
     public static int flp2(int x) {
         x = x | (x >> 1);
         x = x | (x >> 2);

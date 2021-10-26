@@ -7,16 +7,9 @@ public class BitSort {
 
         int mask = 1 << i;
         int swapPos = from;
-        //System.out.println("");
-        //System.out.println(mask);
         for(int j = from; j < to; ++j) {
-            //System.out.println(array[j]);
-            //System.out.println(array[j] & mask);
-            //System.out.println(array[1+j] & mask);
             if((array[j] & mask) == 0 ) {
-                //System.out.println(Arrays.toString(array));
                 swap(array, j, swapPos++);
-                //System.out.println(Arrays.toString(array));
             }
         }
         BitSort.sort(array, i - 1, from, swapPos);

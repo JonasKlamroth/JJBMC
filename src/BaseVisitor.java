@@ -7,6 +7,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.jmlspecs.openjml.JmlTree;
 
 import java.util.ArrayList;
@@ -28,10 +29,14 @@ public class BaseVisitor extends FilterVisitor {
     private final Map<String, List<JCExpression>> functionsByNames = new HashMap<>();
     private final ArrayList<String> calledFunctions = new ArrayList<>();
     private List<JCExpression> invariants = List.nil();
+    public static Maker M;
+    public static Context context;
 
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
+        this.context = context;
+        this.M = maker;
         this.syms = Symtab.instance(context);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);

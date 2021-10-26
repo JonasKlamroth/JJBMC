@@ -1,3 +1,5 @@
+import com.sun.source.tree.ArrayAccessTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -14,12 +16,9 @@ import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
 
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.sun.tools.javac.tree.JCTree.*;
-import static com.sun.tools.javac.tree.JCTree.Tag.POSTDEC;
 import static org.jmlspecs.openjml.JmlTree.*;
 
 
@@ -170,9 +169,11 @@ public class TranslationUtils {
         range = M.Binary(Tag.AND, M.Binary(Tag.LE, min, treeutils.makeIdent(Position.NOPOS, loopVar.sym)), M.Binary(Tag.GE, max, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
         return makeStandardLoop(range, body, loopVar, currentSymbol);
     }
+
     public static List<JCStatement> replaceVarName(String oldName, String newName, List<JCStatement> expr) {
-        for(JCStatement st : expr) {
-            ReplaceVisitor.replace(oldName, newName, st, M);
+        List<JCStatement> res = List.nil();
+        for(int i = 0; i < expr.size(); ++i) {
+            res = res.append(ReplaceVisitor.replace(oldName, newName, expr.get(i), M));
         }
         return expr;
     }
@@ -679,45 +680,69 @@ class RangeExtractor extends JmlTreeScanner {
     }
 }
 
-class ReplaceVisitor extends JmlTreeScanner {
+class ReplaceVisitor extends JmlTreeCopier {
     static String oldName = null;
-    static String newName = null;
-    private final JmlTree.Maker M;
+    static JCExpression newExpression = null;
 
-    public ReplaceVisitor(JmlTree.Maker maker) {
-        this.M = maker;
+
+    public ReplaceVisitor(Context context, Maker maker) {
+        super(context, maker);
     }
 
     @Override
-    public void visitIdent(JCIdent tree) {
-        if (tree.name.toString().equals(oldName)) {
-            tree.name = M.Name(newName);
+    public JCTree visitIdentifier(IdentifierTree node, Void p) {
+        JCIdent t = (JCIdent) super.visitIdentifier(node, p);
+        if(t.getName().toString().equals(oldName)) {
+            return newExpression;
         }
-        super.visitIdent(tree);
+        return t;
     }
 
     @Override
-    public void visitVarDef(JCVariableDecl tree) {
-        if (tree.name.toString().equals(oldName)) {
-            tree.name = M.Name(newName);
+    public JCTree visitArrayAccess(ArrayAccessTree node, Void p) {
+        JCArrayAccess a = (JCArrayAccess) super.visitArrayAccess(node, p);
+        if(a.indexed.toString().equals(oldName)) {
+            a.indexed = newExpression;
         }
-        super.visitVarDef(tree);
+        return a;
+    }
+
+    @Override
+    public JCTree visitJmlVariableDecl(JmlVariableDecl that, Void p) {
+        JCVariableDecl vd = (JCVariableDecl) super.visitJmlVariableDecl(that, p);
+        if(vd.name.toString().equals(oldName)) {
+            return newExpression;
+        }
+        return vd;
+    }
+
+    public static JCExpression replace(String oldName, JCExpression newExpression, JCExpression expr, Maker maker) {
+        ReplaceVisitor.newExpression = newExpression;
+        ReplaceVisitor.oldName = oldName;
+        ReplaceVisitor rv = new ReplaceVisitor(BaseVisitor.context, BaseVisitor.M);
+        return rv.copy(expr);
+    }
+
+    public static JCStatement replace(String oldName, JCExpression newExpression, JCStatement expr, Maker maker) {
+        ReplaceVisitor.newExpression = newExpression;
+        ReplaceVisitor.oldName = oldName;
+        ReplaceVisitor rv = new ReplaceVisitor(BaseVisitor.context, BaseVisitor.M);
+        return rv.copy(expr);
     }
 
     public static JCStatement replace(String oldName, String newName, JCStatement expr, Maker maker) {
-        ReplaceVisitor.newName = newName;
+        ReplaceVisitor.newExpression = maker.Ident(newName);
         ReplaceVisitor.oldName = oldName;
-        ReplaceVisitor rv = new ReplaceVisitor(maker);
-        rv.scan(expr);
-        return expr;
+        ReplaceVisitor rv = new ReplaceVisitor(BaseVisitor.context, BaseVisitor.M);
+        return rv.copy(expr);
     }
 
     public static JCExpression replace(String oldName, String newName, JCExpression expr, Maker maker) {
-        ReplaceVisitor.newName = newName;
+        ReplaceVisitor.newExpression = maker.Ident(newName);
         ReplaceVisitor.oldName = oldName;
-        ReplaceVisitor rv = new ReplaceVisitor(maker);
-        rv.scan(expr);
-        return expr;
+        ReplaceVisitor rv = new ReplaceVisitor(BaseVisitor.context, BaseVisitor.M);
+        JCExpression cpy = rv.copy(expr);
+        return cpy;
     }
 }
 
@@ -726,6 +751,7 @@ class IdentifierVisitor extends JmlTreeScanner {
     private List<JCIdent> idents = List.nil();
     private List<Symbol> syms = List.nil();
     private List<JCExpression> locSets = List.nil();
+    private List<Symbol.VarSymbol> localVars = List.nil();
     private List<Tag> assignOps = List.of(Tag.BITOR_ASG,
             Tag.BITXOR_ASG,
             Tag.BITAND_ASG,
@@ -756,36 +782,66 @@ class IdentifierVisitor extends JmlTreeScanner {
     @Override
     public void visitApply(JCMethodInvocation tree) {
         String functionName = "";
+        List<String> params = List.nil();
         if(tree.meth instanceof JCIdent) {
-            functionName = ((JCIdent) tree.meth).name.toString();
+            JCIdent i = ((JCIdent) tree.meth);
+            functionName = i.name.toString();
+            Symbol.MethodSymbol sym = (Symbol.MethodSymbol) i.sym;
+            for(Symbol.VarSymbol v : sym.params) {
+                params = params.append(v.name.toString());
+            }
         } else if(tree.meth instanceof JCFieldAccess) {
             functionName = ((JCFieldAccess) tree.meth).name.toString();
         }
         if(baseVisitor != null) {
             List<JCExpression> assigns = baseVisitor.getAssignablesForName(functionName);
+            List<JCExpression> processedAssigns = List.nil();
+            for(int j = 0; j < assigns.size(); ++j) {
+                JCExpression assign = assigns.get(j);
+                for(int i = 0; i < params.size(); ++i) {
+                    assign = ReplaceVisitor.replace(params.get(i), tree.args.get(i), assign, BaseVisitor.M);
+                }
+                processedAssigns = processedAssigns.append(assign);
+            }
             if(assigns != null) {
-                locSets = locSets.appendList(assigns);
+                locSets = locSets.prependList(processedAssigns);
             }
         }
     }
 
     @Override
+    public void visitJmlForLoop(JmlForLoop that) {
+        //do nothing here
+    }
+
+    @Override
+    public void visitJmlWhileLoop(JmlWhileLoop that) {
+        //do nothing here
+    }
+
+    @Override
     public void visitUnary(JCUnary tree) {
         if(assignOps.contains(tree.getTag())) {
-            locSets = locSets.append(tree.arg);
+            locSets = locSets.prepend(tree.arg);
         }
         super.visitUnary(tree);
     }
 
     @Override
     public void visitAssignop(JCAssignOp tree) {
-        locSets = locSets.append(tree.lhs);
+        locSets = locSets.prepend(tree.lhs);
         super.visitAssignop(tree);
     }
 
     @Override
+    public void visitJmlVariableDecl(JmlVariableDecl that) {
+        localVars = localVars.append(that.sym);
+        super.visitJmlVariableDecl(that);
+    }
+
+    @Override
     public void visitAssign(JCAssign tree) {
-        locSets = locSets.append(tree.lhs);
+        locSets = locSets.prepend(tree.lhs);
         super.visitAssign(tree);
     }
 
@@ -808,7 +864,16 @@ class IdentifierVisitor extends JmlTreeScanner {
     public static List<JCExpression> getAssignLocations(JCStatement st, BaseVisitor baseVisitor) {
         IdentifierVisitor visitor = new IdentifierVisitor(baseVisitor);
         visitor.scan(st);
-        return visitor.locSets;
+        List<JCExpression> res = List.nil();
+        for(JCExpression e: visitor.locSets) {
+            if(e instanceof JCIdent) {
+                if (visitor.localVars.contains(((JCIdent) e).sym)) {
+                    continue;
+                }
+            }
+            res = res.append(e);
+        }
+        return res;
     }
 }
 

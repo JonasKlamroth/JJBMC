@@ -1,0 +1,9 @@
+{
+    "BubbleSort.java" : [["-fi"], ["-fil"]],
+    "BitMagicCollection.java" : [["flp2", "-u", "35"]],
+    "Grover.java" : [["grover"]],
+    "Lemmata.java" : [["lemma"], ["lemmaTwoNulls"]],
+    "SerTest.java" : [["test"]],
+    "HammingWeight.java" : [[], ["-fi"]],
+    "DualPivotQuicksort" : [["-fi"]]
+}

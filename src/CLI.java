@@ -48,9 +48,6 @@ public class CLI implements Runnable {
     @Parameters(index="1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
     static String functionName = null;
 
-    @Option(names = {"-df", "-dontFilter"}, description = "If set all JBMC output is printed.")
-    static boolean filterOutput = true;
-
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
     static List<String> jbmcOptions = new ArrayList<>();
 
@@ -125,10 +122,27 @@ public class CLI implements Runnable {
     private static Process jbmcProcess = null;
     private static File tmpFile;
 
+    public static void reset() {
+        timeout = 10000;
+        timed = false;
+        debugMode = false;
+        keepTranslation = false;
+        functionName = null;
+        forceInlining = false;
+        forceInliningMethods = false;
+        forceInliningLoops = false;
+        runWithTrace = false;
+        unwinds = -1;
+        maxArraySize = -1;
+        caseIdx = 0;
+        jbmcOptions = new ArrayList<>();
+    }
+
     @Override
     public void run() {
         if(debugMode) {
             Configurator.setRootLevel(Level.DEBUG);
+            keepTranslation = true;
         }
         if(forceInlining) {
             forceInliningLoops = true;

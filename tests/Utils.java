@@ -23,7 +23,7 @@ public class Utils {
 
     public static final String baseTestFolder = "testRes" + File.separator;
     static private boolean keepTmpFile = true;
-    private static boolean filterOutput = true;
+    private static boolean filterOutput = false;
     private boolean doCleanup = false;
 
     public static Collection<Object[]> assignableParameter() {
@@ -46,7 +46,7 @@ public class Utils {
         String classFile = "tests/" + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
-        FunctionNameVisitor.parseFile(fileName);
+        FunctionNameVisitor.parseFile(fileName, true);
         List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.getFunctionBehaviours();
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> unwinds = FunctionNameVisitor.getUnwinds();
@@ -58,7 +58,12 @@ public class Utils {
         // " tests in file: " + tmpFile.getName());
         for(int idx = 0; idx < functionNames.size(); ++idx) {
             if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
-                params.add(new Object[]{classFile, functionNames.get(idx), unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()});
+                String name = functionNames.get(idx);
+                if(!name.contains("<init>")) {
+                    int dotIdx = name.lastIndexOf(":");
+                    name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
+                }
+                params.add(new Object[]{classFile, name, unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()});
             }
         }
         log.debug("Found " + params.size() + " functions.");
