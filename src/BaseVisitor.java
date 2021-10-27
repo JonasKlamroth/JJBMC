@@ -31,10 +31,15 @@ public class BaseVisitor extends FilterVisitor {
     private List<JCExpression> invariants = List.nil();
     public static Maker M;
     public static Context context;
+    private List<JCTree> newDefs;
+    public static BaseVisitor instance;
 
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
+        if(instance == null) {
+            this.instance = this;
+        }
         this.context = context;
         this.M = maker;
         this.syms = Symtab.instance(context);
@@ -89,7 +94,7 @@ public class BaseVisitor extends FilterVisitor {
                 throw new RuntimeException("Unsupported type specification: " + cl.toString());
             }
         }
-        List<JCTree> newDefs = List.nil();
+        newDefs = List.nil();
         FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
@@ -102,10 +107,14 @@ public class BaseVisitor extends FilterVisitor {
         calledFunctions.addAll(fcv.getCalledFunctions());
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
-                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
                 if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                     newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                 }
+            }
+        }
+        for (JCTree def : that.defs) {
+            if (def instanceof JmlMethodDecl) {
+                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
                 if(!((JmlMethodDecl) def).name.toString().equals("<init>")) {
                     newDefs = newDefs.append(def);
                 }
@@ -138,5 +147,16 @@ public class BaseVisitor extends FilterVisitor {
 
     public List<JCExpression> getInvariants() {
         return invariants;
+    }
+
+    public Symbol.MethodSymbol getMethodSymbol(String name) {
+        for(JCTree d : newDefs) {
+            if(d instanceof JCMethodDecl) {
+                if(((JCMethodDecl) d).name.toString().equals(name)) {
+                    return ((JCMethodDecl) d).sym;
+                }
+            }
+        }
+        throw new RuntimeException("Could not find symbol for funkction: " + name);
     }
 }

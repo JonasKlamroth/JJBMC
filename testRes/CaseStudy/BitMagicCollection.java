@@ -19,12 +19,15 @@ class BitMagicCollection {
 
     //find longest string of 1´s
     //for x > 0
+    /*@ requires x > 0;
+      @ ensures (\forall int i; 0 <= i < 32; (\exists int j; i <= j < i + \result + 1; (x & (1 << j)) == 0));
+      @ ensures (\exists int i; 0 <= i < 32; (\forall int j; i <= j < i + \result; (x & (1 << j)) != 0));
+      @*/
     public static int findMax1String(int x) {
         int k;
         for(k = 0; x != 0; k++) {
             x = x & 2*x;
         }
         return k;
-
     }
 }

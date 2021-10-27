@@ -48,7 +48,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     //Has to perserve order (e.g. LinkedHashMap)
     private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
-    private  final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = List.nil();
     private Map<String, String> variableReplacements = new HashMap<>();
     //important that this is linkedHashMap as it perserves ordering
@@ -71,7 +70,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                                 Symbol returnVar,
                                 JmlMethodDecl currentMethod) {
         super(context, maker);
-        baseVisitor = base;
         this.context = context;
         this.M = Maker.instance(context);
         this.names = Names.instance(context);
@@ -236,6 +234,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     b = (JCBinary) TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
                     range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
                     init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+                    newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
@@ -252,7 +251,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 quantifierVars.remove(that.decls.get(0).sym);
                 return M.Ident(boolVar);
             } else {
-                throw new RuntimeException("Unkown token tpye in quantified Expression: " + copy.op);
+                throw new RuntimeException("Quantified expressions may not occure in Java-mode: " + that.toString());
             }
         } else if(copy.op == JmlTokenKind.BSEXISTS) {
             if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
@@ -267,6 +266,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     b = (JCBinary) TranslationUtils.replaceVarName(e.getKey(), e.getValue(), b);
                     range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
                     init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+                    newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
                 }
                 newStatements = newStatements.append(M.Exec(M.Assign(M.Ident(boolVar), b)));
                 List<JCStatement> l = List.nil();
@@ -304,10 +304,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 quantifierVars.remove(that.decls.get(0).sym);
                 return value;
             } else {
-                throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
+                throw new RuntimeException("Quantified expressions may not occure in Java-mode: " + that.toString());
             }
         } else {
-            throw new RuntimeException("Quantified expressions may not occure in Java-mode.");
+            throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
         }
     }
 
@@ -469,7 +469,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(node.getFinallyBlock() != null) {
             throw new RuntimeException("Finally blocks currently not supported: " + node.toString());
         }
-        JCExpression ty = M.Type(baseVisitor.getExceptionClass().type);
+        JCExpression ty = M.Type(BaseVisitor.instance.getExceptionClass().type);
         JCCatch returnCatch = treeutils.makeCatcher(currentSymbol, ty.type);
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.nil(), null));
         returnCatch.body = M.Block(0L, List.of(throwStmt));
@@ -506,12 +506,16 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(that.loopSpecs == null || CLI.forceInliningLoops) {
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
-            if(!(that.body instanceof JCBlock)) {
-                that.body = M.Block(0L, List.of(that.body));
+            if(that.body instanceof JCBlock) {
+                super.copy(that.body);
+                assert newStatements.size() == 1 && newStatements.get(0) instanceof JCBlock;
+            } else {
+                List<JCStatement> bodyStmts = List.of(that.body);
+                JCBlock body = M.Block(0L, bodyStmts);
+                super.copy(body);
             }
-            JmlWhileLoop copy = (JmlWhileLoop)super.visitJmlWhileLoop(that, p);
             assert(newStatements.size() == 1);
-            copy.body = newStatements.get(0);
+            JmlWhileLoop copy = M.WhileLoop(super.copy(that.cond), newStatements.get(0));
             newStatements = tmp.append(copy);
             return copy;
         }
@@ -522,7 +526,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assignables = assignables.appendList(((JmlStatementLoopModifies) spec).storerefs);
             }
         }
-        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body, baseVisitor));
+        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body));
         assignables = TranslationUtils.filterAssignables(assignables);
         assignables = assignables.reverse();
         newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
@@ -658,7 +662,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 assignables = assignables.appendList(((JmlStatementLoopModifies) spec).storerefs);
             }
         }
-        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body, baseVisitor));
+        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body));
         assignables = TranslationUtils.filterAssignables(assignables);
         assignables = assignables.reverse();
         newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
@@ -721,7 +725,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(returnVar != null) {
             assign = M.Assign(M.Ident(returnVar), expressionCopy);
         }
-        JCExpression ty = M.Type(baseVisitor.getExceptionClass().type);
+        JCExpression ty = M.Type(BaseVisitor.instance.getExceptionClass().type);
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.nil(), null));
         if(assign != null) {
             JCBlock block = M.Block(0L, List.of(M.Exec(assign), throwStmt));
@@ -1174,7 +1178,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newClass.def.defs = newDefs;
             return newClass;
         }
-        if(baseVisitor.hasSymbolicVersion(newClass.getIdentifier().toString())) {
+        if(BaseVisitor.instance.hasSymbolicVersion(newClass.getIdentifier().toString())) {
             JCExpression ex = M.Ident(M.Name(newClass.getIdentifier() + "." + newClass.getIdentifier() + "Symb"));
             ex.setType(newClass.type);
             return M.App(ex, newClass.args);
@@ -1214,7 +1218,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 Objects.equals(copy.meth.type, currentSymbol.owner.type)) {
             functionName = ((JCFieldAccess) copy.meth).name.toString();
         }
-        if(baseVisitor.hasSymbolicVersion(functionName) || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {
+        if(BaseVisitor.instance.hasSymbolicVersion(functionName) || copy.meth.toString().equals(currentSymbol.owner.name.toString())) {
             //JCExpression expr = TranslationUtils.checkConformAssignables(currentAssignable, baseVisitor.getAssignablesForName(copy.meth.toString()));
             //JCIf ifst = M.If(M.Unary(Tag.NOT, expr), makeException("Not conforming assignable clauses for method call: " + copy.meth.toString()), null);
             //newStatements = newStatements.append(ifst);
@@ -1229,7 +1233,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 } else {
                     throw new RuntimeException("method call that could not be handled " + copy.meth.toString());
                 }
-                List<JCExpression> assignables = baseVisitor.getAssignablesForName(functionName);
+                List<JCExpression> assignables = BaseVisitor.instance.getAssignablesForName(functionName);
                 assert(assignables != null);
                 List<JCExpression> newargs = List.nil();
                 for(JCExpression e : copy.args) {

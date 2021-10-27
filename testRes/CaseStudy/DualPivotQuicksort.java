@@ -69,15 +69,6 @@ class DualPivotQuicksort {
       @ assignable great;
       @*/
     static void move_great_left_in_loop(int[] a, int k, int left, int right, int pivot2) {
-        /*@
-          @ loop_invariant
-          @     k <= great && 0 <= great
-          @  && (\exists int i; left <= i && i <= great; a[i] <= pivot2)
-          @  && (\forall int j; great < j && j <= \old(great); a[j] > pivot2)
-          @  && great <= \old(great);
-          @ decreases great;
-          @ loop_modifies great;
-          @*/
         while (a[great] > pivot2 && great != k) {
             --great;
         }

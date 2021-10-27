@@ -175,7 +175,7 @@ public class TranslationUtils {
         for(int i = 0; i < expr.size(); ++i) {
             res = res.append(ReplaceVisitor.replace(oldName, newName, expr.get(i), M));
         }
-        return expr;
+        return res;
     }
     public static JCStatement replaceVarName(String oldName, String newName, JCStatement expr) {
         return ReplaceVisitor.replace(oldName, newName, expr, M);
@@ -734,7 +734,8 @@ class ReplaceVisitor extends JmlTreeCopier {
         ReplaceVisitor.newExpression = maker.Ident(newName);
         ReplaceVisitor.oldName = oldName;
         ReplaceVisitor rv = new ReplaceVisitor(BaseVisitor.context, BaseVisitor.M);
-        return rv.copy(expr);
+        JCStatement st = rv.copy(expr);
+        return st;
     }
 
     public static JCExpression replace(String oldName, String newName, JCExpression expr, Maker maker) {
@@ -747,7 +748,6 @@ class ReplaceVisitor extends JmlTreeCopier {
 }
 
 class IdentifierVisitor extends JmlTreeScanner {
-    private BaseVisitor baseVisitor;
     private List<JCIdent> idents = List.nil();
     private List<Symbol> syms = List.nil();
     private List<JCExpression> locSets = List.nil();
@@ -768,8 +768,8 @@ class IdentifierVisitor extends JmlTreeScanner {
             Tag.POSTINC,
             Tag.POSTDEC);
 
-    public IdentifierVisitor(BaseVisitor baseVisitor) {
-        this.baseVisitor = baseVisitor;
+    public IdentifierVisitor() {
+        super();
     }
 
     @Override
@@ -787,23 +787,29 @@ class IdentifierVisitor extends JmlTreeScanner {
             JCIdent i = ((JCIdent) tree.meth);
             functionName = i.name.toString();
             Symbol.MethodSymbol sym = (Symbol.MethodSymbol) i.sym;
+            if(sym == null) {
+                sym = BaseVisitor.instance.getMethodSymbol(functionName);
+            }
+            if(sym == null) {
+                throw new RuntimeException("Could not find symbol for function: " + functionName);
+            }
             for(Symbol.VarSymbol v : sym.params) {
                 params = params.append(v.name.toString());
             }
         } else if(tree.meth instanceof JCFieldAccess) {
             functionName = ((JCFieldAccess) tree.meth).name.toString();
         }
-        if(baseVisitor != null) {
-            List<JCExpression> assigns = baseVisitor.getAssignablesForName(functionName);
-            List<JCExpression> processedAssigns = List.nil();
-            for(int j = 0; j < assigns.size(); ++j) {
-                JCExpression assign = assigns.get(j);
-                for(int i = 0; i < params.size(); ++i) {
-                    assign = ReplaceVisitor.replace(params.get(i), tree.args.get(i), assign, BaseVisitor.M);
-                }
-                processedAssigns = processedAssigns.append(assign);
-            }
+        if(BaseVisitor.instance != null) {
+            List<JCExpression> assigns = BaseVisitor.instance.getAssignablesForName(functionName);
             if(assigns != null) {
+                List<JCExpression> processedAssigns = List.nil();
+                for(int j = 0; j < assigns.size(); ++j) {
+                    JCExpression assign = assigns.get(j);
+                    for(int i = 0; i < params.size(); ++i) {
+                        assign = ReplaceVisitor.replace(params.get(i), tree.args.get(i), assign, BaseVisitor.M);
+                    }
+                    processedAssigns = processedAssigns.append(assign);
+                }
                 locSets = locSets.prependList(processedAssigns);
             }
         }
@@ -845,10 +851,6 @@ class IdentifierVisitor extends JmlTreeScanner {
         super.visitAssign(tree);
     }
 
-    private IdentifierVisitor() {
-        super();
-    }
-
     public static List<JCIdent> getIdents(JCExpression expr) {
         IdentifierVisitor visitor = new IdentifierVisitor();
         visitor.scan(expr);
@@ -861,8 +863,8 @@ class IdentifierVisitor extends JmlTreeScanner {
         return visitor.syms;
     }
 
-    public static List<JCExpression> getAssignLocations(JCStatement st, BaseVisitor baseVisitor) {
-        IdentifierVisitor visitor = new IdentifierVisitor(baseVisitor);
+    public static List<JCExpression> getAssignLocations(JCStatement st) {
+        IdentifierVisitor visitor = new IdentifierVisitor();
         visitor.scan(st);
         List<JCExpression> res = List.nil();
         for(JCExpression e: visitor.locSets) {

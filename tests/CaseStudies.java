@@ -28,6 +28,7 @@ public class CaseStudies {
             if (f.isFile()) {
                 for(List<String> l : getConfigsForFile(f.getName())) {
                     l.add(0, f.getAbsolutePath());
+                    l.add(0, "-c");
                     String[] args = new String[l.size()];
                     args = l.toArray(args);
                     log.info("Running Casestudy: " + f.getName());

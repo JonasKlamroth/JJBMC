@@ -38,6 +38,7 @@ public class Utils {
         ArrayList<Object[]> params = new ArrayList<>();
         createAnnotationsFolder(fileName);
         CLI.keepTranslation = keepTmpFile;
+        CLI.debugMode = true;
         File tmpFile = CLI.prepareForJBMC(fileName);
         if(tmpFile == null) {
             log.error("Someting went wrong. Test aborted.");
