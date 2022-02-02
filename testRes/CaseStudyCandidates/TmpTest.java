@@ -14,51 +14,15 @@ public class TmpTest {
     Object[] otable;
     IntObject[] iotable;
 
-    //@ requires table != null && table.length == 3;
-    //@ requires arg != 0;
-    //@ requires (\exists int i; 0 <= i < table.length; table[i] == arg);
-    private void testIntArrayAssume(int arg) {
-        assert false;
-    }
 
 
-    //@ requires otable != null && otable.length == 3;
-    //@ requires (\exists int i; 0 <= i < otable.length; otable[i] == arg);
-    private void testObjArrayAssume2(Object arg) {
-        assert false;
-    }
-
-    //@ requires otable != null && otable.length == 3;
-    //@ requires arg != null;
-    //@ requires (\exists int i; 0 <= i < otable.length; otable[i] == arg);
-    private void testObjArrayAssume(Object arg) {
-        assert false;
-    }
-
-    //@ requires otable != null && otable.length == 3;
-    //@ ensures (\forall int i; 0 <= i < otable.length; otable[i] == null);
-    private void testObjArrayAssume3(Object arg) {
-        Object o0 = otable[0];
-        Object o1 = otable[1];
-        Object o2 = otable[2];
-    }
-
-    //@ requires iotable != null && iotable.length == 3;
-    //@ requires arg != null;
-    //@ requires (\exists int i; 0 <= i < iotable.length; iotable[i].i == arg.i);
-    private void testObjArrayAssume3(IntObject arg) {
-        assert false;
-    }
-
-    //@ requires iotable != null && iotable.length == 3;
-    //@ requires arg != null;
-    //@ requires (\exists int i; 0 <= i < iotable.length; iotable[i] == arg);
-    private void testObjArrayAssume4(IntObject arg) {
-        assert false;
-    }
-
-    //@ requires o1 == o2 && o1 != null;
-    private void aliasTest(Object o1, Object o2) {
-        assert false;
+    /*@ requires a <= c && b <= d && a >= -1.f && a <= 1.f &&
+      @         b >= -1.f && b <= 1.f &&
+      @         c >= -1.f && c <= 1.f &&
+      @         d >= -1.f && d <= 1.f;
+      @ ensures \result;
+      @*/
+    public static boolean floatTest(float a, float b, float c, float d) {
+        return a + b <= c + d;
     }
 }
