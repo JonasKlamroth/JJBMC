@@ -490,14 +490,14 @@ public class AssignableTests {
     }
 
     //@ assignable arr;
-    @Verifyable
+    @Fails
     private void methodInvAss8() {
         this.arr = new int[5];
         test4(this.arr);
     }
 
     //@ assignable arr;
-    @Verifyable
+    @Fails
     private void methodInvAss9() {
         int[] array = new int[3];
         test4(array);
@@ -559,5 +559,20 @@ public class AssignableTests {
     @Unwind(number = 7)
     private void someCallTest(int[] is) {
         someAssignTest(is);
+    }
+
+    //@ requires a != null;
+    //@ requires i >= 0 && i < j && j < a.length;
+    //@ assignable a[i], a[j];
+    private void someAssign(int[] a, int i, int j) {
+
+    }
+
+    //@ requires a != null && a.length == 5;
+    //@ requires i >= 0 && i < j && i < a.length;
+    //@ assignable a[0..3];
+    @Fails
+    private void anotherCallTest(int[] a, int i, int j) {
+        someAssign(a, 0, 4);
     }
 }

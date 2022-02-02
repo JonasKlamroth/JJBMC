@@ -71,6 +71,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
+        } else if(that.clauseKind.name().equals("assignable")) {
+
+        } else {
+            throw new RuntimeException("Unsupported clause type: " + that.clauseKind + " (" + that + ")");
         }
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
         JCExpression copy = expressionVisitor.copy(normalized);

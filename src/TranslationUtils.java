@@ -74,7 +74,7 @@ public class TranslationUtils {
     }
 
     static JCStatement makeAssertStatementWithDebugAssignments(JCExpression expr) {
-        List<JCIdent> idents = IdentifierVisitor.getIdents(expr);
+        List<JCIdent> idents = IdentVisitor.getIdents(expr);
         List<JCStatement> stmts = List.nil();
         for(JCIdent ident : idents) {
             if(ident.type instanceof Type.JCPrimitiveType) {
@@ -747,9 +747,33 @@ class ReplaceVisitor extends JmlTreeCopier {
     }
 }
 
-class IdentifierVisitor extends JmlTreeScanner {
+
+class IdentVisitor extends JmlTreeScanner {
     private List<JCIdent> idents = List.nil();
     private List<Symbol> syms = List.nil();
+
+    @Override
+    public void visitIdent(JCIdent ident) {
+        idents = idents.append(ident);
+        syms = syms.append(ident.sym);
+        super.visitIdent(ident);
+    }
+
+
+    public static List<JCIdent> getIdents(JCExpression expr) {
+        IdentVisitor visitor = new IdentVisitor();
+        visitor.scan(expr);
+        return visitor.idents;
+    }
+
+    public static List<Symbol> getIdentSymbols(JCExpression expr) {
+        IdentVisitor visitor = new IdentVisitor();
+        visitor.scan(expr);
+        return visitor.syms;
+    }
+}
+
+class IdentifierVisitor extends JmlTreeScanner {
     private List<JCExpression> locSets = List.nil();
     private List<Symbol.VarSymbol> localVars = List.nil();
     private List<Tag> assignOps = List.of(Tag.BITOR_ASG,
@@ -770,13 +794,6 @@ class IdentifierVisitor extends JmlTreeScanner {
 
     public IdentifierVisitor() {
         super();
-    }
-
-    @Override
-    public void visitIdent(JCIdent ident) {
-        idents = idents.append(ident);
-        syms = syms.append(ident.sym);
-        super.visitIdent(ident);
     }
 
     @Override
@@ -851,17 +868,6 @@ class IdentifierVisitor extends JmlTreeScanner {
         super.visitAssign(tree);
     }
 
-    public static List<JCIdent> getIdents(JCExpression expr) {
-        IdentifierVisitor visitor = new IdentifierVisitor();
-        visitor.scan(expr);
-        return visitor.idents;
-    }
-
-    public static List<Symbol> getIdentSymbols(JCExpression expr) {
-        IdentifierVisitor visitor = new IdentifierVisitor();
-        visitor.scan(expr);
-        return visitor.syms;
-    }
 
     public static List<JCExpression> getAssignLocations(JCStatement st) {
         IdentifierVisitor visitor = new IdentifierVisitor();

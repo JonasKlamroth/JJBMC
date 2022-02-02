@@ -60,7 +60,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public boolean inConstructor = false;
     private static int numQuantvars = 0;
     private boolean forceOld = false;
-
+    private boolean ignoreLocals = false;
 
 
     public JmlExpressionVisitor(Context context, Maker maker,
@@ -371,7 +371,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
 
             List<Symbol.VarSymbol> relevantQuantVars = List.nil();
-            List<Symbol> identSymbols = IdentifierVisitor.getIdentSymbols(arg);
+            List<Symbol> identSymbols = IdentVisitor.getIdentSymbols(arg);
             for(Symbol.VarSymbol s : quantifierVars.keySet()) {
                 if(identSymbols.contains(s)) {
                     relevantQuantVars = relevantQuantVars.append(s);
@@ -379,7 +379,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             JCVariableDecl oldVar;
             if (!oldVars.containsKey(arg.toString())) {
-                if(quantifierVars.size() == 0) {
+                if(quantifierVars.size() == 0 || relevantQuantVars.size() == 0) {
                     oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, argCopy);
                 } else {
                     Type.ArrayType arrayType = new Type.ArrayType(argCopy.type, argCopy.type.tsym);
@@ -822,14 +822,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return M.Throw(M.NewClass(null, null, ty, List.of(msgexpr), null));
     }
 
-    public JCExpression editAssignable(JCExpression e) {
+    public JCExpression editAssignable(JCExpression e, boolean ignoreLocals) {
         JCExpression copy = this.copy(e);
-        return editAssignable(copy, false);
+        this.ignoreLocals = ignoreLocals;
+        JCExpression res = editAssignable(copy);
+        this.ignoreLocals = false;
+        return res;
     }
 
-    public JCExpression editAssignable(JCExpression e, boolean ignoreLocals) {
+    public JCExpression editAssignable(JCExpression e) {
         if(e instanceof JCIdent) {
-            if(!ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
+            if(!this.ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
                 return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
@@ -1245,9 +1248,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 copy.args = newargs;
                 for (JCExpression a : assignables) {
-                    JCExpression cond = editAssignable(a);
+                    JCExpression cond = editAssignable(a, true);
                     cond = treeutils.makeNot(Position.NOPOS, cond);
-                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol) currentSymbol;
+                    Symbol.MethodSymbol sym = (Symbol.MethodSymbol) ((JCIdent)copy.meth).sym;
                     if (sym.params != null) {
                         for (int i = 0; i < sym.params.length(); ++i) {
                             cond = TranslationUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + (paramVarCounter - sym.params.length() + i), cond);
