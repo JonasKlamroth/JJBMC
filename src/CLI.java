@@ -93,6 +93,11 @@ public class CLI implements Runnable {
             description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
     public static String jbmcBin = "./jbmc";
 
+    @Option(names = {"-lf", "--libFiles"},
+            description = "Files to be copied to the translation folder.")
+    public static String[] libFiles = new String[]{};
+
+
 
     @Option(names= {"-jc", "-javac"},
             description = "allows to set the javac binary that is used for compilation of source files manually")
@@ -249,6 +254,14 @@ public class CLI implements Runnable {
                 tmpClassFile.delete();
             }
             Files.copy(f.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            for(String s : libFiles)  {
+                File tmpF = new File(f.getParentFile(), s);
+                if(!tmpF.exists()) {
+                    log.error("Could not find libFile: " + tmpF);
+                    return null;
+                }
+                Files.copy(tmpF.toPath(), new File(tmpFolder, tmpF.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
 
             createCProverFolder(tmpFolder.getAbsolutePath());
             long start = System.currentTimeMillis();
@@ -354,6 +367,7 @@ public class CLI implements Runnable {
             }
         }
         log.info("Run jbmc for " + functionNames.size() + " functions.");
+
         for(String functionName : functionNames) {
             ExecutorService executerService = Executors.newSingleThreadExecutor();
             Runnable worker = () -> runJBMC(tmpFile, functionName, paramMap);
