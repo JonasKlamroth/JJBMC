@@ -122,7 +122,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             if(CLI.debugMode) {
                 e.printStackTrace();
             }
-            throw new RuntimeException("Error parsing for function names.");
+            throw new TranslationException("Error parsing for function names.");
         }
     }
 
@@ -162,7 +162,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
                 return "B";
             if (type.toString().equals("short"))
                 return "S";
-            throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+            throw new UnsupportedException("Unkown type " + type.toString() + ". Cannot call JBMC.");
         } else if (type instanceof JCTree.JCArrayTypeTree) {
             return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
         } else if (type != null) {
@@ -171,7 +171,7 @@ class FunctionNameVisitor extends JmlTreeScanner {
             } else if (type instanceof JCTree.JCFieldAccess) {
                 return "L" + ((JCTree.JCFieldAccess) type).sym.toString().replace(".", "/") + ";";
             } else {
-                throw new RuntimeException("Unkown type " + type.toString() + ". Cannot call JBMC.");
+                throw new UnsupportedException("Unkown type " + type.toString() + ". Cannot call JBMC.");
             }
         }
         return "V";

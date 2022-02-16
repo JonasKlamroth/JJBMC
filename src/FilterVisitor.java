@@ -70,77 +70,77 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlChoose(JmlTree.JmlChoose that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodDecl(JmlTree.JmlMethodDecl that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlBinary(JmlTree.JmlBinary that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlBlock(JmlTree.JmlBlock that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlConstraintMethodSig(JmlTree.JmlMethodSig that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlDoWhileLoop(JmlTree.JmlDoWhileLoop that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlEnhancedForLoop(JmlTree.JmlEnhancedForLoop that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlForLoop(JmlTree.JmlForLoop that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlGroupName(JmlTree.JmlGroupName that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlInlinedLoop(JmlTree.JmlInlinedLoop that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodClauseCallable(JmlTree.JmlMethodClauseCallable that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodClauseConditional(JmlTree.JmlMethodClauseConditional that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodClauseDecl(JmlTree.JmlMethodClauseDecl that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlTree.JmlMethodClauseExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlMethodClauseGroup(JmlTree.JmlMethodClauseGroup that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
@@ -148,14 +148,14 @@ public class FilterVisitor extends JmlTreeCopier {
         if(this instanceof VerifyFunctionVisitor && ((VerifyFunctionVisitor) this).currentMethod.name.toString().equals("<init>")) {
             return super.visitJmlMethodClauseSignals(that, p);
         }
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
         //return super.visitJmlMethodClauseSignals(that, p);
     }
 
     @Override
     public JCTree visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly that, Void p) {
         if(!that.defaultClause) {
-            throw new RuntimeException("Not supported: " + that.toString());
+            throw new UnsupportedException(that.toString());
         } else {
             return super.visitJmlMethodClauseSigOnly(that, p);
         }
@@ -163,247 +163,247 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlModelProgramStatement(JmlTree.JmlModelProgramStatement that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlTree.JmlQuantifiedExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlSetComprehension(JmlTree.JmlSetComprehension that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlSingleton(JmlTree.JmlSingleton that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatement(JmlTree.JmlStatement that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementShow(JmlTree.JmlStatementShow that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementDecls(JmlTree.JmlStatementDecls that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementExpr(JmlTree.JmlStatementExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementHavoc(JmlTree.JmlStatementHavoc that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementLoopExpr(JmlTree.JmlStatementLoopExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementLoopModifies(JmlTree.JmlStatementLoopModifies that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlStatementSpec(JmlTree.JmlStatementSpec that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseConditional(JmlTree.JmlTypeClauseConditional that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseConstraint(JmlTree.JmlTypeClauseConstraint that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseDecl(JmlTree.JmlTypeClauseDecl that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseExpr(JmlTree.JmlTypeClauseExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseIn(JmlTree.JmlTypeClauseIn that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseInitializer(JmlTree.JmlTypeClauseInitializer that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseMaps(JmlTree.JmlTypeClauseMaps that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseMonitorsFor(JmlTree.JmlTypeClauseMonitorsFor that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlTypeClauseRepresents(JmlTree.JmlTypeClauseRepresents that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitJmlWhileLoop(JmlTree.JmlWhileLoop that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     //This should be commented our only for testing
 //    @Override
 //    public JCTree visitAssignment(AssignmentTree node, Void p) {
-//        throw new RuntimeException("Not supported: " + node.toString());
+//        throw new UnsupportedException(node.toString());
 //    }
 
     @Override
     public JCTree visitCompoundAssignment(CompoundAssignmentTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitBreak(BreakTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitCase(CaseTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitCatch(CatchTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitClass(ClassTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitConditionalExpression(ConditionalExpressionTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitContinue(ContinueTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitErroneous(ErroneousTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitExpressionStatement(ExpressionStatementTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitEnhancedForLoop(EnhancedForLoopTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitReturn(ReturnTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitSwitch(SwitchTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitSynchronized(SynchronizedTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitThrow(ThrowTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitTry(TryTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitParameterizedType(ParameterizedTypeTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitTypeParameter(TypeParameterTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitUnary(UnaryTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitWildcard(WildcardTree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitOther(Tree node, Void p) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitLetExpr(JCTree.LetExpr that, Void p) {
-        throw new RuntimeException("Not supported: " + that.toString());
+        throw new UnsupportedException(that.toString());
     }
 
     @Override
     public JCTree visitAnnotatedType(AnnotatedTypeTree node, Void aVoid) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitLambdaExpression(LambdaExpressionTree node, Void aVoid) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitMemberReference(MemberReferenceTree node, Void aVoid) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitUnionType(UnionTypeTree node, Void aVoid) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 
     @Override
     public JCTree visitIntersectionType(IntersectionTypeTree node, Void aVoid) {
-        throw new RuntimeException("Not supported: " + node.toString());
+        throw new UnsupportedException(node.toString());
     }
 }

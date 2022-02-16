@@ -111,7 +111,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             ErrorLogger.warn("Jml set statements only supported experimentally.");
             return that.statement;
         }
-        throw new RuntimeException("Unsupported JmlStatement : " + that.toString());
+        throw new UnsupportedException("Unsupported JmlStatement : " + that.toString());
     }
 
     @Override
@@ -140,7 +140,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(M.Block(0L, newStatements));
             translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         } else {
-            throw new RuntimeException("Token of kind " + that.clauseType.name() + " not supported.");
+            throw new UnsupportedException("Token of kind " + that.clauseType.name() + " not supported.");
         }
         return M.JmlExpressionStatement(that.clauseType.name(), that.clauseType, that.label, copy);
     }
@@ -166,7 +166,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return copy;
         } else {
-            throw new RuntimeException("Unsupported unary token: " + u.getTag() + " in " + node.toString());
+            throw new UnsupportedException("Unsupported unary token: " + u.getTag() + " in " + node.toString());
         }
     }
 
@@ -183,16 +183,16 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         if(that.decls.size() != 1) {
-            throw new RuntimeException("Quantifiers only supported with exactly one declaration. (" + that.toString() + ")");
+            throw new UnsupportedException("Quantifiers only supported with exactly one declaration. (" + that.toString() + ")");
         }
         if(!that.decls.get(0).type.isNumeric()) {
-            throw new RuntimeException("Only quantifiers with numeric variables support for now. (" + that.toString() + ")");
+            throw new UnsupportedException("Only quantifiers with numeric variables support for now. (" + that.toString() + ")");
         }
         JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         variableReplacements.put(that.decls.get(0).getName().toString(), "quantVar" + numQuantvars++ + that.decls.get(0).getName().toString());
         RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
         if(copy.range == null) {
-            throw new RuntimeException("Only quantifiers with given ranges supported.");
+            throw new UnsupportedException("Only quantifiers with given ranges supported.");
         }
         JCExpression range = super.copy(copy.range);
         re.extractRange(range);
@@ -204,7 +204,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = TranslationUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
                 if(cond == null) {
-                    throw new RuntimeException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
+                    throw new UnsupportedException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     cond = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
@@ -251,7 +251,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 quantifierVars.remove(that.decls.get(0).sym);
                 return M.Ident(boolVar);
             } else {
-                throw new RuntimeException("Quantified expressions may not occure in Java-mode: " + that.toString());
+                throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that.toString());
             }
         } else if(copy.op == JmlTokenKind.BSEXISTS) {
             if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
@@ -285,7 +285,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 JCVariableDecl quantVar = TranslationUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
                 if(cond == null) {
-                    throw new RuntimeException("The programm appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
+                    throw new UnsupportedException("The program appears to contain unbounded quantifiers which are not supported by this tool (" + copy.toString() + ").");
                 }
                 for(Map.Entry<String, String> e : variableReplacements.entrySet()) {
                     cond = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), cond);
@@ -304,27 +304,27 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 quantifierVars.remove(that.decls.get(0).sym);
                 return value;
             } else {
-                throw new RuntimeException("Quantified expressions may not occure in Java-mode: " + that.toString());
+                throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that.toString());
             }
         } else {
-            throw new RuntimeException("Unkown token type in quantified Expression: " + copy.op);
+            throw new UnsupportedException("Unkown token type in quantified Expression: " + copy.op);
         }
     }
 
 //    @Override
 //    public JCTree visitThrow(ThrowTree node, Void p) {
-//        throw new RuntimeException("Throwing exceptions is currently not supported.");
+//        throw new UnsupportedException("Throwing exceptions is currently not supported.");
 //    }
 
     @Override
     public JCTree visitJmlBinary(JmlBinary that, Void p) {
-        throw new RuntimeException("JmlBinaries should be normalized to JavaBinaries. (" + that.toString() + ")");
+        throw new TranslationException("JmlBinaries should be normalized to JavaBinaries. (" + that.toString() + ")");
     }
 
     @Override
     public JCTree visitBinary(BinaryTree node, Void p) {
         if(!supportedBinaryTags.contains(((JCBinary)node).getTag())) {
-            throw new RuntimeException("Unsupported Operation: " + node.toString() + "(" + ((JCBinary) node).getTag() + ")");
+            throw new UnsupportedException("Unsupported Operation: " + node.toString() + "(" + ((JCBinary) node).getTag() + ")");
         }
         JCBinary b = (JCBinary)node;
         if(b.getTag() == Tag.OR) {
@@ -367,7 +367,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression argCopy = super.copy(that.getArguments().get(0));
             JCExpression arg = that.getArguments().get(0);
             if(!arg.toString().equals(argCopy.toString())) {
-                throw new RuntimeException("Unsupported old expression: " + that.toString());
+                throw new UnsupportedException("Unsupported old expression: " + that.toString());
             }
 
             List<Symbol.VarSymbol> relevantQuantVars = List.nil();
@@ -416,7 +416,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             } else {
                 oldVar = oldVars.get(arg.toString());
                 if(oldVar == null) {
-                    throw new RuntimeException("Couldnt find saved old expression: " + arg.toString());
+                    throw new TranslationException("Couldnt find saved old expression: " + arg.toString());
                 }
             }
 
@@ -430,7 +430,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 return res;
             }
         }
-        throw new RuntimeException("JmlMethodInvocation with type " + that.token + " is not supported.");
+        throw new TranslationException("JmlMethodInvocation with type " + that.token + " is not supported.");
     }
 
     @Override
@@ -438,7 +438,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if (that.token == JmlTokenKind.BSRESULT) {
             return M.Ident(returnVar);
         }
-        throw new RuntimeException("JmlSingleton with type " + that.token + " is not supported.");
+        throw new TranslationException("JmlSingleton with type " + that.token + " is not supported.");
     }
 
     @Override
@@ -448,12 +448,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         } else if(that.clauseType.name().equals("decreases")) {
             return super.visitJmlStatementLoopExpr(that, p);
         }
-        throw new RuntimeException("Token " + that.clauseType.name() + " for loop specifications currently not supported.");
+        throw new TranslationException("Token " + that.clauseType.name() + " for loop specifications currently not supported.");
     }
 
     @Override
     public JCTree visitSwitch(SwitchTree node, Void p) {
-        throw new RuntimeException("Switch-Statements are currently not supported.");
+        throw new TranslationException("Switch-Statements are currently not supported.");
     }
 
     @Override
@@ -467,7 +467,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitTry(TryTree node, Void p) {
         if(node.getFinallyBlock() != null) {
-            throw new RuntimeException("Finally blocks currently not supported: " + node.toString());
+            throw new TranslationException("Finally blocks currently not supported: " + node.toString());
         }
         JCExpression ty = M.Type(BaseVisitor.instance.getExceptionClass().type);
         JCCatch returnCatch = treeutils.makeCatcher(currentSymbol, ty.type);
@@ -488,17 +488,17 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitCase(CaseTree node, Void p) {
-        throw new RuntimeException("Case-Statements are currently not supported.");
+        throw new TranslationException("Case-Statements are currently not supported.");
     }
 
     @Override
     public JCTree visitBreak(BreakTree node, Void p) {
-        throw new RuntimeException("Break-Statements are currently not supported.");
+        throw new TranslationException("Break-Statements are currently not supported.");
     }
 
     @Override
     public JCTree visitContinue(ContinueTree node, Void p) {
-        throw new RuntimeException("Continue-Statements are currently not supported.");
+        throw new TranslationException("Continue-Statements are currently not supported.");
     }
 
     @Override
@@ -537,7 +537,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         for(JmlStatementLoop spec : that.loopSpecs) {
             if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if(oldD != null) {
-                    throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
+                    throw new TranslationException("Only 1 decreases clause per loop allowed but found more.");
                 }
                 dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
                 oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + intVarCounter++),  dExpr, currentSymbol);
@@ -587,13 +587,13 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(copy);
             return copy;
         }
-        throw new RuntimeException("While-Loops with invariants currently not supported.");
+        throw new TranslationException("While-Loops with invariants currently not supported.");
     }
 
     @Override
     public JCTree visitJmlEnhancedForLoop(JmlEnhancedForLoop that, Void p) {
         if(that.loopSpecs != null) {
-            throw new RuntimeException("Enhanced for loops with specifications are currently not supported.");
+            throw new TranslationException("Enhanced for loops with specifications are currently not supported.");
         }
         JmlEnhancedForLoop copy = (JmlEnhancedForLoop) that.clone();
         List<JCStatement> tmp = newStatements;
@@ -645,7 +645,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         }
         if(that.init.size() > 1) {
-            throw new RuntimeException("More than 1 loopVariable currently not supported");
+            throw new TranslationException("More than 1 loopVariable currently not supported");
         }
         JCVariableDecl loopVar = null;
         if(that.init.size() > 0) {
@@ -673,7 +673,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         for(JmlStatementLoop spec : that.loopSpecs) {
             if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if(oldD != null) {
-                    throw new RuntimeException("Only 1 decreases clause per loop allowed but found more.");
+                    throw new TranslationException("Only 1 decreases clause per loop allowed but found more.");
                 }
                 dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
                 oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + intVarCounter++),  dExpr, currentSymbol);
@@ -810,7 +810,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
             return copy;
         } else {
-            throw new RuntimeException("Unkonwn assignment type " + copy.toString());
+            throw new UnsupportedException("Unkonwn assignment type " + copy.toString());
         }
     }
 
@@ -849,7 +849,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     return M.Literal(false);
                 }
             } else {
-                throw new RuntimeException("Unexpected type.");
+                throw new UnsupportedException("Unexpected type.");
             }
             return editAssignable((JCArrayAccess) e);
         } else if(e instanceof JCFieldAccess) {
@@ -864,10 +864,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             } else if(k.token == JmlTokenKind.BSEVERYTHING) {
                 return M.Literal(currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword));
             } else {
-                throw new RuntimeException("Cannot handle assignment to " + e.toString());
+                throw new UnsupportedException("Cannot handle assignment to " + e.toString());
             }
         } else {
-            throw new RuntimeException("Could not handle assignment to " + e.toString());
+            throw new UnsupportedException("Could not handle assignment to " + e.toString());
         }
     }
 
@@ -948,7 +948,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
             if(!(hi instanceof JCIdent || hi instanceof JCLiteral || lo instanceof JCIdent || lo instanceof JCLiteral)) {
-                throw new RuntimeException("Only sidecondition free array indices supported. (" + e.toString() + ")");
+                throw new UnsupportedException("Only sidecondition free array indices supported. (" + e.toString() + ")");
             }
             if(hi == null) {
                 hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
@@ -1110,7 +1110,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlStatementSpec(JmlStatementSpec that, Void p) {
-        throw new RuntimeException("JmlStatementSpecs not supported. (" + that.toString() + ")");
+        throw new UnsupportedException("JmlStatementSpecs not supported. (" + that.toString() + ")");
         //List<JCStatement> saveList = newStatements;
         //newStatements = List.nil();
         //super.copy(that.statementSpecs);
@@ -1206,7 +1206,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 return copy;
             }
-            //throw new RuntimeException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
+            //throw new UnsupportedException("Method calls in specifications are currently not supported. (" + node.toString() + ")");
             ErrorLogger.warn("Method calls in specifications only supported experimentally.");
           //  return (JCMethodInvocation)node;
         }
@@ -1234,7 +1234,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 } else if(copy.meth instanceof JCIdent) {
                     currentSymbol = ((JCIdent) copy.meth).sym;
                 } else {
-                    throw new RuntimeException("method call that could not be handled " + copy.meth.toString());
+                    throw new TranslationException("method call that could not be handled " + copy.meth.toString());
                 }
                 List<JCExpression> assignables = BaseVisitor.instance.getAssignablesForName(functionName);
                 assert(assignables != null);

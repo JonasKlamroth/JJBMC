@@ -42,7 +42,7 @@ public class Utils {
         File tmpFile = CLI.prepareForJBMC(fileName);
         if(tmpFile == null) {
             log.error("Someting went wrong. Test aborted.");
-            throw new RuntimeException("Tmpfile was not created. abort test.");
+            throw new TranslationException("Tmpfile was not created. abort test.");
         }
         String classFile = "tests/" + tmpFile.getName().replace(".java", "");
 
@@ -82,7 +82,7 @@ public class Utils {
             Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error trying to copy TestAnnotations");
+            throw new TranslationException("Error trying to copy TestAnnotations");
         }
         f = new File(fileName);
         dir = new File(f.getParent(),"tmp" + File.separator + "tests" + File.separator + "TestAnnotations" );
@@ -94,7 +94,7 @@ public class Utils {
             Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error trying to copy TestAnnotations");
+            throw new TranslationException("Error trying to copy TestAnnotations");
         }
     }
 

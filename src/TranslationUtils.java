@@ -322,7 +322,7 @@ public class TranslationUtils {
                         JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
                         body = ifst;
                     } catch (NumberFormatException e) {
-                        throw new RuntimeException("Cant havoc expression " + expr);
+                        throw new TranslationException("Cant havoc expression " + expr);
                     }
                 }
                 res = res.append(body);
@@ -330,7 +330,7 @@ public class TranslationUtils {
                 JCFieldAccess fexpr = (JCFieldAccess)expr;
                 if(fexpr.name == null) {
                     if(fexpr.selected.toString().equals("this")) {
-                        throw new RuntimeException("havocing this.* is not supported.");
+                        throw new UnsupportedException("havocing this.* is not supported.");
                     }
                     ErrorLogger.warn("havocing o.* is currently not translated soundly.");
                     res = res.append(M.Exec(M.Assign(fexpr.selected, getNondetFunctionForType(fexpr.selected.type, currentSymbol))));
@@ -342,7 +342,7 @@ public class TranslationUtils {
                     log.warn("NOTE: Havoc of \\everything is currently not supported. In method: " + currentSymbol.toString());
                 }
             } else {
-                throw new RuntimeException("Havoc for expression " + expr + " not supported");
+                throw new UnsupportedException("Havoc for expression " + expr + " not supported");
             }
         }
         return res;
@@ -401,7 +401,7 @@ public class TranslationUtils {
                 return makeNondetWithoutNull(currentSymbol);
             }
         }
-        throw new RuntimeException("Nondet for type " + type + " not supported.");
+        throw new UnsupportedException("Nondet for type " + type + " not supported.");
     }
 
     public static JCMethodInvocation getNondetFunctionForType(Type type, Symbol currentSymbol) {
@@ -488,7 +488,7 @@ public class TranslationUtils {
         } else if(mode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
             return makeAssumeStatement(expr);
         }
-        throw new RuntimeException("Cant create assume or assert in java mode.");
+        throw new TranslationException("Cant create assume or assert in java mode.");
     }
 
     public static boolean isAssumeStatement(JCStatement jcStatement) {
@@ -616,66 +616,104 @@ class RangeExtractor extends JmlTreeScanner {
     public void visitBinary(JCTree.JCBinary tree) {
         if(tree.getKind() == Tree.Kind.GREATER_THAN) {
             if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
+                if(minResult != null) {
+                    throw new UnsupportedException("Ambiguous lower bound in range: ");
+                }
                 minResult = M.Binary(JCTree.Tag.PLUS, tree.getRightOperand(), M.Literal(1));
                 return;
             }
             if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
+                if(maxResult != null) {
+                    throw new UnsupportedException("Ambiguous upper bound in range: ");
+                }
                 maxResult = M.Binary(Tag.MINUS, tree.getLeftOperand(), M.Literal(1));
                 return;
             }
+            throw new UnsupportedException("Error extracting range from quantifier: ");
         }
         else if(tree.getKind() == Tree.Kind.LESS_THAN) {
             if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
+                if(maxResult != null) {
+                    throw new UnsupportedException("Ambiguous upper bound in range: ");
+                }
                 maxResult = M.Binary(Tag.MINUS, tree.getRightOperand(), M.Literal(1));
                 return;
             }
             if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
+                if(minResult != null) {
+                    throw new UnsupportedException("Ambiguous lower bound in range: ");
+                }
                 minResult = M.Binary(Tag.PLUS, tree.getLeftOperand(), M.Literal(1));
                 return;
             }
+            throw new UnsupportedException("Error extracting range from quantifier: ");
         }
         else if(tree.getKind() == Tree.Kind.GREATER_THAN_EQUAL) {
             if(tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getLeftOperand()).name.equals(ident.name)) {
+                if(minResult != null) {
+                    throw new UnsupportedException("Ambiguous lower bound in range: ");
+                }
                 minResult = tree.getRightOperand();
                 return;
             }
             if(tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent)tree.getRightOperand()).name.equals(ident.name)) {
+                if(maxResult != null) {
+                    throw new UnsupportedException("Ambiguous upper bound in range: ");
+                }
                 maxResult = tree.getLeftOperand();
                 return;
             }
+            throw new UnsupportedException("Error extracting range from quantifier: ");
         }
         else if(tree.getKind() == Tree.Kind.LESS_THAN_EQUAL) {
             if (tree.getLeftOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent) tree.getLeftOperand()).name.equals(ident.name)) {
+                if(maxResult != null) {
+                    throw new UnsupportedException("Ambiguous upper bound in range: ");
+                }
                 maxResult = tree.getRightOperand();
                 return;
             }
             if (tree.getRightOperand().getKind() == Tree.Kind.IDENTIFIER && ((JCTree.JCIdent) tree.getRightOperand()).name.equals(ident.name)) {
+                if(minResult != null) {
+                    throw new UnsupportedException("Ambiguous lower bound in range: ");
+                }
                 minResult = tree.getLeftOperand();
                 return;
             }
+            throw new UnsupportedException("Error extracting range from quantifier: ");
         }
-        super.visitBinary(tree);
+        else if(tree.getKind() == Kind.AND || tree.getKind() == Kind.CONDITIONAL_AND) {
+            super.visitBinary(tree);
+            return;
+        }
+        throw new UnsupportedException("Error extracting range from quantifier: " + tree);
     }
 
 
     public JCTree.JCExpression getMin() {
         if(minResult == null) {
-            throw new RuntimeException("No lower bound for quantified variable found.");
+            throw new UnsupportedException("No lower bound for quantified variable found.");
         }
         return minResult;
     }
 
     public JCTree.JCExpression getMax() {
         if(maxResult == null) {
-            throw new RuntimeException("No upper bound for quantified variable found.");
+            throw new UnsupportedException("No upper bound for quantified variable found.");
         }
         return maxResult;
     }
 
     public void extractRange(JCTree tree) {
-        super.scan(tree);
+        try{
+            maxResult = null;
+            minResult = null;
+            super.scan(tree);
+        } catch (UnsupportedException e) {
+            throw new UnsupportedException(e.getInnerMessage() + tree);
+        }
         if(maxResult == null || minResult == null) {
-            throw new RuntimeException("Could not extract bound from range for expr: " + tree.toString());
+            throw new UnsupportedException("Could not extract bound from range for expr: " + tree.toString());
         }
     }
 }
@@ -808,7 +846,7 @@ class IdentifierVisitor extends JmlTreeScanner {
                 sym = BaseVisitor.instance.getMethodSymbol(functionName);
             }
             if(sym == null) {
-                throw new RuntimeException("Could not find symbol for function: " + functionName);
+                throw new TranslationException("Could not find symbol for function: " + functionName);
             }
             for(Symbol.VarSymbol v : sym.params) {
                 params = params.append(v.name.toString());

@@ -52,7 +52,7 @@ public class XmlTest {
     private String printOutput(JBMCOutput output, String functionName) {
         StringBuilder sb = new StringBuilder();
         if(output == null) {
-            throw new RuntimeException("Error parsing xml-output of JBMC.");
+            throw new TranslationException("Error parsing xml-output of JBMC.");
         }
         sb.append("Result for function " + functionName + ":\n");
 

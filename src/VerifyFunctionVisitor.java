@@ -74,7 +74,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         } else if(that.clauseKind.name().equals("assignable")) {
 
         } else {
-            throw new RuntimeException("Unsupported clause type: " + that.clauseKind + " (" + that + ")");
+            throw new UnsupportedException("Unsupported clause type: " + that.clauseKind + " (" + that + ")");
         }
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
         JCExpression copy = expressionVisitor.copy(normalized);
@@ -188,9 +188,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
 
         if (ensCases.size() != reqCases.size() || ensCases.size() != assCases.size()) {
-            throw new RuntimeException("Internal error (please report a bug): Different number of cases for method: " + currentMethod.name.toString());
+            throw new TranslationException("Different number of cases for method: " + currentMethod.name.toString());
         }
         int caseIdx = Math.min(CLI.caseIdx, ensCases.size() - 1);
+        if(caseIdx < 0) {
+            return null;
+        }
         oldVars.putAll(oldVarsInv);
         oldInits = oldInits.appendList(oldInitsInv);
 

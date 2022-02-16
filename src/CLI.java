@@ -188,8 +188,22 @@ public class CLI implements Runnable {
 
         for (JmlTree.JmlCompilationUnit it : cu) {
             //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
-            JCTree t = rewriteAssert(it, ctx);
-            return api.prettyPrint(t);
+            try {
+                JCTree t = rewriteAssert(it, ctx);
+                return api.prettyPrint(t);
+            } catch (UnsupportedException e) {
+                log.error(e.getMessage());
+                if(debugMode) {
+                    e.printStackTrace();
+                }
+                return null;
+            } catch (TranslationException e) {
+                log.error(e.getMessage());
+                if(debugMode) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
         }
         return null;
     }
@@ -266,18 +280,19 @@ public class CLI implements Runnable {
             createCProverFolder(tmpFolder.getAbsolutePath());
             long start = System.currentTimeMillis();
             String translation = translate(tmpFile, apiArgs);
-
-            Matcher m = Pattern.compile("package (.*?);").matcher(translation);
-            String packageName = "";
-            if(m.find()) {
-                packageName = m.group(1);
-                if(packageName == null) {
-                    log.error("Error trying to figure out the package name of the provided source file.");
-                }
-            }
             long finish = System.currentTimeMillis();
             log.debug("Translation took: " + (finish - start) + "ms");
+
             if(translation != null) {
+                Matcher m = Pattern.compile("package (.*?);").matcher(translation);
+                String packageName = "";
+                if(m.find()) {
+                    packageName = m.group(1);
+                    if(packageName == null) {
+                        log.error("Error trying to figure out the package name of the provided source file.");
+                    }
+                }
+
                 if (tmpFile.exists()) {
                     Files.delete(tmpFile.toPath());
                 }
@@ -347,7 +362,7 @@ public class CLI implements Runnable {
         File tmpFile = prepareForJBMC();
         if(tmpFile == null) {
             keepTranslation = true;
-            log.error("Error preparing translation.");
+            log.error("Error preparing translation. Abort verification.");
             return;
         }
         log.debug("Parse function names.");
@@ -530,7 +545,7 @@ public class CLI implements Runnable {
             Files.write(to.toPath(), content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException("Error trying to copy CProver.java");
+            throw new TranslationException("Error trying to copy CProver.java");
         }
     }
 

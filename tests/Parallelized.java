@@ -39,7 +39,7 @@ public class Parallelized extends Parameterized
             }
             catch (InterruptedException exc)
             {
-                throw new RuntimeException(exc);
+                throw new TranslationException("Execution was interrupted.");
             }
         }
 

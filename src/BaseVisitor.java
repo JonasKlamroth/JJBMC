@@ -91,7 +91,7 @@ public class BaseVisitor extends FilterVisitor {
             if(cl instanceof JmlTypeClauseExpr) {
                 invariants = invariants.append(((JmlTypeClauseExpr) cl).expression);
             } else {
-                throw new RuntimeException("Unsupported type specification: " + cl.toString());
+                throw new UnsupportedException("Unsupported type specification: " + cl.toString());
             }
         }
         newDefs = List.nil();
@@ -114,7 +114,10 @@ public class BaseVisitor extends FilterVisitor {
         }
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
-                newDefs = newDefs.append(new VerifyFunctionVisitor(context, M, this).copy(def));
+                JCTree copy = new VerifyFunctionVisitor(context, M, this).copy(def);
+                if(copy != null) {
+                    newDefs = newDefs.append(copy);
+                }
                 if(!((JmlMethodDecl) def).name.toString().equals("<init>")) {
                     newDefs = newDefs.append(def);
                 }
@@ -157,6 +160,6 @@ public class BaseVisitor extends FilterVisitor {
                 }
             }
         }
-        throw new RuntimeException("Could not find symbol for funkction: " + name);
+        throw new TranslationException("Could not find symbol for function: " + name);
     }
 }

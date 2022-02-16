@@ -217,7 +217,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
 
         if(currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
-            throw new RuntimeException("Havocing \\everything is not supported. For invoked method: " + that.name);
+            throw new UnsupportedException("Havocing \\everything is not supported. For invoked method: " + that.name);
         }
         bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 
@@ -333,7 +333,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                     return M.Literal(false);
                 }
             } else {
-                throw new RuntimeException("Unexpected type.");
+                throw new TranslationException("Unexpected type.");
             }
             return editAssignable((JCArrayAccess) e);
         } else if(e instanceof JCFieldAccess) {
@@ -348,10 +348,10 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             } else if(k.token == JmlTokenKind.BSEVERYTHING) {
                 return M.Literal(currentAssignable.stream().noneMatch(loc -> loc instanceof JmlStoreRefKeyword));
             } else {
-                throw new RuntimeException("Cannot handle assignment to " + e.toString());
+                throw new UnsupportedException("Cannot handle assignment to " + e.toString());
             }
         } else {
-            throw new RuntimeException("Could not handle assignment to " + e.toString());
+            throw new UnsupportedException("Could not handle assignment to " + e.toString());
         }
     }
 
@@ -416,7 +416,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
             if(!(hi instanceof JCIdent || hi instanceof JCLiteral || lo instanceof JCIdent || lo instanceof JCLiteral)) {
-                throw new RuntimeException("Only sidecondition free array indices supported. (" + e.toString() + ")");
+                throw new UnsupportedException("Only sidecondition free array indices supported. (" + e.toString() + ")");
             }
             if(hi == null) {
                 hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
