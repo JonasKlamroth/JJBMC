@@ -122,10 +122,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression expr = TranslationUtils.unwrapExpression(that.expression);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            List<JCStatement> oldNeededVariableDefs = neededVariableDefs;
+            neededVariableDefs = List.nil();
             copy = super.copy(expr, p);
             newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = newStatements.prependList(neededVariableDefs);
-            neededVariableDefs = List.nil();
+            neededVariableDefs = oldNeededVariableDefs;
             newStatements = tmp.append(M.Block(0L, newStatements));
             translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         } else if(that.clauseType.name().equals("assume")) {
@@ -133,10 +135,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCExpression expr = TranslationUtils.unwrapExpression(that.expression);
             List<JCStatement> tmp = newStatements;
             newStatements = List.nil();
+            List<JCStatement> oldNeededVariableDefs = neededVariableDefs;
+            neededVariableDefs = List.nil();
             copy = super.copy(expr, p);
             newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = newStatements.prependList(neededVariableDefs);
-            neededVariableDefs = List.nil();
+            neededVariableDefs = oldNeededVariableDefs;
             newStatements = tmp.append(M.Block(0L, newStatements));
             translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         } else {
@@ -762,7 +766,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         if(newStatements.size() > 0) {
             newStatements = l.append(M.Block(0L, newStatements.prependList(neededVariableDefs)));
-            neededVariableDefs = List.nil();
         }
         translationMode = oldMode;
         neededVariableDefs = oldNeededVars;

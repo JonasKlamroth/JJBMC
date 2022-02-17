@@ -1079,4 +1079,25 @@ public class TestSuite {
     private void randomMeth() {
     }
 
+
+    //@ requires a != null && 0 <= i < a.length;
+    //@ ensures a[i] == \old(a[i]) + 1;
+    //@ assignable a[i];
+    @Verifyable
+    public void m1(int[] a, int i) {
+        a[i] = a[i] + 1;
+    }
+
+    //@ requires a != null && a.length < 3;
+    //@ ensures (\forall int i; 0 <= i < a.length; a[i] == \old(a[i]) + 1);
+    //@ assignable a[*];
+    @Verifyable
+    @Unwind(number = 5)
+    public void testCallInLoop(int a[]) {
+        for(int i = 0; i < a.length; ++i) {
+            m1(a, i);
+            //@ assume true;
+        }
+    }
+
 }
