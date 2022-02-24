@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class JBMCOutput {
@@ -151,8 +152,15 @@ public class JBMCOutput {
         trace.applyGuesses();
         trace.filterAssignments();
         if(printGuesses) {
+            Map<String, String> state = new TreeMap<>();
             for (Assignment a : trace.assignments) {
-                sb.append(a + "\n");
+                state.put(a.jbmcVarname, a.value);
+                if("__print".equals(a.jbmcVarname)) {
+                    sb.append("State in line " + a.value + ":\n");
+                    for (Entry<String, String> entry : state.entrySet()) {
+                        sb.append("  " + entry.getKey() + "=" + entry.getValue()+"\n");
+                    }
+                }
             }
         }
         sb.append("Fail in line " + lineNumbers.get(idx) + ":" + failingLines.get(idx) + " (" + reasons.get(idx) + ")\n");
