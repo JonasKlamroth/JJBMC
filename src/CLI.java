@@ -480,7 +480,7 @@ public class CLI implements Runnable {
             }
 
             if(xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
-                JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap);
+                JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap, runWithTrace);
                 printOutput(output, end - start, functionName);
             } else {
                 log.error("Unexpected jbmc output:");

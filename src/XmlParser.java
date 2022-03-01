@@ -33,7 +33,7 @@ public class XmlParser {
             "* * Carnegie Mellon University, Computer Science Department * *\n" +
             "* *                  kroening@kroening.com                  * *";
 
-    public static JBMCOutput parse(String xmlFile, String sourceFile, Map<String, List<String>> paramMap) {
+    public static JBMCOutput parse(String xmlFile, String sourceFile, Map<String, List<String>> paramMap, boolean printTrace) {
         File xmlF = new File(xmlFile);
         File sourceF = new File(sourceFile);
         DocumentBuilder dBuilder = null;
@@ -48,10 +48,10 @@ public class XmlParser {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return parse(doc, sourceF, paramMap);
+        return parse(doc, sourceF, paramMap, printTrace);
     }
 
-    public static JBMCOutput parse(String xmlContent, File sourceFile, Map<String, List<String>> paramMap) {
+    public static JBMCOutput parse(String xmlContent, File sourceFile, Map<String, List<String>> paramMap, boolean printTrace) {
         DocumentBuilder dBuilder;
         try {
             dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -75,10 +75,10 @@ public class XmlParser {
             return null;
         }
         doc.getDocumentElement().normalize();
-        return parse(doc, sourceFile, paramMap);
+        return parse(doc, sourceFile, paramMap, printTrace);
     }
 
-    public static JBMCOutput parse(Document xmlDoc, File sourceFile, Map<String, List<String>> paramMap) {
+    public static JBMCOutput parse(Document xmlDoc, File sourceFile, Map<String, List<String>> paramMap, boolean printTrace) {
         JBMCOutput res = new JBMCOutput();
         try {
             JBMCOutput.Trace references;
@@ -109,6 +109,9 @@ public class XmlParser {
             NodeList statusList = xmlDoc.getElementsByTagName("cprover-status");
             assert statusList.getLength() == 1;
             res.proverStatus = statusList.item(0).getTextContent();
+            if(!printTrace) {
+                return res;
+            }
             NodeList propertyNodeList = xmlDoc.getElementsByTagName("result");
             String reason = null;
             for (int i = 0; i < propertyNodeList.getLength(); ++i) {
