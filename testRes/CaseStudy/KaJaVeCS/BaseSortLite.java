@@ -4,14 +4,14 @@ public class BaseSort {
 
     /*+KeY@ public normal_behaviour
       @ ensures \result == (\num_of int j; 0<=j<a.length; a[j] == el);
-      @ assignable \strictly_nothing;
+      @ assignable \nothing;
       @*/
     public static /*@ pure */ int count(int[] a, int el) {
         int sum = 0;
         /*+KeY@
           @ loop_invariant 0 <= i && i <= a.length;
           @ loop_invariant sum == (\num_of int j; 0<=j<i; a[j] == el);
-          @ assignable \strictly_nothing;
+          @ assignable \nothing;
           @ decreases a.length - i;
           @*/
         for (int i = 0; i < a.length; ++i) {
