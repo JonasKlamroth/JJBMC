@@ -1,3 +1,4 @@
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -16,7 +17,7 @@ public class XmlTest {
     public void runXmlTest(String xmlOutFile, String sourceFile, String outFile, Map<String, List<String>> paramMap, String functionName) throws IOException {
         List<String> allLines = Files.readAllLines(new File(xmlOutFile).toPath());
         String xmlString = String.join("\n", allLines);
-        JBMCOutput out = XmlParser.parse(xmlString, new File(sourceFile), paramMap, true);
+        JBMCOutput out = XmlParser2.parse(xmlString, true, null);
         String outString = printOutput(out, functionName);
         allLines = Files.readAllLines(new File(outFile).toPath());
         String referenceString = String.join("\n", allLines);

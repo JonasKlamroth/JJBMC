@@ -62,6 +62,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
+        TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
 
@@ -84,7 +85,8 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if (translationMode == TranslationMode.ASSERT) {
-            combinedNewEnsStatements = combinedNewEnsStatements.append(M.Block(0L, newStatements));
+            JCBlock b = M.Block(0L, newStatements);
+            combinedNewEnsStatements = combinedNewEnsStatements.append(b);
         } else if (translationMode == TranslationMode.ASSUME) {
             combinedNewReqStatements = combinedNewReqStatements.append(M.Block(0L, newStatements));
         }
@@ -95,6 +97,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
+        TranslationUtils.setCurrentASTNode(that);
         if (currentAssignable == null) {
             currentAssignable = List.nil();
         }
@@ -197,7 +200,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         oldVars.putAll(oldVarsInv);
         oldInits = oldInits.appendList(oldInitsInv);
 
-        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
+        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
@@ -206,7 +209,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 //        JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
 //                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
 
-        JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, Position.NOPOS);
+        JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, TranslationUtils.getCurrentPosition());
 
 
         List<JCStatement> l = List.nil();
@@ -310,6 +313,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             if (!st.toString().equals("super();")) {
                 JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
                 ev.setCurrentAssignable(currentAssignable);
+                TranslationUtils.setCurrentASTNode(st);
                 JCStatement copy = ev.copy(st);
                 if (ev.getNewStatements().size() == 0) {
                     body = body.append(copy);

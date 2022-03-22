@@ -39,7 +39,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
                 JCExpression expr1 = super.copy(binary.getLeftOperand());
                 negated = oldNegated;
                 JCExpression expr2 = super.copy(binary.getRightOperand());
-                JmlBinary b = treeutils.makeJmlBinary(Position.NOPOS, JmlTokenKind.EQUIVALENCE, expr1, expr2);
+                JmlBinary b = treeutils.makeJmlBinary(TranslationUtils.getCurrentPosition(), JmlTokenKind.EQUIVALENCE, expr1, expr2);
                 negated = oldNegated;
                 selfNegated = false;
                 return super.copy(b);
@@ -51,7 +51,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
                 JCExpression expr1 = super.copy(binary.getLeftOperand());
                 negated = oldNegated;
                 JCExpression expr2 = super.copy(binary.getRightOperand());
-                JmlBinary b = treeutils.makeJmlBinary(Position.NOPOS, JmlTokenKind.INEQUIVALENCE, expr1, expr2);
+                JmlBinary b = treeutils.makeJmlBinary(TranslationUtils.getCurrentPosition(), JmlTokenKind.INEQUIVALENCE, expr1, expr2);
                 negated = oldNegated;
                 selfNegated = false;
                 return super.copy(b);
@@ -146,8 +146,8 @@ public class NormalizeVisitor extends JmlTreeCopier {
             JCExpression expr1 = super.copy(binary.lhs);
             negated = false;
             JCExpression expr2 = super.copy(binary.rhs);
-            JmlBinary b = treeutils.makeJmlBinary(Position.NOPOS, JmlTokenKind.IMPLIES, expr1, expr2);
-            JmlBinary b1 = treeutils.makeJmlBinary(Position.NOPOS, JmlTokenKind.IMPLIES, expr2, expr1);
+            JmlBinary b = treeutils.makeJmlBinary(TranslationUtils.getCurrentPosition(), JmlTokenKind.IMPLIES, expr1, expr2);
+            JmlBinary b1 = treeutils.makeJmlBinary(TranslationUtils.getCurrentPosition(), JmlTokenKind.IMPLIES, expr2, expr1);
             JCBinary b2 = M.Binary(Tag.AND, b, b1);
             b2.setType(binary.type);
             negated = oldNegated;

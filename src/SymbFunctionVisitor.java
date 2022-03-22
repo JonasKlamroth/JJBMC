@@ -90,6 +90,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     }
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
+        TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if(that.clauseKind.name().equals("ensures")) {
@@ -153,7 +154,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 for(JCVariableDecl vd : currentMethod.params) {
                     l = l.append(M.Ident(vd));
                 }
-                JCReturn ret = M.Return(M.NewClass(null, null, M.at(Position.NOPOS).Type(currentSymbol.owner.type), l, null));
+                JCReturn ret = M.Return(M.NewClass(null, null, M.at(TranslationUtils.getCurrentPosition()).Type(currentSymbol.owner.type), l, null));
                 copy.body = M.Block(0L, List.of(ret));
                 copy.restype = M.Ident(copy.sym.owner.name);
                 copy.name = M.Name(copy.sym.owner.name + "Symb");
@@ -185,7 +186,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             for(JCVariableDecl vd : currentMethod.params) {
                 l = l.append(M.Ident(vd));
             }
-            JCNewClass initVal = M.NewClass(null, null, M.at(Position.NOPOS).Type(currentSymbol.owner.type), l, null);
+            JCNewClass initVal = M.NewClass(null, null, M.at(TranslationUtils.getCurrentPosition()).Type(currentSymbol.owner.type), l, null);
             returnVar = treeutils.makeVarDef(currentMethod.sym.owner.type, M.Name("returnVar"), currentMethod.sym, initVal);
             hasReturn = true;
             this.returnVar = returnVar.sym;
@@ -202,7 +203,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             copy.restype = M.Ident(copy.sym.owner.name);
             inConstructor = false;
         }
-        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, Position.NOPOS);
+        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
         JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
         JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
         JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
@@ -230,12 +231,12 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 for(int j = 0; j < reqCases.get(i).size(); ++j) {
                     if(reqCases.get(i).get(j) instanceof JCAssert) {
                         JCAssert assertStmt = (JCAssert) reqCases.get(i).get(j);
-                        innerReqExpr = treeutils.makeAnd(Position.NOPOS, innerReqExpr, assertStmt.cond);
+                        innerReqExpr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), innerReqExpr, assertStmt.cond);
                     } else {
                         l = l.append(reqCases.get(i).get(j));
                     }
                 }
-                reqExpr = treeutils.makeOr(Position.NOPOS, reqExpr, innerReqExpr);
+                reqExpr = treeutils.makeOr(TranslationUtils.getCurrentPosition(), reqExpr, innerReqExpr);
                 asserts = asserts.append(innerReqExpr);
             }
             l = l.append(TranslationUtils.makeAssertStatement(reqExpr));
@@ -254,7 +255,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 for(int j = 0; j < ensCases.get(i).size(); ++j) {
                     JCExpression expr = TranslationUtils.extractAssumeExpr(ensCases.get(i).get(j));
                     if(expr != null) {
-                        innerReqExpr = treeutils.makeAnd(Position.NOPOS, innerReqExpr, expr);
+                        innerReqExpr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), innerReqExpr, expr);
                     } else {
                         l = l.append(ensCases.get(i).get(j));
                     }
@@ -267,7 +268,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
 
         if(copy.name.toString().equals("<init>")) {
-            l = l.append(TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(Position.NOPOS, M.Ident(returnVar), treeutils.makeNullLiteral(Position.NOPOS)), VerifyFunctionVisitor.TranslationMode.ASSUME));
+            l = l.append(TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), M.Ident(returnVar), treeutils.makeNullLiteral(TranslationUtils.getCurrentPosition())), VerifyFunctionVisitor.TranslationMode.ASSUME));
         }
         if(hasReturn && returnVar != null) {
             JCReturn returnStmt = M.Return(M.Ident(returnVar));
@@ -377,17 +378,17 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             if(pot.size() == 0) {
                 return M.Literal(true);
             }
-            JCExpression expr = treeutils.makeNeqObject(Position.NOPOS, pot.get(0), e);
+            JCExpression expr = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(0), e);
             if(!pot.get(0).sym.owner.equals(currentSymbol) && !pot.get(0).toString().startsWith("this.")) {
-                expr = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(0)), e);
+                expr = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), M.Ident("this." + pot.get(0)), e);
             }
             for(int i = 1; i < pot.size(); ++i) {
                 if(!pot.get(i).sym.owner.equals(currentSymbol) && !pot.get(i).toString().startsWith("this.")) {
-                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, M.Ident("this." + pot.get(i)), e);
-                    expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+                    JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), M.Ident("this." + pot.get(i)), e);
+                    expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, expr1);
                 } else {
-                    JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i), e);
-                    expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+                    JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(i), e);
+                    expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, expr1);
                 }
             }
             return expr;
@@ -411,7 +412,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         if(pot.size() == 0) {
             return expr;
         }
-        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, e.indexed);
+        JCExpression exprs = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(0).expression, e.indexed);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
@@ -419,30 +420,30 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 throw new UnsupportedException("Only sidecondition free array indices supported. (" + e.toString() + ")");
             }
             if(hi == null) {
-                hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
+                hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(0).expression), M.Literal(1));
             }
             if(lo == null) {
-                lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), M.Literal(0));
             }
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.getIndex(), hi));
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.getIndex(), lo));
+            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.getIndex(), hi));
+            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.getIndex(), lo));
         }
-        expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
+        expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, exprs);
         for(int i = 1; i < pot.size(); ++i) {
-            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, e.indexed);
+            JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(i).expression, e.indexed);
             if(pot.get(i).lo != null || pot.get(0).hi != null) {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
                 if(hi == null) {
-                    hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression), M.Literal(1));
+                    hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(i).expression), M.Literal(1));
                 }
                 if(lo == null) {
-                    lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                    lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), M.Literal(0));
                 }
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.getIndex(), hi));
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.getIndex(), lo));
+                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.getIndex(), hi));
+                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.getIndex(), lo));
             }
-            expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+            expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, expr1);
         }
         return expr;
     }
@@ -455,35 +456,35 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         if(pot.size() == 0) {
             return expr;
         }
-        JCExpression exprs = treeutils.makeNeqObject(Position.NOPOS, pot.get(0).expression, e.expression);
+        JCExpression exprs = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(0).expression, e.expression);
         if(pot.get(0).lo != null || pot.get(0).hi != null) {
             JCExpression hi = pot.get(0).hi;
             JCExpression lo = pot.get(0).lo;
             if(hi == null) {
-                hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(0).expression), M.Literal(1));
+                hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(0).expression), M.Literal(1));
             }
             if(lo == null) {
-                lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), M.Literal(0));
             }
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.hi, hi));
-            exprs = treeutils.makeOr(Position.NOPOS, exprs, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.lo, lo));
+            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.hi, hi));
+            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.lo, lo));
         }
-        expr = treeutils.makeAnd(Position.NOPOS, expr, exprs);
+        expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, exprs);
         for(int i = 1; i < pot.size(); ++i) {
-            JCExpression expr1 = treeutils.makeNeqObject(Position.NOPOS, pot.get(i).expression, e.expression);
+            JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(i).expression, e.expression);
             if(pot.get(i).lo != null || pot.get(0).hi != null) {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
                 if(hi == null) {
-                    hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, pot.get(i).expression), M.Literal(1));
+                    hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(i).expression), M.Literal(1));
                 }
                 if(lo == null) {
-                    lo = treeutils.makeArrayLength(Position.NOPOS, M.Literal(0));
+                    lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), M.Literal(0));
                 }
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.GT, e.hi, hi));
-                expr1 = treeutils.makeOr(Position.NOPOS, expr1, treeutils.makeBinary(Position.NOPOS, Tag.LT, e.lo, lo));
+                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.hi, hi));
+                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1, treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.lo, lo));
             }
-            expr = treeutils.makeAnd(Position.NOPOS, expr, expr1);
+            expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, expr1);
         }
         return expr;
     }
@@ -512,15 +513,15 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             if(expr == null) {
                 expr = editAssignable(f.selected, fa.selected, true);
             } else {
-                expr = treeutils.makeAnd(Position.NOPOS, expr, editAssignable(f.selected, fa.selected, true));
+                expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, editAssignable(f.selected, fa.selected, true));
             }
 
         }
         for(JCIdent i : pot1) {
             if(expr == null) {
-                expr = treeutils.makeNeqObject(Position.NOPOS, i, f);
+                expr = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), i, f);
             } else {
-                expr = treeutils.makeAnd(Position.NOPOS, expr, treeutils.makeNeqObject(Position.NOPOS, i, f));
+                expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), i, f));
             }
         }
         if(expr == null) {

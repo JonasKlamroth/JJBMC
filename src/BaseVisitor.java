@@ -45,7 +45,6 @@ public class BaseVisitor extends FilterVisitor {
         this.syms = Symtab.instance(context);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
-        TranslationUtils.init(context);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
+import org.jmlspecs.openjml.utils.ui.ASTTreeNode;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -33,12 +34,28 @@ public class TranslationUtils {
     private static Symtab syms;
     private static JmlTreeUtils treeutils;
     private static int counter = 0;
+    private static JmlCompilationUnit compilationUnit;
+    private static int currentPosition = -1;
 
-    public static void init(Context context) {
+    public static void init(Context context, JmlCompilationUnit compilationUnit) {
         TranslationUtils.M = JmlTree.Maker.instance(context);
         TranslationUtils.syms = Symtab.instance(context);
         TranslationUtils.treeutils = JmlTreeUtils.instance(context);
+        TranslationUtils.compilationUnit = compilationUnit;
     }
+
+    public static int getCurrentPosition() {
+        return TranslationUtils.currentPosition;
+    }
+
+    public static void setCurrentPosition(int pos) {
+        TranslationUtils.currentPosition = pos;
+    }
+
+    public static void setCurrentASTNode(JCTree node) {
+        TranslationUtils.currentPosition = node.getStartPosition();
+    }
+
     static JCTree.JCStatement makeAssumeStatement(JCTree.JCExpression expr) {
         JCTree.JCIdent classCProver = M.Ident(M.Name("CProver"));
         JCTree.JCFieldAccess assumeFunc = M.Select(classCProver, M.Name("assume"));
@@ -62,7 +79,7 @@ public class TranslationUtils {
                 }
             }
         }
-        return List.of(M.at(Position.NOPOS).Assert(expr, null));
+        return List.of(M.at(TranslationUtils.getCurrentPosition()).Assert(expr, null));
     }
 
     static JCStatement makeAssertStatement(JCExpression expr) {
@@ -78,7 +95,7 @@ public class TranslationUtils {
         List<JCStatement> stmts = List.nil();
         for(JCIdent ident : idents) {
             if(ident.type instanceof Type.JCPrimitiveType) {
-                //JCVariableDecl variableDecl = treeutils.makeVariableDecl(M.Name("_" + counter++ + ident.name), ident.type, ident, Position.NOPOS);
+                //JCVariableDecl variableDecl = treeutils.makeVariableDecl(M.Name("_" + counter++ + ident.name), ident.type, ident, TranslationUtils.getCurrentPosition());
                 //stmts = stmts.append(variableDecl);
             }
         }
@@ -166,7 +183,7 @@ public class TranslationUtils {
         re.extractRange(range);
         JCExpression min = re.getMin();
         JCExpression max = re.getMax();
-        range = M.Binary(Tag.AND, M.Binary(Tag.LE, min, treeutils.makeIdent(Position.NOPOS, loopVar.sym)), M.Binary(Tag.GE, max, treeutils.makeIdent(Position.NOPOS, loopVar.sym)));
+        range = M.Binary(Tag.AND, M.Binary(Tag.LE, min, treeutils.makeIdent(TranslationUtils.getCurrentPosition(), loopVar.sym)), M.Binary(Tag.GE, max, treeutils.makeIdent(TranslationUtils.getCurrentPosition(), loopVar.sym)));
         return makeStandardLoop(range, body, loopVar, currentSymbol);
     }
 
@@ -186,7 +203,7 @@ public class TranslationUtils {
     }
 
     public static JCTree.JCForLoop makeStandardLoop(JCTree.JCExpression cond, List<JCTree.JCStatement> body, JCTree.JCVariableDecl loopVarName, Symbol currentSymbol) {
-        JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(Position.NOPOS, JCTree.Tag.PREINC, treeutils.makeIdent(Position.NOPOS, loopVarName.sym)));
+        JCTree.JCExpressionStatement loopStep = M.Exec(treeutils.makeUnary(TranslationUtils.getCurrentPosition(), JCTree.Tag.PREINC, treeutils.makeIdent(TranslationUtils.getCurrentPosition(), loopVarName.sym)));
         List<JCTree.JCExpressionStatement> loopStepl = List.from(Collections.singletonList(loopStep));
         JCTree.JCBlock loopBodyBlock = M.Block(0L, List.from(body));
         List<JCTree.JCStatement> loopVarl = List.from(Collections.singletonList(loopVarName));
@@ -214,13 +231,13 @@ public class TranslationUtils {
                 if(tmp == null) {
                     tmp = checkConformAssignables(expr, expr1);
                 } else {
-                    tmp = treeutils.makeBinary(Position.NOPOS, Tag.OR, tmp, checkConformAssignables(expr, expr1));
+                    tmp = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.OR, tmp, checkConformAssignables(expr, expr1));
                 }
             }
             if(res == null) {
                 res = tmp;
             } else {
-                res = treeutils.makeBinary(Position.NOPOS, Tag.AND, res, tmp);
+                res = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.AND, res, tmp);
             }
         }
         return res;
@@ -252,7 +269,7 @@ public class TranslationUtils {
                 lo1 = M.Literal(0);
             }
             if(hi1 == null) {
-                hi1 = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr1.expression), M.Literal(1));
+                hi1 = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), aexpr1.expression), M.Literal(1));
             }
             JmlStoreRefArrayRange aexpr2 = (JmlStoreRefArrayRange)expr2;
             JCExpression lo2 = aexpr2.lo;
@@ -261,18 +278,18 @@ public class TranslationUtils {
                 lo2 = M.Literal(0);
             }
             if(hi2 == null) {
-                hi2 = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aexpr2.expression), M.Literal(1));
+                hi2 = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), aexpr2.expression), M.Literal(1));
             }
-            JCExpression res = treeutils.makeBinary(Position.NOPOS, Tag.GE, lo1, lo2);
-            JCExpression res1 = treeutils.makeBinary(Position.NOPOS, Tag.LE, hi1, hi2);
-            res = treeutils.makeBinary(Position.NOPOS, Tag.AND, res, res1);
-            return treeutils.makeBinary(Position.NOPOS, Tag.AND, res, prev);
+            JCExpression res = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GE, lo1, lo2);
+            JCExpression res1 = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LE, hi1, hi2);
+            res = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.AND, res, res1);
+            return treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.AND, res, prev);
 
         }
         if(symb1 != null && symb2 != null) {
-            return treeutils.makeBooleanLiteral(Position.NOPOS, symb1.equals(symb2));
+            return treeutils.makeBooleanLiteral(TranslationUtils.getCurrentPosition(), symb1.equals(symb2));
         }
-        return treeutils.makeBooleanLiteral(Position.NOPOS, false);
+        return treeutils.makeBooleanLiteral(TranslationUtils.getCurrentPosition(), false);
     }
 
     public static List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
@@ -315,11 +332,11 @@ public class TranslationUtils {
                             loopVar.init = lo;
                         }
                         if(hi == null) {
-                            hi = treeutils.makeBinary(Position.NOPOS, Tag.MINUS, treeutils.makeArrayLength(Position.NOPOS, aExpr.get(i)), M.Literal(1));
+                            hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), aExpr.get(i)), M.Literal(1));
                         }
-                        JCExpression range = treeutils.makeBinary(Position.NOPOS, Tag.LE, M.Ident(loopVar), jev.copy(hi));
-                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(Position.NOPOS, aexpr.expression, treeutils.nullLit)));
-                        JCStatement ifst = M.If(treeutils.makeNeqObject(Position.NOPOS, aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
+                        JCExpression range = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LE, M.Ident(loopVar), jev.copy(hi));
+                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aexpr.expression, treeutils.nullLit)));
+                        JCStatement ifst = M.If(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
                         body = ifst;
                     } catch (NumberFormatException e) {
                         throw new TranslationException("Cant havoc expression " + expr);
@@ -598,6 +615,15 @@ public class TranslationUtils {
             }
         }
         return false;
+    }
+
+    public static int getLineNumber(JCTree node) {
+        return compilationUnit.getLineMap().getLineNumber(node.getStartPosition());
+    }
+
+    public static String getPackageName() {
+        JCExpression packageName = compilationUnit.getPackageName();
+        return packageName == null ? "" : packageName.toString();
     }
 }
 

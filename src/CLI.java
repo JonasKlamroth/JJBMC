@@ -126,6 +126,7 @@ public class CLI implements Runnable {
     private static boolean didCleanUp = false;
     private static Process jbmcProcess = null;
     private static File tmpFile;
+    private static TraceInformation traceInformation;
 
     public static void reset() {
         timeout = 10000;
@@ -190,7 +191,10 @@ public class CLI implements Runnable {
             //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
             try {
                 JCTree t = rewriteAssert(it, ctx);
-                return api.prettyPrint(t);
+                //return api.prettyPrint(t);
+                PrettyPrintInformation ppi = CostumPrettyPrinter.prettyPrint(t);
+                CLI.traceInformation = ppi.ti;
+                return ppi.prettyPrinted;
             } catch (UnsupportedException e) {
                 log.error(e.getMessage());
                 if(debugMode) {
@@ -284,14 +288,7 @@ public class CLI implements Runnable {
             log.debug("Translation took: " + (finish - start) + "ms");
 
             if(translation != null) {
-                Matcher m = Pattern.compile("package (.*?);").matcher(translation);
-                String packageName = "";
-                if(m.find()) {
-                    packageName = m.group(1);
-                    if(packageName == null) {
-                        log.error("Error trying to figure out the package name of the provided source file.");
-                    }
-                }
+                String packageName = TranslationUtils.getPackageName();
 
                 if (tmpFile.exists()) {
                     Files.delete(tmpFile.toPath());
@@ -321,7 +318,7 @@ public class CLI implements Runnable {
         }
 
         try {
-            String[] commands = new String[apiArgs.length + 2];
+            String[] commands = new String[apiArgs.length + 3];
             if(javacBin == null) {
                 javacBin = findJavaVersion();
             } else {
@@ -333,8 +330,9 @@ public class CLI implements Runnable {
                 return null;
             }
             commands[0] = javacBin;
-            commands[1] = tmpFile.getAbsolutePath();
-            System.arraycopy(apiArgs, 0, commands, 2, apiArgs.length);
+            commands[1] = "-g";
+            commands[2] = tmpFile.getAbsolutePath();
+            System.arraycopy(apiArgs, 0, commands, 3, apiArgs.length);
             log.debug("Compiling translated file: " + Arrays.toString(commands));
             ProcessBuilder pb = new ProcessBuilder().command(commands)
                     .redirectOutput(new File(tmpFolder, "compilationErrors.txt"))
@@ -480,7 +478,7 @@ public class CLI implements Runnable {
             }
 
             if(xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
-                JBMCOutput output = XmlParser.parse(xmlOutput, tmpFile, paramMap, runWithTrace);
+                JBMCOutput output = XmlParser2.parse(xmlOutput, runWithTrace, CLI.traceInformation);
                 printOutput(output, end - start, functionName);
             } else {
                 log.error("Unexpected jbmc output:");
@@ -626,14 +624,9 @@ public class CLI implements Runnable {
         }
     }
 
-    JCTree rewriteRAC(JmlTree.JmlCompilationUnit cu, Context context) {
-        JmlAssertionAdder jaa = new JmlAssertionAdder(context, false, true);
-        context.dump();
-        return jaa.convert(cu);
-    }
-
     static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
         context.dump();
+        TranslationUtils.init(context, cu);
         JCTree res = cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
         BaseVisitor.instance = null;
         return res;
