@@ -30,42 +30,15 @@ public class CostumPrettyPrinter extends JmlPretty {
         //super.visitAnnotation(tree);
     }
 
-    //@Override
-    //public void printStat(JCTree tree) throws IOException {
-    //    lineMap.put(currentLine, TranslationUtils.getLineNumber(tree));
-    //    super.printStat(tree);
-    //}
-
-
-    @Override
-    public void visitNewClass(JCTree.JCNewClass tree) {
-        super.visitNewClass(tree);
-        ti.addMethodCall(currentLine);
-    }
-
     @Override
     public void visitApply(JCTree.JCMethodInvocation tree) {
         super.visitApply(tree);
-        ti.addMethodCall(currentLine);
-    }
-
-    @Override
-    public void visitAssign(JCTree.JCAssign tree) {
-        super.visitAssign(tree);
-        String name = tree.getVariable().toString();
-        if(name.startsWith("this.")) {
-            name = name.substring(5);
-        }
-        ti.addAssignment(currentLine, name);
     }
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        ti.addMethod(currentLine + 1, that.getName().toString(), that.mods.getFlags().contains(Modifier.STATIC));
+        ti.addMethod(currentLine + 1, that.getName().toString());
         ti.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(that));
-        for(JCTree.JCVariableDecl p : that.params){
-            ti.addParam(p.getName().toString(), that.getName().toString());
-        }
         super.visitJmlMethodDecl(that);
     }
 
@@ -89,21 +62,14 @@ public class CostumPrettyPrinter extends JmlPretty {
     @Override
     public void visitSelect(JCTree.JCFieldAccess tree) {
         super.visitSelect(tree);
-        String name = tree.toString();
-        if(name.startsWith("this.")) {
-            name = name.substring(5);
-        }
-        assertVars.add(name);
+        assertVars.add(tree.toString());
     }
 
     @Override
     public void visitVarDef(JCTree.JCVariableDecl that) {
         super.visitVarDef(that);
         if(that.sym.owner instanceof Symbol.MethodSymbol && !that.sym.owner.name.toString().equals("<init>")) {
-            ti.addLocalVar(that.getName().toString(), that.sym.owner.name.toString());
-        }
-        if(that.init != null) {
-            ti.addAssignment(currentLine, that.getName().toString());
+            return;
         }
         ti.addLineEquality(currentLine, TranslationUtils.getLineNumber(that));
     }
@@ -145,6 +111,7 @@ public class CostumPrettyPrinter extends JmlPretty {
             //for(int key : cpp.lineMap.keySet()) {
             //    System.out.println(key + " : " + cpp.lineMap.get(key));
             //}
+            cpp.ti.setExpressionMap(CLI.expressionMap);
             return new PrettyPrintInformation(sw.toString(), cpp.ti);
         } catch (Exception var3) {
             throw new TranslationException("Error pretty printing translated AST.");

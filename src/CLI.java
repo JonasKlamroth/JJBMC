@@ -11,10 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -121,6 +118,8 @@ public class CLI implements Runnable {
     @Option(names = {"-d", "-debug"},
             description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
     public static boolean debugMode = false;
+
+    public static Map<String, String> expressionMap = new HashMap<>();
 
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
@@ -478,8 +477,11 @@ public class CLI implements Runnable {
             }
 
             if(xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+                long start1 = System.currentTimeMillis();
                 JBMCOutput output = XmlParser2.parse(xmlOutput, runWithTrace, CLI.traceInformation);
                 printOutput(output, end - start, functionName);
+                long duration = System.currentTimeMillis() - start1;
+                log.debug("Parsing xml took: " + duration + "ms.");
             } else {
                 log.error("Unexpected jbmc output:");
                 log.error(xmlOutput);

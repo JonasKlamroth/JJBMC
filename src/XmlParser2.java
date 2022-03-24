@@ -1,6 +1,7 @@
 import com.sun.tools.javac.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jmlspecs.annotation.In;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,8 +25,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class XmlParser2 {
-    private static Logger log = LogManager.getLogger(XmlParser2.class);
-    private static String jbmcBanner = "\n" +
+    private static final Logger log = LogManager.getLogger(XmlParser2.class);
+    private static final String jbmcBanner = "\n" +
             "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
             "* *                 Copyright (C) 2001-2018                 * *\n" +
             "* *              Daniel Kroening, Edmund Clarke             * *\n" +
@@ -33,7 +34,7 @@ public class XmlParser2 {
             "* *                  kroening@kroening.com                  * *";
 
     public static JBMCOutput parse(File xmlFile, boolean printTrace, TraceInformation ti) {
-        DocumentBuilder dBuilder = null;
+        DocumentBuilder dBuilder;
         Document doc = null;
         try {
             dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -117,10 +118,7 @@ public class XmlParser2 {
                         } else {
                             lineNumber = Integer.parseInt(location.getAttribute("line"));
                         }
-                        Set<String> relevantVars = null;
-                        if(reason.contains("assertion")) {
-                            relevantVars = ti.getAssertVarsForLine(lineNumber);
-                        }
+                        Pair<Integer, Integer> relevantRange = ti.getRelevantRange(lineNumber);
                         NodeList assignmentList = ((Element) propertyNode).getElementsByTagName("assignment");
                         List<JBMCOutput.Assignment> assignments = new ArrayList<>();
                         List<JBMCOutput.Assignment> lineAssignments = new ArrayList<>();
@@ -132,12 +130,17 @@ public class XmlParser2 {
                                 Element lhs = (Element) assignment.getElementsByTagName("full_lhs").item(0);
                                 Element value = (Element) assignment.getElementsByTagName("full_lhs_value").item(0);
                                 int line = Integer.parseInt(aLocation.getAttribute("line"));
-                                if(line > lastLine) {
+                                int origLine = ti.getOriginalLine(line);
+                                if(line > lastLine && line < relevantRange.snd && line >= relevantRange.fst) {
                                     ti.provideGuesses(lineAssignments);
                                     lineAssignments = new ArrayList<>();
                                     lastLine = line;
                                 }
-                                JBMCOutput.Assignment assignment1 = new JBMCOutput.Assignment(line, lhs.getTextContent(), value.getTextContent(), null);
+                                String parameterName = null;
+                                if(assignment.getAttribute("assignment_type").equals("actual_parameter")) {
+                                    parameterName = assignment.getAttribute("display_name");
+                                }
+                                JBMCOutput.Assignment assignment1 = new JBMCOutput.Assignment(line, lhs.getTextContent(), value.getTextContent(), null, parameterName);
                                 lineAssignments.add(assignment1);
                                 assignments.add(assignment1);
 
@@ -147,6 +150,9 @@ public class XmlParser2 {
                             }
                         }
                         trace = extractTrace(assignments);
+                        if(reason.contains("assertion")) {
+                            trace.relevantVars = ti.getAssertVarsForLine(lineNumber);
+                        }
                     }
                     if (lineNumber < 0) {
                         res.addProperty(propertyElemnt.getAttribute("property"), null, lineNumber, null, null);
@@ -162,7 +168,7 @@ public class XmlParser2 {
         } catch (Exception e) {
             log.info("Error parsing xml file.");
             TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = null;
+            Transformer transformer;
             try {
                 transformer = tf.newTransformer();
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -171,10 +177,8 @@ public class XmlParser2 {
                 transformer.transform(new DOMSource(xmlDoc), new StreamResult(writer));
                 String output = writer.toString();
                 log.debug(output);
-            } catch (TransformerConfigurationException ex) {
+            } catch (TransformerException ex) {
                 ex.printStackTrace();
-            } catch (TransformerException transformerException) {
-                transformerException.printStackTrace();
             }
             e.printStackTrace();
         }
@@ -183,9 +187,9 @@ public class XmlParser2 {
     }
 
     public static JBMCOutput.Trace extractTrace(List<JBMCOutput.Assignment> assignments) {
-        for(JBMCOutput.Assignment a : assignments) {
-            System.out.println("assignment in line " + a.lineNumber + ": " + a.guess + " (" + a.jbmcVarname + ") = " + a.value);
-        }
+        //for(JBMCOutput.Assignment a : assignments) {
+            //log.info("assignment in line " + a.lineNumber + ": " + a.guess + " (" + a.jbmcVarname + ") = " + a.value);
+        //}
         return new JBMCOutput.Trace(assignments);
     }
 

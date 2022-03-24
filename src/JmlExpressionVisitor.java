@@ -187,13 +187,14 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitJmlQuantifiedExpr(JmlQuantifiedExpr that, Void p) {
         if(that.decls.size() != 1) {
-            throw new UnsupportedException("Quantifiers only supported with exactly one declaration. (" + that.toString() + ")");
+            throw new UnsupportedException("Quantifiers only supported with exactly one declaration. (" + that + ")");
         }
         if(!that.decls.get(0).type.isNumeric()) {
-            throw new UnsupportedException("Only quantifiers with numeric variables support for now. (" + that.toString() + ")");
+            throw new UnsupportedException("Only quantifiers with numeric variables supported for now. (" + that + ")");
         }
         JmlQuantifiedExpr copy = (JmlQuantifiedExpr)that.clone();
         variableReplacements.put(that.decls.get(0).getName().toString(), "quantVar" + numQuantvars++ + that.decls.get(0).getName().toString());
+        CLI.expressionMap.put("quantVar" + (numQuantvars - 1) + that.decls.get(0).getName().toString(), that.decls.get(0).getName().toString());
         RangeExtractor re = new RangeExtractor(M, that.decls.get(0).sym);
         if(copy.range == null) {
             throw new UnsupportedException("Only quantifiers with given ranges supported.");
@@ -253,9 +254,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = stmts.appendList(l);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
-                return M.Ident(boolVar);
+                JCExpression translatedExpression = M.Ident(boolVar);
+                CLI.expressionMap.put(translatedExpression.toString(), that.toString());
+                return translatedExpression;
             } else {
-                throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that.toString());
+                throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that);
             }
         } else if(copy.op == JmlTokenKind.BSEXISTS) {
             if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
@@ -284,7 +287,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = stmts.appendList(l);
                 variableReplacements.remove(that.decls.get(0).getName().toString());
                 quantifierVars.remove(that.decls.get(0).sym);
-                return M.Ident(boolVar);
+                JCExpression translatedExpression = M.Ident(boolVar);
+                CLI.expressionMap.put(translatedExpression.toString(), that.toString());
+                return translatedExpression;
             } else if(translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
                 JCVariableDecl quantVar = TranslationUtils.makeNondetIntVar(names.fromString(variableReplacements.get(that.decls.get(0).getName().toString())), currentSymbol);
                 neededVariableDefs = neededVariableDefs.append(quantVar);
@@ -417,6 +422,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     oldInits = oldInits.append(oldInit);
                 }
                 oldVars.put(arg.toString(), oldVar);
+                CLI.expressionMap.put(M.Ident(oldVar).toString(), that.toString());
             } else {
                 oldVar = oldVars.get(arg.toString());
                 if(oldVar == null) {

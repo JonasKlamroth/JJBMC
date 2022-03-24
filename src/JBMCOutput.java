@@ -13,25 +13,44 @@ public class JBMCOutput {
 
     public static class Trace {
         List<Assignment> assignments;
+        Set<String> relevantVars = null;
 
         public Trace(List<Assignment> assignments) {
             this.assignments = assignments;
         }
 
         private void filterAssignments() {
-            filterAssignments(null);
+            filterAssignments(relevantVars);
         }
 
-        private void filterAssignments(List<String> relevantVars) {
+        private boolean isRelevantVar(String var) {
+            if(var == null) {
+                return false;
+            }
+            for(String s : relevantVars) {
+                if(s.equals(var)) {
+                    return true;
+                }
+                if(var.equals("this." + s)) {
+                    return true;
+                }
+            }
+            if(var.contains("[")) {
+                return isRelevantVar(var.substring(0, var.lastIndexOf("[")));
+            }
+            return false;
+        }
+
+        private void filterAssignments(Set<String> relevantVars) {
             List<Assignment> trace = assignments;
             if(relevantVars != null) {
-                trace = trace.stream().filter(a -> !a.jbmcVarname.contains("arg") || relevantVars.contains(a.guess)).collect(Collectors.toList());
+                trace = trace.stream().filter(a -> isRelevantVar(a.guess)).collect(Collectors.toList());
             }
             trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
             trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
             List<Assignment> res = new ArrayList<>();
             int idx = 0;
-            List<Assignment> group = new ArrayList<>();
+            List<Assignment> group;
             while (idx < trace.size()) {
                 group = new ArrayList<>();
                 group.add(trace.get(idx));
@@ -50,9 +69,7 @@ public class JBMCOutput {
             for(Assignment a : group) {
                 groupMap.put(a.guess, a);
             }
-            List<Assignment> res = new ArrayList<>();
-            res.addAll(groupMap.values());
-            return res;
+            return new ArrayList<>(groupMap.values());
         }
     }
 
@@ -65,12 +82,14 @@ public class JBMCOutput {
     }
 
     public static class Assignment {
+        public String parameterName;
         public int lineNumber;
         protected String jbmcVarname;
         public String value;
         public String guess;
 
-        public Assignment(int line, String jbmcVarname, String value, String guess) {
+        public Assignment(int line, String jbmcVarname, String value, String guess, String parameterName) {
+            this.parameterName = parameterName;
             this.lineNumber = line;
             this.setJbmcVarname(jbmcVarname);
             this.value = value;
