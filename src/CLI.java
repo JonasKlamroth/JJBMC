@@ -4,7 +4,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.jmlspecs.openjml.Factory;
 import org.jmlspecs.openjml.IAPI;
 import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.esc.JmlAssertionAdder;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,8 +13,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.*;
