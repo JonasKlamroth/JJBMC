@@ -857,8 +857,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if(((JCFieldAccess) expr).sym.owner.equals(currentSymbol)) {
                     return M.Literal(false);
                 }
-            } else {
-                throw new UnsupportedException("Unexpected type.");
             }
             return editAssignable((JCArrayAccess) e);
         } else if(e instanceof JCFieldAccess) {

@@ -14,7 +14,6 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeScanner;
 import org.jmlspecs.openjml.JmlTreeUtils;
-import org.jmlspecs.openjml.utils.ui.ASTTreeNode;
 
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -294,52 +293,55 @@ public class TranslationUtils {
 
     public static List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
         List<JCStatement> res = List.nil();
+        List<String> havoced = List.nil();
         for(JCExpression expr : storerefs) {
-            if(expr instanceof JCIdent) {
-                if(expr.type.isPrimitive()) {
-                    res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(expr.type, currentSymbol))));
-                } else {
-                    res = res.append(M.Exec(M.Assign(expr, makeNondetWithNull(currentSymbol))));
-                }
-            } else if(expr instanceof  JmlStoreRefArrayRange) {
-                JmlStoreRefArrayRange arrayRange = (JmlStoreRefArrayRange) expr;
-                Type elemType = ((Type.ArrayType)arrayRange.expression.type).elemtype;
-                JCExpression inner = expr;
-                List<Pair<JCExpression, JCExpression>> dims = List.nil();
-                List<JCVariableDecl> loopVars = List.nil();
-                int idx = 0;
-                while (inner instanceof JmlStoreRefArrayRange) {
-                    dims = dims.append(new Pair<>(((JmlStoreRefArrayRange) inner).lo, ((JmlStoreRefArrayRange) inner).hi));
-                    loopVars = loopVars.append(treeutils.makeIntVarDef(M.Name("__tmpVar__" + idx++), ((JmlStoreRefArrayRange) inner).lo, currentSymbol));
-                    inner = ((JmlStoreRefArrayRange) inner).expression;
-                }
-                List<JCExpression> aExpr = List.nil();
-                JCExpression finalExpression = inner;
-                for(int i = loopVars.size() - 1; i >= 0; --i) {
-                    aExpr = aExpr.prepend(finalExpression);
-                    finalExpression =  M.Indexed(finalExpression, M.Ident(loopVars.get(i)));
-                }
+            if(!havoced.contains((expr.toString()))) {
+                havoced = havoced.append(expr.toString());
+                if(expr instanceof JCIdent) {
+                    if (expr.type.isPrimitive()) {
+                        res = res.append(M.Exec(M.Assign(expr, getNondetFunctionForType(expr.type, currentSymbol))));
+                    } else {
+                        res = res.append(M.Exec(M.Assign(expr, makeNondetWithNull(currentSymbol))));
+                    }
+                } else if(expr instanceof  JmlStoreRefArrayRange) {
+                    JmlStoreRefArrayRange arrayRange = (JmlStoreRefArrayRange) expr;
+                    Type elemType = ((Type.ArrayType)arrayRange.expression.type).elemtype;
+                    JCExpression inner = expr;
+                    List<Pair<JCExpression, JCExpression>> dims = List.nil();
+                    List<JCVariableDecl> loopVars = List.nil();
+                    int idx = 0;
+                    while (inner instanceof JmlStoreRefArrayRange) {
+                        dims = dims.append(new Pair<>(((JmlStoreRefArrayRange) inner).lo, ((JmlStoreRefArrayRange) inner).hi));
+                        loopVars = loopVars.append(treeutils.makeIntVarDef(M.Name("__tmpVar__" + idx++), ((JmlStoreRefArrayRange) inner).lo, currentSymbol));
+                        inner = ((JmlStoreRefArrayRange) inner).expression;
+                    }
+                    List<JCExpression> aExpr = List.nil();
+                    JCExpression finalExpression = inner;
+                    for(int i = loopVars.size() - 1; i >= 0; --i) {
+                        aExpr = aExpr.prepend(finalExpression);
+                        finalExpression =  M.Indexed(finalExpression, M.Ident(loopVars.get(i)));
+                    }
 
-                JCStatement body = M.Exec(M.Assign(finalExpression, getNondetFunctionForType(elemType, currentSymbol)));
-                for(int i = 0; i < dims.size(); ++i) {
-                    try {
-                        Pair<JCExpression, JCExpression> d = dims.get(i);
-                        JCVariableDecl loopVar = loopVars.get(i);
-                        JCExpression lo = d.fst;
-                        JCExpression hi = d.snd;
-                        if(lo == null) {
-                            lo = M.Literal(0);
-                            loopVar.init = lo;
-                        }
-                        if(hi == null) {
-                            hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), aExpr.get(i)), M.Literal(1));
-                        }
-                        JCExpression range = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LE, M.Ident(loopVar), jev.copy(hi));
-                        //res = res.append(makeAssertStatement(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aexpr.expression, treeutils.nullLit)));
-                        JCStatement ifst = M.If(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
-                        body = ifst;
-                    } catch (NumberFormatException e) {
-                        throw new TranslationException("Cant havoc expression " + expr);
+                    JCStatement body = M.Exec(M.Assign(finalExpression, getNondetFunctionForType(elemType, currentSymbol)));
+                    for(int i = 0; i < dims.size(); ++i) {
+                        try {
+                            Pair<JCExpression, JCExpression> d = dims.get(i);
+                            JCVariableDecl loopVar = loopVars.get(i);
+                            JCExpression lo = d.fst;
+                            JCExpression hi = d.snd;
+                            if(lo == null) {
+                                lo = M.Literal(0);
+                                loopVar.init = lo;
+                            }
+                            if(hi == null) {
+                                hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS, treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), aExpr.get(i)), M.Literal(1));
+                            }
+                            JCExpression range = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LE, M.Ident(loopVar), jev.copy(hi));
+                            //res = res.append(makeAssertStatement(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aexpr.expression, treeutils.nullLit)));
+                            JCStatement ifst = M.If(treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), aExpr.get(i), treeutils.nullLit), M.Block(0L, List.of(makeStandardLoop(range, List.of(body), loopVar, currentSymbol))), null);
+                            body = ifst;
+                        } catch (NumberFormatException e) {
+                            throw new TranslationException("Cant havoc expression " + expr);
                     }
                 }
                 res = res.append(body);
@@ -360,6 +362,7 @@ public class TranslationUtils {
                 }
             } else {
                 throw new UnsupportedException("Havoc for expression " + expr + " not supported");
+                }
             }
         }
         return res;
