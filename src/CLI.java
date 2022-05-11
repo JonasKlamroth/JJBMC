@@ -95,7 +95,7 @@ public class CLI implements Runnable {
 
     @Option(names= {"-jc", "-javac"},
             description = "allows to set the javac binary that is used for compilation of source files manually")
-    public static String javacBin = null;
+    public static String javacBin = "javac";
 
     @Option(names= {"-ci", "-contractIndex"},
             description = "Allows to specify which of the contracts is going to be specified index from 0 upwards",
@@ -123,6 +123,9 @@ public class CLI implements Runnable {
     private static Process jbmcProcess = null;
     private static File tmpFile;
     private static TraceInformation traceInformation;
+
+    private static boolean isWindows = System.getProperty("os.name")
+            .toLowerCase().startsWith("windows");
 
     public static void reset() {
         timeout = 10000;
@@ -296,10 +299,6 @@ public class CLI implements Runnable {
                 packageFolder.mkdirs();
                 tmpFile = new File(packageFolder, tmpFile.getName());
                 Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
-                if (!copyJBMC()) {
-                    cleanUp();
-                    return null;
-                }
             } else {
                 return null;
             }
@@ -315,16 +314,11 @@ public class CLI implements Runnable {
 
         try {
             String[] commands = new String[apiArgs.length + 3];
-            if(javacBin == null) {
-                javacBin = findJavaVersion();
-            } else {
-                if(!verifyJavaVersion(javacBin)) {
-                    return null;
-                }
-            }
-            if(javacBin == null) {
+            if(!verifyJavaVersion(javacBin)) {
+                log.error("The provided javac version doesnt seem to be a valid java 8 compiler. Please make sure that the default javac is version 8 or provide a path to a javac binary manually via the option -javac.");
                 return null;
             }
+
             commands[0] = javacBin;
             commands[1] = "-g";
             commands[2] = tmpFile.getAbsolutePath();
@@ -408,11 +402,15 @@ public class CLI implements Runnable {
             log.debug("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
             String classFile = tmpFile.getAbsolutePath().replace(".java", "");
-            classFile = classFile.substring(classFile.lastIndexOf("/tmp") + 5);
+            classFile = classFile.substring(classFile.lastIndexOf(File.separator + "tmp") + 5);
             //classFile = "." + classFile;
 
             ArrayList<String> tmp = new ArrayList<>();
-            tmp.add(jbmcBin);
+            if(isWindows) {
+                tmp.add("cmd.exe");
+                tmp.add("/c");
+            }
+            tmp.add("jbmc");
             tmp.add(classFile);
             tmp.add("--function");
             tmp.add(functionName);
@@ -434,7 +432,9 @@ public class CLI implements Runnable {
             Runtime rt = Runtime.getRuntime();
             rt.addShutdownHook(new Thread(CLI::cleanUp));
             long start = System.currentTimeMillis();
+
             jbmcProcess = rt.exec(commands, null, tmpFolder);
+
 
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(jbmcProcess.getInputStream()));
@@ -452,6 +452,15 @@ public class CLI implements Runnable {
                 line = stdInput.readLine();
             }
 
+            StringBuilder sb2 = new StringBuilder();
+            String line2 = stdInput.readLine();
+            while (line2 != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+                line = stdError.readLine();
+            }
+
+
             if(Thread.interrupted()) {
                 return;
             }
@@ -461,6 +470,7 @@ public class CLI implements Runnable {
             long end = System.currentTimeMillis();
 
             String xmlOutput = sb.toString();
+            String error = sb2.toString();
 
 
             if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
@@ -546,39 +556,6 @@ public class CLI implements Runnable {
         }
     }
 
-    private static boolean copyJBMC() {
-        try {
-            InputStream is = Main.class.getResourceAsStream("jbmc");
-            File to = new File(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
-            FileOutputStream buffer = new FileOutputStream(to.getAbsoluteFile());
-            int nRead;
-            byte[] data = new byte[1024];
-            while ((nRead = is.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-            buffer.flush();
-            buffer.close();
-            is.close();
-
-            ArrayList<String> tmp = new ArrayList<>();
-            tmp.add("chmod");
-            tmp.add("+x");
-            tmp.add(tmpFolder.getAbsolutePath() + File.separator + "jbmc");
-            String[] commandsChmod = new String[tmp.size()];
-            commandsChmod = tmp.toArray(commandsChmod);
-
-            Runtime rt = Runtime.getRuntime();
-            rt.addShutdownHook(new Thread(CLI::cleanUp));
-            Process proc = rt.exec(commandsChmod);
-            proc.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            log.error("Could not copy jbmc.");
-            return false;
-        }
-        return true;
-
-    }
 
     static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
@@ -655,7 +632,7 @@ public class CLI implements Runnable {
 
     static private String findJavaVersion() {
         String[] commands = new String[]{"update-alternatives", "--list", "javac"};
-        String[] wcommands = new String[]{"which", "-a", "javac"};
+        String[] wcommands = new String[]{"where", "-a", "javac"};
         Process p = null;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(commands)
