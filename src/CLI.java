@@ -13,6 +13,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.*;
@@ -85,7 +87,7 @@ public class CLI implements Runnable {
 
     @Option(names= {"-jbmc", "-jbmcBinary"},
             description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
-    public static String jbmcBin = "./jbmc";
+    public static String jbmcBin = "jbmc";
 
     @Option(names = {"-lf", "--libFiles"},
             description = "Files to be copied to the translation folder.")
@@ -126,6 +128,9 @@ public class CLI implements Runnable {
 
     private static boolean isWindows = System.getProperty("os.name")
             .toLowerCase().startsWith("windows");
+
+    private static final int jbmcMajorVer = 5;
+    private static final int jbmcMinorVer = 22;
 
     public static void reset() {
         timeout = 10000;
@@ -341,9 +346,83 @@ public class CLI implements Runnable {
             log.error("Error during preparation.");
             e.printStackTrace();
         }
+
+
         //cleanUp();
         log.debug("Complilation sucessfull.");
+        if(!verifyJBMCVersion()) {
+            return null;
+        }
         return tmpFile;
+    }
+
+    private static boolean verifyJBMCVersion() {
+        try {
+            String[] commands = new String[]{jbmcBin};
+
+            Runtime rt = Runtime.getRuntime();
+            rt.addShutdownHook(new Thread(CLI::cleanUp));
+            long start = System.currentTimeMillis();
+
+            Process process = rt.exec(commands);
+
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(process.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(process.getErrorStream()));
+
+            StringBuilder sb = new StringBuilder();
+            String line = stdInput.readLine();
+            while (line != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+                line = stdInput.readLine();
+            }
+
+            StringBuilder sb2 = new StringBuilder();
+            String line2 = stdInput.readLine();
+            while (line2 != null) {
+                sb.append(line);
+                sb.append(System.getProperty("line.separator"));
+                line = stdError.readLine();
+            }
+
+            //Has to stay down here otherwise not reading the output may block the process
+            process.waitFor();
+
+            String output = sb.toString();
+            String error = sb2.toString();
+            if(output.toLowerCase().contains("jbmc version")) {
+                log.debug("Found valid jbmc version: " + output);
+                Pattern pattern = Pattern.compile("jbmc version (\\d*)\\.(\\d*)\\.(\\d*) \\(", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(output);
+                boolean matchFound = matcher.find();
+                if(Integer.parseInt(matcher.group(1)) < jbmcMajorVer) {
+                    log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
+                    log.error("Found version: " + output);
+                    log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
+                    log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+                    return false;
+                } else if(Integer.parseInt(matcher.group(2)) < jbmcMinorVer) {
+                    log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
+                    log.error("Found version: " + output);
+                    log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
+                    log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+                    return false;
+                }
+                return true;
+            }
+        } catch (IOException | InterruptedException e) {
+            keepTranslation = true;
+            log.error("Error validating jbmc binary \"" + jbmcBin + "\" (" + e.getMessage() + ")");
+            log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+            //e.printStackTrace();
+            return false;
+        }
+        log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
+        log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+        return true;
     }
 
     static public void translateAndRunJBMC() {
