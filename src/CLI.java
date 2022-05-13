@@ -320,7 +320,7 @@ public class CLI implements Runnable {
         try {
             String[] commands = new String[apiArgs.length + 3];
             if(!verifyJavaVersion(javacBin)) {
-                log.error("The provided javac version doesnt seem to be a valid java 8 compiler. Please make sure that the default javac is version 8 or provide a path to a javac binary manually via the option -javac.");
+                log.error("The provided javac version doesn't seem to be a valid java 8 compiler. Please make sure that the default javac is version 8 or provide a path to a javac binary manually via the option -javac.");
                 return null;
             }
 
@@ -403,12 +403,14 @@ public class CLI implements Runnable {
                     log.error("Found version: " + output);
                     log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
                     log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+                    log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
                 } else if(Integer.parseInt(matcher.group(2)) < jbmcMinorVer) {
                     log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
                     log.error("Found version: " + output);
                     log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
                     log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+                    log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
                 }
                 return true;
@@ -417,11 +419,13 @@ public class CLI implements Runnable {
             keepTranslation = true;
             log.error("Error validating jbmc binary \"" + jbmcBin + "\" (" + e.getMessage() + ")");
             log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+            log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
             //e.printStackTrace();
             return false;
         }
         log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
         log.error("Either install jbmc and make sure it is included in the path or provide a jbmc binary manually with the -jbmcBinary option");
+        log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
         return true;
     }
 
@@ -709,46 +713,6 @@ public class CLI implements Runnable {
         return false;
     }
 
-    static private String findJavaVersion() {
-        String[] commands = new String[]{"update-alternatives", "--list", "javac"};
-        String[] wcommands = new String[]{"where", "-a", "javac"};
-        Process p = null;
-        try {
-            ProcessBuilder pb = new ProcessBuilder().command(commands)
-                    .redirectErrorStream(true);
-            p = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = reader.readLine();
-            while(line != null) {
-                if(line.contains("8")) {
-                    verifyJavaVersion(line);
-                    return line;
-                }
-                line = reader.readLine();
-            }
-            pb = new ProcessBuilder().command(wcommands)
-                    .redirectErrorStream(true);
-            p = pb.start();
-            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            line = reader.readLine();
-            while(line != null) {
-                if(verifyJavaVersion(line)) {
-                    return line;
-                }
-                line = reader.readLine();
-            }
-
-        } catch (IOException e) {
-            log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-            log.info("To manually provide a path to a javac binary use -javac option.");
-            log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
-            return null;
-        }
-        log.error("Found no viable javac version (has to be 1.8). Please make sure java version is 1.8 is installed on your computer.");
-        log.info("To manually provide a path to a javac binary use -javac option.");
-        log.info("To install java-jdk 1.8: sudo apt install openjdk-8-jdk (on ubuntu)");
-        return null;
-    }
 }
 
 

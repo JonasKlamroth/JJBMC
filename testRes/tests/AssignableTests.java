@@ -575,4 +575,60 @@ public class AssignableTests {
     private void anotherCallTest(int[] a, int i, int j) {
         someAssign(a, 0, 4);
     }
+
+
+    @Fails
+    public int[] testIllegalAssignment() {
+        int[] arr = new int[]{0, 0, 0};
+        int i = 2;
+        //@ loop_invariant 0 <= j <= arr.length;
+        //@ loop_modifies arr[0..i-1];
+        for (int j = 0; j < arr.length; ++j) {
+            mod(arr, j);
+        }
+        return arr;
+    }
+
+    //@ assignable arr[x];
+    public void mod(int[] arr, int x) {
+        arr[2] = 0;
+    }
+
+    @Verifyable
+    void testLoopModifiesWithInvariant() {
+        int[] array = new int[1];
+        int t = 0;
+        //@ loop_invariant t == 0;
+        //@ loop_modifies array[t];
+        while (true) {
+            t = 0;
+            mod(array, t);
+        }
+    }
+
+    //@ assignable pubInt;
+    @Fails
+    void testLoopModField1() {
+        //@ loop_invariant true;
+        //@ assignable privInt;
+        for(int i = 0; i < 3; ++i) {
+            privInt = i;
+        }
+    }
+
+    //@ assignable pubInt;
+    @Fails
+    void testWriteOp() {
+        privInt -= 5;
+    }
+
+    @Verifyable
+    void testLoopModField() {
+        //@ loop_invariant true;
+        for(int i = 0; i < 3; ++i) {
+            privInt = i;
+        }
+    }
+
+
 }

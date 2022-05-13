@@ -1,3 +1,4 @@
+import com.sun.mail.iap.Argument;
 import com.sun.source.tree.*;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -61,6 +62,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private static int numQuantvars = 0;
     private boolean forceOld = false;
     private boolean ignoreLocals = false;
+    private List<JCVariableDecl> currentLoopVars = List.nil();
+    private List<JCExpression> changedLocalVars = List.nil();
+    private static int oldVarCounter = 0;
 
 
     public JmlExpressionVisitor(Context context, Maker maker,
@@ -160,14 +164,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         } else if(u.getTag() == Tag.POSTINC || u.getTag() == Tag.POSTDEC ||
                 u.getTag() == Tag.PREDEC || u.getTag() == Tag.PREINC) {
-            if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                return copy;
-            }
-            JCExpression cond = editAssignable(u.arg);
-            if(cond != null) {
-                JCStatement jcAssert = TranslationUtils.makeAssertStatement(treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond));
-                newStatements = newStatements.append(jcAssert);
-            }
+            newStatements = newStatements.appendList(makeAssignableAssertion(u.arg));
             return copy;
         } else {
             throw new UnsupportedException("Unsupported unary token: " + u.getTag() + " in " + node.toString());
@@ -389,7 +386,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             JCVariableDecl oldVar;
             if (!oldVars.containsKey(arg.toString())) {
                 if(quantifierVars.size() == 0 || relevantQuantVars.size() == 0) {
-                    oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVars.size()), currentSymbol, argCopy);
+                    oldVar = treeutils.makeVarDef(arg.type, M.Name("old" + oldVarCounter++), currentSymbol, argCopy);
                 } else {
                     Type.ArrayType arrayType = new Type.ArrayType(argCopy.type, argCopy.type.tsym);
                     List<JCExpression> dims = List.nil();
@@ -401,7 +398,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                         arrayType = new Type.ArrayType(arrayType, arrayType.tsym);
                     }
                     JCExpression init = M.NewArray(M.Type(arg.type), dims, null);
-                    oldVar = treeutils.makeVarDef(arrayType, M.Name("old" + oldVars.size()), currentSymbol, init);
+                    oldVar = treeutils.makeVarDef(arrayType, M.Name("old" + oldVarCounter++), currentSymbol, init);
 
 
                     JCExpression bodyExp = M.Ident(oldVar);
@@ -529,21 +526,42 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(copy);
             return copy;
         }
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        List<JCExpression> oldAssignbales = currentAssignable;
+        List<JCStatement> oldInitsOld = oldInits;
+        oldInits = List.nil();
+        LinkedHashMap<String, JCVariableDecl> oldVarsOld = oldVars;
+        oldVars = new LinkedHashMap<>();
+        List<JCExpression> oldChangedLocalVars = changedLocalVars;
+        changedLocalVars = List.nil();
+
+        List<JCStatement> assertInitInvs = assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
         List<JCExpression> assignables = List.nil();
         for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopModifies) {
                 assignables = assignables.appendList(((JmlStatementLoopModifies) spec).storerefs);
             }
         }
-        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body));
+        if(assignables.size() == 0) {
+            assignables = assignables.append(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+        }
+        if(assignables.size() == 1 && assignables.get(0) instanceof  JmlStoreRefKeyword && ((JmlStoreRefKeyword) assignables.get(0)).token == JmlTokenKind.BSNOTHING) {
+            assignables = List.nil();
+        }
+        for(JCExpression e : assignables) {
+            assertInitInvs = assertInitInvs.appendList(makeAssignableAssertion(e));
+        }
+        for(JCVariableDecl decl : currentLoopVars) {
+            assignables = assignables.append(M.Ident(decl));
+        }
+        //assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body));
         assignables = TranslationUtils.filterAssignables(assignables);
-        assignables = assignables.reverse();
-        newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
+        //List<JCStatement> havocStatements = TranslationUtils.havoc(assignables, currentSymbol, this);
+        currentAssignable = assignables;
 
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
+        List<JCStatement> assumeInvs = assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
         JCVariableDecl oldD = null;
         JCExpression dExpr = null;
+        List<JCStatement> oldDecreases = List.nil();
         for(JmlStatementLoop spec : that.loopSpecs) {
             if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if(oldD != null) {
@@ -551,7 +569,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
                 oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + intVarCounter++),  dExpr, currentSymbol);
-                newStatements = newStatements.append(oldD);
+                oldDecreases = oldDecreases.append(oldD);
             }
         }
 
@@ -563,6 +581,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(!(that.body instanceof JCBlock)) {
             that.body = M.Block(0L, List.of(that.body));
         }
+        changedLocalVars = List.nil();
         for(JCStatement st : ((JCBlock)that.body).getStatements()) {
             JCStatement stcopy = super.copy(st);
             if(newStatements.size() == 0) {
@@ -572,14 +591,36 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = List.nil();
             }
         }
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
-        ifbodystatements = ifbodystatements.appendList(newStatements);
+        assignables = assignables.reverse();
+        assignables = assignables.appendList(changedLocalVars);
+        List<JCStatement> havocStatements = TranslationUtils.havoc(assignables, currentSymbol, this);
+        List<JCStatement> assertInvs = assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
+        currentAssignable = oldAssignbales;
+        ifbodystatements = ifbodystatements.appendList(assertInvs);
         if(dExpr != null) {
             ifbodystatements = ifbodystatements.append(
                     TranslationUtils.makeAssertStatement(makeDereasesStatement(oldD, dExpr)));
         }
+
+        List<JCStatement> prepareOldVarsSt = List.nil();
+        for (JCVariableDecl variableDecl : oldVars.values()) {
+            prepareOldVarsSt = prepareOldVarsSt.append(variableDecl);
+        }
+
+        for (JCStatement oldInit : oldInits) {
+            prepareOldVarsSt = prepareOldVarsSt.append(oldInit);
+        }
         JCBlock ifbody = M.Block(0L, ifbodystatements.append(assumefalse));
-        newStatements = statements.append(M.If(that.cond, ifbody, null));
+        newStatements = statements.appendList(prepareOldVarsSt)
+                .appendList(assertInitInvs)
+                .appendList(oldDecreases)
+                .appendList(havocStatements)
+                .appendList(assumeInvs)
+                .append(M.If(that.cond, ifbody, null));
+
+        oldInits = oldInitsOld;
+        oldVars = oldVarsOld;
+        changedLocalVars = oldChangedLocalVars;
         return that;
     }
 
@@ -634,7 +675,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = List.from(finalSteps);
             }
             List<JCStatement> steps = newStatements;
-            newStatements = List.nil();
             newStatements = tmp1;
             newStatements = TranslationUtils.diff(newStatements, List.from(inits));
             tmp = tmp.appendList(newStatements);
@@ -654,71 +694,28 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = tmp.append(copy);
             return copy;
         }
-        if(that.init.size() > 1) {
-            throw new TranslationException("More than 1 loopVariable currently not supported");
-        }
-        JCVariableDecl loopVar = null;
-        if(that.init.size() > 0) {
-            loopVar = (JCVariableDecl)that.init.get(0);
-        }
-        if(loopVar != null)  {
-            newStatements = newStatements.append(loopVar);
-        }
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
-        List<JCExpression> assignables = List.nil();
-        assignables = assignables.append(M.Ident(loopVar));
-        for(JmlTree.JmlStatementLoop spec : that.loopSpecs) {
-            if (spec instanceof JmlStatementLoopModifies) {
-                assignables = assignables.appendList(((JmlStatementLoopModifies) spec).storerefs);
-            }
-        }
-        assignables = assignables.appendList(IdentifierVisitor.getAssignLocations(that.body));
-        assignables = TranslationUtils.filterAssignables(assignables);
-        assignables = assignables.reverse();
-        newStatements = newStatements.appendList(TranslationUtils.havoc(assignables, currentSymbol, this));
 
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSUME);
-        JCVariableDecl oldD = null;
-        JCExpression dExpr = null;
-        for(JmlStatementLoop spec : that.loopSpecs) {
-            if(spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
-                if(oldD != null) {
-                    throw new TranslationException("Only 1 decreases clause per loop allowed but found more.");
-                }
-                dExpr = super.copy(((JmlStatementLoopExpr) spec).expression);
-                oldD = treeutils.makeIntVarDef(M.Name("oldDecreasesClauseValue" + intVarCounter++),  dExpr, currentSymbol);
-                newStatements = newStatements.append(oldD);
+        currentLoopVars = List.nil();
+        for(JCStatement st : that.init) {
+            if(st instanceof JCVariableDecl) {
+                this.currentLoopVars = currentLoopVars.append((JCVariableDecl)st);
+            } else {
+                throw new UnsupportedException("Unsupported init in for loop: " + st + " (only variable declarations allowed)");
             }
         }
 
-        List<JCStatement> statements = newStatements;
-        newStatements = List.nil();
-        JCStatement assumefalse = TranslationUtils.makeAssumeStatement(treeutils.makeLit(TranslationUtils.getCurrentPosition(), syms.booleanType, false));
-        List<JCStatement> ifbodystatements = List.nil();
-        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
         if(!(that.body instanceof JCBlock)) {
             that.body = M.Block(0L, List.of(that.body));
         }
-        for(JCStatement st : ((JCBlock)that.body).getStatements()) {
-            JCStatement stcopy = super.copy(st);
-            if(newStatements.size() == 0) {
-                ifbodystatements = ifbodystatements.append(stcopy);
-            } else {
-                ifbodystatements = ifbodystatements.appendList(newStatements);
-                newStatements = List.nil();
-            }
+        for(JCExpressionStatement st : that.step) {
+            ((JCBlock) that.body).stats = ((JCBlock) that.body).stats.append(st);
         }
-        for(JCExpressionStatement est : that.step) {
-            ifbodystatements = ifbodystatements.append(est);
+        JCWhileLoop whileConvertion = M.JmlWhileLoop(M.WhileLoop(that.cond, that.body), that.loopSpecs);
+        JCBlock block = M.Block(0L, List.of(whileConvertion));
+        for(JCStatement decl : that.init) {
+            block.stats = block.stats.prepend(decl);
         }
-        assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
-        ifbodystatements = ifbodystatements.appendList(newStatements);
-        if(dExpr != null) {
-            ifbodystatements = ifbodystatements.append(
-                    TranslationUtils.makeAssertStatement(makeDereasesStatement(oldD, dExpr)));
-        }
-        JCBlock ifbody = M.Block(0L, ifbodystatements.append(assumefalse));
-        newStatements = statements.append(M.If(that.cond, ifbody, null));
+        super.copy(block);
         return that;
     }
 
@@ -756,7 +753,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
     }
 
-    private void assumeOrAssertAllInvs(List<JmlStatementLoop> invs, VerifyFunctionVisitor.TranslationMode mode) {
+    private List<JCStatement> assumeOrAssertAllInvs(List<JmlStatementLoop> invs, VerifyFunctionVisitor.TranslationMode mode) {
         List<JCStatement> oldNeededVars = neededVariableDefs;
         neededVariableDefs = List.nil();
         List<JCStatement> l = newStatements;
@@ -770,20 +767,20 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(assertCopy, mode));
             }
         }
+        List<JCStatement> res = List.nil();
         if(newStatements.size() > 0) {
-            newStatements = l.append(M.Block(0L, newStatements.prependList(neededVariableDefs)));
+            res = List.of(M.Block(0L, newStatements.prependList(neededVariableDefs)));
         }
+        newStatements = l;
         translationMode = oldMode;
         neededVariableDefs = oldNeededVars;
+        return res;
     }
 
 
     @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
-        if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-            return super.visitAssignment(node, p);
-        }
         JCExpression cond = editAssignable(assign.getVariable());
         if(cond != null) {
             cond = treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond);
@@ -808,15 +805,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 copy.getTag() == Tag.SL_ASG ||
                 copy.getTag() == Tag.SR_ASG ||
                 copy.getTag() == Tag.USR_ASG) {
-            if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
-                return copy;
-            }
-            JCExpression cond = editAssignable(copy.lhs);
-            if(cond != null) {
-                JCStatement assertSt = TranslationUtils.makeAssumeOrAssertStatement(treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond), VerifyFunctionVisitor.TranslationMode.ASSERT);
-                newStatements = newStatements.append(assertSt);
-                //newStatements = newStatements.append(M.Exec(u));
-            }
+            newStatements = newStatements.appendList(makeAssignableAssertion(copy.lhs));
             return copy;
         } else {
             throw new UnsupportedException("Unkonwn assignment type " + copy.toString());
@@ -839,9 +828,25 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return res;
     }
 
+    public List<JCStatement> makeAssignableAssertion(JCExpression expr) {
+        JCExpression cond = editAssignable(expr);
+        if(cond instanceof JCLiteral && ((JCLiteral) cond).getValue().equals(false)) {
+            return List.nil();
+        }
+        return List.of(TranslationUtils.makeAssertStatement(treeutils.makeNot(Position.NOPOS, cond), "Illegal assignment to " + expr));
+    }
     public JCExpression editAssignable(JCExpression e) {
+        if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
+            if(e instanceof JCIdent) {
+                if (!this.ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
+                    changedLocalVars = changedLocalVars.append((JCIdent) e);
+                }
+            }
+            return M.Literal(false);
+        }
         if(e instanceof JCIdent) {
             if(!this.ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
+                changedLocalVars = changedLocalVars.append((JCIdent) e);
                 return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
@@ -1263,7 +1268,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                             cond = TranslationUtils.replaceVarName(sym.params.get(i).name.toString(), "$$param" + (paramVarCounter - sym.params.length() + i), cond);
                         }
                     }
-                    newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(cond, VerifyFunctionVisitor.TranslationMode.ASSERT));
+                    newStatements = newStatements.append(TranslationUtils.makeAssertStatement(cond, "Illegal assignment to " + a));
                 }
 
                 //for (JCExpression a : assignables) {

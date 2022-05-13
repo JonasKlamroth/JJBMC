@@ -1005,9 +1005,22 @@ public class TestSuite {
 
     //@ requires privInt == 0;
     //@ ensures privInt == 3;
+    //@ assignable privInt;
+    @Fails
+    private void loopInvModTest31() {
+        //@ loop_invariant 0 <= privInt <= 3;
+        while(privInt < 3) {
+            incPrivInt();
+        }
+    }
+
+    //@ requires privInt == 0;
+    //@ ensures privInt == 3;
+    //@ assignable privInt;
     @Verifyable
     private void loopInvModTest3() {
         //@ loop_invariant 0 <= privInt <= 3;
+        //@ loop_modifies privInt;
         while(privInt < 3) {
             incPrivInt();
         }
@@ -1033,11 +1046,35 @@ public class TestSuite {
     }
 
     //@ assignable \nothing;
+    @Fails
+    private void loopInvAssTest1() {
+        int j = 0;
+        //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
+        //@ assignable \nothing;
+        while(j < 1) {
+            privInt++;
+        }
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void loopInvAssTest2() {
+        int j = 0;
+        //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
+        //@ assignable \nothing;
+        while(j < 0) {
+            j = inc(j);
+            privInt++;
+        }
+    }
+
+    //@ assignable \nothing;
     @Verifyable
     private void loopInvAssTest() {
         int j = 0;
         //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
-        while(j < 0) {
+        //@ assignable \nothing;
+        while(j < 1) {
             j = inc(j);
         }
     }

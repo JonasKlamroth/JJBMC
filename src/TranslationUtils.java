@@ -65,7 +65,7 @@ public class TranslationUtils {
     }
 
 
-    static List<JCTree.JCStatement> makeAssertStatementList(JCTree.JCExpression expr) {
+    static List<JCTree.JCStatement> makeAssertStatementList(JCTree.JCExpression expr, String info) {
         if(CLI.splitAssertions) {
             expr = unwrapExpression(expr);
             if(expr instanceof JCBinary) {
@@ -78,15 +78,26 @@ public class TranslationUtils {
                 }
             }
         }
+        if(info != null) {
+            return List.of(M.at(TranslationUtils.getCurrentPosition()).Assert(expr, M.Literal(info)));
+        }
         return List.of(M.at(TranslationUtils.getCurrentPosition()).Assert(expr, null));
     }
 
-    static JCStatement makeAssertStatement(JCExpression expr) {
-        List<JCStatement> l = makeAssertStatementList(expr);
+    static List<JCTree.JCStatement> makeAssertStatementList(JCExpression expr) {
+        return makeAssertStatementList(expr, null);
+    }
+
+    static JCStatement makeAssertStatement(JCExpression expr, String info) {
+        List<JCStatement> l = makeAssertStatementList(expr, info);
         if(l.size() == 1) {
             return l.get(0);
         }
         return M.Block(0L, l);
+    }
+
+    static JCStatement makeAssertStatement(JCExpression expr) {
+        return makeAssertStatement(expr, null);
     }
 
     static JCStatement makeAssertStatementWithDebugAssignments(JCExpression expr) {
@@ -291,7 +302,7 @@ public class TranslationUtils {
         return treeutils.makeBooleanLiteral(TranslationUtils.getCurrentPosition(), false);
     }
 
-    public static List<JCStatement> havoc(List<JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
+    public static List<JCStatement> havoc(List<? extends JCExpression> storerefs, Symbol currentSymbol, JmlTreeCopier jev) {
         List<JCStatement> res = List.nil();
         List<String> havoced = List.nil();
         for(JCExpression expr : storerefs) {
@@ -320,6 +331,14 @@ public class TranslationUtils {
                     for(int i = loopVars.size() - 1; i >= 0; --i) {
                         aExpr = aExpr.prepend(finalExpression);
                         finalExpression =  M.Indexed(finalExpression, M.Ident(loopVars.get(i)));
+                    }
+                    if(dims.size() == 1) {
+                        if (dims.get(0).fst != null && dims.get(0).fst.toString().equals(dims.get(0).snd.toString())) {
+                            JCExpression arrayAccess = M.Indexed(inner, dims.get(0).fst);
+                            JCStatement body = M.Exec(M.Assign(arrayAccess, getNondetFunctionForType(elemType, currentSymbol)));
+                            res = res.append(body);
+                            continue;
+                        }
                     }
 
                     JCStatement body = M.Exec(M.Assign(finalExpression, getNondetFunctionForType(elemType, currentSymbol)));
