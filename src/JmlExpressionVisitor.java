@@ -1,4 +1,3 @@
-import com.sun.mail.iap.Argument;
 import com.sun.source.tree.*;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -65,6 +64,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private List<JCVariableDecl> currentLoopVars = List.nil();
     private List<JCExpression> changedLocalVars = List.nil();
     private static int oldVarCounter = 0;
+    private static List<Symbol.VarSymbol> loopLocalVars = List.nil();
 
 
     public JmlExpressionVisitor(Context context, Maker maker,
@@ -533,6 +533,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         oldVars = new LinkedHashMap<>();
         List<JCExpression> oldChangedLocalVars = changedLocalVars;
         changedLocalVars = List.nil();
+        List<Symbol.VarSymbol> oldLoopLocalVars = loopLocalVars;
+        loopLocalVars = List.nil();
 
         List<JCStatement> assertInitInvs = assumeOrAssertAllInvs(that.loopSpecs, VerifyFunctionVisitor.TranslationMode.ASSERT);
         List<JCExpression> assignables = List.nil();
@@ -621,6 +623,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         oldInits = oldInitsOld;
         oldVars = oldVarsOld;
         changedLocalVars = oldChangedLocalVars;
+        loopLocalVars = oldLoopLocalVars;
         return that;
     }
 
@@ -839,14 +842,18 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if(currentAssignable.stream().anyMatch(loc -> loc instanceof JmlStoreRefKeyword)) {
             if(e instanceof JCIdent) {
                 if (!this.ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
-                    changedLocalVars = changedLocalVars.append((JCIdent) e);
+                    if(!loopLocalVars.contains(((JCIdent) e).sym)) {
+                        changedLocalVars = changedLocalVars.append((JCIdent) e);
+                    }
                 }
             }
             return M.Literal(false);
         }
         if(e instanceof JCIdent) {
             if(!this.ignoreLocals && (((JCIdent) e).sym == null || ((JCIdent) e).sym.owner.equals(currentSymbol))) {
-                changedLocalVars = changedLocalVars.append((JCIdent) e);
+                if(!loopLocalVars.contains(((JCIdent) e).sym)) {
+                    changedLocalVars = changedLocalVars.append((JCIdent) e);
+                }
                 return M.Literal(false);
             }
             return editAssignable((JCIdent)e);
@@ -1205,6 +1212,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitJmlVariableDecl(JmlVariableDecl that, Void p) {
         JmlVariableDecl copy = (JmlVariableDecl)super.visitJmlVariableDecl(that, p);
         newStatements = newStatements.append(copy);
+        loopLocalVars = loopLocalVars.append(copy.sym);
         return copy;
     }
 

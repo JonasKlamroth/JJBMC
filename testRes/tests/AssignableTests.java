@@ -594,6 +594,17 @@ public class AssignableTests {
         arr[2] = 0;
     }
 
+
+    @Verifyable
+    public void loopLocalVarTest() {
+        //@ loop_modifies \nothing;
+        for(int i = 0; i < 3; ++i) {
+            int x = 0;
+            x = 3;
+        }
+    }
+}
+
     @Verifyable
     void testLoopModifiesWithInvariant() {
         int[] array = new int[1];
