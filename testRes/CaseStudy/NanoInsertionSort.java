@@ -1,4 +1,4 @@
-
+import java.util.Arrays;
 /**
  * This class implements sorting algorithms by Vladimir Yaroslavskiy,
  * such as Merging sort, the pair, nano and optimized insertion sorts,
@@ -8,7 +8,7 @@
  * @version 2018.02.18
  * @since 10
  */
-final class SortingAlgorithms {
+public class NanoInsertionSort {
 
     /**
      * Sorts the specified range of the array by the nano insertion sort.
@@ -20,8 +20,10 @@ final class SortingAlgorithms {
     /*@
       @ normal_behaviour
       @ requires a != null && a.length <=5;
-      @ ensures (\forall int i; low <= i && i < high-2; a[i] <= a[i+1]);
-      @ assignable a[*];
+      @ requires low >= 1 && low < high && high <= a.length;
+      @ requires (\forall int j; low <= j < high; (\exists int i; 0 <= i < low; a[i] <= a[j]));
+      @ ensures (\forall int i; low <= i && i < high - 1; a[i] <= a[i+1]);
+      @ assignable a[low .. high - 1];
       @*/
     static void nanoInsertionSort(int[] a, int low, int high) {
         /*
@@ -38,5 +40,5 @@ final class SortingAlgorithms {
             }
             a[k + 1] = ak;
         }
-    }
+   }
 }

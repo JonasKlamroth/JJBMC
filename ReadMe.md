@@ -13,7 +13,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 ### Requirements
 - Java 8 (both newer and older versions do not work due to incompatibilities with OpenJML)
 - Gradle 6.4.1 or higher (only if gradle wrapper does not work on your system)
-- Preferrably some Unix OS (tested only on Ubuntu 20.04)
+- Preferably some Unix OS (tested only on Ubuntu 20.04)
 
 ### Compiling JJBMC
 - Make sure that **JAVA_HOME** points to a valid installation of Java 8 (tested for openjdk).
@@ -22,23 +22,24 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 - If the previous step does not work, first create a gradle wrapper via ``gradle wrapper``.
 
 ## Running JJBMC
+- **Important**: JJBMC uses JBMC as a backend. Please make sure that a recent version (currently >= 5.22) of JBMC is installed and included in the path. To download and install the latest JBMC version (as part of CBMC) go to https://github.com/diffblue/cbmc/releases/.
 - You can see the available command-line options via ``java -jar JJBMC.jar``.
-- In general, you can run JJBMC via ``java -jar JJBMC.jar JAVA_FILE -j="JBMC_OPTIONS"``, where **JAVA_FILE** should be replaced by the JML-specified Java file that you want to analyze, and **JBMC_OPTIONS** should be replaced by the JBMC options that you want to set, e.g., a bound for loop unrollings via ``--unwind BOUND`` (**BOUND** should be replaced by the size of the desired bound). For examples, see the section below.
+- In general, you can run JJBMC via ``java -jar JJBMC.jar JAVA_FILE METHOD_NAME -j="JBMC_OPTIONS"``, where **JAVA_FILE** should be replaced by the JML-specified Java file that you want to analyze, **METHOD_NAME** can be replaced by a name of a method you would like to verify (if left out all methods are verified), and **JBMC_OPTIONS** should be replaced by the JBMC options that you want to set, e.g., a bound for loop unrollings via ``--unwind BOUND`` (**BOUND** should be replaced by the size of the desired bound). For examples, see the section below.
 
 ## Examples
 - You can analyze a correct modular [Bubblesort example](testRes/BubbleSort.java) via
 ```
-java -jar JJBMC.jar testRes/BubbleSort.java -j="--unwind 6"
+java -jar JJBMC.jar testRes/BubbleSort.java sort
 ```
-- You can analyze the same [Bubblesort example](testRes/BubbleSortBroken.java), however with a wrong specification via
+- You can analyze the same [Bubblesort example](testRes/BubbleSort.java), however with a wrong specification via
 ```
-java -jar JJBMC.jar testRes/BubbleSortBroken.java -j="--unwind 6"
+java -jar JJBMC.jar testRes/BubbleSort.java broken_sort 
 ```
-- You can analyze a non-modular version of the [Bubblesort example](testRes/BubbleSort.java) via
+- You can analyze force a non modular verification (inlining all loop invariants and methods) of the [Bubblesort example](testRes/BubbleSort.java) via
 ```
-java -jar JJBMC.jar testRes/BubbleSort.java -fi -j="--unwind 6"
+java -jar JJBMC.jar testRes/BubbleSort.java -fi 
 ```
 - You can analyze the [Hammingweight example](testRes/NormalHammingWeight.java) via
 ```
-java -jar JJBMC.jar testRes/NormalHammingWeight.java -j="--unwind 33"
+java -jar JJBMC.jar testRes/NormalHammingWeight.java -u 33
 ```
