@@ -23,9 +23,9 @@ jobs:
         java-version: 8.0.312+7
     - name: Copy jbmc binary
       run: |
-        echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
+        echo "PATH=$GITHUB_WORKSPACE/JBMCbin:$PATH" >> $GITHUB_ENV
         chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
-    - name: run gradle
-      run: |
-        chmod +x ./gradlew
-        ./gradlew build
+    - name: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.4
+        arguments: build
