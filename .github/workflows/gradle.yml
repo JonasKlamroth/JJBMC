@@ -25,4 +25,7 @@ jobs:
         echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
         chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
     - name: Build with Gradle
-      run: gradle build
+      run: |
+        gradle wrapper
+        chmod +x gradlew
+        ./gradlew build
