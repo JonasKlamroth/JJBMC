@@ -10,8 +10,8 @@ class Lemmata {
 
     public static /*@ pure */ int countEven(/*@nullable*/Object[] a) {
         int result = 0;
-        for(int i = 0; i < a.length; i += 2) {
-            if(a[i] != null) {
+       for (int i = 0; i < a.length; i += 2) {
+            if (a[i] != null) {
                 result ++;
             }
         }

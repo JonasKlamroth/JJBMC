@@ -1,3 +1,7 @@
+import java.io.File;
+import translation.FunctionNameVisitor;
+import cli.CLI;
+import cli.CostumPrintStream;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,7 +40,7 @@ public class TestSuiteTests {
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
         init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests/TestSuite.java");
+        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "TestSuite.java");
     }
 
     @Test

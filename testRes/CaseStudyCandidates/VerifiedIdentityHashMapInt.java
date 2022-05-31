@@ -482,7 +482,7 @@ public class VerifiedIdentityHashMapInt {
       @     (x == 0 ==> \result == 0);
       @*/
     public static /*@ pure @*/ int hash(int x, int length) {
-        if(x == 0) {
+        if (x == 0) {
             return 0;
         }
         int h =  x;

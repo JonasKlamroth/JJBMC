@@ -1,10 +1,10 @@
+import Exceptions.TranslationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.runners.Parameterized;
 import org.junit.runners.model.RunnerScheduler;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +58,7 @@ public class Parallelized extends Parameterized
         ThreadPoolScheduler tps = null;
         try {
             Field fThreads = klass.getField("numThreads");
-            if(java.lang.reflect.Modifier.isStatic(fThreads.getModifiers()) && java.lang.reflect.Modifier.isFinal(fThreads.getModifiers())) {
+            if (java.lang.reflect.Modifier.isStatic(fThreads.getModifiers()) && java.lang.reflect.Modifier.isFinal(fThreads.getModifiers())) {
                 int numThreads = fThreads.getInt(null);
                 tps = new ThreadPoolScheduler(numThreads);
             } else {

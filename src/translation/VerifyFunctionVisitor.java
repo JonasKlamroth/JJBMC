@@ -1,14 +1,20 @@
+package translation;
+
+import Exceptions.TranslationException;
+import Exceptions.UnsupportedException;
+import utils.NormalizeVisitor;
+import utils.TranslationUtils;
+import cli.CLI;
+import cli.ErrorLogger;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
-import com.sun.tools.javac.util.Position;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTreeUtils;
@@ -72,7 +78,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
-        } else if(that.clauseKind.name().equals("assignable")) {
+        } else if (that.clauseKind.name().equals("assignable")) {
 
         } else {
             throw new UnsupportedException("Unsupported clause type: " + that.clauseKind + " (" + that + ")");
@@ -120,7 +126,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         currentAssignable = List.nil();
         JCTree copy = super.visitJmlSpecificationCase(that, p);
 
-        if(TranslationUtils.isPure(currentMethod)) {
+        if (TranslationUtils.isPure(currentMethod)) {
             currentAssignable = currentAssignable.append(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING));
         }
 
@@ -150,10 +156,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             this.returnVar = null;
         }
 
-        if(that.mods.annotations != null) {
-            for(JCAnnotation a : that.mods.annotations) {
-                if(a instanceof JmlAnnotation) {
-                    if(a.annotationType.toString().endsWith(".Pure")) {
+        if (that.mods.annotations != null) {
+           for (JCAnnotation a : that.mods.annotations) {
+                if (a instanceof JmlAnnotation) {
+                    if (a.annotationType.toString().endsWith(".Pure")) {
                         ErrorLogger.warn("\"pure\" annotations a currently only translated as assignable \\nothing.");
                     }
                 }
@@ -194,7 +200,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             throw new TranslationException("Different number of cases for method: " + currentMethod.name.toString());
         }
         int caseIdx = Math.min(CLI.caseIdx, ensCases.size() - 1);
-        if(caseIdx < 0) {
+        if (caseIdx < 0) {
             return null;
         }
         oldVars.putAll(oldVarsInv);
@@ -278,7 +284,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             l = l.append(M.Block(0L, invariantAssert));
         }
 
-        if(CLI.doSanityCheck) {
+        if (CLI.doSanityCheck) {
             l = l.append(TranslationUtils.makeAssertStatement(M.Literal(false)));
         }
         if (returnStmt != null) {
@@ -293,7 +299,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         reqCases = List.nil();
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
-        if(!currentMethod.name.toString().equals("<init>")) {
+        if (!currentMethod.name.toString().equals("<init>")) {
             currentMethod.name = M.Name(currentMethod.name.toString() + "Verf");
         }
         return currentMethod;
@@ -304,7 +310,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if (currentAssignable == null || currentAssignable.size() == 0) {
             currentAssignable = List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
         }
-        if(currentAssignable.size() == 1 && currentAssignable.get(0) instanceof JmlStoreRefKeyword && ((JmlStoreRefKeyword) currentAssignable.get(0)).token.equals(JmlTokenKind.BSNOTHING)) {
+        if (currentAssignable.size() == 1 && currentAssignable.get(0) instanceof JmlStoreRefKeyword && ((JmlStoreRefKeyword) currentAssignable.get(0)).token.equals(JmlTokenKind.BSNOTHING)) {
             currentAssignable = List.nil();
         }
         List<JCStatement> body = List.nil();

@@ -7,7 +7,7 @@ class HeapSort {
     //@        assignable a[*];
     public static void heapSort(int[] a) {
 
-        if(a.length <= 1)
+        if (a.length <= 1)
             return;
 
         heapify(a);
@@ -19,7 +19,7 @@ class HeapSort {
         // @ loop_invariant (\forall int i; 0<=i<a.length; 2*i+1 < t ==> a[i] >= a[2*i+1]);
         // @ loop_invariant (\forall int i; 0<=i<a.length; 2*i+2 < t ==> a[i] >= a[2*i+2]);
         // @ decreases t;
-        for(int t = a.length-1; t > 0; t--) {
+       for (int t = a.length-1; t > 0; t--) {
             popMax(a, t);
             //@ assume (\forall int i; 0 <=i<a.length; 0<=a[i]<5);
         }

@@ -1,11 +1,14 @@
+import java.io.File;
+import translation.FunctionNameVisitor;
+import cli.CLI;
+import cli.CostumPrintStream;
+import java.io.IOException;
+import java.util.Collection;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.io.IOException;
-import java.util.Collection;
 
 @RunWith(Parallelized.class)
 public class AssignableTests {
@@ -36,7 +39,7 @@ public class AssignableTests {
     @Parameterized.Parameters
     public static Collection<Object[]> assignableParamter() {
         init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests/AssignableTests.java");
+        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "AssignableTests.java");
     }
 
     @Test

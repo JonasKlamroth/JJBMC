@@ -1,6 +1,9 @@
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import Exceptions.TranslationException;
+import translation.FunctionNameVisitor;
+import cli.CLI;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -11,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by jklamroth on 12/3/18.
@@ -22,16 +25,16 @@ public class Utils {
     private static Logger log = LogManager.getLogger(Utils.class);
 
     public static final String baseTestFolder = "testRes" + File.separator;
-    static private boolean keepTmpFile = true;
+    private static boolean keepTmpFile = true;
     private static boolean filterOutput = false;
     private boolean doCleanup = false;
 
     public static Collection<Object[]> assignableParameter() {
-        return prepareParameters(baseTestFolder + "tests/AssignableTests.java");
+        return prepareParameters(baseTestFolder + "tests" + File.separator + "AssignableTests.java");
     }
 
     public static Collection<Object[]> assignable2Parameter() {
-        return prepareParameters(baseTestFolder + "tests/AssignableTests2.java");
+        return prepareParameters(baseTestFolder + "tests" + File.separator + "AssignableTests2.java");
     }
 
     public static Collection<Object[]> prepareParameters(String fileName) {
@@ -40,27 +43,24 @@ public class Utils {
         CLI.keepTranslation = keepTmpFile;
         CLI.debugMode = true;
         File tmpFile = CLI.prepareForJBMC(fileName);
-        if(tmpFile == null) {
+        if (tmpFile == null) {
             log.error("Someting went wrong. Test aborted.");
             throw new TranslationException("Tmpfile was not created. abort test.");
         }
-        String classFile = "tests/" + tmpFile.getName().replace(".java", "");
+        String classFile = "tests" + File.separator + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
         FunctionNameVisitor.parseFile(fileName, true);
         List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.getFunctionBehaviours();
         List<String> functionNames = FunctionNameVisitor.getFunctionNames();
         List<String> unwinds = FunctionNameVisitor.getUnwinds();
-        assert(functionNames.size() == testBehaviours.size());
-        assert(functionNames.size() == unwinds.size());
-        // log.info("Running " +
-        // (int) testBehaviours.stream().
-        //         filter(b -> b != FunctionNameVisitor.TestBehaviour.Ignored).count() +
-        // " tests in file: " + tmpFile.getName());
-        for(int idx = 0; idx < functionNames.size(); ++idx) {
-            if(testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
+        assert (functionNames.size() == testBehaviours.size());
+        assert (functionNames.size() == unwinds.size());
+
+        for (int idx = 0; idx < functionNames.size(); ++idx) {
+            if (testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
                 String name = functionNames.get(idx);
-                if(!name.contains("<init>")) {
+                if (!name.contains("<init>")) {
                     int dotIdx = name.lastIndexOf(":");
                     name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
                 }
@@ -71,27 +71,33 @@ public class Utils {
         return params;
     }
 
-    static private void createAnnotationsFolder(String fileName) {
+    private static void createAnnotationsFolder(String fileName) {
         File f = new File(fileName);
-        File dir = new File(f.getParent(),"tmp" + File.separator + "TestAnnotations" );
+        File dir = new File(f.getParent(), "tmp" + File.separator + "TestAnnotations");
         log.debug("Copying Annotation files to " + dir.getAbsolutePath());
         dir.mkdirs();
         try {
-            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations"+ File.separator + "Fails.java").toPath(),
+                    new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations" + File.separator + "Verifyable.java").toPath(),
+                    new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations" + File.separator + "Unwind.java").toPath(),
+                    new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
             throw new TranslationException("Error trying to copy TestAnnotations");
         }
         f = new File(fileName);
-        dir = new File(f.getParent(),"tmp" + File.separator + "tests" + File.separator + "TestAnnotations" );
+        dir = new File(f.getParent(), "tmp" + File.separator + "tests" + File.separator + "TestAnnotations");
         log.debug("Copying Annotation files to " + dir.getAbsolutePath());
         dir.mkdirs();
         try {
-            Files.copy(new File("./tests/TestAnnotations/Fails.java").toPath(), new File(dir,"Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Verifyable.java").toPath(), new File(dir,"Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("./tests/TestAnnotations/Unwind.java").toPath(), new File(dir,"Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations" + File.separator + "Fails.java").toPath(),
+                    new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations" + File.separator + "Verifyable.java").toPath(),
+                    new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "TestAnnotations" + File.separator + "Unwind.java").toPath(),
+                    new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
             throw new TranslationException("Error trying to copy TestAnnotations");
@@ -99,16 +105,17 @@ public class Utils {
     }
 
     public void runCaseStudies(String[] files) {
-        for(String fileName : files) {
+        for (String fileName : files) {
             CLI.translateAndRunJBMC(fileName);
         }
     }
 
-    public static void runTests( String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
+    public static void runTests(String classFile, String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
+            throws IOException, InterruptedException {
         log.info("Running test for function: " + function);
         //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
         String[] commands;
-        if(unwind != null) {
+        if (unwind != null) {
             log.info("unwind set to " + unwind);
             commands = new String[]{ "jbmc", classFile, "--function", function, "--unwind", unwind};
         } else {
@@ -118,7 +125,7 @@ public class Utils {
         log.info("Run jbmc with commands: " + Arrays.toString(commands));
 
         Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(commands, null, new File("./testRes/tests/tmp"));
+        Process proc = rt.exec(commands, null, new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp"));
         proc.waitFor();
 
 
@@ -145,7 +152,7 @@ public class Utils {
                 }
                 s = stdError.readLine();
             }
-            if(!filterOutput) {
+            if (!filterOutput) {
                 log.info(out);
             }
             assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
@@ -162,7 +169,7 @@ public class Utils {
     //}
 
     public void cleanup() {
-        if(!keepTmpFile) {
+        if (!keepTmpFile) {
             CLI.cleanUp();
         }
     }

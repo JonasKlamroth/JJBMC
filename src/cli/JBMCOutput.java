@@ -1,4 +1,9 @@
-import java.util.*;
+package cli;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JBMCOutput {
@@ -24,18 +29,18 @@ public class JBMCOutput {
         }
 
         private boolean isRelevantVar(String var) {
-            if(var == null) {
+            if (var == null) {
                 return false;
             }
-            for(String s : relevantVars) {
-                if(s.equals(var)) {
+            for (String s : relevantVars) {
+                if (s.equals(var)) {
                     return true;
                 }
-                if(var.equals("this." + s)) {
+                if (var.equals("this." + s)) {
                     return true;
                 }
             }
-            if(var.contains("[")) {
+            if (var.contains("[")) {
                 return isRelevantVar(var.substring(0, var.lastIndexOf("[")));
             }
             return false;
@@ -43,7 +48,7 @@ public class JBMCOutput {
 
         private void filterAssignments(Set<String> relevantVars) {
             List<Assignment> trace = assignments;
-            if(relevantVars != null) {
+            if (relevantVars != null) {
                 trace = trace.stream().filter(a -> isRelevantVar(a.guess)).collect(Collectors.toList());
             }
             trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
@@ -66,7 +71,7 @@ public class JBMCOutput {
 
         private List<Assignment> filterGroup(List<Assignment> group) {
             LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
-            for(Assignment a : group) {
+            for (Assignment a : group) {
                 groupMap.put(a.guess, a);
             }
             return new ArrayList<>(groupMap.values());
@@ -114,24 +119,24 @@ public class JBMCOutput {
     public String printTrace(String property, boolean printGuesses) {
         StringBuilder sb = new StringBuilder();
         int idx = properties.indexOf(property);
-        if(idx == -1) {
+        if (idx == -1) {
             return "";
         }
         Trace trace = traces.get(idx);
-        if(trace == null) {
+        if (trace == null) {
             return "";
         }
 
         sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
         trace.filterAssignments();
-        if(printGuesses) {
+        if (printGuesses) {
             for (Assignment a : trace.assignments) {
-                if(a.guess != null) {
+                if (a.guess != null) {
                     sb.append(a + "\n");
                 }
             }
         }
-        if(asserts.get(idx) != null) {
+        if (asserts.get(idx) != null) {
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + asserts.get(idx) + " (" + reasons.get(idx) + ")\n");
         } else {
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + reasons.get(idx) + "\n");
@@ -146,14 +151,15 @@ public class JBMCOutput {
 
     public String printErrors() {
         StringBuilder sb = new StringBuilder();
-        for(String e : errors) {
+        for (String e : errors) {
             sb.append(e);
         }
         return sb.toString();
     }
+
     public String printAllTraces() {
         StringBuilder sb = new StringBuilder();
-        for(String s : properties) {
+        for (String s : properties) {
             sb.append(printTrace(s));
         }
         return sb.toString();
@@ -162,8 +168,8 @@ public class JBMCOutput {
     public String printStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append(proverStatus + "\n");
-        if(errors.size() > 0) {
-            for(String error : errors) {
+        if (errors.size() > 0) {
+            for (String error : errors) {
                 sb.append(error);
             }
         }

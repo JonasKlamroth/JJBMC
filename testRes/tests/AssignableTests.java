@@ -197,14 +197,14 @@ public class AssignableTests {
     private void assignalbeTest8() {
         int i = 5;
         i = 10;
-        if(i > 10) {
+        if (i > 10) {
             i = 20;
         }
     }
 
     @Verifyable
     private void assignalbeTest9() {
-        if(privInt > 10) {
+        if (privInt > 10) {
             privInt = 20;
         }
     }
@@ -347,7 +347,7 @@ public class AssignableTests {
     @Verifyable
     @Unwind(number = 12)
     private void assignableTest19() {
-        for(; privInt < 10; privInt++) {
+       for (; privInt < 10; privInt++) {
             int i = 0;
         }
     }
@@ -358,7 +358,7 @@ public class AssignableTests {
     @Fails
     @Unwind(number = 11)
     private void assignableTest20() {
-        for(; privInt < 10; privInt++) {
+       for (; privInt < 10; privInt++) {
             int i = 0;
         }
     }
@@ -382,7 +382,7 @@ public class AssignableTests {
     //@ assignable privInt;
     @Verifyable
     private void assignableTest23() {
-        if(privInt++ > 0) {
+        if (privInt++ > 0) {
             return;
         }
     }
@@ -392,7 +392,7 @@ public class AssignableTests {
     //@ assignable \nothing;
     @Fails
     private void assignableTest24() {
-        if(privInt++ > 0) {
+        if (privInt++ > 0) {
             return;
         }
     }
@@ -598,7 +598,7 @@ public class AssignableTests {
     @Verifyable
     public void loopLocalVarTest() {
         //@ loop_modifies \nothing;
-        for(int i = 0; i < 3; ++i) {
+       for (int i = 0; i < 3; ++i) {
             int x = 0;
             x = 3;
         }
@@ -622,7 +622,7 @@ public class AssignableTests {
     void testLoopModField1() {
         //@ loop_invariant true;
         //@ assignable privInt;
-        for(int i = 0; i < 3; ++i) {
+       for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
     }
@@ -636,7 +636,7 @@ public class AssignableTests {
     @Verifyable
     void testLoopModField() {
         //@ loop_invariant true;
-        for(int i = 0; i < 3; ++i) {
+       for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
     }

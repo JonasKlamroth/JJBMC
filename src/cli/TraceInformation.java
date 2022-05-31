@@ -1,9 +1,27 @@
-import com.sun.tools.javac.util.Pair;
+package cli;
 
-import java.util.*;
+import Exceptions.TranslationException;
+import com.sun.tools.javac.util.Pair;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class TraceInformation {
-    private static final List<String> ignoredVars = Arrays.asList("enableAssume", "enableNondet", "(void *)", "nondet_array_length", "array_data_init", "array_init_iter", "new_array_item", "malloc", "@class_identifier", "tmp", "assertionsDisabled");
+    private static final List<String> ignoredVars = Arrays.asList("enableAssume",
+            "enableNondet",
+            "(void *)",
+            "nondet_array_length",
+            "array_data_init",
+            "array_init_iter",
+            "new_array_item",
+            "malloc",
+            "@class_identifier",
+            "tmp",
+            "assertionsDisabled");
 
     private Map<String, String> expressionMap = new HashMap<>();
     private final SortedMap<Integer, Integer> lineMap = new TreeMap<>();
@@ -34,8 +52,8 @@ public class TraceInformation {
 
     public int getStartingLineForMethodAt(int line) {
         int idx = methods.firstKey();
-        for(int k : methods.keySet()) {
-            if(line < k) {
+        for (int k : methods.keySet()) {
+            if (line < k) {
                 break;
             } else {
                 idx = k;
@@ -52,20 +70,20 @@ public class TraceInformation {
     }
 
     public void trackDynamicObject(String name, String object) {
-        if((!name.equals("this") || !objectMap.containsKey(object)) && !name.contains("new_tmp")) {
+        if ((!name.equals("this") || !objectMap.containsKey(object)) && !name.contains("new_tmp")) {
             objectMap.put(object, name);
         }
     }
 
     public int getOriginalLine(int line) {
-        if(!lineMap.containsKey(line)) {
+        if (!lineMap.containsKey(line)) {
             return -1;
         }
         return lineMap.get(line);
     }
 
     public Set<String> getAssertVarsForLine(int line) {
-        if(!assertVars.containsKey(line)) {
+        if (!assertVars.containsKey(line)) {
             throw new RuntimeException("No assert found in line: " + line + " but requested variables for it.");
         }
         return assertVars.get(line);
@@ -73,8 +91,8 @@ public class TraceInformation {
 
     public Pair<Integer, Integer> getRelevantRange(int lineIn) {
         int begin = -1;
-        for(int line : methods.keySet()) {
-            if(line <= lineIn) {
+        for (int line : methods.keySet()) {
+            if (line <= lineIn) {
                 begin = line;
             } else {
                 return new Pair<>(begin, line);
@@ -85,17 +103,17 @@ public class TraceInformation {
 
     public void provideGuesses(List<JBMCOutput.Assignment> lineAssignments) {
         String t = null;
-        for(int i = lineAssignments.size() - 1; i >= 0; --i) {
+        for (int i = lineAssignments.size() - 1; i >= 0; --i) {
             JBMCOutput.Assignment a = lineAssignments.get(i);
-            if(isRelevantValue(a.value)) {
+            if (isRelevantValue(a.value)) {
                 if (a.value.startsWith("&dynamic_")) {
                     String value = cleanValue(a.value);
                     trackDynamicObject(a.jbmcVarname, value);
                 }
-                if(a.jbmcVarname.endsWith("data") && a.value.contains("dynamic_") && a.value.contains("_array")) {
+                if (a.jbmcVarname.endsWith("data") && a.value.contains("dynamic_") && a.value.contains("_array")) {
                     String guess = guessVariable(a.jbmcVarname);
                     String value = cleanValue(a.value);
-                    if(guess != null) {
+                    if (guess != null) {
                         trackDynamicObject(guess, value);
                     } else {
                         trackDynamicObject(a.jbmcVarname, value);
@@ -103,13 +121,13 @@ public class TraceInformation {
                 }
             }
         }
-        for(int i = lineAssignments.size() - 1; i >= 0; --i) {
+        for (int i = lineAssignments.size() - 1; i >= 0; --i) {
             JBMCOutput.Assignment a = lineAssignments.get(i);
-            if(isRelevantValue(a.value)) {
+            if (isRelevantValue(a.value)) {
                 a.guess = guessVariable(a.jbmcVarname);
-                if(a.guess != null && a.parameterName != null) {
+                if (a.guess != null && a.parameterName != null) {
                     String method = methods.get(getStartingLineForMethodAt(a.lineNumber));
-                    if(a.parameterName.contains(method)) {
+                    if (a.parameterName.contains(method)) {
                         addRelevantVar(a.guess, a.lineNumber);
                     }
                 }
@@ -121,11 +139,11 @@ public class TraceInformation {
 
     private void addRelevantVar(String guess, int lineNumber) {
         Pair<Integer, Integer> range = getRelevantRange(lineNumber);
-        for(int i = range.fst; i <= range.snd; ++i) {
+        for (int i = range.fst; i <= range.snd; ++i) {
             try {
-                Set<String> aVs = getAssertVarsForLine(i);
-                if(aVs != null) {
-                    aVs.add(guess);
+                Set<String> assertVarsForLine = getAssertVarsForLine(i);
+                if (assertVarsForLine != null) {
+                    assertVarsForLine.add(guess);
                 }
             } catch (RuntimeException e) {
                 //thats ok in this case
@@ -134,16 +152,16 @@ public class TraceInformation {
     }
 
     private String cleanValue(String value) {
-        if(value.startsWith("&")) {
+        if (value.startsWith("&")) {
             value = value.substring(1);
         }
-        if(value.startsWith("(") && value.endsWith(")")) {
+        if (value.startsWith("(") && value.endsWith(")")) {
             value = value.substring(1, value.length() - 1);
         }
-        if(value.startsWith("(void *)")){
+        if (value.startsWith("(void *)")) {
             value = value.substring(8);
         }
-        if(value.endsWith("[0L]")) {
+        if (value.endsWith("[0L]")) {
             value = value.substring(0, value.length() - 4);
         }
         return value;
@@ -151,27 +169,27 @@ public class TraceInformation {
 
 
     private static boolean isRelevantValue(String value) {
-        if(value.contains("@class_identifier")) {
+        if (value.contains("@class_identifier")) {
             return false;
         }
         return !value.contains("{");
-        //if(value.contains("dynamic")) {
-            //return false;
+        //if (value.contains("dynamic")) {
+        //return false;
         //}
     }
 
     private static boolean isRelevant(Set<String> relevantVars, String guess) {
-        if(guess == null) {
+        if (guess == null) {
             return false;
         }
-        for(String s : relevantVars) {
-            if(s.equals(guess)) {
+        for (String s : relevantVars) {
+            if (s.equals(guess)) {
                 return true;
             }
-            if(guess.contains("[") && guess.substring(0, guess.indexOf("[")).equals(s)) {
+            if (guess.contains("[") && guess.substring(0, guess.indexOf("[")).equals(s)) {
                 return true;
             }
-            if(guess.contains(".") && guess.substring(0, guess.indexOf(".")).equals(s)) {
+            if (guess.contains(".") && guess.substring(0, guess.indexOf(".")).equals(s)) {
                 return true;
             }
         }
@@ -179,11 +197,11 @@ public class TraceInformation {
     }
 
     public String guessVariable(String lhs) {
-        if(lhs == null) {
+        if (lhs == null) {
             return null;
         }
-        for(String s : ignoredVars) {
-            if(lhs.contains(s)) {
+        for (String s : ignoredVars) {
+            if (lhs.contains(s)) {
                 return null;
             }
         }
@@ -194,8 +212,8 @@ public class TraceInformation {
             res = applyObjectMap(res);
         }
 
-        for(String s : ignoredVars) {
-            if(res.contains(s)) {
+        for (String s : ignoredVars) {
+            if (res.contains(s)) {
                 return null;
             }
         }
@@ -205,27 +223,27 @@ public class TraceInformation {
 
     private String applyExpressionMap(String lhs) {
         String res = lhs;
-        for(String s : expressionMap.keySet()) {
+        for (String s : expressionMap.keySet()) {
             res = res.replace(s, expressionMap.get(s));
         }
         return res;
     }
 
     private String applyObjectMap(String lhs) {
-        if(lhs.contains(".")) {
+        if (lhs.contains(".")) {
             String object = objectMap.get(lhs.substring(0, lhs.indexOf(".")));
-            if(object == null) {
+            if (object == null) {
                 return lhs;
             }
             return lhs.replace(lhs.substring(0, lhs.indexOf(".")), object);
         }
-        if(lhs.contains("[")) {
+        if (lhs.contains("[")) {
             String object = objectMap.get(lhs.substring(0, lhs.indexOf("[")));
-            if(object == null) {
+            if (object == null) {
                 return lhs;
             }
-            if(object.endsWith(".data")) {
-                return lhs.replace(lhs.substring(0, lhs.indexOf("[")), object.substring(0, object.length()-5));
+            if (object.endsWith(".data")) {
+                return lhs.replace(lhs.substring(0, lhs.indexOf("[")), object.substring(0, object.length() - 5));
             }
             return lhs.replace(lhs.substring(0, lhs.indexOf("[")), object);
 

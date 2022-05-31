@@ -36,7 +36,7 @@ public class WrapUtils {
           @ loop_modifies s[*], lastBreak, lastSpace;
           @*/
         while(lastSpace != -1) {
-            if(lastSpace - lastBreak > lineLength) {
+            if (lastSpace - lastBreak > lineLength) {
                 s[lastSpace] = '\n';
                 lastBreak = lastSpace;
             }
@@ -60,8 +60,8 @@ public class WrapUtils {
           @ decreases s.length - k;
           @ loop_modifies \nothing;
           @*/
-        for(int k = from; k < s.length; k++) {
-            if(s[k] == c) {
+       for (int k = from; k < s.length; k++) {
+            if (s[k] == c) {
                 return k;
             }
         }

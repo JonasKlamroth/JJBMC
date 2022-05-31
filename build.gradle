@@ -11,6 +11,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
+apply plugin: 'checkstyle'
 
 sourceCompatibility = 1.8
 test.testLogging.showStandardStreams = true
@@ -33,10 +34,25 @@ sourceSets {
       }
    }
 }
+
+checkstyle {
+    toolVersion '8.45.1';    // your choice here
+}
+
+checkstyleMain {
+    source ='src/'
+}
+
+checkstyleTest {
+    source ='test/'
+}
+
+
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
-    jcenter()
+    mavenCentral()
 }
 
 // In this section you declare the dependencies for your production and test code

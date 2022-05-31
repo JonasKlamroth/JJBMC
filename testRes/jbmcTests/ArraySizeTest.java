@@ -7,7 +7,7 @@ public class ArraySizeTest {
     //@ requires p != null && p.length == arraySize;
     //@ ensures (\forall int i; i >= 0 && i < p.length; p[i] == 3);
     public void test() {
-        for(int i = 0; i < arraySize; ++i) {
+       for (int i = 0; i < arraySize; ++i) {
             p[i] = 3;
         }
         p[arraySize - 1] = 4;

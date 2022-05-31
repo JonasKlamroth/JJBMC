@@ -1,3 +1,5 @@
+package cli;
+
 public class PrettyPrintInformation {
     String prettyPrinted;
     TraceInformation ti;

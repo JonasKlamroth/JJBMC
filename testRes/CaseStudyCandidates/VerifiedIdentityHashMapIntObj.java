@@ -490,7 +490,7 @@ public class VerifiedIdentityHashMapInt {
       @     (x == null ==> \result == 0);
       @*/
     public static /*@ pure @*/ int hash(IntObject x, int length) {
-        if(x == null) {
+        if (x == null) {
             return 0;
         }
         int h =  x.hash;

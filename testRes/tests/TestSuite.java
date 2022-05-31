@@ -102,7 +102,7 @@ public class TestSuite {
     //@ assignable privInt;
     @Verifyable
     private void returnTest() {
-        if(privInt == 0) {
+        if (privInt == 0) {
             return;
         } else {
             privInt = 0;
@@ -149,7 +149,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 11 - i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -162,7 +162,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 11 + i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -175,7 +175,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 11 + i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -188,7 +188,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 9 - i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -201,7 +201,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 10 - i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -214,7 +214,7 @@ public class TestSuite {
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
         //@ loop_modifies arr[*];
         //@ decreases 5 - i;
-        for(int i = 0; i < 10; ++i) {
+       for (int i = 0; i < 10; ++i) {
             arr[i] = i;
         }
     }
@@ -226,7 +226,7 @@ public class TestSuite {
     private void uninterpretedFunctionTest() {
         Object o = new Object();
         CProver.assume(CProver.uninterpreted_fresh(o));
-        assert(CProver.uninterpreted_fresh(o));
+        assert (CProver.uninterpreted_fresh(o));
     }*/
 
 //    @Verifyable
@@ -345,7 +345,7 @@ public class TestSuite {
     @Unwind(number = 6)
     @Verifyable
     public void havocTest5(int[] arr) {
-        for(int i = 0; i < arr.length; ++i) {
+       for (int i = 0; i < arr.length; ++i) {
             arr[i]++;
         }
     }
@@ -382,7 +382,7 @@ public class TestSuite {
     @Unwind(number = 6)
     private int testNoInvariantLoop() {
         int res = 0;
-        for(int i = 0; i < 5; i++) {
+       for (int i = 0; i < 5; i++) {
             res += i;
         }
         return res;
@@ -418,7 +418,7 @@ public class TestSuite {
 
     @Fails
     private void assertTest() {
-        //@ assert(0 > 1);
+        //@ assert (0 > 1);
     }
 
     @Fails
@@ -907,7 +907,7 @@ public class TestSuite {
     @Verifyable
     @Unwind(number = 7)
     private void oldArrayTest() {
-        for(int i = 0; i < arr.length; ++i) {
+       for (int i = 0; i < arr.length; ++i) {
             arr[i]++;
         }
     }
@@ -923,7 +923,7 @@ public class TestSuite {
           @ loop_modifies i, b[1..arr.length - 1];
           @ decreases arr.length - i;
          */
-        for(int i = 1; i < arr.length; ++i) {
+       for (int i = 1; i < arr.length; ++i) {
             b[i] = arr[i] + 1;
         }
         arr = b;
@@ -936,7 +936,7 @@ public class TestSuite {
     @Verifyable
     private int test1() {
         int res = 0;
-        for(int i = 0; i++ < 3; res = inc(res)) {
+       for (int i = 0; i++ < 3; res = inc(res)) {
         }
         return res;
     }
@@ -954,7 +954,7 @@ public class TestSuite {
 
     @Verifyable
     public boolean shortcutTest4() {
-        if(true && boolFunct(0)) {
+        if (true && boolFunct(0)) {
             return true;
         }
         return false;
@@ -1084,7 +1084,7 @@ public class TestSuite {
     private void assForLoopTest() {
         int j = 0;
         //@ loop_invariant j <= 1;
-        for(int i = 0; i < 3; ++i) {
+       for (int i = 0; i < 3; ++i) {
             j += 1;
         }
     }
@@ -1107,7 +1107,7 @@ public class TestSuite {
     //@ requires arr != null && arr.length > 0;
     //@ assignable t3;
     private void EnhancedForTest() {
-        for(int i : arr) {
+       for (int i : arr) {
             randomMeth();
         }
     }
@@ -1131,7 +1131,7 @@ public class TestSuite {
     @Verifyable
     @Unwind(number = 5)
     public void testCallInLoop(int a[]) {
-        for(int i = 0; i < a.length; ++i) {
+       for (int i = 0; i < a.length; ++i) {
             m1(a, i);
             //@ assume true;
         }

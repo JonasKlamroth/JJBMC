@@ -1,14 +1,14 @@
 import java.util.Arrays;
 public class BitSort {
     private static void sort(int[] array, int i, int from, int to) {
-        if(i < 0 || to - from <= 1) {
+        if (i < 0 || to - from <= 1) {
             return;
         }
 
         int mask = 1 << i;
         int swapPos = from;
-        for(int j = from; j < to; ++j) {
-            if((array[j] & mask) == 0 ) {
+       for (int j = from; j < to; ++j) {
+            if ((array[j] & mask) == 0 ) {
                 swap(array, j, swapPos++);
             }
         }

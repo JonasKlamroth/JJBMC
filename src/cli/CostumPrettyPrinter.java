@@ -1,14 +1,16 @@
+package cli;
+
+import Exceptions.TranslationException;
+import utils.TranslationUtils;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
-import org.jmlspecs.openjml.JmlPretty;
-import org.jmlspecs.openjml.JmlTree;
-
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashSet;
 import java.util.Set;
+import org.jmlspecs.openjml.JmlPretty;
+import org.jmlspecs.openjml.JmlTree;
 
 public class CostumPrettyPrinter extends JmlPretty {
     int currentLine = 1;
@@ -45,7 +47,7 @@ public class CostumPrettyPrinter extends JmlPretty {
     @Override
     public void visitIdent(JCTree.JCIdent tree) {
         super.visitIdent(tree);
-        if(!(tree.sym instanceof Symbol.MethodSymbol) && !tree.toString().equals("this")) {
+        if (!(tree.sym instanceof Symbol.MethodSymbol) && !tree.toString().equals("this")) {
             assertVars.add(tree.toString());
         }
     }
@@ -68,7 +70,7 @@ public class CostumPrettyPrinter extends JmlPretty {
     @Override
     public void visitVarDef(JCTree.JCVariableDecl that) {
         super.visitVarDef(that);
-        if(that.sym.owner instanceof Symbol.MethodSymbol && !that.sym.owner.name.toString().equals("<init>")) {
+        if (that.sym.owner instanceof Symbol.MethodSymbol && !that.sym.owner.name.toString().equals("<init>")) {
             return;
         }
         ti.addLineEquality(currentLine, TranslationUtils.getLineNumber(that));
@@ -76,7 +78,7 @@ public class CostumPrettyPrinter extends JmlPretty {
 
     @Override
     public void visitClassDef(JCTree.JCClassDecl tree) {
-        ti.addLineEquality(currentLine +1, TranslationUtils.getLineNumber(tree));
+        ti.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(tree));
         super.visitClassDef(tree);
     }
 
@@ -86,10 +88,10 @@ public class CostumPrettyPrinter extends JmlPretty {
             this.print("{");
             this.println();
             this.indent();
-            for(JCTree.JCStatement st : tree.getStatements()) {
+            for (JCTree.JCStatement st : tree.getStatements()) {
                 this.align();
                 this.printStat(st);
-                if(!(st instanceof JCTree.JCBlock)) {
+                if (!(st instanceof JCTree.JCBlock)) {
                     ti.addLineEquality(currentLine, TranslationUtils.getLineNumber(st));
                 }
                 this.println();

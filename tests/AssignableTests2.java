@@ -1,3 +1,7 @@
+import java.io.File;
+import translation.FunctionNameVisitor;
+import cli.CLI;
+import cli.CostumPrintStream;
 import junitparams.JUnitParamsRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -22,12 +26,12 @@ public class AssignableTests2 {
 
     public static Collection<Object[]> assignableParamter2() {
         init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests/AssignableTests2.java");
+        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "AssignableTests2.java");
     }
 
     @Test
     @junitparams.Parameters(method = "assignableParamter2")
-    public void runAssignableTests2( String classFile,String function, String unwind,  FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
+    public void runAssignableTests2(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 }

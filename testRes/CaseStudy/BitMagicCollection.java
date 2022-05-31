@@ -25,7 +25,7 @@ class BitMagicCollection {
       @*/
     public static int findMax1String(int x) {
         int k;
-        for(k = 0; x != 0; k++) {
+       for (k = 0; x != 0; k++) {
             x = x & 2*x;
         }
         return k;

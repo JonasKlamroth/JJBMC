@@ -6,13 +6,13 @@ public class jbmcTests{
 
     public void test2(){
         jbmcTests local = new jbmcTests();
-        t=CProver.nondetWithNull();
+         = Prover.nondetWithNull();
         assert local!=t;
     }
 
     public void test3(){
-        t=new jbmcTests();
-        t2=CProver.nondetWithNull();
+         = ew jbmcTests();
+        t = Prover.nondetWithNull();
         assert t2!=t;
     }
 }

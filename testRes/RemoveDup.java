@@ -45,8 +45,8 @@ class RemoveDup {
           @ decreases a.length-k + 2;
           @ loop_modifies result[*];
           @*/
-        for(int k = 0; k < a.length; k++) {
-            if(!contains(result, p, a[k])) {
+       for (int k = 0; k < a.length; k++) {
+            if (!contains(result, p, a[k])) {
                 result[p] = a[k];
                 p++;
             }
@@ -66,8 +66,8 @@ class RemoveDup {
           @ decreases a.length-i + 2;
           @ loop_modifies \nothing;
           @*/
-        for(int i = 0; i < len; i++) {
-            if(a[i] == v) {
+       for (int i = 0; i < len; i++) {
+            if (a[i] == v) {
                 return true;
             }
         }
@@ -90,7 +90,7 @@ class RemoveDup {
           @ loop_modifies result[*];
           @ decreases length - i + 2;
           @*/
-        for(int i = 0; i < length; i++) {
+       for (int i = 0; i < length; i++) {
             result[i] = a[i];
         }
         return result;

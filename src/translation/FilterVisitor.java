@@ -1,55 +1,31 @@
+package translation;
+
+import Exceptions.UnsupportedException;
 import com.sun.source.tree.AnnotatedTypeTree;
-import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ArrayAccessTree;
-import com.sun.source.tree.ArrayTypeTree;
-import com.sun.source.tree.AssertTree;
 import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.BreakTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CatchTree;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.CompoundAssignmentTree;
 import com.sun.source.tree.ConditionalExpressionTree;
 import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.EmptyStatementTree;
 import com.sun.source.tree.EnhancedForLoopTree;
 import com.sun.source.tree.ErroneousTree;
 import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.ImportTree;
-import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.IntersectionTypeTree;
-import com.sun.source.tree.LabeledStatementTree;
 import com.sun.source.tree.LambdaExpressionTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberReferenceTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.ParameterizedTypeTree;
-import com.sun.source.tree.ParenthesizedTree;
-import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.SynchronizedTree;
 import com.sun.source.tree.ThrowTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TryTree;
-import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.TypeParameterTree;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.UnionTypeTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
@@ -59,9 +35,11 @@ import org.jmlspecs.openjml.JmlTreeCopier;
 /**
  * Created by jklamroth on 2/5/19.
  *
- * This Visitor is used to implement the whitelisting apprach:
+ * <p>
+ * This Visitor is used to implement the whitelisting approach:
  * the default is that no TreeElement is supported with some exceptions like for example
  * basic types. Everything else has to overwritten in order to prevent the exception from being thrown.
+ * </p>
  */
 public class FilterVisitor extends JmlTreeCopier {
     public FilterVisitor(Context context, JmlTree.Maker maker) {
@@ -145,7 +123,7 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseSignals(JmlTree.JmlMethodClauseSignals that, Void p) {
-        if(this instanceof VerifyFunctionVisitor && ((VerifyFunctionVisitor) this).currentMethod.name.toString().equals("<init>")) {
+        if (this instanceof VerifyFunctionVisitor && ((VerifyFunctionVisitor) this).currentMethod.name.toString().equals("<init>")) {
             return super.visitJmlMethodClauseSignals(that, p);
         }
         throw new UnsupportedException(that.toString());
@@ -154,7 +132,7 @@ public class FilterVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly that, Void p) {
-        if(!that.defaultClause) {
+        if (!that.defaultClause) {
             throw new UnsupportedException(that.toString());
         } else {
             return super.visitJmlMethodClauseSigOnly(that, p);
@@ -272,10 +250,10 @@ public class FilterVisitor extends JmlTreeCopier {
     }
 
     //This should be commented our only for testing
-//    @Override
-//    public JCTree visitAssignment(AssignmentTree node, Void p) {
-//        throw new UnsupportedException(node.toString());
-//    }
+    @Override
+    public JCTree visitAssignment(AssignmentTree node, Void p) {
+        throw new UnsupportedException(node.toString());
+    }
 
     @Override
     public JCTree visitCompoundAssignment(CompoundAssignmentTree node, Void p) {
@@ -383,27 +361,27 @@ public class FilterVisitor extends JmlTreeCopier {
     }
 
     @Override
-    public JCTree visitAnnotatedType(AnnotatedTypeTree node, Void aVoid) {
+    public JCTree visitAnnotatedType(AnnotatedTypeTree node, Void unused) {
         throw new UnsupportedException(node.toString());
     }
 
     @Override
-    public JCTree visitLambdaExpression(LambdaExpressionTree node, Void aVoid) {
+    public JCTree visitLambdaExpression(LambdaExpressionTree node, Void unused) {
         throw new UnsupportedException(node.toString());
     }
 
     @Override
-    public JCTree visitMemberReference(MemberReferenceTree node, Void aVoid) {
+    public JCTree visitMemberReference(MemberReferenceTree node, Void unused) {
         throw new UnsupportedException(node.toString());
     }
 
     @Override
-    public JCTree visitUnionType(UnionTypeTree node, Void aVoid) {
+    public JCTree visitUnionType(UnionTypeTree node, Void unused) {
         throw new UnsupportedException(node.toString());
     }
 
     @Override
-    public JCTree visitIntersectionType(IntersectionTypeTree node, Void aVoid) {
+    public JCTree visitIntersectionType(IntersectionTypeTree node, Void unused) {
         throw new UnsupportedException(node.toString());
     }
 }

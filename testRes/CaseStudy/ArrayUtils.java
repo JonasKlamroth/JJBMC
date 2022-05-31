@@ -3,7 +3,7 @@ public class ArrayUtils {
       @ ensures (\forall int i; 0 <= i < array.length; array[i] == null);
       @*/
     public void setNull(Object[] array) {
-        for(int i = 0; i < array.length; ++i) {
+       for (int i = 0; i < array.length; ++i) {
             array[i] = null;
         }
     }
@@ -14,7 +14,7 @@ public class ArrayUtils {
       @ ensures (\forall int i; 0 <= i < array.length; array[i] >= 0);
       @*/
     public void addOne(int[] array) {
-        for(int i = 0; i < array.length; ++i) {
+       for (int i = 0; i < array.length; ++i) {
             array[i]++;
         }
     }
@@ -27,7 +27,7 @@ public class ArrayUtils {
       @ ensures (\forall int i; 0 <= i < array.length; array[i] >= 0);
       @*/
     public void addX(int[] array, int x) {
-        for(int i = 0; i < array.length; ++i) {
+       for (int i = 0; i < array.length; ++i) {
             array[i] += x;
         }
     }

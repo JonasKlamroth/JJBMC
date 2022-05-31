@@ -12,7 +12,7 @@ public class Shop {
         java.lang.String[] temp0 = new String[]{"Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grapefruit", "Huckleberry", "Iyokan", "Jackfruit", "Kumquat", "Lemon", "Mandarine", "Nectarine", "Orange", "Peach", "Quince", "Raspberry", "Strawberry", "Tangerine", "Ugli", "Vanilla", "Watermelon", "Ximenia", "Yuzu", "Zwetschge"};
         productNames = temp0;
         int[] tmp = new int[]{3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7, 9, 3, 2, 3, 8, 4, 6, 2, 6, 4, 3, 3};
-        assert Utils.isNonNegative(tmp);
+        assert utils.isNonNegative(tmp);
         ImmutableArray temp1 = ImmutableArray.__INIT_trampoline(tmp).__sortNonNegative_trampoline(false);
         //@ assume (true) && (temp1 != null && temp1.arr != null && Utils.isNonNegative(temp1.arr));
         //@ assume (true) && (temp1 != null && temp1.arr != null && Utils.isSorted(temp1.arr));

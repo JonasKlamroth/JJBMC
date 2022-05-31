@@ -152,8 +152,8 @@ public final class SSSS {
 
 
     public static void main(String args[]) {
-        for(int n = BASE_CASE_SIZE; n > 0; n++) {
-            if(!isValidSampleResultForLen(sample_parameters(n), n)) {
+       for (int n = BASE_CASE_SIZE; n > 0; n++) {
+            if (!isValidSampleResultForLen(sample_parameters(n), n)) {
                 throw new Error("Fails for "+n);
             }
         }

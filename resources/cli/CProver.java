@@ -2,8 +2,8 @@ package org.cprover;
 
 public final class CProver
 {
-    public static boolean enableAssume=true;
-    public static boolean enableNondet=true;
+    public static boolean enableAssume = true;
+    public static boolean enableNondet = true;
 
     public static boolean nondetBoolean()
     {
@@ -117,7 +117,7 @@ public final class CProver
 
     public static void assume(boolean condition)
     {
-        if(enableAssume && !condition)
+        if (enableAssume && !condition)
         {
             throw new RuntimeException("CProver.assume() predicate is false");
         }

@@ -53,9 +53,9 @@ public class DeutschJozsaAlgorithm {
 
         double sum0 = c[0]*c[0] + c[1] * c[1];
         double sum1 = c[2]*c[2] + c[3] * c[3];
-        if(sum0 > sum1) {
+        if (sum0 > sum1) {
             cBit = false;
-            if(sum0 == 0) {
+            if (sum0 == 0) {
                 assert false;
             }
             c = new double[]{
@@ -68,7 +68,7 @@ public class DeutschJozsaAlgorithm {
             return cBit;
         } else {
             cBit = true;
-            if(sum1 == 0) {
+            if (sum1 == 0) {
                 assert false;
             }
             c = new double[]{
@@ -96,7 +96,7 @@ public class DeutschJozsaAlgorithm {
         float[] q_6 = new float[]{(0.70710677f * (q_5[0]) + 0.70710677f * (q_5[2])),(0.70710677f * (q_5[1]) + 0.70710677f * (q_5[3])),(0.70710677f * (q_5[0]) + -0.70710677f * (q_5[2])),(0.70710677f * (q_5[1]) + -0.70710677f * (q_5[3])),};
         float dvar_1 = (q_6[0] * q_6[0]) + (q_6[1] * q_6[1]) + 0.0f;
         float dvar_2 = (q_6[2] * q_6[2]) + (q_6[3] * q_6[3]) + 0.0f;
-        if(dvar_1 < dvar_2) {
+        if (dvar_1 < dvar_2) {
             float[] q_7 = new float[]{0.0f,0.0f,(q_6[2]),(q_6[3]),};
             boolean[] c_1 = new boolean[]{false};
             q_res = q_7;
@@ -112,19 +112,19 @@ public class DeutschJozsaAlgorithm {
 
     static double sqrt(double m)
     {
-        double i=0;
+        double  = ;
         double x1,x2;
         x2 = 0;
         while( (i*i) <= m )
             i+=0.2f;
-        x1=i;
-        for(int j=0;j<5;j++)
+        x = ;
+       for (int  = ;j<5;j++)
         {
-            x2=m;
+            x = ;
             x2/=x1;
             x2+=x1;
             x2/=2;
-            x1=x2;
+            x = 2;
         }
         return x2;
     }

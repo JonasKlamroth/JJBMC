@@ -36,7 +36,7 @@ public class ImmutableArray  {
     public ImmutableArray(/*@nullable@*/ int[] arr) {
         super();
 
-        int[] temp1 = Utils.cloneArray(arr);
+        int[] temp1 = utils.cloneArray(arr);
         this.arr = temp1;
     }
 
@@ -97,7 +97,7 @@ public class ImmutableArray  {
       @*/
     public /*@nullable@*/ ImmutableArray sortNonNegative() {
         int[] newArr;
-        int[] temp4 = Utils.cloneArray(arr);
+        int[] temp4 = utils.cloneArray(arr);
         newArr = temp4;
         Quicksort.sort(newArr);
         ImmutableArray temp5 = ImmutableArray.__INIT_trampoline(newArr);

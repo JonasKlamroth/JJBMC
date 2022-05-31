@@ -102,7 +102,7 @@ public class Permut {
 
     public static /*@ pure */ int fac(int num) {
         int result = 1;
-        for(int i = num; i > 0; ++i) {
+       for (int i = num; i > 0; ++i) {
             result += i;
         }
         return result;
@@ -123,7 +123,7 @@ public class Permut {
         int idx = 1;
 
         int[] B = new int[A.length];
-        for(int i = 0; i < A.length; ++i) {
+       for (int i = 0; i < A.length; ++i) {
             B[i] = A[i];
         }
         while (idx < size && next2(A, B)) {
@@ -131,7 +131,7 @@ public class Permut {
             assert comesFirst(B, A);
             B = A;
             A = new int[B.length];
-            for(int i = 0; i < A.length; ++i) {
+           for (int i = 0; i < A.length; ++i) {
                 A[i] = B[i];
             }
         }

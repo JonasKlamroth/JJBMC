@@ -1,21 +1,31 @@
+package translation;
+
+import static com.sun.tools.javac.tree.JCTree.JCClassDecl;
+import static com.sun.tools.javac.tree.JCTree.JCExpression;
+import static com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import static org.jmlspecs.openjml.JmlTree.JmlClassDecl;
+import static org.jmlspecs.openjml.JmlTree.JmlCompilationUnit;
+import static org.jmlspecs.openjml.JmlTree.JmlMethodDecl;
+import static org.jmlspecs.openjml.JmlTree.JmlTypeClause;
+import static org.jmlspecs.openjml.JmlTree.JmlTypeClauseExpr;
+import static org.jmlspecs.openjml.JmlTree.Maker;
+
+import Exceptions.TranslationException;
+import Exceptions.UnsupportedException;
+import cli.ErrorLogger;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.jmlspecs.openjml.JmlTree;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jmlspecs.openjml.JmlTree;
 
-import static com.sun.tools.javac.tree.JCTree.*;
-import static org.jmlspecs.openjml.JmlTree.*;
 
 /**
  * Created by jklamroth on 11/13/18.
@@ -37,7 +47,7 @@ public class BaseVisitor extends FilterVisitor {
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
-        if(instance == null) {
+        if (instance == null) {
             this.instance = this;
         }
         this.context = context;
@@ -54,7 +64,7 @@ public class BaseVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlCompilationUnit(JmlCompilationUnit that, Void p) {
-        if(!used) {
+        if (!used) {
             used = true;
             JmlCompilationUnit cu = (JmlCompilationUnit) super.visitJmlCompilationUnit(that, p);
             cu.defs = cu.defs.prepend(M.Import(M.Ident(M.Name("org.cprover.CProver")), false));
@@ -68,7 +78,7 @@ public class BaseVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
-        if(that.sym.flatname.toString().contains("$")) {
+        if (that.sym.flatname.toString().contains("$")) {
             ErrorLogger.warn("Inner classes currently only copied.");
             return that;
         }
@@ -86,8 +96,8 @@ public class BaseVisitor extends FilterVisitor {
         returnExcClass.mods.flags |= 8L;
         //make it public
         returnExcClass.mods.flags |= 1L;
-        for(JmlTypeClause cl : that.typeSpecs.clauses) {
-            if(cl instanceof JmlTypeClauseExpr) {
+        for (JmlTypeClause cl : that.typeSpecs.clauses) {
+            if (cl instanceof JmlTypeClauseExpr) {
                 invariants = invariants.append(((JmlTypeClauseExpr) cl).expression);
             } else {
                 throw new UnsupportedException("Unsupported type specification: " + cl.toString());
@@ -106,7 +116,8 @@ public class BaseVisitor extends FilterVisitor {
         calledFunctions.addAll(fcv.getCalledFunctions());
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
-                if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) || (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
+                if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) ||
+                        (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                     newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                 }
             }
@@ -114,15 +125,15 @@ public class BaseVisitor extends FilterVisitor {
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
                 JCTree copy = new VerifyFunctionVisitor(context, M, this).copy(def);
-                if(copy != null) {
+                if (copy != null) {
                     newDefs = newDefs.append(copy);
                 }
-                if(!((JmlMethodDecl) def).name.toString().equals("<init>")) {
+                if (!((JmlMethodDecl) def).name.toString().equals("<init>")) {
                     newDefs = newDefs.append(def);
                 }
-            } else if(def instanceof JmlClassDecl) {
+            } else if (def instanceof JmlClassDecl) {
                 BaseVisitor bv = new BaseVisitor(context, M);
-                JmlClassDecl copiedClass = bv.copy((JmlClassDecl)def);
+                JmlClassDecl copiedClass = bv.copy((JmlClassDecl) def);
                 newDefs = newDefs.append(copiedClass);
             } else {
                 newDefs = newDefs.append(def);
@@ -152,9 +163,9 @@ public class BaseVisitor extends FilterVisitor {
     }
 
     public Symbol.MethodSymbol getMethodSymbol(String name) {
-        for(JCTree d : newDefs) {
-            if(d instanceof JCMethodDecl) {
-                if(((JCMethodDecl) d).name.toString().equals(name)) {
+        for (JCTree d : newDefs) {
+            if (d instanceof JCMethodDecl) {
+                if (((JCMethodDecl) d).name.toString().equals(name)) {
                     return ((JCMethodDecl) d).sym;
                 }
             }
