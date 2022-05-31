@@ -25,7 +25,7 @@ jobs:
       run: |
         echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
         chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
-    - uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 7.4
-        arguments: build
+    - name: run gradle
+      run: |
+        chmod +x ./gradlew
+        ./gradlew build
