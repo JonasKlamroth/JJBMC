@@ -17,13 +17,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 1.8
+    - uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.4
     - name: Copy jbmc binary
       run: |
         echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
         chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
     - name: Build with Gradle
       run: |
-        ./gradlew build
+        gradle build
