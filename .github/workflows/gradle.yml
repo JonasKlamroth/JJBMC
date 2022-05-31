@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: zulu
-        java-version: 1.8
+        java-version: 8.0.312+7
     - name: Copy jbmc binary
       run: |
         echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
