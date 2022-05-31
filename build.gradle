@@ -44,7 +44,7 @@ checkstyleMain {
 }
 
 checkstyleTest {
-    source ='test/'
+    source ='tests/'
 }
 
 
@@ -64,7 +64,7 @@ dependencies {
 
 task fatJar(type: Jar) {
     manifest {
-        attributes "Main-Class": "Main"
+        attributes "Main-Class": "cli.Main"
     }
     archiveBaseName = 'JJBMC'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -81,9 +81,14 @@ task fatJar(type: Jar) {
     }
 }
 
+task caseStudies(type: JavaExec) {
+    classpath sourceSets.test.runtimeClasspath
+    main = "casestudy.CaseStudies"
+}
+
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
         options.deprecation = true
 }
 
-mainClassName = 'Main'
+mainClassName = 'cli.Main'

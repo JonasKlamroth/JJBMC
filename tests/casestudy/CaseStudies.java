@@ -22,7 +22,14 @@ public class CaseStudies {
     private JsonObject configs = null;
     private Logger log = LogManager.getLogger(CaseStudies.class);
 
-    @Test
+    public static void main(String[] args) {
+        try {
+            new CaseStudies().runCaseStudies();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void runCaseStudies() throws Exception {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
