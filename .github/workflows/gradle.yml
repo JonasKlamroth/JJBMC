@@ -21,6 +21,8 @@ jobs:
       with:
         java-version: 1.8
     - name: Copy jbmc binary
-      run: cp JBMCbin/jbmc /usr/bin/
+      run: |
+        echo "::add-path::$GITHUB_WORKSPACE/JBMCbin"
+        chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
     - name: Build with Gradle
       run: gradle build
