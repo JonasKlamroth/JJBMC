@@ -20,13 +20,11 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 1.8
-    - uses: gradle/gradle-build-action@v2
-      with:
-        gradle-version: 7.4
     - name: Copy jbmc binary
       run: |
         echo "PATH=$GITHUB_WORKSPACE/JBMCbin" >> $GITHUB_ENV
         chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
-    - name: Build with Gradle
-      run: |
-        gradle build
+    - uses: gradle/gradle-build-action@v2
+      with:
+        gradle-version: 7.4
+        arguments: build
