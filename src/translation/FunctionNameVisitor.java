@@ -1,11 +1,11 @@
 package translation;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
 import cli.CLI;
 import cli.ErrorLogger;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,18 +18,12 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 
 public class FunctionNameVisitor extends JmlTreeScanner {
-    private static Logger log = LogManager.getLogger(FunctionNameVisitor.class);
+    private static final Logger log = LogManager.getLogger(FunctionNameVisitor.class);
     private static List<String> functionNames = new ArrayList<>();
     private static List<TestBehaviour> functionBehaviours = new ArrayList<>();
     private static List<String> unwinds = new ArrayList<>();
-    private static Map<String, List<String>> paramMap = new HashMap<>();
+    private static final Map<String, List<String>> paramMap = new HashMap<>();
     private boolean getAll = false;
-
-    public enum TestBehaviour {
-        Verifyable,
-        Fails,
-        Ignored
-    }
 
     public static List<String> getFunctionNames() {
         return functionNames;
@@ -45,6 +39,37 @@ public class FunctionNameVisitor extends JmlTreeScanner {
 
     public static List<TestBehaviour> getFunctionBehaviours() {
         return functionBehaviours;
+    }
+
+    public static void parseFile(String fileName, boolean getAll) {
+        functionNames = new ArrayList<>();
+        functionBehaviours = new ArrayList<>();
+        unwinds = new ArrayList<>();
+        try {
+            String[] args = {fileName};
+            IAPI api = Factory.makeAPI(CLI.apiArgs);
+            java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
+            int a = api.typecheck(cu);
+            //System.out.printf("a=%d", a);
+
+            Context ctx = api.context();
+            FunctionNameVisitor fnv = new FunctionNameVisitor();
+            fnv.getAll = getAll;
+            for (JmlTree.JmlCompilationUnit it : cu) {
+                //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
+                ctx.dump();
+                it.accept(fnv);
+            }
+        } catch (Exception e) {
+            if (CLI.debugMode) {
+                e.printStackTrace();
+            }
+            throw new TranslationException("Error parsing for function names.");
+        }
+    }
+
+    public static void parseFile(String fileName) {
+        parseFile(fileName, false);
     }
 
     @Override
@@ -88,12 +113,12 @@ public class FunctionNameVisitor extends JmlTreeScanner {
                 try {
                     unwinds.add(((JCTree.JCAssign) annotation.args.get(0)).rhs.toString());
                 } catch (Exception e) {
-                    log.warn("Cannot parse annotation " + annotation.toString());
+                    log.warn("Cannot parse annotation " + annotation);
                 }
             } else if (annotation.annotationType.toString().contains(".Pure")) {
                 //do nothing
             } else {
-                ErrorLogger.warn("Found unknown annotation: " + annotation.toString());
+                ErrorLogger.warn("Found unknown annotation: " + annotation);
             }
         }
         if (functionNames.size() != functionBehaviours.size()) {
@@ -102,38 +127,6 @@ public class FunctionNameVisitor extends JmlTreeScanner {
         if (functionBehaviours.size() != unwinds.size()) {
             unwinds.add(null);
         }
-    }
-
-    public static void parseFile(String fileName, boolean getAll) {
-        functionNames = new ArrayList<>();
-        functionBehaviours = new ArrayList<>();
-        unwinds = new ArrayList<>();
-        try {
-            String[] args = {fileName};
-            IAPI api = Factory.makeAPI(CLI.apiArgs);
-            java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
-            int a = api.typecheck(cu);
-            //System.out.printf("a=%d", a);
-
-            Context ctx = api.context();
-            FunctionNameVisitor fnv = new FunctionNameVisitor();
-            fnv.getAll = getAll;
-            for (JmlTree.JmlCompilationUnit it : cu) {
-                //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
-                ctx.dump();
-                it.accept(fnv);
-            }
-        } catch (Exception e) {
-            if (CLI.debugMode) {
-                e.printStackTrace();
-            }
-            throw new TranslationException("Error parsing for function names.");
-        }
-    }
-
-
-    public static void parseFile(String fileName) {
-        parseFile(fileName, false);
     }
 
     private String returnTypeString(JCTree.JCExpression rtType) {
@@ -190,5 +183,11 @@ public class FunctionNameVisitor extends JmlTreeScanner {
             }
         }
         return "V";
+    }
+
+    public enum TestBehaviour {
+        Verifyable,
+        Fails,
+        Ignored
     }
 }

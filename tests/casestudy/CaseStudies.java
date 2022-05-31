@@ -1,11 +1,10 @@
+package casestudy;
+
 import cli.CostumPrintStream;
+import cli.Main;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +12,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Test;
 
 public class CaseStudies {
     private String configString = null;
@@ -25,9 +27,9 @@ public class CaseStudies {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
         File caseStudyFolder = new File("testRes" + File.separator + "CaseStudy");
-       for (File f : caseStudyFolder.listFiles()) {
+        for (File f : caseStudyFolder.listFiles()) {
             if (f.isFile()) {
-               for (List<String> l : getConfigsForFile(f.getName())) {
+                for (List<String> l : getConfigsForFile(f.getName())) {
                     l.add(0, f.getAbsolutePath());
                     l.add(0, "-c");
                     String[] args = new String[l.size()];
@@ -58,10 +60,10 @@ public class CaseStudies {
 
     private List<List<String>> jsonToList(JsonArray arr) {
         List<List<String>> configs = new ArrayList<>();
-       for (int i = 0; i < arr.size(); ++i) {
+        for (int i = 0; i < arr.size(); ++i) {
             List<String> config = new ArrayList<>();
             JsonArray jsonConfig = (JsonArray) arr.get(i);
-           for (int j = 0; j < jsonConfig.size(); ++j) {
+            for (int j = 0; j < jsonConfig.size(); ++j) {
                 config.add(jsonConfig.get(j).getAsString());
             }
             configs.add(config);

@@ -1,4 +1,4 @@
-package Exceptions;
+package exceptions;
 
 public class UnsupportedException extends RuntimeException {
     String message = "";

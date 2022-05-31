@@ -1,15 +1,17 @@
-import java.io.File;
-import translation.FunctionNameVisitor;
+package test;
+
 import cli.CLI;
 import cli.CostumPrintStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import junitparams.JUnitParamsRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.util.Collection;
+import translation.FunctionNameVisitor;
+import utils.Utils;
 
 @RunWith(JUnitParamsRunner.class)
 public class AssignableTests2 {
@@ -31,7 +33,8 @@ public class AssignableTests2 {
 
     @Test
     @junitparams.Parameters(method = "assignableParamter2")
-    public void runAssignableTests2(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder ) throws IOException, InterruptedException {
+    public void runAssignableTests2(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour,
+                                    String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 }

@@ -1,9 +1,8 @@
 package cli;
 
-import Exceptions.TranslationException;
-import utils.TranslationUtils;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
+import exceptions.TranslationException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -11,14 +10,30 @@ import java.util.HashSet;
 import java.util.Set;
 import org.jmlspecs.openjml.JmlPretty;
 import org.jmlspecs.openjml.JmlTree;
+import utils.TranslationUtils;
 
 public class CostumPrettyPrinter extends JmlPretty {
-    int currentLine = 1;
     private final TraceInformation ti = new TraceInformation();
+    int currentLine = 1;
     private Set<String> assertVars = new HashSet<>();
 
     public CostumPrettyPrinter(Writer out, boolean sourceOutput) {
         super(out, sourceOutput);
+    }
+
+    public static PrettyPrintInformation prettyPrint(JCTree tree) {
+        try {
+            StringWriter sw = new StringWriter();
+            CostumPrettyPrinter cpp = new CostumPrettyPrinter(sw, true);
+            tree.accept(cpp);
+            //for(int key : cpp.lineMap.keySet()) {
+            //    System.out.println(key + " : " + cpp.lineMap.get(key));
+            //}
+            cpp.ti.setExpressionMap(CLI.expressionMap);
+            return new PrettyPrintInformation(sw.toString(), cpp.ti);
+        } catch (Exception var3) {
+            throw new TranslationException("Error pretty printing translated AST.");
+        }
     }
 
     @Override
@@ -102,21 +117,6 @@ public class CostumPrettyPrinter extends JmlPretty {
             this.print("}");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static PrettyPrintInformation prettyPrint(JCTree tree) {
-        try {
-            StringWriter sw = new StringWriter();
-            CostumPrettyPrinter cpp = new CostumPrettyPrinter(sw, true);
-            tree.accept(cpp);
-            //for(int key : cpp.lineMap.keySet()) {
-            //    System.out.println(key + " : " + cpp.lineMap.get(key));
-            //}
-            cpp.ti.setExpressionMap(CLI.expressionMap);
-            return new PrettyPrintInformation(sw.toString(), cpp.ti);
-        } catch (Exception var3) {
-            throw new TranslationException("Error pretty printing translated AST.");
         }
     }
 }

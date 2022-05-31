@@ -1,9 +1,28 @@
 package translation;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
-import utils.NormalizeVisitor;
-import utils.TranslationUtils;
+import static com.sun.tools.javac.tree.JCTree.JCAnnotation;
+import static com.sun.tools.javac.tree.JCTree.JCBlock;
+import static com.sun.tools.javac.tree.JCTree.JCExpression;
+import static com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
+import static com.sun.tools.javac.tree.JCTree.JCIdent;
+import static com.sun.tools.javac.tree.JCTree.JCMethodDecl;
+import static com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
+import static com.sun.tools.javac.tree.JCTree.JCModifiers;
+import static com.sun.tools.javac.tree.JCTree.JCReturn;
+import static com.sun.tools.javac.tree.JCTree.JCStatement;
+import static com.sun.tools.javac.tree.JCTree.JCTry;
+import static com.sun.tools.javac.tree.JCTree.JCTypeParameter;
+import static com.sun.tools.javac.tree.JCTree.JCVariableDecl;
+import static org.jmlspecs.openjml.JmlTree.JmlAnnotation;
+import static org.jmlspecs.openjml.JmlTree.JmlMethodClauseExpr;
+import static org.jmlspecs.openjml.JmlTree.JmlMethodClauseStoreRef;
+import static org.jmlspecs.openjml.JmlTree.JmlMethodDecl;
+import static org.jmlspecs.openjml.JmlTree.JmlMethodSpecs;
+import static org.jmlspecs.openjml.JmlTree.JmlSpecificationCase;
+import static org.jmlspecs.openjml.JmlTree.JmlStatementSpec;
+import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
+import static org.jmlspecs.openjml.JmlTree.Maker;
+
 import cli.CLI;
 import cli.ErrorLogger;
 import com.sun.source.tree.MethodTree;
@@ -15,27 +34,28 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
+import java.util.LinkedHashMap;
+import javax.lang.model.element.Modifier;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTreeUtils;
-
-import javax.lang.model.element.Modifier;
-import java.util.LinkedHashMap;
-
-import static com.sun.tools.javac.tree.JCTree.*;
-import static org.jmlspecs.openjml.JmlTree.*;
+import utils.NormalizeVisitor;
+import utils.TranslationUtils;
 
 /**
  * Created by jklamroth on 11/13/18.
  *
- * This Visitor translates methods and their translation into Java!?
+ * <p> This Visitor translates methods and their translation into Java!? </p>
  */
 public class VerifyFunctionVisitor extends FilterVisitor {
-    private final Maker M;
+    private final Maker maker;
     private final Context context;
     private final Symtab syms;
     private final JmlTreeUtils treeutils;
     private final ClassReader reader;
+    private final BaseVisitor baseVisitor;
     protected JmlMethodDecl currentMethod;
     private List<JCStatement> newStatements = List.nil();
     private List<JCStatement> combinedNewReqStatements = List.nil();
@@ -49,17 +69,14 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     //Has to perserve order (e.g. LinkedHashMap)
     private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
-    private final BaseVisitor baseVisitor;
     private List<JCExpression> currentAssignable = null;
 
-
-    public enum TranslationMode {ASSUME, ASSERT, JAVA, DEMONIC}
 
     public VerifyFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
         super(context, maker);
         baseVisitor = base;
         this.context = context;
-        this.M = Maker.instance(context);
+        this.maker = Maker.instance(context);
         this.syms = Symtab.instance(context);
         this.treeutils = JmlTreeUtils.instance(context);
         this.reader = ClassReader.instance(context);
@@ -70,7 +87,8 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
         TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
-        JmlExpressionVisitor expressionVisitor = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
+        JmlExpressionVisitor expressionVisitor =
+            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
 
         if (that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
@@ -79,11 +97,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
         } else if (that.clauseKind.name().equals("assignable")) {
-
+            //Nothing to do here
+            ;
         } else {
             throw new UnsupportedException("Unsupported clause type: " + that.clauseKind + " (" + that + ")");
         }
-        JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, M);
+        JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, maker);
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         oldVars.putAll(expressionVisitor.getOldVars());
@@ -91,14 +110,14 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if (translationMode == TranslationMode.ASSERT) {
-            JCBlock b = M.Block(0L, newStatements);
+            JCBlock b = maker.Block(0L, newStatements);
             combinedNewEnsStatements = combinedNewEnsStatements.append(b);
         } else if (translationMode == TranslationMode.ASSUME) {
-            combinedNewReqStatements = combinedNewReqStatements.append(M.Block(0L, newStatements));
+            combinedNewReqStatements = combinedNewReqStatements.append(maker.Block(0L, newStatements));
         }
         newStatements = List.nil();
         translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-        return M.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
+        return maker.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
     }
 
     @Override
@@ -127,7 +146,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCTree copy = super.visitJmlSpecificationCase(that, p);
 
         if (TranslationUtils.isPure(currentMethod)) {
-            currentAssignable = currentAssignable.append(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING));
+            currentAssignable = currentAssignable.append(maker.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING));
         }
 
         ensCases = ensCases.append(combinedNewEnsStatements);
@@ -149,7 +168,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();
         if (!(t instanceof Type.JCVoidType)) {
-            returnVar = treeutils.makeVarDef(t, M.Name("returnVar"), currentMethod.sym, TranslationUtils.getLiteralForType(t));
+            returnVar = treeutils.makeVarDef(t, maker.Name("returnVar"), currentMethod.sym, TranslationUtils.getLiteralForType(t));
             hasReturn = true;
             this.returnVar = returnVar.sym;
         } else {
@@ -157,7 +176,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
 
         if (that.mods.annotations != null) {
-           for (JCAnnotation a : that.mods.annotations) {
+            for (JCAnnotation a : that.mods.annotations) {
                 if (a instanceof JmlAnnotation) {
                     if (a.annotationType.toString().endsWith(".Pure")) {
                         ErrorLogger.warn("\"pure\" annotations a currently only translated as assignable \\nothing.");
@@ -174,8 +193,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         List<JCStatement> oldInitsInv = List.nil();
         LinkedHashMap<String, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
         for (JCExpression expression : baseVisitor.getInvariants()) {
-            expression = NormalizeVisitor.normalize(expression, context, M);
-            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVar, currentMethod);
+            expression = NormalizeVisitor.normalize(expression, context, maker);
+            JmlExpressionVisitor ev =
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVar, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVars.putAll(ev.getOldVars());
             oldInits = oldInits.appendList(ev.getOldInits());
@@ -186,8 +206,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         List<JCStatement> invariantAssume = List.nil();
         for (JCExpression expression : baseVisitor.getInvariants()) {
-            expression = NormalizeVisitor.normalize(expression, context, M);
-            JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVar, currentMethod);
+            expression = NormalizeVisitor.normalize(expression, context, maker);
+            JmlExpressionVisitor ev =
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVar, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVarsInv.putAll(ev.getOldVars());
             oldInitsInv = oldInitsInv.appendList(ev.getOldInits());
@@ -206,23 +227,14 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         oldVars.putAll(oldVarsInv);
         oldInits = oldInits.appendList(oldInitsInv);
 
-        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, M.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
-        JCExpression ty = M.at(that).Type(syms.runtimeExceptionType);
-        JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
-        JCThrow throwStmt = M.Throw(M.NewClass(null, null, ty, List.of(msg), null));
-//        JCTry reqTry = M.Try(M.Block(0L, List.from(combinedNewReqStatements)),
-//                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
-//        JCTry ensTry = M.Try(M.Block(0L, List.from(combinedNewEnsStatements)),
-//                List.of(M.Catch(catchVar, M.Block(0L, List.of(throwStmt)))), null);
-
-        JCVariableDecl catchVarb = treeutils.makeVarDef(baseVisitor.getExceptionClass().type, M.Name("ex"), currentMethod.sym, TranslationUtils.getCurrentPosition());
-
+        JCVariableDecl catchVarb =
+            treeutils.makeVarDef(baseVisitor.getExceptionClass().type, maker.Name("ex"), currentMethod.sym, TranslationUtils.getCurrentPosition());
 
         List<JCStatement> l = List.nil();
 
         JCReturn returnStmt = null;
         if (returnVar != null) {
-            returnStmt = M.Return(M.Ident(returnVar));
+            returnStmt = maker.Return(maker.Ident(returnVar));
         }
 
         List<JCStatement> body = List.nil();
@@ -248,16 +260,16 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             }
         }
 
-        JCTry bodyTry = M.Try(M.Block(0L, body),
-                List.of(
-                        M.Catch(catchVarb, M.Block(0L, List.nil()))
-                ),
-                null);
+        JCTry bodyTry = maker.Try(maker.Block(0L, body),
+            List.of(
+                maker.Catch(catchVarb, maker.Block(0L, List.nil()))
+            ),
+            null);
 
         //assume invariants if its not a constructor
         long check = that.getModifiers().flags & 8L;
         if (check == 0 && !that.getName().toString().contains("<init>")) {
-            l = l.append(M.Block(0L, invariantAssume));
+            l = l.append(maker.Block(0L, invariantAssume));
         }
 
         l = l.appendList(reqCases.get(caseIdx));
@@ -281,17 +293,17 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
         //assert invariants
         if (check == 0 && !TranslationUtils.isPure(currentMethod)) {
-            l = l.append(M.Block(0L, invariantAssert));
+            l = l.append(maker.Block(0L, invariantAssert));
         }
 
         if (CLI.doSanityCheck) {
-            l = l.append(TranslationUtils.makeAssertStatement(M.Literal(false)));
+            l = l.append(TranslationUtils.makeAssertStatement(maker.Literal(false)));
         }
         if (returnStmt != null) {
             l = l.append(returnStmt);
         }
 
-        currentMethod.body = M.Block(0L, l);
+        currentMethod.body = maker.Block(0L, l);
 
         currentMethod.methodSpecsCombined = null;
         currentMethod.cases = null;
@@ -300,24 +312,26 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
         if (!currentMethod.name.toString().equals("<init>")) {
-            currentMethod.name = M.Name(currentMethod.name.toString() + "Verf");
+            currentMethod.name = maker.Name(currentMethod.name.toString() + "Verf");
         }
         return currentMethod;
     }
 
-    private List<JCStatement> transformBody(List<JCStatement> oBody, int caseIdx, JmlMethodDecl currentMethod) {
+    private List<JCStatement> transformBody(List<JCStatement> bodyList, int caseIdx, JmlMethodDecl currentMethod) {
         List<JCExpression> currentAssignable = assCases.get(caseIdx);
         if (currentAssignable == null || currentAssignable.size() == 0) {
-            currentAssignable = List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
+            currentAssignable = List.of(maker.JmlStoreRefKeyword(JmlTokenKind.BSEVERYTHING));
         }
-        if (currentAssignable.size() == 1 && currentAssignable.get(0) instanceof JmlStoreRefKeyword && ((JmlStoreRefKeyword) currentAssignable.get(0)).token.equals(JmlTokenKind.BSNOTHING)) {
+        if (currentAssignable.size() == 1 && currentAssignable.get(0) instanceof JmlStoreRefKeyword &&
+            ((JmlStoreRefKeyword) currentAssignable.get(0)).token.equals(JmlTokenKind.BSNOTHING)) {
             currentAssignable = List.nil();
         }
         List<JCStatement> body = List.nil();
         List<JCStatement> variableDefs = List.nil();
-        for (JCStatement st : oBody) {
+        for (JCStatement st : bodyList) {
             if (!st.toString().equals("super();")) {
-                JmlExpressionVisitor ev = new JmlExpressionVisitor(context, M, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
+                JmlExpressionVisitor ev =
+                    new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
                 ev.setCurrentAssignable(currentAssignable);
                 TranslationUtils.setCurrentASTNode(st);
                 JCStatement copy = ev.copy(st);
@@ -352,8 +366,15 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         List<JCVariableDecl> params = this.copy(t.params, p);
         JCVariableDecl recvparam = (JCVariableDecl) this.copy((JCTree) t.recvparam, p);
         List<JCExpression> thrown = this.copy(t.thrown, p);
-        JCBlock body = M.Block(0L, List.nil());
+        JCBlock body = maker.Block(0L, List.nil());
         JCExpression defaultValue = (JCExpression) this.copy((JCTree) t.defaultValue, p);
-        return this.M.at(t.pos).MethodDef(mods, t.name, restype, typarams, recvparam, params, thrown, body, defaultValue);
+        return this.maker.at(t.pos).MethodDef(mods, t.name, restype, typarams, recvparam, params, thrown, body, defaultValue);
+    }
+
+    public enum TranslationMode {
+        ASSUME,
+        ASSERT,
+        JAVA,
+        DEMONIC
     }
 }

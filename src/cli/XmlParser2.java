@@ -29,11 +29,11 @@ import org.xml.sax.SAXException;
 public class XmlParser2 {
     private static final Logger log = LogManager.getLogger(XmlParser2.class);
     private static final String jbmcBanner = "\n" +
-            "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
-            "* *                 Copyright (C) 2001-2018                 * *\n" +
-            "* *              Daniel Kroening, Edmund Clarke             * *\n" +
-            "* * Carnegie Mellon University, Computer Science Department * *\n" +
-            "* *                  kroening@kroening.com                  * *";
+        "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
+        "* *                 Copyright (C) 2001-2018                 * *\n" +
+        "* *              Daniel Kroening, Edmund Clarke             * *\n" +
+        "* * Carnegie Mellon University, Computer Science Department * *\n" +
+        "* *                  kroening@kroening.com                  * *";
 
     public static JBMCOutput parse(File xmlFile, boolean printTrace, TraceInformation ti) {
         DocumentBuilder builder;
@@ -108,18 +108,18 @@ public class XmlParser2 {
                     if (propertyElemnt.getAttribute("status").equals("FAILURE")) {
 
                         Element failure = (Element) propertyElemnt
-                                .getElementsByTagName("failure")
-                                .item(0);
+                            .getElementsByTagName("failure")
+                            .item(0);
                         reason = failure.getAttribute("reason");
                         Element location = (Element) failure
-                                .getElementsByTagName("location")
-                                .item(0);
+                            .getElementsByTagName("location")
+                            .item(0);
                         if (location == null) {
                             if (propertyElemnt.getAttribute("property").contains("unwind")) {
                                 res.addProperty("Unwinding assertion",
-                                        new JBMCOutput.Trace(new ArrayList<>()),
-                                        -1,
-                                        "Try to increase the unwinding parameter.", null);
+                                    new JBMCOutput.Trace(new ArrayList<>()),
+                                    -1,
+                                    "Try to increase the unwinding parameter.", null);
                                 return res;
                             } else {
                                 throw new Exception("location was null.");
@@ -150,10 +150,10 @@ public class XmlParser2 {
                                     parameterName = assignment.getAttribute("display_name");
                                 }
                                 JBMCOutput.Assignment assignment1 = new JBMCOutput.Assignment(line,
-                                        lhs.getTextContent(),
-                                        value.getTextContent(),
-                                        null,
-                                        parameterName);
+                                    lhs.getTextContent(),
+                                    value.getTextContent(),
+                                    null,
+                                    parameterName);
                                 lineAssignments.add(assignment1);
                                 assignments.add(assignment1);
                             }
@@ -168,10 +168,10 @@ public class XmlParser2 {
                     } else {
                         if (reason.contains("assertion")) {
                             res.addProperty(propertyElemnt.getAttribute("property"),
-                                    trace,
-                                    ti.getOriginalLine(lineNumber),
-                                    reason,
-                                    ti.getAssertForLine(lineNumber));
+                                trace,
+                                ti.getOriginalLine(lineNumber),
+                                reason,
+                                ti.getAssertForLine(lineNumber));
                         } else {
                             res.addProperty(propertyElemnt.getAttribute("property"), trace, ti.getOriginalLine(lineNumber), reason, null);
                         }

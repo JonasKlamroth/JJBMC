@@ -1,8 +1,8 @@
 package tests;
 
-import TestAnnotations.Fails;
-import TestAnnotations.Unwind;
-import TestAnnotations.Verifyable;
+import testannotations.Fails;
+import testannotations.Unwind;
+import testannotations.Verifyable;
 
 /**
  * Created by jklamroth on 9/18/18.

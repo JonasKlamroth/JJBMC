@@ -1,7 +1,8 @@
-import java.io.File;
-import translation.FunctionNameVisitor;
+package test;
+
 import cli.CLI;
 import cli.CostumPrintStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import org.junit.AfterClass;
@@ -9,10 +10,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import translation.FunctionNameVisitor;
+import utils.Parallelized;
+import utils.Utils;
 
 @RunWith(Parallelized.class)
-public class AssignableTests {
-    public static final int numThreads = 8;
+public class TestSuiteTests {
+    public static final int numThreads = 16;
 
     @Parameterized.Parameter(value = 0)
     public String classFile;
@@ -37,13 +41,14 @@ public class AssignableTests {
     }
 
     @Parameterized.Parameters
-    public static Collection<Object[]> assignableParamter() {
+    public static Collection<Object[]> getParameters() {
         init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "AssignableTests.java");
+        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "TestSuite.java");
     }
 
     @Test
-    public void runAssignableTests() throws IOException, InterruptedException {
+    public void runTestSuite() throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
+
 }

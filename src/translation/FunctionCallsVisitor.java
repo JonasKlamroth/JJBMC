@@ -1,6 +1,5 @@
 package translation;
 
-import utils.TranslationUtils;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
@@ -11,17 +10,18 @@ import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
+import utils.TranslationUtils;
 
 
 /**
  * Created by jklamroth on 12/17/18.
  */
 public class FunctionCallsVisitor extends JmlTreeCopier {
-    private Set<String> calledFunctions = new HashSet<>();
-    private Set<String> specifiedFunctions = new HashSet<>();
+    JmlTree.JmlMethodDecl currentMethod = null;
+    private final Set<String> calledFunctions = new HashSet<>();
+    private final Set<String> specifiedFunctions = new HashSet<>();
     private List<JCTree.JCExpression> assignables = List.nil();
     private boolean foundNothing = false;
-    JmlTree.JmlMethodDecl currentMethod = null;
 
     public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
@@ -32,7 +32,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         if (((JCTree.JCMethodInvocation) that).meth instanceof JCTree.JCIdent) {
             calledFunctions.add(((JCTree.JCIdent) ((JCTree.JCMethodInvocation) that).meth).getName().toString());
         } else if ((((JCTree.JCMethodInvocation) that).meth instanceof JCTree.JCFieldAccess
-                && ((JCTree.JCMethodInvocation) that).meth.type.getReturnType().equals(currentMethod.sym.owner.type))) {
+            && ((JCTree.JCMethodInvocation) that).meth.type.getReturnType().equals(currentMethod.sym.owner.type))) {
             calledFunctions.add(((JCTree.JCFieldAccess) ((JCTree.JCMethodInvocation) that).meth).name.toString());
         }
         return super.visitMethodInvocation(that, p);
@@ -42,7 +42,7 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
     public JCTree visitJmlMethodClauseStoreRef(JmlTree.JmlMethodClauseStoreRef that, Void p) {
         if (that.list != null) {
             if (that.list.stream().anyMatch(loc -> loc instanceof JmlTree.JmlStoreRefKeyword
-                    && ((JmlTree.JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
+                && ((JmlTree.JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
                 foundNothing = true;
             } else {
                 for (JCTree.JCExpression e : that.list) {

@@ -1,12 +1,12 @@
 package utils;
 
-import translation.BaseVisitor;
 import com.sun.source.tree.ArrayAccessTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
+import translation.BaseVisitor;
 
 public class ReplaceVisitor extends JmlTreeCopier {
     static String oldName = null;

@@ -1,6 +1,5 @@
 package translation;
 
-import Exceptions.UnsupportedException;
 import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BreakTree;
@@ -29,6 +28,7 @@ import com.sun.source.tree.UnionTypeTree;
 import com.sun.source.tree.WildcardTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
+import exceptions.UnsupportedException;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 
@@ -250,10 +250,10 @@ public class FilterVisitor extends JmlTreeCopier {
     }
 
     //This should be commented our only for testing
-    @Override
-    public JCTree visitAssignment(AssignmentTree node, Void p) {
-        throw new UnsupportedException(node.toString());
-    }
+    //@Override
+    //public JCTree visitAssignment(AssignmentTree node, Void p) {
+    //throw new UnsupportedException(node.toString());
+    //}
 
     @Override
     public JCTree visitCompoundAssignment(CompoundAssignmentTree node, Void p) {

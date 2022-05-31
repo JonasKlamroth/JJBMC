@@ -46,8 +46,6 @@ import static org.jmlspecs.openjml.JmlTree.JmlVariableDecl;
 import static org.jmlspecs.openjml.JmlTree.JmlWhileLoop;
 import static org.jmlspecs.openjml.JmlTree.Maker;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
 import cli.CLI;
 import cli.ErrorLogger;
 import com.sun.source.tree.AssignmentTree;
@@ -79,6 +77,8 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Pair;
 import com.sun.tools.javac.util.Position;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -92,10 +92,10 @@ import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import org.jmlspecs.openjml.Utils;
-import utils.TranslationUtils;
-import utils.RangeExtractor;
 import utils.IdentVisitor;
 import utils.NormalizeVisitor;
+import utils.RangeExtractor;
+import utils.TranslationUtils;
 
 
 /**
@@ -1359,17 +1359,6 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     newStatements = newStatements.append(TranslationUtils.makeAssertStatement(cond, "Illegal assignment to " + a));
                 }
 
-                //for (JCExpression a : assignables) {
-
-                //    JCExpression cond = editAssignable(a);
-                //    cond = treeutils.makeNot(Utils.TranslationUtils.getCurrentPosition(), cond);
-                //    JCStatement ass = Utils.TranslationUtils.makeAssumeOrAssertStatement(cond, Translation.VerifyFunctionVisitor.TranslationMode.ASSERT);
-                //    Symbol.MethodSymbol sym = (Symbol.MethodSymbol)currentSymbol;
-                //   for (int i = 0; i < sym.params.length(); ++i) {
-                //        ass = Utils.TranslationUtils.replaceVarName(sym.params.get(i).name.toString(), copy.args.get(i));
-                //    }
-                //    newStatements = newStatements.append(ass);
-                //}
                 currentSymbol = oldSymbol;
             }
             copy.meth = maker.Ident(copy.meth.toString() + "Symb");

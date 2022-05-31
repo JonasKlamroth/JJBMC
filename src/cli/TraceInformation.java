@@ -1,7 +1,7 @@
 package cli;
 
-import Exceptions.TranslationException;
 import com.sun.tools.javac.util.Pair;
+import exceptions.TranslationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,23 +12,50 @@ import java.util.TreeMap;
 
 public class TraceInformation {
     private static final List<String> ignoredVars = Arrays.asList("enableAssume",
-            "enableNondet",
-            "(void *)",
-            "nondet_array_length",
-            "array_data_init",
-            "array_init_iter",
-            "new_array_item",
-            "malloc",
-            "@class_identifier",
-            "tmp",
-            "assertionsDisabled");
-
-    private Map<String, String> expressionMap = new HashMap<>();
+        "enableNondet",
+        "(void *)",
+        "nondet_array_length",
+        "array_data_init",
+        "array_init_iter",
+        "new_array_item",
+        "malloc",
+        "@class_identifier",
+        "tmp",
+        "assertionsDisabled");
     private final SortedMap<Integer, Integer> lineMap = new TreeMap<>();
     private final SortedMap<Integer, String> methods = new TreeMap<>();
     private final SortedMap<Integer, Set<String>> assertVars = new TreeMap<>();
     private final SortedMap<Integer, String> asserts = new TreeMap<>();
     private final Map<String, String> objectMap = new HashMap<>();
+    private Map<String, String> expressionMap = new HashMap<>();
+
+    private static boolean isRelevantValue(String value) {
+        if (value.contains("@class_identifier")) {
+            return false;
+        }
+        return !value.contains("{");
+        //if (value.contains("dynamic")) {
+        //return false;
+        //}
+    }
+
+    private static boolean isRelevant(Set<String> relevantVars, String guess) {
+        if (guess == null) {
+            return false;
+        }
+        for (String s : relevantVars) {
+            if (s.equals(guess)) {
+                return true;
+            }
+            if (guess.contains("[") && guess.substring(0, guess.indexOf("[")).equals(s)) {
+                return true;
+            }
+            if (guess.contains(".") && guess.substring(0, guess.indexOf(".")).equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void addLineEquality(int printed, int orig) {
         lineMap.put(printed, orig);
@@ -165,35 +192,6 @@ public class TraceInformation {
             value = value.substring(0, value.length() - 4);
         }
         return value;
-    }
-
-
-    private static boolean isRelevantValue(String value) {
-        if (value.contains("@class_identifier")) {
-            return false;
-        }
-        return !value.contains("{");
-        //if (value.contains("dynamic")) {
-        //return false;
-        //}
-    }
-
-    private static boolean isRelevant(Set<String> relevantVars, String guess) {
-        if (guess == null) {
-            return false;
-        }
-        for (String s : relevantVars) {
-            if (s.equals(guess)) {
-                return true;
-            }
-            if (guess.contains("[") && guess.substring(0, guess.indexOf("[")).equals(s)) {
-                return true;
-            }
-            if (guess.contains(".") && guess.substring(0, guess.indexOf(".")).equals(s)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public String guessVariable(String lhs) {

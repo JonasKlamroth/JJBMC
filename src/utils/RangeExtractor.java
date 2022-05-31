@@ -1,17 +1,17 @@
 package utils;
 
-import Exceptions.UnsupportedException;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
+import exceptions.UnsupportedException;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
 
 public class RangeExtractor extends JmlTreeScanner {
     private final JmlTree.Maker maker;
+    private final Symbol ident;
     private JCTree.JCExpression minResult;
     private JCTree.JCExpression maxResult;
-    private final Symbol ident;
 
     public RangeExtractor(JmlTree.Maker maker, Symbol ident) {
         this.ident = ident;

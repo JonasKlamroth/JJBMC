@@ -1,8 +1,8 @@
 package tests;
 
-import TestAnnotations.Fails;
-import TestAnnotations.Unwind;
-import TestAnnotations.Verifyable;
+import testannotations.Fails;
+import testannotations.Unwind;
+import testannotations.Verifyable;
 
 /**
  * Created by jklamroth on 1/11/19.
@@ -212,7 +212,7 @@ public class AssignableTests {
 
     //@ requires t != null;
     //@ assignable t2.*;
-    @TestAnnotations.Fails
+    @Fails
     private void assignableTest10(TestSuite t) {
         TestSuite testSuite = new TestSuite();
         testSuite = t;
@@ -603,7 +603,6 @@ public class AssignableTests {
             x = 3;
         }
     }
-}
 
     @Verifyable
     void testLoopModifiesWithInvariant() {
@@ -640,6 +639,4 @@ public class AssignableTests {
             privInt = i;
         }
     }
-
-
 }

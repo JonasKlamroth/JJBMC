@@ -1,3 +1,5 @@
+package cli;
+
 import cli.CLI;
 import cli.CostumPrintStream;
 import picocli.CommandLine;

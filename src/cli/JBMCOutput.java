@@ -16,6 +16,74 @@ public class JBMCOutput {
     public List<Trace> traces = new ArrayList<>();
     public List<Integer> lineNumbers = new ArrayList<>();
 
+    public void addProperty(String name, Trace trace, int lineNumber, String reason, String ass) {
+        properties.add(name);
+        traces.add(trace);
+        lineNumbers.add(lineNumber);
+        reasons.add(reason);
+        asserts.add(ass);
+    }
+
+    public String printTrace(String property, boolean printGuesses) {
+        StringBuilder sb = new StringBuilder();
+        int idx = properties.indexOf(property);
+        if (idx == -1) {
+            return "";
+        }
+        Trace trace = traces.get(idx);
+        if (trace == null) {
+            return "";
+        }
+
+        sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
+        trace.filterAssignments();
+        if (printGuesses) {
+            for (Assignment a : trace.assignments) {
+                if (a.guess != null) {
+                    sb.append(a + "\n");
+                }
+            }
+        }
+        if (asserts.get(idx) != null) {
+            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + asserts.get(idx) + " (" + reasons.get(idx) + ")\n");
+        } else {
+            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + reasons.get(idx) + "\n");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    public String printTrace(String property) {
+        return printTrace(property, true);
+    }
+
+    public String printErrors() {
+        StringBuilder sb = new StringBuilder();
+        for (String e : errors) {
+            sb.append(e);
+        }
+        return sb.toString();
+    }
+
+    public String printAllTraces() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : properties) {
+            sb.append(printTrace(s));
+        }
+        return sb.toString();
+    }
+
+    public String printStatus() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(proverStatus + "\n");
+        if (errors.size() > 0) {
+            for (String error : errors) {
+                sb.append(error);
+            }
+        }
+        return sb.toString();
+    }
+
     public static class Trace {
         List<Assignment> assignments;
         Set<String> relevantVars = null;
@@ -78,20 +146,12 @@ public class JBMCOutput {
         }
     }
 
-    public void addProperty(String name, Trace trace, int lineNumber, String reason, String ass) {
-        properties.add(name);
-        traces.add(trace);
-        lineNumbers.add(lineNumber);
-        reasons.add(reason);
-        asserts.add(ass);
-    }
-
     public static class Assignment {
         public String parameterName;
         public int lineNumber;
-        protected String jbmcVarname;
         public String value;
         public String guess;
+        protected String jbmcVarname;
 
         public Assignment(int line, String jbmcVarname, String value, String guess, String parameterName) {
             this.parameterName = parameterName;
@@ -113,66 +173,5 @@ public class JBMCOutput {
         public void setJbmcVarname(String jbmcVarname) {
             this.jbmcVarname = jbmcVarname;
         }
-    }
-
-
-    public String printTrace(String property, boolean printGuesses) {
-        StringBuilder sb = new StringBuilder();
-        int idx = properties.indexOf(property);
-        if (idx == -1) {
-            return "";
-        }
-        Trace trace = traces.get(idx);
-        if (trace == null) {
-            return "";
-        }
-
-        sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
-        trace.filterAssignments();
-        if (printGuesses) {
-            for (Assignment a : trace.assignments) {
-                if (a.guess != null) {
-                    sb.append(a + "\n");
-                }
-            }
-        }
-        if (asserts.get(idx) != null) {
-            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + asserts.get(idx) + " (" + reasons.get(idx) + ")\n");
-        } else {
-            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + reasons.get(idx) + "\n");
-        }
-        sb.append("\n");
-        return sb.toString();
-    }
-
-    public String printTrace(String property) {
-        return printTrace(property, true);
-    }
-
-    public String printErrors() {
-        StringBuilder sb = new StringBuilder();
-        for (String e : errors) {
-            sb.append(e);
-        }
-        return sb.toString();
-    }
-
-    public String printAllTraces() {
-        StringBuilder sb = new StringBuilder();
-        for (String s : properties) {
-            sb.append(printTrace(s));
-        }
-        return sb.toString();
-    }
-
-    public String printStatus() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(proverStatus + "\n");
-        if (errors.size() > 0) {
-            for (String error : errors) {
-                sb.append(error);
-            }
-        }
-        return sb.toString();
     }
 }

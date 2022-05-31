@@ -1,5 +1,5 @@
-import TestAnnotations.Fails;
-import TestAnnotations.Unwind;
+import testannotations.Fails;
+import testannotations.Unwind;
 
 /**
  * Created by jklamroth on 1/3/19.

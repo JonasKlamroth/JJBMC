@@ -10,8 +10,6 @@ import static org.jmlspecs.openjml.JmlTree.JmlTypeClause;
 import static org.jmlspecs.openjml.JmlTree.JmlTypeClauseExpr;
 import static org.jmlspecs.openjml.JmlTree.Maker;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
 import cli.ErrorLogger;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -19,6 +17,8 @@ import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,27 +31,27 @@ import org.jmlspecs.openjml.JmlTree;
  * Created by jklamroth on 11/13/18.
  */
 public class BaseVisitor extends FilterVisitor {
-    private static Logger log = LogManager.getLogger(BaseVisitor.class);
-    private boolean used = false;
-    private JCTree.JCClassDecl returnExcClass;
+    public static Maker M;
+    public static Context context;
+    public static BaseVisitor instance;
+    private static final Logger log = LogManager.getLogger(BaseVisitor.class);
     private final ClassReader reader;
     private final Symtab syms;
     private final Map<String, List<JCExpression>> functionsByNames = new HashMap<>();
     private final ArrayList<String> calledFunctions = new ArrayList<>();
+    private boolean used = false;
+    private JCTree.JCClassDecl returnExcClass;
     private List<JCExpression> invariants = List.nil();
-    public static Maker M;
-    public static Context context;
     private List<JCTree> newDefs;
-    public static BaseVisitor instance;
 
 
     public BaseVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
         if (instance == null) {
-            this.instance = this;
+            instance = this;
         }
-        this.context = context;
-        this.M = maker;
+        BaseVisitor.context = context;
+        M = maker;
         this.syms = Symtab.instance(context);
         this.reader = ClassReader.instance(context);
         this.reader.init(syms);
@@ -75,7 +75,6 @@ public class BaseVisitor extends FilterVisitor {
     }
 
 
-
     @Override
     public JCTree visitJmlClassDecl(JmlTree.JmlClassDecl that, Void p) {
         if (that.sym.flatname.toString().contains("$")) {
@@ -87,9 +86,9 @@ public class BaseVisitor extends FilterVisitor {
         classSymbol.completer = null;
         classSymbol.flatname = M.Name("ReturnException");
         returnExcClass = M.ClassDef(M.Modifiers(0L), M.Name("ReturnException"), List.nil(),
-                M.Type(syms.runtimeExceptionType),
-                com.sun.tools.javac.util.List.nil(),
-                com.sun.tools.javac.util.List.nil());
+            M.Type(syms.runtimeExceptionType),
+            com.sun.tools.javac.util.List.nil(),
+            com.sun.tools.javac.util.List.nil());
         returnExcClass.sym = classSymbol;
         returnExcClass.type = classSymbol.type;
         //make it static
@@ -117,7 +116,7 @@ public class BaseVisitor extends FilterVisitor {
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl) {
                 if (calledFunctions.contains(((JmlMethodDecl) def).getName().toString()) ||
-                        (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
+                    (((JmlMethodDecl) def).getName().toString().equals("<init>") && ((that.mods.flags & 1024) == 0))) {
                     newDefs = newDefs.append(new SymbFunctionVisitor(context, M, this).copy(def));
                 }
             }

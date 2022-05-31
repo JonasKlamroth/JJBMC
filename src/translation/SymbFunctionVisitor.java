@@ -24,10 +24,6 @@ import static org.jmlspecs.openjml.JmlTree.JmlStoreRefArrayRange;
 import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
 import static org.jmlspecs.openjml.JmlTree.Maker;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
-import utils.NormalizeVisitor;
-import utils.TranslationUtils;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -35,6 +31,8 @@ import com.sun.tools.javac.jvm.ClassReader;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
 import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
@@ -42,6 +40,8 @@ import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
+import utils.NormalizeVisitor;
+import utils.TranslationUtils;
 
 /**
  * Created by jklamroth on 12/10/18.

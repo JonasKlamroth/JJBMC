@@ -22,10 +22,7 @@ import static org.jmlspecs.openjml.JmlTree.JmlStoreRefArrayRange;
 import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
 import static org.jmlspecs.openjml.JmlTree.Maker;
 
-import Exceptions.TranslationException;
-import Exceptions.UnsupportedException;
 import cli.CLI;
-import translation.VerifyFunctionVisitor;
 import cli.ErrorLogger;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -36,6 +33,8 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Pair;
+import exceptions.TranslationException;
+import exceptions.UnsupportedException;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +43,7 @@ import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeCopier;
 import org.jmlspecs.openjml.JmlTreeUtils;
+import translation.VerifyFunctionVisitor;
 
 
 /**
@@ -55,10 +55,10 @@ import org.jmlspecs.openjml.JmlTreeUtils;
  */
 public class TranslationUtils {
     private static final Logger log = LogManager.getLogger(TranslationUtils.class);
+    private static final int counter = 0;
     private static Maker M;
     private static Symtab syms;
     private static JmlTreeUtils treeutils;
-    private static final int counter = 0;
     private static JmlCompilationUnit compilationUnit;
     private static int currentPosition = -1;
 

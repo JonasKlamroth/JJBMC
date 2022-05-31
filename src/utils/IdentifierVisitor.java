@@ -1,16 +1,14 @@
 package utils;
 
-import Exceptions.TranslationException;
-import translation.BaseVisitor;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
+import exceptions.TranslationException;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeScanner;
+import translation.BaseVisitor;
 
 public class IdentifierVisitor extends JmlTreeScanner {
-    private List<JCTree.JCExpression> locSets = List.nil();
-    private List<Symbol.VarSymbol> localVars = List.nil();
     private final List<JCTree.Tag> assignOps = List.of(JCTree.Tag.BITOR_ASG,
         JCTree.Tag.BITXOR_ASG,
         JCTree.Tag.BITAND_ASG,
@@ -26,6 +24,8 @@ public class IdentifierVisitor extends JmlTreeScanner {
         JCTree.Tag.PREDEC,
         JCTree.Tag.POSTINC,
         JCTree.Tag.POSTDEC);
+    private List<JCTree.JCExpression> locSets = List.nil();
+    private List<Symbol.VarSymbol> localVars = List.nil();
 
     public IdentifierVisitor() {
         super();
