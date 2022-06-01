@@ -12,7 +12,12 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
@@ -21,10 +26,21 @@ jobs:
       with:
         distribution: zulu
         java-version: 8.0.312+7
-    - name: Copy jbmc binary
+    - name: Install cbmc (linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
-        echo "PATH=$GITHUB_WORKSPACE/JBMCbin:$PATH" >> $GITHUB_ENV
-        chmod +x $GITHUB_WORKSPACE/JBMCbin/jbmc
+        curl https://github.com/diffblue/cbmc/releases/download/cbmc-5.58.1/ubuntu-20.04-cbmc-5.58.1-Linux.deb -o cbmc.deb -L
+        dpkg -i cbmc.deb
+    - name: Install cbmc (windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        curl -L -o cbmc.msi https://github.com/diffblue/cbmc/releases/download/cbmc-5.58.1/cbmc-5.58.1-win64.msi
+        msiexec /i cbmc-5.58.1-win64.msi
+        PATH="C:\Program Files\cbmc\bin";%PATH%
+    - name: Install cbmc (mac)
+      if: matrix.os == 'macos_latest'
+      run: |
+        brew install cbmc
     - uses: gradle/gradle-build-action@v2
       with:
         gradle-version: 7.4
