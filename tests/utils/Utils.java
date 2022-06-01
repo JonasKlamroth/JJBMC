@@ -107,7 +107,7 @@ public class Utils {
 
     public static void runTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
         throws IOException, InterruptedException {
-        if(behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
+        if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 

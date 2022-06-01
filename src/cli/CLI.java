@@ -436,8 +436,8 @@ public class CLI implements Runnable {
         log.info("Run jbmc for " + functionNames.size() + " functions.");
 
         for (String functionName : functionNames) {
-            if(isWindows) {
-                if(functionName.contains("()")) {
+            if (isWindows) {
+                if (functionName.contains("()")) {
                     functionName = functionName.replace("<init>", "<clinit>");
                 }
                 functionName = "\"" + functionName + "\"";
