@@ -35,7 +35,7 @@ public class CostumPrintStream extends PrintStream {
         if (!filtered) {
             String s = new String(buf, StandardCharsets.UTF_8);
             if (s.contains(File.separator + "tmp" + File.separator)) {
-                super.print(s.replaceAll(File.separator + "tmp", ""));
+                super.print(s.replace(File.separator + "tmp", ""));
             }
             if (s.contains("signals () false")) {
                 return;

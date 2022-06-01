@@ -436,8 +436,15 @@ public class CLI implements Runnable {
         log.info("Run jbmc for " + functionNames.size() + " functions.");
 
         for (String functionName : functionNames) {
+            if(isWindows) {
+                if(functionName.contains("()")) {
+                    functionName = functionName.replace("<init>", "<clinit>");
+                }
+                functionName = "\"" + functionName + "\"";
+            }
             ExecutorService executerService = Executors.newSingleThreadExecutor();
-            Runnable worker = () -> runJBMC(tmpFile, functionName, paramMap);
+            String finalFunctionName = functionName;
+            Runnable worker = () -> runJBMC(tmpFile, finalFunctionName, paramMap);
 
             final Future handler = executerService.submit(worker);
             try {
@@ -473,6 +480,7 @@ public class CLI implements Runnable {
             if (isWindows) {
                 tmp.add("cmd.exe");
                 tmp.add("/c");
+                classFile = classFile.replaceAll("\\\\", "/");
             }
             tmp.add("jbmc");
             tmp.add(classFile);
@@ -703,6 +711,7 @@ public class CLI implements Runnable {
             doSanityCheck = false;
             translateAndRunJBMC();
         }
+        System.exit(0);
     }
 
 }

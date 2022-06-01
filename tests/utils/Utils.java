@@ -107,32 +107,48 @@ public class Utils {
 
     public static void runTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
         throws IOException, InterruptedException {
-        log.info("Running test for function: " + function);
-        //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-        String[] commands;
-        if (unwind != null) {
-            log.info("unwind set to " + unwind);
-            commands = new String[] {"jbmc", classFile, "--function", function, "--unwind", unwind};
-        } else {
-            commands = new String[] {"jbmc", classFile, "--function", function};
-        }
+        if(behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
+            log.info("Running test for function: " + function);
+            //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 
-        log.info("Run jbmc with commands: " + Arrays.toString(commands));
+            List<String> commandList = new ArrayList<>();
+            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                if (function.contains("()")) {
+                    function = function.replace("<init>", "<clinit>");
+                }
+                function = "\"" + function + "\"";
+                classFile = classFile.replaceAll("\\\\", "/");
+                commandList.add("cmd.exe");
+                commandList.add("/c");
+            }
 
-        Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(commands, null, new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp"));
-        proc.waitFor();
+            commandList.add("jbmc");
+            commandList.add(classFile);
+            commandList.add("--function");
+            commandList.add(function);
+
+            if (unwind != null) {
+                commandList.add("--unwind");
+                commandList.add(unwind);
+            }
+
+            String[] commands = new String[commandList.size()];
+            commands = commandList.toArray(commands);
+
+            log.info("Run jbmc with commands: " + Arrays.toString(commands));
+
+            Runtime rt = Runtime.getRuntime();
+            Process proc = rt.exec(commands, null, new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp"));
 
 
-        BufferedReader stdInput = new BufferedReader(new
-            InputStreamReader(proc.getInputStream()));
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(proc.getInputStream()));
 
-        BufferedReader stdError = new BufferedReader(new
-            InputStreamReader(proc.getErrorStream()));
+            //BufferedReader stdError = new BufferedReader(new
+            //        InputStreamReader(proc.getErrorStream()));
 
-        String s = stdInput.readLine();
-        StringBuilder out = new StringBuilder();
-        if (s != null) {
+            String s = stdInput.readLine();
+            StringBuilder out = new StringBuilder();
             out.append("JBMC Output for file: ").append(classFile).append(" with function ").append(function).append("\n");
             while (s != null) {
                 if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
@@ -140,19 +156,14 @@ public class Utils {
                 }
                 s = stdInput.readLine();
             }
-            s = stdError.readLine();
-            while (s != null) {
-                if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                    out.append(s).append("\n");
-                }
-                s = stdError.readLine();
-            }
-            if (!filterOutput) {
-                log.info(out);
-            }
+
+            proc.waitFor();
             assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
             assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
             assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
+            if (!filterOutput) {
+                log.info(out);
+            }
         } else {
             log.warn("Function: " + function + " ignored due to missing annotation.");
         }
