@@ -158,12 +158,12 @@ public class Utils {
             }
 
             proc.waitFor();
-            assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
-            assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
-            assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
             if (!filterOutput) {
                 log.info(out);
             }
+            assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
+            assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
+            assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
         } else {
             log.warn("Function: " + function + " ignored due to missing annotation.");
         }
