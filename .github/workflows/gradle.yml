@@ -43,7 +43,6 @@ jobs:
         cd testRes
         javac CaseStudy\BubbleSort.java
         cmd.exe /c jbmc CaseStudy/BubbleSort --function CaseStudy.BubbleSort.sort --unwind 6
-      shell: cmd
     - name: Install cbmc (mac)
       if: matrix.os == 'macos-latest'
       run: |
