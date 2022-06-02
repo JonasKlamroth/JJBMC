@@ -144,11 +144,13 @@ public class Utils {
             BufferedReader stdInput = new BufferedReader(new
                     InputStreamReader(proc.getInputStream()));
 
-            //BufferedReader stdError = new BufferedReader(new
-            //        InputStreamReader(proc.getErrorStream()));
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(proc.getErrorStream()));
 
             String s = stdInput.readLine();
+            String error = stdError.readLine();
             StringBuilder out = new StringBuilder();
+            StringBuilder errOut = new StringBuilder();
             out.append("JBMC Output for file: ").append(classFile).append(" with function ").append(function).append("\n");
             while (s != null) {
                 if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
@@ -156,14 +158,20 @@ public class Utils {
                 }
                 s = stdInput.readLine();
             }
+            while (error != null) {
+                errOut.append(error).append("\n");
+                error = stdError.readLine();
+            }
 
             proc.waitFor();
             if (!filterOutput) {
                 log.info(out);
+                log.info(errOut);
             }
             assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
             assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
             assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
+
         } else {
             log.warn("Function: " + function + " ignored due to missing annotation.");
         }
