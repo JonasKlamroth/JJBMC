@@ -24,7 +24,7 @@ import translation.FunctionNameVisitor;
  * Created by jklamroth on 12/3/18.
  */
 public class Utils {
-    public static final String baseTestFolder = "testRes" + File.separator;
+    public static final String baseTestFolder = "." + File.separator + "testRes" + File.separator;
     private static Logger log = LogManager.getLogger(Utils.class);
     private static boolean keepTmpFile = true;
     private static boolean filterOutput = false;
@@ -109,6 +109,9 @@ public class Utils {
         throws IOException, InterruptedException {
         if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
+            if(Files.exists(new File(classFile + ".class").toPath())) {
+                System.out.println("Classfile not found: " + classFile);
+            }
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 
             List<String> commandList = new ArrayList<>();
@@ -138,7 +141,9 @@ public class Utils {
             log.info("Run jbmc with commands: " + Arrays.toString(commands));
 
             Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec(commands, null, new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp"));
+            File tmp = new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp");
+            System.out.println(tmp);
+            Process proc = rt.exec(commands, null, tmp);
 
 
             BufferedReader stdInput = new BufferedReader(new

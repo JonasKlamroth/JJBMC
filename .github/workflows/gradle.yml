@@ -47,5 +47,4 @@ jobs:
     #    arguments: build
     - name: run gradle
       run: |
-        gradle fatJar
-        java -jar JJBMC.jar testRes\CaseStudy\BubbleSort.java -u 6
+        gradle build
