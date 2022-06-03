@@ -46,17 +46,21 @@ jobs:
     #    gradle-version: 7.4
     #    arguments: build
     - name: run tests (windows)
+      if: matrix.os == 'windows-latest'
       run: |
         gradle testJar
         java -jar JJBMC-test.jar
     - name: run tests (unix)
+      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
       run: |
         gradle build
     - name: run sample (windows)
+      if: matrix.os == 'windows-latest'
       run: |
         gradle fatJar
         java -jar JJBMC.jar .\testRes\CaseStudy\BubbleSort.java -u 6
     - name: run sample (unix)
+      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
       run: |
         gradle fatJar
         java -jar JJBMC.jar ./testRes/CaseStudy/BubbleSort.java -u 6
