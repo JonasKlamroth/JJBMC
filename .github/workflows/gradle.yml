@@ -45,6 +45,18 @@ jobs:
     #  with:
     #    gradle-version: 7.4
     #    arguments: build
-    - name: run gradle
+    - name: run tests (windows)
       run: |
-        gradle run --args="testRes/CaseStudy/BubbleSort.java sort -u 6"
+        gradle testJar
+        java -jar JJBMC-test.jar
+    - name: run tests (unix)
+      run: |
+        gradle build
+    - name: run sample (windows)
+      run: |
+        gradle fatJar
+        java -jar JJBMC.jar .\testRes\CaseStudy\BubbleSort.java -u 6
+    - name: run sample (unix)
+      run: |
+        gradle fatJar
+        java -jar JJBMC.jar ./testRes/CaseStudy/BubbleSort.java -u 6

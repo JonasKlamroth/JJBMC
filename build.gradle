@@ -81,6 +81,31 @@ task fatJar(type: Jar) {
     }
 }
 
+task testJar(type: Jar) {
+    manifest {
+        attributes "Main-Class": "test.TestRunner"
+    }
+    archiveBaseName = 'JJBMC-test'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    sourceSets.main.output.each {
+        from it
+    }
+    sourceSets.test.output.each {
+        from it
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+    doLast {
+        copy {
+            from 'build/libs/JJBMC-test.jar'
+            into '.'
+        }
+    }
+}
+
 task caseStudies(type: JavaExec) {
     classpath sourceSets.test.runtimeClasspath
     main = "casestudy.CaseStudies"
