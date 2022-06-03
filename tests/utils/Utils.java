@@ -109,9 +109,6 @@ public class Utils {
         throws IOException, InterruptedException {
         if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
-            if (!Files.exists(new File(classFile + ".class").toPath())) {
-                System.out.println("Classfile not found: " + classFile + ".class");
-            }
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 
             List<String> commandList = new ArrayList<>();
@@ -141,9 +138,12 @@ public class Utils {
             log.info("Run jbmc with commands: " + Arrays.toString(commands));
 
             Runtime rt = Runtime.getRuntime();
-            File tmp = new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp");
-            System.out.println(tmp);
-            Process proc = rt.exec(commands, null, tmp);
+            File parentDir = new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp");
+            if (!Files.exists(new File(parentDir, classFile + ".class").toPath())) {
+                System.out.println("Classfile not found: " + new File(parentDir, classFile + ".class").toPath());
+            }
+            System.out.println(parentDir);
+            Process proc = rt.exec(commands, null, parentDir);
 
 
             BufferedReader stdInput = new BufferedReader(new
