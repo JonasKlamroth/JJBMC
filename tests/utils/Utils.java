@@ -109,7 +109,7 @@ public class Utils {
         throws IOException, InterruptedException {
         if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
-            if(Files.exists(new File(classFile + ".class").toPath())) {
+            if (Files.exists(new File(classFile + ".class").toPath())) {
                 System.out.println("Classfile not found: " + classFile);
             }
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
