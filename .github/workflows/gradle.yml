@@ -47,4 +47,4 @@ jobs:
     #    arguments: build
     - name: run gradle
       run: |
-        gradle build
+        gradle run --args="testRes/CaseStudy/BubbleSort.java sort -u 6"
