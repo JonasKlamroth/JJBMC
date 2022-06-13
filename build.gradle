@@ -111,14 +111,18 @@ task testJar(type: Jar) {
     }
 }
 
+task harshCheckstyle(type: Checkstyle) {
+    source = "src/"
+    configFile = file("${rootDir}/config/checkstyle/checkstyleHarsh.xml")
+    classpath = files()
+}
+
 task caseStudies(type: JavaExec) {
     classpath sourceSets.test.runtimeClasspath
-    main = "casestudy.CaseStudies"
+    mainClass = "casestudy.CaseStudies"
 }
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
-        options.deprecation = true
+    options.deprecation = true
 }
-
-mainClassName = 'cli.Main'
