@@ -1,3 +1,7 @@
+# JJBMC 
+![build status](https://github.com/JonasKlamroth/JJBMC/actions/workflows/gradle.yml/badge.svg)
+
+
 JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](https://www.kit.edu), which enables the software bounded model checker [JBMC](https://www.cprover.org/jbmc/) to verify contracts written in the [Java Modeling Language (JML)](http://jmlspecs.org/index.shtml). In order to run the tool, you have 3 options:
 - Build it manually.
 - Use our prebuilt docker image (notice, however, that proofs will take significantly longer in the docker version).
