@@ -63,6 +63,8 @@ dependencies {
 }
 
 task fatJar(type: Jar) {
+    dependsOn tasks.getByPath("classes")
+
     manifest {
         attributes "Main-Class": "cli.Main"
     }
@@ -82,6 +84,9 @@ task fatJar(type: Jar) {
 }
 
 task testJar(type: Jar) {
+    dependsOn tasks.getByPath("classes")
+    dependsOn tasks.getByPath("testClasses")
+
     manifest {
         attributes "Main-Class": "test.TestRunner"
     }
