@@ -47,3 +47,14 @@ java -jar JJBMC.jar testRes/BubbleSort.java -fi
 ```
 java -jar JJBMC.jar testRes/NormalHammingWeight.java -u 33
 ```
+
+## Publications
+
+### Publication introducing JJBMC:
+
+* Bernhard Beckert, Michael Kirsten, Jonas Klamroth, and Mattias Ulbrich: *[Modular Verification of JML Contracts Using Bounded Model Checking](https://formal.kastel.kit.edu/biblio/?lang=en&key=BeckertKirstenEA20)*. (in proceedings of ISOLA 2020)
+
+### Publications of research in which JJBMC was used:
+
+* Martin de Boer, Stijn de Gouw, Jonas Klamroth, Christian Jung, Mattias Ulbrich, and Alexander Weigl: *[Formal Specification and Verification of JDK’s Identity Hash Map Implementation](https://formal.kastel.kit.edu/biblio/?lang=en&key=BoerGouwKlamroth2022_1000148092)* (in proceedings of iFM 2022)
+* Jonas Klamroth, Florian Lanzinger, Wolfram Pfeifer, and Mattias Ulbrich: *[The Karlsruhe Java Verification Suite](https://formal.kastel.kit.edu/biblio/?lang=en&key=KlamrothEtAl2022)* (In The Logic of Software, Springer, 2022)
