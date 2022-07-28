@@ -93,6 +93,10 @@ public class JBMCOutput {
         }
 
         private void filterAssignments() {
+            relevantVars.addAll(CLI.relevantVars);
+            if(CLI.fullTraceRequested) {
+                relevantVars = null;
+            }
             filterAssignments(relevantVars);
         }
 
@@ -121,6 +125,7 @@ public class JBMCOutput {
             }
             trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
             trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
+            trace = trace.stream().filter(a -> !a.jbmcVarname.contains("derefd_pointer")).collect(Collectors.toList());
             List<Assignment> res = new ArrayList<>();
             int idx = 0;
             List<Assignment> group;

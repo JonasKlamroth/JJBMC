@@ -119,6 +119,12 @@ public class CLI implements Runnable {
     @Option(names = {"-h", "-help"}, usageHelp = true,
         description = "Print usage help and exit.")
     static boolean usageHelpRequested;
+    @Option(names = {"-rv", "-relevantVar"},
+       description = "Names of variables whos values should be printed in a trace. (Has to be run with -tr option)")
+    static List<String> relevantVars = new ArrayList<>();
+    @Option(names = {"-ft", "-fullTrace"}, description = "Prevents traces from being filtered for relevant variables and prints all values. " +
+        "(Has to be run with -tr option)")
+    public static boolean fullTraceRequested = false;
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
     private static Process jbmcProcess = null;
@@ -141,6 +147,8 @@ public class CLI implements Runnable {
         maxArraySize = -1;
         caseIdx = 0;
         jbmcOptions = new ArrayList<>();
+        fullTraceRequested = false;
+        relevantVars = new ArrayList<>();
     }
 
     public static String translate(File file) throws Exception {
@@ -552,6 +560,11 @@ public class CLI implements Runnable {
                 return;
             } else {
                 log.debug("JBMC terminated normally.");
+            }
+
+            if((fullTraceRequested || relevantVars.size() > 0) && !runWithTrace) {
+                runWithTrace = true;
+                log.warn("Options concerning the trace where found but not -tr option was given. \"-tr\" was automatically added.");
             }
 
             if (xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
