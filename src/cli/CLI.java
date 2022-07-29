@@ -129,7 +129,6 @@ public class CLI implements Runnable {
     private static boolean didCleanUp = false;
     private static Process jbmcProcess = null;
     private static File tmpFile;
-    private static TraceInformation traceInformation;
     private static final boolean isWindows = System.getProperty("os.name")
         .toLowerCase().startsWith("windows");
 
@@ -183,7 +182,6 @@ public class CLI implements Runnable {
                 JCTree t = rewriteAssert(it, ctx);
                 //return api.prettyPrint(t);
                 PrettyPrintInformation ppi = CostumPrettyPrinter.prettyPrint(t);
-                CLI.traceInformation = ppi.ti;
                 return ppi.prettyPrinted;
             } catch (UnsupportedException e) {
                 log.error(e.getMessage());
@@ -569,7 +567,7 @@ public class CLI implements Runnable {
 
             if (xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
                 long start1 = System.currentTimeMillis();
-                JBMCOutput output = XmlParser2.parse(xmlOutput, runWithTrace, CLI.traceInformation);
+                JBMCOutput output = XmlParser2.parse(xmlOutput, runWithTrace);
                 printOutput(output, end - start, functionName);
                 long duration = System.currentTimeMillis() - start1;
                 log.debug("Parsing xml took: " + duration + "ms.");

@@ -23,6 +23,7 @@ import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
 import static org.jmlspecs.openjml.JmlTree.Maker;
 
 import cli.CLI;
+import cli.CostumPrettyPrinter;
 import cli.ErrorLogger;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
@@ -62,6 +63,10 @@ public class TranslationUtils {
     private static JmlCompilationUnit compilationUnit;
     private static int currentPosition = -1;
 
+    private static JCTree currentEnsures = null;
+
+    private static JCTree currentAssignable = null;
+
     public static void init(Context context, JmlCompilationUnit compilationUnit) {
         TranslationUtils.M = JmlTree.Maker.instance(context);
         TranslationUtils.syms = Symtab.instance(context);
@@ -71,6 +76,14 @@ public class TranslationUtils {
 
     public static int getCurrentPosition() {
         return TranslationUtils.currentPosition;
+    }
+
+    public static void setCurrentEnsures(JCTree ensures) {
+        TranslationUtils.currentEnsures = ensures;
+    }
+
+    public static void setCurrentAssignable(JCTree assignable) {
+        TranslationUtils.currentAssignable = assignable;
     }
 
     public static void setCurrentPosition(int pos) {
@@ -90,6 +103,17 @@ public class TranslationUtils {
             M.Apply(com.sun.tools.javac.util.List.nil(), assumeFunc, largs));
     }
 
+    public static String assignablesToString(List<JCExpression> assignables) {
+        StringBuilder sb = new StringBuilder();
+        for(JCExpression e : assignables) {
+            sb.append(e.toString());
+            sb.append(", ");
+        }
+        String res = sb.toString();
+        res = res.substring(0, res.length() - 2);
+        return res;
+    }
+
 
     static List<JCTree.JCStatement> makeAssertStatementList(JCTree.JCExpression expr, String info) {
         if (CLI.splitAssertions) {
@@ -105,9 +129,13 @@ public class TranslationUtils {
             }
         }
         if (info != null) {
-            return List.of(M.at(TranslationUtils.getCurrentPosition()).Assert(expr, M.Literal(info)));
+            JCTree.JCAssert jcAssert = M.at(TranslationUtils.getCurrentPosition()).Assert(expr, M.Literal(info));
+            CostumPrettyPrinter.assertMap.put(jcAssert, currentEnsures);
+            return List.of(jcAssert);
         }
-        return List.of(M.at(TranslationUtils.getCurrentPosition()).Assert(expr, null));
+        JCTree.JCAssert jcAssert = M.at(TranslationUtils.getCurrentPosition()).Assert(expr, null);
+        CostumPrettyPrinter.assertMap.put(jcAssert, currentEnsures);
+        return List.of(jcAssert);
     }
 
     static List<JCTree.JCStatement> makeAssertStatementList(JCExpression expr) {
@@ -674,5 +702,9 @@ public class TranslationUtils {
     public static String getPackageName() {
         JCExpression packageName = compilationUnit.getPackageName();
         return packageName == null ? "" : packageName.toString();
+    }
+
+    public static JCTree getCurrentEnsures() {
+        return currentEnsures;
     }
 }

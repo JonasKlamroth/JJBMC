@@ -92,6 +92,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
         if (that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
+            TranslationUtils.setCurrentEnsures(that);
             translationMode = TranslationMode.ASSERT;
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
@@ -128,6 +129,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
         if (that.list != null) {
             currentAssignable = currentAssignable.appendList(that.list);
+            TranslationUtils.setCurrentAssignable(M.JmlMethodClauseStoreRef(that.keyword, that.clauseKind, currentAssignable));
         }
 
         return super.visitJmlMethodClauseStoreRef(that, p);

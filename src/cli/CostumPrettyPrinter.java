@@ -6,19 +6,23 @@ import exceptions.TranslationException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import org.jmlspecs.openjml.JmlPretty;
 import org.jmlspecs.openjml.JmlTree;
 import utils.TranslationUtils;
 
 public class CostumPrettyPrinter extends JmlPretty {
-    private final TraceInformation ti = new TraceInformation();
+
+    public static Map<JCTree, JCTree> assertMap = new HashMap<>();
     int currentLine = 1;
     private Set<String> assertVars = new HashSet<>();
 
     public CostumPrettyPrinter(Writer out, boolean sourceOutput) {
         super(out, sourceOutput);
+        TraceInformation.reset();
     }
 
     public static PrettyPrintInformation prettyPrint(JCTree tree) {
@@ -29,8 +33,8 @@ public class CostumPrettyPrinter extends JmlPretty {
             //for(int key : cpp.lineMap.keySet()) {
             //    System.out.println(key + " : " + cpp.lineMap.get(key));
             //}
-            cpp.ti.setExpressionMap(CLI.expressionMap);
-            return new PrettyPrintInformation(sw.toString(), cpp.ti);
+            TraceInformation.setExpressionMap(CLI.expressionMap);
+            return new PrettyPrintInformation(sw.toString());
         } catch (Exception var3) {
             throw new TranslationException("Error pretty printing translated AST.");
         }
@@ -54,8 +58,8 @@ public class CostumPrettyPrinter extends JmlPretty {
 
     @Override
     public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
-        ti.addMethod(currentLine + 1, that.getName().toString());
-        ti.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(that));
+        TraceInformation.addMethod(currentLine + 1, that.getName().toString());
+        TraceInformation.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(that));
         super.visitJmlMethodDecl(that);
     }
 
@@ -71,8 +75,12 @@ public class CostumPrettyPrinter extends JmlPretty {
     public void visitAssert(JCTree.JCAssert tree) {
         assertVars = new HashSet<>();
         super.visitAssert(tree);
-        ti.addAssertVars(currentLine, assertVars);
-        ti.addAssert(currentLine, tree.toString());
+        TraceInformation.addAssertVars(currentLine, assertVars);
+        if(tree.detail == null && assertMap.containsKey(tree) && assertMap.get(tree) != null) {
+            TraceInformation.addAssert(currentLine, assertMap.get(tree).toString());
+        } else {
+            TraceInformation.addAssert(currentLine, tree.toString());
+        }
         assertVars = new HashSet<>();
     }
 
@@ -88,12 +96,12 @@ public class CostumPrettyPrinter extends JmlPretty {
         if (that.sym.owner instanceof Symbol.MethodSymbol && !that.sym.owner.name.toString().equals("<init>")) {
             return;
         }
-        ti.addLineEquality(currentLine, TranslationUtils.getLineNumber(that));
+        TraceInformation.addLineEquality(currentLine, TranslationUtils.getLineNumber(that));
     }
 
     @Override
     public void visitClassDef(JCTree.JCClassDecl tree) {
-        ti.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(tree));
+        TraceInformation.addLineEquality(currentLine + 1, TranslationUtils.getLineNumber(tree));
         super.visitClassDef(tree);
     }
 
@@ -107,7 +115,7 @@ public class CostumPrettyPrinter extends JmlPretty {
                 this.align();
                 this.printStat(st);
                 if (!(st instanceof JCTree.JCBlock)) {
-                    ti.addLineEquality(currentLine, TranslationUtils.getLineNumber(st));
+                    TraceInformation.addLineEquality(currentLine, TranslationUtils.getLineNumber(st));
                 }
                 this.println();
             }

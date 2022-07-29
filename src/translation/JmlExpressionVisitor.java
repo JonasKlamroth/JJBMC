@@ -48,6 +48,7 @@ import static org.jmlspecs.openjml.JmlTree.Maker;
 
 import cli.CLI;
 import cli.ErrorLogger;
+import cli.TraceInformation;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.BreakTree;
@@ -501,7 +502,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     oldInits = oldInits.append(oldInit);
                 }
                 oldVars.put(arg.toString(), oldVar);
-                CLI.expressionMap.put(maker.Ident(oldVar).toString(), that.toString());
+                TraceInformation.ignoredVars.add(oldVar.name.toString());
+                //CLI.expressionMap.put(maker.Ident(oldVar).toString(), that.toString());
             } else {
                 oldVar = oldVars.get(arg.toString());
                 if (oldVar == null) {
@@ -843,6 +845,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     private List<JCStatement> assumeOrAssertAllInvs(List<JmlStatementLoop> invs, VerifyFunctionVisitor.TranslationMode mode) {
+        JCTree oldEnsures = TranslationUtils.getCurrentEnsures();
         List<JCStatement> oldNeededVars = neededVariableDefs;
         neededVariableDefs = List.nil();
         List<JCStatement> l = newStatements;
@@ -853,6 +856,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 translationMode = mode;
                 JCExpression normalized = NormalizeVisitor.normalize(((JmlStatementLoopExpr) spec).expression, context, maker);
                 JCExpression assertCopy = this.copy(normalized);
+                TranslationUtils.setCurrentEnsures(spec);
                 newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(assertCopy, mode));
             }
         }
@@ -863,6 +867,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         newStatements = l;
         translationMode = oldMode;
         neededVariableDefs = oldNeededVars;
+        TranslationUtils.setCurrentEnsures(oldEnsures);
         return res;
     }
 
@@ -921,7 +926,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         if (cond instanceof JCLiteral && ((JCLiteral) cond).getValue().equals(false)) {
             return List.nil();
         }
-        return List.of(TranslationUtils.makeAssertStatement(treeutils.makeNot(Position.NOPOS, cond), "Illegal assignment to " + expr));
+        return List.of(TranslationUtils.makeAssertStatement(treeutils.makeNot(expr.pos, cond), "Illegal assignment to " + expr +
+            " conflicting with assiganbles + " + TranslationUtils.assignablesToString(currentAssignable)));
     }
 
     public JCExpression editAssignable(JCExpression e) {
@@ -1341,7 +1347,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     JCVariableDecl saveParam = treeutils.makeVarDef(e.type, maker.Name("$$param" + paramVarCounter++), oldSymbol,
                         TranslationUtils.getLiteralForType(e.type));
                     neededVariableDefs = neededVariableDefs.append(saveParam);
-                    JCStatement assign = maker.Exec(maker.Assign(maker.Ident(saveParam), this.copy(e)));
+                    JCAssign a = maker.Assign(maker.Ident(saveParam), this.copy(e));
+                    JCStatement assign = maker.Exec(a);
+                    CLI.expressionMap.put(a.lhs.toString(), a.rhs.toString());
                     newStatements = newStatements.append(assign);
                     newargs = newargs.append(treeutils.makeIdent(TranslationUtils.getCurrentPosition(), saveParam.sym));
                 }
@@ -1356,7 +1364,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                                 "$$param" + (paramVarCounter - sym.params.length() + i), cond);
                         }
                     }
-                    newStatements = newStatements.append(TranslationUtils.makeAssertStatement(cond, "Illegal assignment to " + a));
+                    JCStatement assertion = TranslationUtils.makeAssertStatement(cond, "Illegal assignment to " + a + " conflicting with assignables " + TranslationUtils.assignablesToString(currentAssignable));
+                    assertion.pos = copy.pos;
+                    newStatements = newStatements.append(assertion);
                 }
 
                 currentSymbol = oldSymbol;
