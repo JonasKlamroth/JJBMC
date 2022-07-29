@@ -30,7 +30,7 @@ class BubbleSort {
     }
 
     /*@
-      @ requires arr != null && arr.length <= 5;
+      @ requires arr != null && arr.length <= 5 && arr.length >= 2 && arr[0] > arr[1];
       @ ensures (\forall int v; 0 <= v && v <= \result.length - 1; (\forall int w; 0 <= w && w <= v - 1; \result[w] < \result[v]));
       @ assignable arr[*];
       @*/

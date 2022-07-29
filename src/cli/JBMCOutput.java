@@ -1,8 +1,10 @@
 package cli;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,19 +39,35 @@ public class JBMCOutput {
 
         sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
         trace.filterAssignments();
+        trace.getFinalVals();
         if (printGuesses) {
-            for (Assignment a : trace.assignments) {
+            for (Assignment a : trace.filteredAssignments) {
                 if (a.guess != null) {
                     sb.append(a + "\n");
                 }
             }
         }
         if (asserts.get(idx) != null) {
-            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + asserts.get(idx) + " (" + reasons.get(idx) + ")\n");
+            String assertion = asserts.get(idx);
+            if(assertion.contains("\"Illegal assignment ")) {
+                assertion = assertion.substring(assertion.indexOf("\"") + 1, assertion.length() - 2);
+            }
+            sb.append("Fail in line " + lineNumbers.get(idx) + ": " + assertion + " (" + reasons.get(idx) + ")\n");
+            sb.append("with concrete values: " + "\n");
+            sb.append(printFinalVals(traces.get(idx)));
         } else {
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + reasons.get(idx) + "\n");
         }
         sb.append("\n");
+        return sb.toString();
+    }
+
+    private String printFinalVals(Trace trace) {
+        StringBuilder sb = new StringBuilder();
+        for(String k : trace.finalVals.keySet()) {
+            sb.append(TraceInformation.applyExpressionMap(k) + " = " + trace.finalVals.get(k));
+            sb.append("\n");
+        }
         return sb.toString();
     }
 
@@ -84,99 +102,13 @@ public class JBMCOutput {
         return sb.toString();
     }
 
-    public static class Trace {
-        List<Assignment> assignments;
-        Set<String> relevantVars = null;
 
-        public Trace(List<Assignment> assignments) {
-            this.assignments = assignments;
-        }
-
-        private void filterAssignments() {
-            relevantVars.addAll(CLI.relevantVars);
-            if(CLI.fullTraceRequested) {
-                relevantVars = null;
-            }
-            filterAssignments(relevantVars);
-        }
-
-        private boolean isRelevantVar(String var) {
-            if (var == null) {
-                return false;
-            }
-            for (String s : relevantVars) {
-                if (s.equals(var)) {
-                    return true;
-                }
-                if (var.equals("this." + s)) {
-                    return true;
-                }
-            }
-            if (var.contains("[")) {
-                return isRelevantVar(var.substring(0, var.lastIndexOf("[")));
-            }
-            return false;
-        }
-
-        private void filterAssignments(Set<String> relevantVars) {
-            List<Assignment> trace = assignments;
-            if (relevantVars != null) {
-                trace = trace.stream().filter(a -> isRelevantVar(a.guess)).collect(Collectors.toList());
-            }
-            trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
-            trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
-            trace = trace.stream().filter(a -> !a.jbmcVarname.contains("derefd_pointer")).collect(Collectors.toList());
-            List<Assignment> res = new ArrayList<>();
-            int idx = 0;
-            List<Assignment> group;
-            while (idx < trace.size()) {
-                group = new ArrayList<>();
-                group.add(trace.get(idx));
-                for (int i = idx; i < trace.size() - 1 && trace.get(i).lineNumber == trace.get(i + 1).lineNumber; ++i) {
-                    idx = i + 1;
-                    group.add(trace.get(i + 1));
-                }
-                idx++;
-                res.addAll(filterGroup(group));
-            }
-            assignments = res;
-        }
-
-        private List<Assignment> filterGroup(List<Assignment> group) {
-            LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
-            for (Assignment a : group) {
-                groupMap.put(a.guess, a);
-            }
-            return new ArrayList<>(groupMap.values());
-        }
+    private String cutArrayString(String s, int size) {
+        int pos = s.indexOf(",");
+        while (--size > 0 && pos != -1)
+            pos = s.indexOf(",", pos + 1);
+        return s.substring(0, pos - 1) + "}";
     }
 
-    public static class Assignment {
-        public String parameterName;
-        public int lineNumber;
-        public String value;
-        public String guess;
-        protected String jbmcVarname;
 
-        public Assignment(int line, String jbmcVarname, String value, String guess, String parameterName) {
-            this.parameterName = parameterName;
-            this.lineNumber = line;
-            this.setJbmcVarname(jbmcVarname);
-            this.value = value;
-            this.guess = guess;
-        }
-
-        @Override
-        public String toString() {
-            return "in line " + lineNumber + ": " + this.guess + " (" + jbmcVarname + ") = " + value;
-        }
-
-        public String getJbmcVarname() {
-            return jbmcVarname;
-        }
-
-        public void setJbmcVarname(String jbmcVarname) {
-            this.jbmcVarname = jbmcVarname;
-        }
-    }
 }

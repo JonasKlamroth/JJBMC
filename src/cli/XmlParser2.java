@@ -35,7 +35,7 @@ public class XmlParser2 {
         "* * Carnegie Mellon University, Computer Science Department * *\n" +
         "* *                  kroening@kroening.com                  * *";
 
-    public static JBMCOutput parse(File xmlFile, boolean printTrace, TraceInformation ti) {
+    public static JBMCOutput parse(File xmlFile, boolean printTrace) {
         DocumentBuilder builder;
         Document doc = null;
         try {
@@ -44,10 +44,10 @@ public class XmlParser2 {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
-        return parse(doc, printTrace, ti);
+        return parse(doc, printTrace);
     }
 
-    public static JBMCOutput parse(String xmlContent, boolean printTrace, TraceInformation ti) {
+    public static JBMCOutput parse(String xmlContent, boolean printTrace) {
         DocumentBuilder builder;
         try {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -71,13 +71,13 @@ public class XmlParser2 {
             return null;
         }
         doc.getDocumentElement().normalize();
-        return parse(doc, printTrace, ti);
+        return parse(doc, printTrace);
     }
 
-    public static JBMCOutput parse(Document xmlDoc, boolean printTrace, TraceInformation ti) {
+    public static JBMCOutput parse(Document xmlDoc, boolean printTrace) {
         JBMCOutput res = new JBMCOutput();
         try {
-            JBMCOutput.Trace trace = null;
+            Trace trace = null;
             xmlDoc.getDocumentElement().normalize();
             NodeList messageList = xmlDoc.getElementsByTagName("message");
             for (int i = 0; i < messageList.getLength(); ++i) {
@@ -117,7 +117,7 @@ public class XmlParser2 {
                         if (location == null) {
                             if (propertyElemnt.getAttribute("property").contains("unwind")) {
                                 res.addProperty("Unwinding assertion",
-                                    new JBMCOutput.Trace(new ArrayList<>()),
+                                    new Trace(new ArrayList<>()),
                                     -1,
                                     "Try to increase the unwinding parameter.", null);
                                 return res;
@@ -127,10 +127,10 @@ public class XmlParser2 {
                         } else {
                             lineNumber = Integer.parseInt(location.getAttribute("line"));
                         }
-                        Pair<Integer, Integer> relevantRange = ti.getRelevantRange(lineNumber);
+                        Pair<Integer, Integer> relevantRange = TraceInformation.getRelevantRange(lineNumber);
                         NodeList assignmentList = ((Element) propertyNode).getElementsByTagName("assignment");
-                        List<JBMCOutput.Assignment> assignments = new ArrayList<>();
-                        List<JBMCOutput.Assignment> lineAssignments = new ArrayList<>();
+                        List<Assignment> assignments = new ArrayList<>();
+                        List<Assignment> lineAssignments = new ArrayList<>();
                         int lastLine = -1;
                         for (int j = 0; j < assignmentList.getLength(); ++j) {
                             Element assignment = (Element) assignmentList.item(j);
@@ -139,9 +139,9 @@ public class XmlParser2 {
                                 Element lhs = (Element) assignment.getElementsByTagName("full_lhs").item(0);
                                 Element value = (Element) assignment.getElementsByTagName("full_lhs_value").item(0);
                                 int line = Integer.parseInt(location1.getAttribute("line"));
-                                int origLine = ti.getOriginalLine(line);
+                                //int origLine = TraceInformation.getOriginalLine(line);
                                 if (line > lastLine && line < relevantRange.snd && line >= relevantRange.fst) {
-                                    ti.provideGuesses(lineAssignments);
+                                    //trace.provideGuesses(lineAssignments);
                                     lineAssignments = new ArrayList<>();
                                     lastLine = line;
                                 }
@@ -149,7 +149,7 @@ public class XmlParser2 {
                                 if (assignment.getAttribute("assignment_type").equals("actual_parameter")) {
                                     parameterName = assignment.getAttribute("display_name");
                                 }
-                                JBMCOutput.Assignment assignment1 = new JBMCOutput.Assignment(line,
+                                Assignment assignment1 = new Assignment(line,
                                     lhs.getTextContent(),
                                     value.getTextContent(),
                                     null,
@@ -160,7 +160,7 @@ public class XmlParser2 {
                         }
                         trace = extractTrace(assignments);
                         if (reason.contains("assertion")) {
-                            trace.relevantVars = ti.getAssertVarsForLine(lineNumber);
+                            trace.relevantVars = TraceInformation.getAssertVarsForLine(lineNumber);
                         }
                     }
                     if (lineNumber < 0) {
@@ -169,11 +169,11 @@ public class XmlParser2 {
                         if (reason.contains("assertion")) {
                             res.addProperty(propertyElemnt.getAttribute("property"),
                                 trace,
-                                ti.getOriginalLine(lineNumber),
+                                TraceInformation.getOriginalLine(lineNumber),
                                 reason,
-                                ti.getAssertForLine(lineNumber));
+                                TraceInformation.getAssertForLine(lineNumber));
                         } else {
-                            res.addProperty(propertyElemnt.getAttribute("property"), trace, ti.getOriginalLine(lineNumber), reason, null);
+                            res.addProperty(propertyElemnt.getAttribute("property"), trace, TraceInformation.getOriginalLine(lineNumber), reason, null);
                         }
                     }
                 }
@@ -199,8 +199,8 @@ public class XmlParser2 {
         return res;
     }
 
-    public static JBMCOutput.Trace extractTrace(List<JBMCOutput.Assignment> assignments) {
-        return new JBMCOutput.Trace(assignments);
+    public static Trace extractTrace(List<Assignment> assignments) {
+        return new Trace(assignments);
     }
 
     private static String getOriginalName(String[] exprs, Map<String, String> exprMap) {
