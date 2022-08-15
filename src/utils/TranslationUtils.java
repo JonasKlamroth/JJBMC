@@ -104,6 +104,9 @@ public class TranslationUtils {
     }
 
     public static String assignablesToString(List<JCExpression> assignables) {
+        if (assignables.isEmpty()) {
+            return "\\nothing";
+        }
         StringBuilder sb = new StringBuilder();
         for(JCExpression e : assignables) {
             sb.append(e.toString());
