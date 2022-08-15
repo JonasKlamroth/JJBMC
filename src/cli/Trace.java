@@ -41,9 +41,9 @@ public class Trace {
         for (String s : relevantVars) {
             String[] vars = var.split("=");
             for(String v : vars) {
-                s = s.replace("this.", "");
-                v = v.replace("this.", "");
-                if (s.equals(v.trim())) {
+                s = s.replace("this.", "").trim();
+                v = v.replace("this.", "").trim();
+                if (s.equals(v) || v.startsWith(v + ".")) {
                     return true;
                 }
             }
@@ -59,7 +59,7 @@ public class Trace {
         //trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
         trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
         trace = trace.stream().filter(a -> !a.jbmcVarname.contains("derefd_pointer")).collect(Collectors.toList());
-        trace = trace.stream().filter(a -> !a.value.contains("@class_identifier")).collect(Collectors.toList());
+        //trace = trace.stream().filter(a -> !a.value.contains("@class_identifier") && !a.value.startsWith("[")).collect(Collectors.toList());
         allAssignments = trace;
         List<Assignment> res = new ArrayList<>();
         int idx = 0;
@@ -67,10 +67,12 @@ public class Trace {
         while (idx < trace.size()) {
             group = new ArrayList<>();
             group.add(trace.get(idx));
-            for (int i = idx; i < trace.size() - 1 && trace.get(i).lineNumber == trace.get(i + 1).lineNumber; ++i) {
-                idx = i + 1;
+            int newIdx = idx;
+            for (int i = idx; i < trace.size() - 1 && !TraceInformation.isActualNewLine(trace.get(idx).lineNumber, trace.get(i + 1).lineNumber); ++i) {
+                newIdx = i + 1;
                 group.add(trace.get(i + 1));
             }
+            idx = newIdx;
             provideGuesses(group);
             group = filterGroup(group);
             for(int i = 0; i < group.size(); ++i) {
@@ -135,13 +137,31 @@ public class Trace {
         }
         if (value.startsWith("{")) {
             //its an array
-            value = value.replace("{", "").replace("}", "");
+            value = value.replace("{", "");
+            value = value.substring(0, value.length() - 1);
             String[] values = value.split(",");
-            List<Object> vals = new ArrayList<>();
-            for(String val : values) {
-                vals.add(getValue(val, idx));
+            if(!values[0].trim().startsWith(".@")) {
+                //its an array
+                List<Object> vals = new ArrayList<>();
+                for (String val : values) {
+                    vals.add(getValue(val, idx));
+                }
+                return vals;
+            } else {
+                //its an object
+                Map<String, Object> vals = new HashMap<>();
+                for(String val : values) {
+                    val = val.trim();
+                    String key = val.substring(0, val.indexOf("=")).trim();
+                    key = key.replace(".", "");
+                    String innerVal = val.substring(val.indexOf("=") + 1).trim();
+
+                    if(!key.startsWith("@")) {
+                        vals.put(key, getValue(innerVal, idx));
+                    }
+                }
+                return vals;
             }
-            return vals;
         }
         //guess its a String
         return value;
@@ -169,6 +189,9 @@ public class Trace {
                 if(val instanceof ArrayList) {
                     val = performArrayUpdates(allAssignments.get(i), val, i, maxIdx);
                 }
+                if(val instanceof Map) {
+                    val = performFieldUpdates(allAssignments.get(i), val, i, maxIdx);
+                }
                 return val;
             }
         }
@@ -191,13 +214,33 @@ public class Trace {
         return valArray;
     }
 
+    private Object performFieldUpdates(Assignment assignment, Object val, int idx, int maxIdx) {
+        Map<String, Object> valMap = (Map<String, Object>)val;
+        String varName = assignment.jbmcVarname;
+        for(int i = idx; i < maxIdx; ++i) {
+            if(allAssignments.get(i).jbmcVarname.startsWith(varName + ".")) {
+                try {
+                    String s = allAssignments.get(i).jbmcVarname;
+                    String fieldName = s.substring(s.indexOf(".") + 1);
+                    if(!fieldName.startsWith("@")) {
+                        valMap.put(fieldName, getValue(allAssignments.get(i).value));
+                    }
+
+                } catch (NumberFormatException e) {}
+            }
+        }
+        return valMap;
+    }
+
     void getFinalVals() {
         for(String rv : relevantVars) {
             for(Assignment a : this.filteredAssignments) {
                 String[] vars = a.guess.split("=");
                 for(String v : vars) {
-                    if (v.trim().equals(rv)) {
-                        finalVals.put(rv, getValue(a.value));
+                    v = v.trim().replace("this.", "");
+                    rv = rv.trim().replace("this.", "");
+                    if (v.equals(rv)) {
+                        finalVals.put(rv, a.value);
                     }
                 }
             }
@@ -209,7 +252,6 @@ public class Trace {
     }
 
     public void provideGuesses(List<Assignment> lineAssignments) {
-        String t = null;
         for (int i = 0; i < lineAssignments.size(); ++i) {
             Assignment a = lineAssignments.get(i);
             if (isRelevantValue(a.value)) {

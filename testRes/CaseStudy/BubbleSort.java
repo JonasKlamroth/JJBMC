@@ -55,7 +55,7 @@ class BubbleSort {
 
 
     /*@
-      @ requires array != null && 2 <= array.length;
+      @ requires array != null;
       @ requires first < array.length && 0 <= first;
       @ requires second < array.length && 0 <= second;
       @ requires first != second;

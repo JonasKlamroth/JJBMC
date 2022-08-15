@@ -138,6 +138,11 @@ public class TraceInformation {
         return null;
     }
 
+    public static boolean isActualNewLine(int oldLine, int newLine) {
+        Pair<Integer, Integer> range = getRelevantRange(oldLine);
+        return newLine != oldLine && newLine >= range.fst && newLine < range.snd;
+    }
+
 
     private void addRelevantVar(String guess, int lineNumber) {
         Pair<Integer, Integer> range = getRelevantRange(lineNumber);
@@ -171,6 +176,7 @@ public class TraceInformation {
 
 
     public static String applyExpressionMap(String lhs) {
+        expressionMap.put("returnVar", "\\result");
         if(lhs == null) {
             return null;
         }
