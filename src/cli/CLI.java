@@ -560,7 +560,7 @@ public class CLI implements Runnable {
                 log.debug("JBMC terminated normally.");
             }
 
-            if((fullTraceRequested || relevantVars.size() > 0) && !runWithTrace) {
+            if ((fullTraceRequested || relevantVars.size() > 0) && !runWithTrace) {
                 runWithTrace = true;
                 log.warn("Options concerning the trace where found but not -tr option was given. \"-tr\" was automatically added.");
             }

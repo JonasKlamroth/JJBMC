@@ -35,12 +35,12 @@ public class Trace {
         if (var == null) {
             return false;
         }
-        if(var.startsWith("(") && var.endsWith(")")) {
+        if (var.startsWith("(") && var.endsWith(")")) {
             return false;
         }
         for (String s : relevantVars) {
             String[] vars = var.split("=");
-            for(String v : vars) {
+            for (String v : vars) {
                 s = s.replace("this.", "").trim();
                 v = v.replace("this.", "").trim();
                 if (s.equals(v) || v.startsWith(v + ".")) {
@@ -68,19 +68,22 @@ public class Trace {
             group = new ArrayList<>();
             group.add(trace.get(idx));
             int newIdx = idx;
-            for (int i = idx; i < trace.size() - 1 && !TraceInformation.isActualNewLine(trace.get(idx).lineNumber, trace.get(i + 1).lineNumber); ++i) {
+            for (int i = idx; i < trace.size() - 1 &&
+                !TraceInformation.isActualNewLine(trace.get(idx).lineNumber, trace.get(i + 1).lineNumber); ++i) {
                 newIdx = i + 1;
                 group.add(trace.get(i + 1));
             }
             idx = newIdx;
             provideGuesses(group);
             group = filterGroup(group);
-            for(int i = 0; i < group.size(); ++i) {
-                if (i + 2  + CLI.maxArraySize < group.size() && group.get(i + 1).jbmcVarname.endsWith(".length") && group.get(i + 2).jbmcVarname.endsWith(".data")) {
+            for (int i = 0; i < group.size(); ++i) {
+                if (i + 2  + CLI.maxArraySize < group.size() &&
+                    group.get(i + 1).jbmcVarname.endsWith(".length") &&
+                    group.get(i + 2).jbmcVarname.endsWith(".data")) {
                     //this is a combined array assignment
                     group.get(i).value = getValue(group.get(i).value, idx).toString();
 
-                    for(int j = 0; j < CLI.maxArraySize + 2; ++j) {
+                    for (int j = 0; j < CLI.maxArraySize + 2; ++j) {
                         group.remove(i + 1);
                     }
                 } else {
@@ -99,34 +102,34 @@ public class Trace {
     }
 
     private Object getValue(String value, int idx) {
-        if(value.equals("null")) {
+        if (value.equals("null")) {
             return "null";
         }
         try {
             int val = Integer.parseInt(value);
             return val;
-        } catch (NumberFormatException _) {
+        } catch (NumberFormatException e) {
             //this may happen
         }
         try {
             float val = Float.parseFloat(value);
             return val;
-        } catch (NumberFormatException _) {
+        } catch (NumberFormatException e) {
             //this may happen
         }
         try {
             long val = Long.parseLong(value);
             return val;
-        } catch (NumberFormatException _) {
+        } catch (NumberFormatException e) {
             //this may happen
         }
         try {
             double val = Double.parseDouble(value);
             return val;
-        } catch (NumberFormatException _) {
+        } catch (NumberFormatException e) {
             //this may happen
         }
-        if(value.equals("true")) {
+        if (value.equals("true")) {
             return true;
         }
         if (value.equals("false")) {
@@ -140,7 +143,7 @@ public class Trace {
             value = value.replace("{", "");
             value = value.substring(0, value.length() - 1);
             String[] values = value.split(",");
-            if(!values[0].trim().startsWith(".@")) {
+            if (!values[0].trim().startsWith(".@")) {
                 //its an array
                 List<Object> vals = new ArrayList<>();
                 for (String val : values) {
@@ -150,13 +153,13 @@ public class Trace {
             } else {
                 //its an object
                 Map<String, Object> vals = new HashMap<>();
-                for(String val : values) {
+                for (String val : values) {
                     val = val.trim();
                     String key = val.substring(0, val.indexOf("=")).trim();
                     key = key.replace(".", "");
                     String innerVal = val.substring(val.indexOf("=") + 1).trim();
 
-                    if(!key.startsWith("@")) {
+                    if (!key.startsWith("@")) {
                         vals.put(key, getValue(innerVal, idx));
                     }
                 }
@@ -183,13 +186,13 @@ public class Trace {
 
     private Object findValue(String value, int maxIdx) {
         value = value.replace("&", "");
-        for(int i = maxIdx; i >= 0; --i) {
+        for (int i = maxIdx; i >= 0; --i) {
             if (allAssignments.get(i).jbmcVarname.equals(value) || allAssignments.get(i).jbmcVarname.equals(value + ".data")) {
                 Object val = getValue(allAssignments.get(i).value, maxIdx);
-                if(val instanceof ArrayList) {
+                if (val instanceof ArrayList) {
                     val = performArrayUpdates(allAssignments.get(i), val, i, maxIdx);
                 }
-                if(val instanceof Map) {
+                if (val instanceof Map) {
                     val = performFieldUpdates(allAssignments.get(i), val, i, maxIdx);
                 }
                 return val;
@@ -199,44 +202,43 @@ public class Trace {
     }
 
     private Object performArrayUpdates(Assignment assignment, Object val, int idx, int maxIdx) {
-        ArrayList valArray = (ArrayList)val;
+        ArrayList valArray = (ArrayList) val;
         String varName = assignment.jbmcVarname;
-        for(int i = idx; i < maxIdx; ++i) {
-            if(allAssignments.get(i).jbmcVarname.startsWith(varName + "[")) {
+        for (int i = idx; i < maxIdx; ++i) {
+            if (allAssignments.get(i).jbmcVarname.startsWith(varName + "[")) {
                 try {
                     String s = allAssignments.get(i).jbmcVarname;
                     int index = Integer.parseInt(s.substring(s.indexOf("[") + 1, s.indexOf("]") - 1));
                     valArray.set(index, getValue(allAssignments.get(i).value));
 
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("Error parsing the trace.");
+                }
             }
         }
         return valArray;
     }
 
     private Object performFieldUpdates(Assignment assignment, Object val, int idx, int maxIdx) {
-        Map<String, Object> valMap = (Map<String, Object>)val;
+        Map<String, Object> valMap = (Map<String, Object>) val;
         String varName = assignment.jbmcVarname;
-        for(int i = idx; i < maxIdx; ++i) {
-            if(allAssignments.get(i).jbmcVarname.startsWith(varName + ".")) {
-                try {
-                    String s = allAssignments.get(i).jbmcVarname;
-                    String fieldName = s.substring(s.indexOf(".") + 1);
-                    if(!fieldName.startsWith("@")) {
-                        valMap.put(fieldName, getValue(allAssignments.get(i).value));
-                    }
-
-                } catch (NumberFormatException e) {}
+        for (int i = idx; i < maxIdx; ++i) {
+            if (allAssignments.get(i).jbmcVarname.startsWith(varName + ".")) {
+                String s = allAssignments.get(i).jbmcVarname;
+                String fieldName = s.substring(s.indexOf(".") + 1);
+                if (!fieldName.startsWith("@")) {
+                    valMap.put(fieldName, getValue(allAssignments.get(i).value));
+                }
             }
         }
         return valMap;
     }
 
     void getFinalVals() {
-        for(String rv : relevantVars) {
-            for(Assignment a : this.filteredAssignments) {
+        for (String rv : relevantVars) {
+            for (Assignment a : this.filteredAssignments) {
                 String[] vars = a.guess.split("=");
-                for(String v : vars) {
+                for (String v : vars) {
                     v = v.trim().replace("this.", "");
                     rv = rv.trim().replace("this.", "");
                     if (v.equals(rv)) {
@@ -277,7 +279,7 @@ public class Trace {
                 if (a.guess != null && a.parameterName != null) {
                     String method = TraceInformation.getMethod(TraceInformation.getStartingLineForMethodAt(a.lineNumber));
                     if (a.parameterName.contains(method)) {
-                        if(!a.guess.isEmpty()) {
+                        if (!a.guess.isEmpty()) {
                             relevantVars.add(a.guess);
                         }
                     }
@@ -308,7 +310,7 @@ public class Trace {
                 return lhs;
             }
             String res = lhs.replace(lhs.substring(0, lhs.indexOf(".")), object);
-            if(res.endsWith(".data")) {
+            if (res.endsWith(".data")) {
                 return res.substring(0, res.length() - 5);
             }
             return res;
@@ -325,7 +327,7 @@ public class Trace {
 
         }
         String object = getObjectName(lhs);
-        if(object != null) {
+        if (object != null) {
             return applyObjectMap(object);
         }
         return lhs;
@@ -355,19 +357,19 @@ public class Trace {
         //res = TraceInformation.applyExpressionMap(res);
         String tmpRes = res;
         String rest = "";
-        if(tmpRes.contains("[")) {
+        if (tmpRes.contains("[")) {
             rest = tmpRes.substring(tmpRes.indexOf("["));
             tmpRes = tmpRes.substring(0, tmpRes.indexOf("["));
         }
         String object = reverseObjectMap.get(tmpRes);
-        if(object != null) {
+        if (object != null) {
             res = "";
             for (Map.Entry<String, String> k : reverseObjectMap.entrySet()) {
                 if (k.getValue().equals(object) && relevantVars.contains(k.getKey())) {
                     res += k.getKey() + " = ";
                 }
             }
-            if(!res.isEmpty()) {
+            if (!res.isEmpty()) {
                 res = res.substring(0, res.length() - 3);
             }
         }

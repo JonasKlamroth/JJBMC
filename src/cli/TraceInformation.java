@@ -177,7 +177,7 @@ public class TraceInformation {
 
     public static String applyExpressionMap(String lhs) {
         expressionMap.put("returnVar", "\\result");
-        if(lhs == null) {
+        if (lhs == null) {
             return null;
         }
         String res = lhs;
