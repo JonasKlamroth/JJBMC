@@ -49,7 +49,7 @@ public class JBMCOutput {
         }
         if (asserts.get(idx) != null) {
             String assertion = asserts.get(idx);
-            if(assertion.contains("\"Illegal assignment ")) {
+            if (assertion.contains("\"Illegal assignment ")) {
                 assertion = assertion.substring(assertion.indexOf("\"") + 1, assertion.length() - 2);
             }
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + assertion + " (" + reasons.get(idx) + ")\n");
