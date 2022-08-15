@@ -16,7 +16,7 @@ public class Trace {
     private Object noValue = new Object();
     List<Assignment> filteredAssignments;
     List<Assignment> allAssignments;
-    Set<String> relevantVars = null;
+    Set<String> relevantVars = new HashSet<>();
     private final Map<String, String> objectMap = new HashMap<>();
     private final Map<String, String> reverseObjectMap = new HashMap<>();
 
