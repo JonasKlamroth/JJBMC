@@ -102,6 +102,7 @@ public class Trace {
     }
 
     private Object getValue(String value, int idx) {
+        value = value.trim();
         if (value.equals("null")) {
             return "null";
         }
@@ -176,6 +177,7 @@ public class Trace {
     }
 
     private List<Assignment> filterGroup(List<Assignment> group) {
+        group = group.stream().filter(a -> !a.value.contains("dynamic_object")).collect(Collectors.toList());
         LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
         for (Assignment a : group) {
             groupMap.put(a.guess, a);
@@ -371,6 +373,8 @@ public class Trace {
             }
             if (!res.isEmpty()) {
                 res = res.substring(0, res.length() - 3);
+            } else {
+                return null;
             }
         }
         return res + rest;
