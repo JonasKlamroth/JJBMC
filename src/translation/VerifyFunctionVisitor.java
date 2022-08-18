@@ -63,7 +63,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private List<List<JCStatement>> reqCases = List.nil();
     private List<List<JCStatement>> ensCases = List.nil();
     private List<List<JCExpression>> assCases = List.nil();
-    private Symbol returnVar = null;
+    private Symbol returnVarSym = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     //Has to perserve order (e.g. LinkedHashMap)
@@ -88,7 +88,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor =
-            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
+            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVarSym, currentMethod);
 
         if (that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
@@ -172,9 +172,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if (!(t instanceof Type.JCVoidType)) {
             returnVar = treeutils.makeVarDef(t, maker.Name("returnVar"), currentMethod.sym, TranslationUtils.getLiteralForType(t));
             hasReturn = true;
-            this.returnVar = returnVar.sym;
+            this.returnVarSym = returnVar.sym;
         } else {
-            this.returnVar = null;
+            this.returnVarSym = null;
         }
 
         if (that.mods.annotations != null) {
@@ -197,7 +197,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         for (JCExpression expression : baseVisitor.getInvariants()) {
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
-                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVar, currentMethod);
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVarSym, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVars.putAll(ev.getOldVars());
             oldInits = oldInits.appendList(ev.getOldInits());
@@ -210,7 +210,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         for (JCExpression expression : baseVisitor.getInvariants()) {
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
-                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVar, currentMethod);
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVarSym, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVarsInv.putAll(ev.getOldVars());
             oldInitsInv = oldInitsInv.appendList(ev.getOldInits());
@@ -288,7 +288,13 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if (returnVar != null) {
             l = l.append(returnVar);
         }
-        l = l.append(bodyTry);
+
+        //if its a constructor the body may not be wrapped in a try because of the initialization of final fields
+        if (!that.getName().toString().contains("<init>")) {
+            l = l.append(bodyTry);
+        } else {
+            l = l.appendList(body);
+        }
 
 
         l = l.appendList(ensCases.get(caseIdx));
@@ -333,7 +339,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         for (JCStatement st : bodyList) {
             if (!st.toString().equals("super();")) {
                 JmlExpressionVisitor ev =
-                    new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, this.returnVar, currentMethod);
+                    new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, this.returnVarSym, currentMethod);
                 ev.setCurrentAssignable(currentAssignable);
                 TranslationUtils.setCurrentASTNode(st);
                 JCStatement copy = ev.copy(st);
