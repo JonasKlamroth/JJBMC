@@ -10,6 +10,7 @@ import testannotations.Verifyable;
 public class TestSuite {
     class UnusedClassForTestingPurpose {}
     private int privInt = 0;
+    private final int finalVar;
     public int pubInt;
     TestSuite t2;
     TestSuite t3;
@@ -24,7 +25,9 @@ public class TestSuite {
     }
 
     @Verifyable
-    public TestSuite() {}
+    public TestSuite() {
+        this.finalVar = 0;
+    }
 
     //@ ensures pubInt == i;
     @Verifyable
