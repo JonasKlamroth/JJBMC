@@ -13,20 +13,24 @@ public final class BMCTree {
       @*/
 
     /*@ private invariant
-      @ tree.length + 1 == sorted_splitters.length;
+      @ tree.length  == sorted_splitters.length + 1;
       @*/
 
     /*@ private invariant tree.length == 1 << log_buckets; */
-    /*@ private invariant log_buckets > 0 && log_buckets < tree.length; */
+    /*@ private invariant log_buckets > 1 && log_buckets <= 6; */
 
     /*@ private invariant
-      @  (\forall int i; 0 <= i < tree.length;
-      @    tree[i] == sorted_splitters[pi(i)]);
+      @  (\forall int i; 1 <= i < tree.length;
+      @    tree[i] == sorted_splitters[pi(i) - 1]);
       @*/
 
+
+
     /*@ private normal_behaviour
+      @ requires tree != null && sorted_splitters != null;
       @  requires tree.length == sorted_splitters.length + 1;
       @  requires tree.length == 1 << log_buckets;
+      @  requires log_buckets >= 0 && log_buckets <= 6;
       @*/
     public BMCTree(int[] sorted_splitters, int[] tree, int log_buckets) {
         this.sorted_splitters = sorted_splitters;
@@ -45,8 +49,7 @@ public final class BMCTree {
     /*@ pure */
     public int pi(int b) {
         int r = (2 * (b - (1 << log2(b))) + 1) * (1 << (log_buckets - 1 - log2(b)));
-        r -= 1;
-        return r >= 0 ? r : -r;
+        return r;
     }
 
     /*@ pure */
@@ -72,7 +75,7 @@ public final class BMCTree {
             b = 2 * b + (this.tree[b] < value ? 1 : 0);
         }
 
-        return b;
+        return b - (1 << this.log_buckets);
     }
 
     public static void main(String[] args) {

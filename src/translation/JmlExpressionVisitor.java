@@ -586,12 +586,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitBreak(BreakTree node, Void p) {
-        throw new TranslationException("Break-Statements are currently not supported.");
+        throw new UnsupportedException("Break-Statements are currently not supported.");
     }
 
     @Override
     public JCTree visitContinue(ContinueTree node, Void p) {
-        throw new TranslationException("Continue-Statements are currently not supported.");
+        throw new UnsupportedException("Continue-Statements are currently not supported.");
     }
 
     @Override
@@ -1403,7 +1403,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitIdentifier(IdentifierTree node, Void p) {
-        if (inConstructor && ((JCIdent) node).sym.owner != currentSymbol && !node.getName().toString().equals("this")) {
+        if (inConstructor && ((JCIdent) node).sym != null && ((JCIdent) node).sym.owner != currentSymbol &&
+            !node.getName().toString().equals("this")) {
             return maker.Select(maker.Ident(returnVar), (Name) node.getName());
         }
         return super.visitIdentifier(node, p);

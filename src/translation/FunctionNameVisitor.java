@@ -1,6 +1,7 @@
 package translation;
 
 import cli.CLI;
+import cli.CostumPrintStream;
 import cli.ErrorLogger;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
@@ -49,7 +50,9 @@ public class FunctionNameVisitor extends JmlTreeScanner {
             String[] args = {fileName};
             IAPI api = Factory.makeAPI(CLI.apiArgs);
             java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
+            CostumPrintStream.turnOff();
             int a = api.typecheck(cu);
+            CostumPrintStream.turnOn();
             //System.out.printf("a=%d", a);
 
             Context ctx = api.context();
