@@ -1,8 +1,8 @@
 class NoBranchBinarySearch {
 
-    public static final int K = 5;
+    public static final int K = 6;
 
-    /*@ public static invariant K==5;*/
+    /*@ public static invariant K==6;*/
 
 
 
@@ -21,6 +21,6 @@ class NoBranchBinarySearch {
             d >>= 1;
             b = a[b-d] < v ? b : b - d;
         }
-        return b - 1;
+        return b;
     }
 }
