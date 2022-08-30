@@ -23,7 +23,7 @@
  * questions.
  */
 
-package java.util;
+//package java.util;
 
 //import sun.misc.SharedSecrets;
 
@@ -133,9 +133,15 @@ package java.util;
  */
 
 public class VerifiedIdentityHashMap
-        //extends AbstractMap
-        //implements Map, java.io.Serializable, Cloneable {
-{
+    {
+
+    public static class IntObject {
+        public final int hash;
+
+        public IntObject(int hash) {
+            this.hash = hash;
+        }
+    }
 
     /*+KEY@ // JML specifically for KeY
       @ public invariant
@@ -209,41 +215,37 @@ public class VerifiedIdentityHashMap
       @   \dl_inInt(modCount);
       @
       @*/
-    /*+OPENJML@ // JML for non-KeY tools, i.e. JJBMC
+         /*+OPENJML@ // JML for non-KeY tools, i.e. JJBMC
       @ public invariant
       @   table != null &&
-      @   //MINIMUM_CAPACITY * 2 <= table.length  && // is no longer valid as we set min and max to 4
-      @   //MAXIMUM_CAPACITY * 2 >= table.length;
+      @   MINIMUM_CAPACITY == 4 &&
+      @   DEFAULT_CAPACITY == 4 &&
+      @   MAXIMUM_CAPACITY == 8 &&
+      @   MINIMUM_CAPACITY * 2 <= table.length  &&
+      @   MAXIMUM_CAPACITY * 2 >= table.length;
       @
       @ // For all key-value pairs: if key == null, then value == null
-      @ //public invariant
+      @ public invariant
       @   (\forall int i;
       @         0 <= i && i < table.length / 2;
       @         (table[i * 2] == null ==> table[i * 2 + 1] == null));
       @
       @ // Non-empty keys are unique
       @ public invariant
-      @   (\forall int i; 0 <= i && i < table.length / 2;
-      @       (\forall int j;
-      @       i <= j && j < table.length / 2;
-      @       (table[2*i] != null && table[2*i] == table[2*j]) ==> i == j));
+      @ (\forall int i; 0 <= i && i < table.length / 2;
+      @     (\forall int j;
+      @     i <= j && j < table.length / 2;
+      @     (table[2*i] != null && table[2*i] == table[2*j]) ==> i == j));
       @
-//      @ // Size equals the number of non-empty keys in the table
-//      @ public invariant
-//      @   size == (\num_of int i;
-//      @       0 <= i < table.length / 2;
-//      @       table[2 * i] != null);
-//      @
+      @ public invariant
+      @   threshold < MAXIMUM_CAPACITY;
+      @
       @ // Table length is a power of two
       @ public invariant
       @   (table.length & (table.length - 1)) == 0;
       @
-      @ // Table length is always an even number
-      @ public invariant
-      @   table.length % 2 == 0;
-      @
       @ // Table must have at least one empty key-element to prevent
-      @ // infinite loops when a key is not present.
+      @ // get-method from endlessly looping when a key is not present.
       @ public invariant
       @   (\exists int i;
       @       0 <= i < table.length / 2;
@@ -259,24 +261,25 @@ public class VerifiedIdentityHashMap
       @           hash(table[2*i], table.length) / 2 <= j < i;
       @           table[2*j] != null));
       @
-//      @ // There are no gaps between a key's hashed index and its actual
-//      @ // index (if the key is at a lower index than the hash code)
-//      @ public invariant
-//      @   (\forall int i;
-//      @       0 <= i < table.length / 2;
-//      @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
-//      @       (\forall int j;
-//      @           hash(table[2*i], table.length) <= 2*j < table.length || 0 <= 2*j < hash(table[2*i], table.length);
-//      @           table[2*j] != null));
-//      @
-//      @ // All keys and values are of type Object
-//      @ public invariant
-//      @   \typeof(table) == \type(Object[]);
-//      @
-//      @ // Field modCount is of type integer (limits:
-//      @ // Integer.MIN_VALUE and Integer.MAX_VALUE)
-//      @ public invariant
-//      @   \dl_inInt(modCount);
+      @ // There are no gaps between a key's hashed index and its actual
+      @ // index (if the key is at a lower index than the hash code)
+      @ public invariant
+      @   (\forall int i;
+      @       0 <= i < table.length / 2;
+      @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
+      @       (\forall int j;
+      @           hash(table[2*i], table.length) / 2 <= j < table.length / 2;
+      @           table[2*j] != null));
+      @
+      @ public invariant
+      @   (\forall int i;
+      @       0 <= i < table.length / 2;
+      @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
+      @       (\forall int j;
+      @           0 <= j < hash(table[2*i], table.length) / 2;
+      @           table[2*j] != null));
+      @
+      @
       @*/
 
     /**
@@ -285,8 +288,8 @@ public class VerifiedIdentityHashMap
      * (specified) expected maximum size of 21, given a load factor
      * of 2/3.
      */
-    private /*@ spec_public @*/ static final int DEFAULT_CAPACITY =  32; // Original code. Disable for JJBMC
-    // private /*@ spec_public @*/ static final int DEFAULT_CAPACITY =  4; // Enable for JJBMC
+    //private /*@ spec_public @*/ static final int DEFAULT_CAPACITY =  32; // Original code. Disable for JJBMC
+    private /*@ spec_public @*/ static final int DEFAULT_CAPACITY =  4; // Enable for JJBMC
 
     /**
      * The minimum capacity, used if a lower value is implicitly specified
@@ -305,13 +308,13 @@ public class VerifiedIdentityHashMap
      * because it has to have at least one slot with the key == null
      * in order to avoid infinite loops in get(), put(), remove()
      */
-    private /*@ spec_public @*/ static final int MAXIMUM_CAPACITY =  1 << 29; // Original code. Disable for JJBMC
-    // private /*@ spec_public @*/ static final int MAXIMUM_CAPACITY =  4; // Enable for JJBMC
+    //private /*@ spec_public @*/ static final int MAXIMUM_CAPACITY =  1 << 29; // Original code. Disable for JJBMC
+    private /*@ spec_public @*/ static final int MAXIMUM_CAPACITY =  8; // Enable for JJBMC
 
     /**
      * The table, resized as necessary. Length MUST always be a power of two.
      */
-    private /*@ spec_public nullable @*/ transient Object[] table;
+    public transient IntObject[] table;
 
     /**
      * The number of key-value mappings contained in this identity hash map.
@@ -325,10 +328,14 @@ public class VerifiedIdentityHashMap
      */
     private /*@ spec_public @*/ transient int modCount;
 
+
+    public transient int threshold;
+
     /**
      * Value representing null keys inside tables.
      */
-    private /*@ spec_public @*/ static final Object NULL_KEY =  new Object();
+    private /*@ spec_public @*/ static final IntObject NULL_KEY =  new IntObject(0);
+
 
     /**
      * Use NULL_KEY for key if it is null.
@@ -337,7 +344,7 @@ public class VerifiedIdentityHashMap
       @   ensures key == null ==> \result == NULL_KEY;
       @   ensures key != null ==> \result == key;
       @*/
-    private /*@ spec_public @*/ static /*@ pure @*/ Object maskNull(/*@ nullable @*/ Object key) {
+    private /*@ pure spec_public @*/ static IntObject maskNull(/*@ nullable @*/ IntObject key) {
         return (key == null ? NULL_KEY : key);
     }
 
@@ -348,7 +355,7 @@ public class VerifiedIdentityHashMap
       @   ensures key == NULL_KEY ==> \result == null;
       @   ensures key != NULL_KEY ==> \result == key;
       @*/
-    private /*@ spec_public @*/ static /*@ pure nullable @*/ Object unmaskNull(Object key) {
+    private /*@ pure spec_public @*/ static IntObject unmaskNull(IntObject key) {
         return (key == NULL_KEY ? null : key);
     }
 
@@ -357,7 +364,7 @@ public class VerifiedIdentityHashMap
      * maximum size (21).
      */
     /*+KEY@
-      @ public normal_behavior
+      @ private normal_behavior
       @   ensures
       @     table != null &&
       @     table.length == (\bigint)2 * DEFAULT_CAPACITY &&
@@ -393,7 +400,7 @@ public class VerifiedIdentityHashMap
     public VerifiedIdentityHashMap(int expectedMaxSize) {
         if (expectedMaxSize < 0)
             throw new IllegalArgumentException("expectedMaxSize is negative: "
-                    + expectedMaxSize);
+                + expectedMaxSize);
         init(capacity(expectedMaxSize));
     }
 
@@ -457,9 +464,9 @@ public class VerifiedIdentityHashMap
     private static /*@ pure @*/ int capacity(int expectedMaxSize) {
         // assert expectedMaxSize >= 0;
         return
-                (expectedMaxSize > MAXIMUM_CAPACITY / 3) ? MAXIMUM_CAPACITY :
-                        (expectedMaxSize <= 2 * MINIMUM_CAPACITY / 3) ? MINIMUM_CAPACITY :
-                                Integer.highestOneBit(expectedMaxSize + (expectedMaxSize << 1));
+            (expectedMaxSize > MAXIMUM_CAPACITY / 3) ? MAXIMUM_CAPACITY :
+                (expectedMaxSize <= 2 * MINIMUM_CAPACITY / 3) ? MINIMUM_CAPACITY :
+                    Integer.highestOneBit(expectedMaxSize + (expectedMaxSize << 1));
     }
 
     /**
@@ -500,7 +507,7 @@ public class VerifiedIdentityHashMap
         // assert initCapacity >= MINIMUM_CAPACITY;
         // assert initCapacity <= MAXIMUM_CAPACITY;
 
-        table = new Object[2 * initCapacity];
+        table = new IntObject[2 * initCapacity];
     }
 
     /**
@@ -508,7 +515,7 @@ public class VerifiedIdentityHashMap
      *
      * @return the number of key-value mappings in this map
      */
-    /*@ also
+    /*@
       @ public normal_behavior
       @   ensures
       @     \result == size;
@@ -524,7 +531,7 @@ public class VerifiedIdentityHashMap
      * @return <tt>true</tt> if this identity hash map contains no key-value
      *         mappings
      */
-    /*@ also
+    /*@
       @ public normal_behavior
       @   ensures
       @     \result <==> size == 0;
@@ -545,8 +552,11 @@ public class VerifiedIdentityHashMap
       @     \result < length &&
       @     \result >= 0;
       @*/
-    private /*@ spec_public @*/ static /*@ pure @*/ int hash(Object x, int length) {
-        int h =  System.identityHashCode(x);
+    private /*@ spec_public @*/ static /*@ pure @*/ int hash(IntObject x, int length) {
+        if (x == null) {
+            return 0;
+        }
+        int h =  x.hash;
         // Multiply by -127, and left-shift to use least bit as part of hash
         return ((h << 1) - (h << 8)) & (length - 1);
     }
@@ -605,7 +615,7 @@ public class VerifiedIdentityHashMap
       @*/
     /*+OPENJML@
       @ // Key exists
-      @ also
+      @
       @ public normal_behavior
       @   requires
       @     (\exists int i;
@@ -626,9 +636,9 @@ public class VerifiedIdentityHashMap
       @   ensures
       @     \result == null;
       @*/
-    public /*@ pure nullable @*/ java.lang.Object get(/*@ nullable @*/ Object key) {
-        Object k =  maskNull(key);
-        Object[] tab =  table;
+    public /*@ pure nullable @*/ IntObject get(/*@ nullable @*/ IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
@@ -654,12 +664,12 @@ public class VerifiedIdentityHashMap
           @
           @ decreasing hash > i ? hash - i : hash + len - i;
           @
-          @ assignable \nothing;
+          @ assignable \strictly_nothing;
           @*/
         while (true) {
-            Object item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
-                return (java.lang.Object) tab[i + 1];
+                return  tab[i + 1];
             if (item == null)
                 return null;
             i = nextKeyIndex(i, len);
@@ -684,16 +694,16 @@ public class VerifiedIdentityHashMap
        @         table[j * 2] == maskNull(key));
        @*/
      /*+OPENJML@
-       @ also
+       @
        @ public normal_behavior
        @   ensures
        @     \result <==> (\exists int j;
        @         0 <= j < (table.length / 2);
        @         table[j * 2] == maskNull(key));
        @*/
-    public /*@ pure @*/ boolean containsKey(/*@ nullable @*/ Object key) {
-        Object k =  maskNull(key);
-        Object[] tab =  table;
+    public /*@ pure @*/ boolean containsKey(/*@ nullable @*/ IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
@@ -719,10 +729,10 @@ public class VerifiedIdentityHashMap
           @
           @ decreasing hash > i ? hash - i : hash + len - i;
           @
-          @ assignable \nothing;
+          @ assignable \strictly_nothing;
           @*/
         while (true) {
-            Object item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
                 return true;
             if (item == null)
@@ -740,22 +750,24 @@ public class VerifiedIdentityHashMap
      *         specified object reference
      * @see     #containsKey(Object)
      */
-    /*+KEY@ also
+    /*+KEY@
+      @ also
       @ public normal_behavior
       @   ensures
       @     \result <==> (\exists \bigint j;
       @         0 <= j < table.length / (\bigint)2;
       @         table[j * (\bigint)2] != null && table[j * (\bigint)2 + 1] == value);
       @*/
-     /*+OPENJML@ also
+    /*+OPEN_JML@
+      @ also
       @ public normal_behavior
       @   ensures
       @     \result <==> (\exists int j;
       @         0 <= j < table.length / 2;
       @         table[j * 2] != null && table[j * 2 + 1] == value);
       @*/
-    public /*@ pure @*/ boolean containsValue(/*@ nullable @*/ Object value) {
-        Object[] tab =  table;
+    public /*@ pure @*/ boolean containsValue(/*@ nullable @*/ IntObject value) {
+        IntObject[] tab =  table;
 
         /*+KEY@
           @ // Index i is always an odd value within the array bounds
@@ -769,7 +781,7 @@ public class VerifiedIdentityHashMap
           @
           @ decreasing tab.length + 1 - i;
           @
-          @ assignable \nothing;
+          @ assignable \strictly_nothing;
           @*/
         for (int i =  1; i < tab.length; i += 2)
             if (tab[i] == value && tab[i - 1] != null)
@@ -800,9 +812,9 @@ public class VerifiedIdentityHashMap
       @       0 <= i < table.length / 2;
       @       table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
       @*/
-    private /*@ spec_public @*/ /*@ pure @*/ boolean containsMapping(Object key, Object value) {
-        Object k =  maskNull(key);
-        Object[] tab =  table;
+    private /*@ spec_public @*/ /*@ pure @*/ boolean containsMapping(IntObject key, IntObject value) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
@@ -828,10 +840,10 @@ public class VerifiedIdentityHashMap
           @
           @ decreasing hash > i ? hash - i : hash + len - i;
           @
-          @ assignable \nothing;
+          @ assignable \strictly_nothing;
           @*/
         while (true) {
-            Object item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k)
                 return tab[i + 1] == value;
             if (item == null)
@@ -924,11 +936,65 @@ public class VerifiedIdentityHashMap
       @         0 <= i < table.length / (\bigint)2;
       @         table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
       @*/
-    public /*@ nullable @*/ java.lang.Object put(/*@ nullable @*/ java.lang.Object key, /*@ nullable @*/ java.lang.Object value) {
-        final Object k =  maskNull(key);
+    /*+OPENJML@
+      @
+      @ public normal_behavior
+      @   requires
+      @     // The key is already present in the table
+      @     (\exists int i;
+      @         0 <= i < table.length / 2;
+      @         table[i*2] == maskNull(key));
+      @   assignable
+      @     table[*];
+      @   ensures
+      @     // The new value is associated with key and
+      @     // the old value associated with key is returned
+      @     (\exists int i;
+      @         0 <= i < table.length / 2;
+      @         table[i*2] == maskNull(key) &&
+      @         \result == \old(table[i * 2 + 1]) &&
+      @         table[i * 2 + 1] == value);
+      @   ensures
+      @     // After execution, all keys are unchanged and all old values are unchanged
+      @     // except the old value that was associated with key
+      @     (\forall int i;
+      @         0 <= i < \old(table.length) / 2;
+      @         (\old(table[i * 2]) == table[i * 2]) &&
+      @         (\old(table[i * 2]) != maskNull(key) ==>
+      @             \old(table[i * 2 + 1]) == table[i * 2 + 1]));
+      @ also
+      @ public normal_behavior
+      @   requires
+      @     size < MAXIMUM_CAPACITY - 1;
+      @   requires
+      @     // The key is not present in the table
+      @     !(\exists int i;
+      @         0 <= i < table.length / 2;
+      @         table[i * 2] == maskNull(key));
+      @   assignable
+      @     size, table[*], modCount, table;
+      @   ensures
+      @     // size must be increased by 1, modCount must change, and null must be returned
+      @     size == \old(size) + 1 && modCount != \old(modCount) && \result == null;
+      @   ensures
+      @     // After execution, all old keys are still present and all old values are still present
+      @     (\forall int i;
+      @         0 <= i < \old(table.length) / 2;
+      @         (\exists int j;
+      @             0 <= j < table.length / 2;
+      @             (\old(table[i * 2]) == table[j * 2]) &&
+      @              \old(table[i * 2 + 1]) == table[j * 2 + 1]));
+      @   ensures
+      @     // After execution, the table contains the new key associated with the new value
+      @     (\exists int i;
+      @         0 <= i < table.length / 2;
+      @         table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
+      @*/
+    public /*@ nullable @*/ IntObject put(/*@ nullable @*/ IntObject key, /*@ nullable @*/ IntObject value) {
+        final IntObject k =  maskNull(key);
 
         retryAfterResize: for (;;) {
-            final Object[] tab =  table;
+            final IntObject tab[] =  table;
             final int len =  tab.length;
             int i =  hash(k, len);
 
@@ -958,12 +1024,12 @@ public class VerifiedIdentityHashMap
             @ // if the loop iteration completes, the heap is unchanged
             @ // in case key is present, table is updated but the loop iteration terminates without
             @ // completing because the method returns, so the assignable clause need not hold
-            @ assignable \nothing;
+            @ assignable \strictly_nothing;
             @*/
-            for (Object item; (item = tab[i]) != null;
+            for( IntObject item; (item = tab[i]) != null;
                  i = nextKeyIndex(i, len)) {
                 if (item == k) {
-                    java.lang.Object oldValue =  (java.lang.Object) tab[i + 1];
+                    IntObject oldValue =  tab[i + 1];
                     tab[i + 1] = value;
                     return oldValue;
                 }
@@ -972,8 +1038,9 @@ public class VerifiedIdentityHashMap
             final int s =  size + 1;
             // Use optimized form of 3 * s.
             // Next capacity is len, 2 * current capacity.
+            //TODO is is just commented out
             //if (s + (s << 1) > len && resize(len))
-            //    continue retryAfterResize;
+                //continue retryAfterResize;
 
             modCount++;
             tab[i] = k;
@@ -1010,7 +1077,7 @@ public class VerifiedIdentityHashMap
       @     table.length == (\bigint)2 * MAXIMUM_CAPACITY &&
       @     size < MAXIMUM_CAPACITY - 1;
       @   assignable
-      @     \nothing;
+      @     \strictly_nothing;
       @   ensures
       @     \result == false;
       @
@@ -1024,7 +1091,7 @@ public class VerifiedIdentityHashMap
       @     newCapacity <= (\bigint)2 * MAXIMUM_CAPACITY;
       @
       @   assignable
-      @     \nothing;
+      @     \strictly_nothing;
       @
       @   ensures
       @     // Map is unchanged, so return false
@@ -1120,9 +1187,11 @@ public class VerifiedIdentityHashMap
       @   ensures
       @     // After execution, all old entries are still present
       @     (\forall int i;
-      @       0 <= i < \old(table.length) && i % 2 == 0;
+      @       0 <= i < \old(table.length);
+      @       i % 2 == 0 ==>
       @       (\exists int j;
-      @         0 <= j < table.length && j % 2 == 0;
+      @         0 <= j < table.length;
+      @         j % 2 == 0 ==>
       @         \old(table[i]) == table[j] && \old(table[i + 1]) == table[j + 1]));
       @
       @   ensures
@@ -1145,7 +1214,7 @@ public class VerifiedIdentityHashMap
     {
         int newLength =  newCapacity * 2;
 
-        Object[] oldTable =  table;
+        IntObject[] oldTable =  table;
         int oldLength =  oldTable.length;
         if (oldLength == 2 * MAXIMUM_CAPACITY) { // can't expand any further
             if (size == MAXIMUM_CAPACITY - 1)
@@ -1155,7 +1224,7 @@ public class VerifiedIdentityHashMap
         if (oldLength >= newLength)
             return false;
 
-        Object[] newTable =  new Object[newLength];
+        IntObject[] newTable =  new IntObject[newLength];
 
         /*+KEY@
           @ // All processed entries are copied to newTable
@@ -1235,9 +1304,9 @@ public class VerifiedIdentityHashMap
           @   oldLength - j;
           @*/
         for (int j =  0; j < oldLength; j += 2) {
-            Object key =  oldTable[j];
+            IntObject key =  oldTable[j];
             if (key != null) {
-                Object value =  oldTable[j + 1];
+                IntObject value =  oldTable[j + 1];
                 oldTable[j] = null;
                 oldTable[j + 1] = null;
                 int i =  hash(key, newLength);
@@ -1265,7 +1334,7 @@ public class VerifiedIdentityHashMap
                   @          newTable[2 * g] != null);
                   @
                   @ assignable
-                  @   \nothing;
+                  @   \strictly_nothing;
                   @
                   @ decreasing
                   @   hash > i ? hash - i : newLength + hash - i;
@@ -1280,6 +1349,7 @@ public class VerifiedIdentityHashMap
         return true;
     }
 
+
     /**
      * Removes the mapping for this key from this map if present.
      *
@@ -1289,9 +1359,59 @@ public class VerifiedIdentityHashMap
      *         (A <tt>null</tt> return can also indicate that the map
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public java.lang.Object remove(Object key) {
-        Object k =  maskNull(key);
-        Object[] tab =  table;
+    /*@
+      @ public normal_behavior
+      @   requires
+      @     // key exists in old table?
+      @     (\exists int i;
+      @        0 <= i < table.length / 2;
+      @        table[i*2] != null &&
+      @        table[i*2].hash == maskNull(key).hash);
+      @   requires
+      @     // there are no two keys with identical hashes
+      @     (\forall int i;
+      @         0 <= i < table.length / 2;
+      @             (\forall int j;
+      @                 0 <= j < table.length / 2;
+      @                     (table[i*2] != null && table[j*2] != null) ==>
+      @                     (hash(table[i*2], table.length) == hash(table[j*2], table.length) ==> i == j)));
+      @   assignable
+      @     size, table, table[*], modCount;
+      @   //ensures
+      @     // Size is subtracted by 1
+      @   //  size == \old(size) - 1; //todo with new invariant and count
+      @
+      @   //ensures
+      @     // modCount is changed
+      @     //modCount != \old(modCount);
+      @
+      @   ensures
+      @     // Result is the removed value
+      @     (\exists int j;
+      @       0 <= j < \old(table.length) / 2;
+      @       (\old(table[j * 2]) != null &&
+      @       ((\old(table[j*2]).hash == maskNull(key).hash) && \result == \old(table[j*2 + 1]))));
+      @
+      @   ensures
+      @     // All not-to-be-removed elements are still present
+      @     (\forall int i;
+      @       0 <= i < \old(table.length) / 2;
+      @       \old(table[i * 2]) != null ==>
+      @       (\old(table[i * 2]).hash != maskNull(key).hash ==>
+      @         (\exists int j;
+      @            0 <= j < table.length / 2;
+      @            table[j*2] == \old(table[i * 2]) && table[j*2+1] == \old(table[i * 2+1]))));
+      @
+      @   ensures
+      @     // The deleted key no longer exists in the table
+      @     !(\exists int i;
+      @        0 <= i < table.length / 2;
+      @        table[i * 2] != null &&
+      @        table[i*2].hash == maskNull(key).hash);
+      @*/
+    public IntObject remove(IntObject key) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
@@ -1303,13 +1423,13 @@ public class VerifiedIdentityHashMap
           @ assignable i, modCount, size, tab[*];
           @*/
         while (true) {
-            Object item =  tab[i];
-            if (item == k) {
+            IntObject item =  table[i];
+            if (item.hash == k.hash) {
                 modCount++;
                 size--;
-                @SuppressWarnings("unchecked") java.lang.Object oldValue =  (java.lang.Object) tab[i + 1];
-                tab[i + 1] = null;
-                tab[i] = null;
+                @SuppressWarnings("unchecked") IntObject oldValue = table[i + 1];
+                table[i + 1] = null;
+                table[i] = null;
                 closeDeletion(i);
                 return oldValue;
             }
@@ -1327,14 +1447,14 @@ public class VerifiedIdentityHashMap
      * @return  <code>true</code> if and only if the specified key-value
      *          mapping was in the map
      */
-    private boolean removeMapping(Object key, Object value) {
-        Object k =  maskNull(key);
-        Object[] tab =  table;
+    private boolean removeMapping(IntObject key, IntObject value) {
+        IntObject k =  maskNull(key);
+        IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
 
         while (true) {
-            Object item =  tab[i];
+            IntObject item =  tab[i];
             if (item == k) {
                 if (tab[i + 1] != value)
                     return false;
@@ -1361,14 +1481,14 @@ public class VerifiedIdentityHashMap
     private void closeDeletion(int d)
     // Adapted from Knuth Section 6.4 Algorithm R
     {
-        Object[] tab =  table;
+        IntObject[] tab =  table;
         int len =  tab.length;
 
         // Look for items to swap into newly vacated slot
         // starting at index immediately following deletion,
         // and continuing until a null slot is seen, indicating
         // the end of a run of possibly-colliding keys.
-        Object item;
+        IntObject item;
         for (int i =  nextKeyIndex(d, len); (item = tab[i]) != null;
              i = nextKeyIndex(i, len))
         // The following test triggers if the item at slot i (which
@@ -1407,7 +1527,7 @@ public class VerifiedIdentityHashMap
       @        table[i] == null);
       @*/
     /*+OPENJML@
-      @ also
+      @
       @ public normal_behavior
       @   assignable
       @     modCount, size, table[0 .. table.length - 1];
@@ -1421,7 +1541,7 @@ public class VerifiedIdentityHashMap
       @*/
     public void clear() {
         modCount++;
-        Object[] tab =  table;
+        IntObject[] tab =  table;
 
         /*+KEY@
           @ maintaining
@@ -1437,6 +1557,47 @@ public class VerifiedIdentityHashMap
             tab[i] = null;
         size = 0;
     }
+
+    /**
+     * Compares the specified object with this map for equality.  Returns
+     * <tt>true</tt> if the given object is also a map and the two maps
+     * represent identical object-reference mappings.  More formally, this
+     * map is equal to another map <tt>m</tt> if and only if
+     * <tt>this.entrySet().equals(m.entrySet())</tt>.
+     *
+     * <p><b>Owing to the reference-equality-based semantics of this map it is
+     * possible that the symmetry and transitivity requirements of the
+     * <tt>Object.equals</tt> contract may be violated if this map is compared
+     * to a normal map.  However, the <tt>Object.equals</tt> contract is
+     * guaranteed to hold among <tt>VerifiedIdentityHashMap</tt> instances.</b>
+     *
+     * @param  o object to be compared for equality with this map
+     * @return <tt>true</tt> if the specified object is equal to this map
+     * @see Object#equals(Object)
+     */
+   /* public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof VerifiedIdentityHashMap) {
+            VerifiedIdentityHashMap m =  (VerifiedIdentityHashMap) o;
+            if (m.size() != size)
+                return false;
+
+            IntObject[] tab =  m.table;
+            for (int i =  0; i < tab.length; i += 2) {
+                IntObject k =  tab[i];
+                if (k != null && !containsMapping(k, tab[i + 1]))
+                    return false;
+            }
+            return true;
+        } else if (o instanceof Map) {
+            Map m =  (Map)o;
+            //return entrySet().equals(m.entrySet());
+            return false;
+        } else {
+            return false;  // o is not a Map
+        }
+    }*/
 
     /**
      * Returns the hash code value for this map.  The hash code of a map is
@@ -1459,15 +1620,31 @@ public class VerifiedIdentityHashMap
      */
     public int hashCode() {
         int result =  0;
-        Object[] tab =  table;
+        IntObject[] tab =  table;
         for (int i =  0; i < tab.length; i += 2) {
-            Object key =  tab[i];
+            IntObject key =  tab[i];
             if (key != null) {
                 Object k =  unmaskNull(key);
                 result += System.identityHashCode(k) ^
-                        System.identityHashCode(tab[i + 1]);
+                    System.identityHashCode(tab[i + 1]);
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a shallow copy of this identity hash map: the keys and values
+     * themselves are not cloned.
+     *
+     * @return a shallow copy of this map
+     */
+    public Object clone() {
+        try {
+            VerifiedIdentityHashMap m =  (VerifiedIdentityHashMap) super.clone();
+            m.table = table.clone();
+            return m;
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError();
+        }
     }
 }
