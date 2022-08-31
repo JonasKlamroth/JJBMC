@@ -106,6 +106,7 @@ public class Trace {
 
     private Object getValue(String value, int idx) {
         value = value.trim();
+        value = cleanValue(value);
         if (value.equals("null")) {
             return "null";
         }

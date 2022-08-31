@@ -159,6 +159,7 @@ public class TraceInformation {
     }
 
     public static String cleanValue(String value) {
+        value = value.trim();
         if (value.startsWith("(") && value.endsWith(")")) {
             value = value.substring(1, value.length() - 1);
         }
