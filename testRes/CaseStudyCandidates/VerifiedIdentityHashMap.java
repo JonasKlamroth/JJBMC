@@ -636,23 +636,23 @@ public class VerifiedIdentityHashMap
       @ // Key exists
       @
       @ public normal_behavior
-      @   requires
+      @   ensures
       @     (\exists int i;
       @       0 <= i < table.length / 2;
-      @       table[i * 2] == maskNull(key));
-      @   ensures
+      @       table[i * 2] != null &&
+      @       table[i * 2].hash == maskNull(key).hash)
+      @       ==>
       @     (\exists int i;
       @        0 <= i < table.length / 2;
-      @        table[i * 2] == maskNull(key) && \result == table[i * 2 + 1]);
+      @        table[i * 2] != null &&
+      @        table[i * 2].hash == maskNull(key).hash && \result == table[i * 2 + 1]);
       @
       @ // Key does not exist
-      @ also
-      @ public normal_behavior
-      @   requires
+      @   ensures
       @     !(\exists int i;
       @       0 <= i < table.length / 2;
-      @       table[i * 2] == maskNull(key));
-      @   ensures
+      @       table[i * 2] != null &&
+      @       table[i * 2].hash == maskNull(key).hash) ==>
       @     \result == null;
       @*/
     public /*@ pure nullable @*/ IntObject get(/*@ nullable @*/ IntObject key) {
@@ -687,7 +687,7 @@ public class VerifiedIdentityHashMap
           @*/
         while (true) {
             IntObject item =  tab[i];
-            if (item == k)
+            if (item != null && item.hash == k.hash)
                 return  tab[i + 1];
             if (item == null)
                 return null;
@@ -718,7 +718,8 @@ public class VerifiedIdentityHashMap
        @   ensures
        @     \result <==> (\exists int j;
        @         0 <= j < (table.length / 2);
-       @         table[j * 2] == maskNull(key));
+       @         table[j * 2] != null &&
+       @         table[j * 2].hash == maskNull(key).hash);
        @*/
     public /*@ pure @*/ boolean containsKey(/*@ nullable @*/ IntObject key) {
         IntObject k =  maskNull(key);
@@ -752,7 +753,7 @@ public class VerifiedIdentityHashMap
           @*/
         while (true) {
             IntObject item =  tab[i];
-            if (item == k)
+            if (item != null && item.hash == k.hash)
                 return true;
             if (item == null)
                 return false;
@@ -778,12 +779,13 @@ public class VerifiedIdentityHashMap
       @         table[j * (\bigint)2] != null && table[j * (\bigint)2 + 1] == value);
       @*/
     /*+OPEN_JML@
-      @ also
       @ public normal_behavior
       @   ensures
       @     \result <==> (\exists int j;
       @         0 <= j < table.length / 2;
-      @         table[j * 2] != null && table[j * 2 + 1] == value);
+      @         table[j * 2] != null && (
+      @             (table[j * 2 + 1] == null && table[j * 2 + 1] == value) ||
+      @             (table[j * 2 + 1] != null && table[j * 2 + 1].hash == value.hash));
       @*/
     public /*@ pure @*/ boolean containsValue(/*@ nullable @*/ IntObject value) {
         IntObject[] tab =  table;
@@ -803,7 +805,7 @@ public class VerifiedIdentityHashMap
           @ assignable \strictly_nothing;
           @*/
         for (int i =  1; i < tab.length; i += 2)
-            if (tab[i] == value && tab[i - 1] != null)
+            if ((tab[i] == null && value == null) || (tab[i] != null && tab[i].hash == value.hash) && tab[i - 1] != null)
                 return true;
 
         return false;
@@ -826,10 +828,13 @@ public class VerifiedIdentityHashMap
       @*/
     /*+OPENJML@
       @ private normal_behavior
+      @   requires value != null; //TODO only showing this for value != null. This could be changed
       @   ensures
       @     \result <==> (\exists int i;
       @       0 <= i < table.length / 2;
-      @       table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
+      @       table[i * 2] != null &&
+      @       table[i * 2 + 1] != null &&
+      @       table[i * 2].hash == maskNull(key).hash && table[i * 2 + 1].hash == value.hash);
       @*/
     private /*@ spec_public @*/ /*@ pure @*/ boolean containsMapping(IntObject key, IntObject value) {
         IntObject k =  maskNull(key);
@@ -863,8 +868,8 @@ public class VerifiedIdentityHashMap
           @*/
         while (true) {
             IntObject item =  tab[i];
-            if (item == k)
-                return tab[i + 1] == value;
+            if (item != null && item.hash == k.hash)
+                return tab[i + 1] != null && tab[i + 1].hash == value.hash;
             if (item == null)
                 return false;
             i = nextKeyIndex(i, len);
@@ -962,7 +967,8 @@ public class VerifiedIdentityHashMap
       @     // The key is already present in the table
       @     (\exists int i;
       @         0 <= i < table.length / 2;
-      @         table[i*2] == maskNull(key));
+      @         table[i*2] != null &&
+      @         table[i*2].hash == maskNull(key).hash);
       @   assignable
       @     table[*];
       @   ensures
@@ -970,7 +976,8 @@ public class VerifiedIdentityHashMap
       @     // the old value associated with key is returned
       @     (\exists int i;
       @         0 <= i < table.length / 2;
-      @         table[i*2] == maskNull(key) &&
+      @         table[i*2] != null &&
+      @         table[i*2].hash == maskNull(key).hash &&
       @         \result == \old(table[i * 2 + 1]) &&
       @         table[i * 2 + 1] == value);
       @   ensures
@@ -978,8 +985,9 @@ public class VerifiedIdentityHashMap
       @     // except the old value that was associated with key
       @     (\forall int i;
       @         0 <= i < \old(table.length) / 2;
+      @         table[i*2] != null &&
       @         (\old(table[i * 2]) == table[i * 2]) &&
-      @         (\old(table[i * 2]) != maskNull(key) ==>
+      @         (\old(table[i * 2].hash) != maskNull(key).hash ==>
       @             \old(table[i * 2 + 1]) == table[i * 2 + 1]));
       @ also
       @ public normal_behavior
@@ -1058,8 +1066,8 @@ public class VerifiedIdentityHashMap
             // Use optimized form of 3 * s.
             // Next capacity is len, 2 * current capacity.
             //TODO is is just commented out
-            //if (s + (s << 1) > len && resize(len))
-                //continue retryAfterResize;
+            if (s + (s << 1) > len && resize(len))
+                continue retryAfterResize;
 
             modCount++;
             tab[i] = k;
@@ -1158,34 +1166,6 @@ public class VerifiedIdentityHashMap
       @         table[2*n] == \old(table[2*m]) && table[2*n + 1] == \old(table[2*m + 1])));
       @*/
     /*+OPENJML@
-      @ // Nothing changes if table.length == 2 * MAXIMUM_CAPACITY &&
-      @ // size < MAXIMUM_CAPACITY - 1.
-      @ private normal_behavior
-      @   requires
-      @     table.length == 2 * MAXIMUM_CAPACITY &&
-      @     size < MAXIMUM_CAPACITY - 1;
-      @   assignable
-      @     \nothing;
-      @   ensures
-      @     \result == false;
-      @
-      @ // Nothing changes when table.length < 2 * MAXIMUM_CAPACITY &&
-      @ // table.length >= 2 * newCapacity.
-      @ private normal_behavior
-      @   requires
-      @     table.length < 2 * MAXIMUM_CAPACITY &&
-      @     table.length >= 2 * newCapacity &&
-      @     newCapacity >= MINIMUM_CAPACITY &&
-      @     newCapacity <= 2 * MAXIMUM_CAPACITY;
-      @
-      @   assignable
-      @     \nothing;
-      @
-      @   ensures
-      @     // Map is unchanged, so return false
-      @     \result == false;
-      @
-      @
       @ // If we actually resize (table.length < 2 * MAXIMUM_CAPACITY && table.length < 2 * newCapacity)
       @ // then rehash the table with the new length to re-establish the class invariant.
       @ private normal_behavior
