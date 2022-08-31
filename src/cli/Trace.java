@@ -214,7 +214,7 @@ public class Trace {
     }
 
     private Object performArrayUpdates(String varName, Object val, int idx, int maxIdx) {
-        ArrayList valArray = (ArrayList) val;
+        @SuppressWarnings("unchecked") ArrayList<Object> valArray = (ArrayList<Object>) val;
         for (int i = idx; i < maxIdx; ++i) {
             if (allAssignments.get(i).jbmcVarname.startsWith(varName + "[")) {
                 try {
@@ -237,7 +237,7 @@ public class Trace {
     }
 
     private Object performFieldUpdates(String varName, Object val, int idx, int maxIdx) {
-        Map<String, Object> valMap = (Map<String, Object>) val;
+        @SuppressWarnings("unchecked") Map<String, Object> valMap = (Map<String, Object>) val;
         for (int i = idx; i < maxIdx; ++i) {
             if (allAssignments.get(i).jbmcVarname.startsWith(varName + ".")) {
                 String s = allAssignments.get(i).jbmcVarname;
