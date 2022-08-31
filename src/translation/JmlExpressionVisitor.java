@@ -60,6 +60,7 @@ import com.sun.source.tree.ContinueTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.IfTree;
+import com.sun.source.tree.LabeledStatementTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
@@ -591,7 +592,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitContinue(ContinueTree node, Void p) {
-        throw new UnsupportedException("Continue-Statements are currently not supported.");
+        if(CLI.forceInliningLoops) {
+            return super.visitContinue(node, p);
+        }
+        throw new UnsupportedException("Continue-Statements are currently only supported when inlining.");
     }
 
     @Override
@@ -730,6 +734,27 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             return copy;
         }
         throw new TranslationException("While-Loops with invariants currently not supported.");
+    }
+
+
+    @Override
+    public JCTree visitLabeledStatement(LabeledStatementTree node, Void p) {
+        List<JCStatement> tmp = newStatements;
+        newStatements = List.nil();
+        JCTree.JCLabeledStatement lst = (JCTree.JCLabeledStatement) super.visitLabeledStatement(node, p);
+        if(newStatements.isEmpty()) {
+            return lst;
+        } else {
+            if(newStatements.size() == 1) {
+                lst.body = newStatements.get(0);
+                newStatements = List.of(lst);
+            } else {
+                lst.body = M.Block(0L, newStatements);
+                newStatements = List.of(lst);
+            }
+        }
+        newStatements = newStatements.prependList(tmp);
+        return lst;
     }
 
     @Override
