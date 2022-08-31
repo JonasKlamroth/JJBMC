@@ -159,19 +159,32 @@ public class TraceInformation {
     }
 
     public static String cleanValue(String value) {
-        if (value.startsWith("&")) {
-            value = value.substring(1);
-        }
         if (value.startsWith("(") && value.endsWith(")")) {
             value = value.substring(1, value.length() - 1);
         }
         if (value.startsWith("(void *)")) {
             value = value.substring(8);
         }
+        if (value.startsWith("&")) {
+            value = value.substring(1);
+        }
         if (value.endsWith("[0L]")) {
             value = value.substring(0, value.length() - 4);
         }
         return value;
+    }
+
+    public static String cleanLHS(String lhs) {
+        if (lhs.startsWith("(") && lhs.endsWith(")")) {
+            lhs = lhs.substring(1, lhs.length() - 1);
+        }
+        if (lhs.startsWith("(void *)")) {
+            lhs = lhs.substring(8);
+        }
+        if (lhs.startsWith("&")) {
+            lhs = lhs.substring(1);
+        }
+        return lhs;
     }
 
 

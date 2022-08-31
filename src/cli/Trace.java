@@ -1,5 +1,6 @@
 package cli;
 
+import static cli.TraceInformation.cleanLHS;
 import static cli.TraceInformation.cleanValue;
 import static cli.TraceInformation.isRelevantValue;
 
@@ -55,9 +56,11 @@ public class Trace {
     }
 
     private List<Assignment> filterAssignments(Set<String> relevantVars) {
+        allAssignments.get(0).toString();
         List<Assignment> trace = allAssignments;
         //trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
         trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
+        trace = trace.stream().filter(a -> !a.jbmcVarname.contains("this$0")).collect(Collectors.toList());
         trace = trace.stream().filter(a -> !a.jbmcVarname.contains("derefd_pointer")).collect(Collectors.toList());
         //trace = trace.stream().filter(a -> !a.value.contains("@class_identifier") && !a.value.startsWith("[")).collect(Collectors.toList());
         allAssignments = trace;
@@ -77,12 +80,19 @@ public class Trace {
             provideGuesses(group);
             group = filterGroup(group);
             for (int i = 0; i < group.size(); ++i) {
-                group.get(i).value = getValue(group.get(i).value, idx).toString();
-                if(group.get(i).jbmcVarname.contains("dynamic_") && group.get(i).jbmcVarname.contains("_array")) {
-                    Object o = getValue(group.get(i).jbmcVarname, idx);
-                    o = null;
+                group.get(i).guessedValue = getValue(group.get(i).value, idx);
+                if(group.get(i).jbmcVarname.contains("_array") && group.get(i).jbmcVarname.startsWith("dynamic_")) {
+                    if(group.get(i).jbmcVarname.contains("[")) {
+                        Object o = getValue(group.get(i).jbmcVarname.substring(0, group.get(i).jbmcVarname.indexOf("[")));
+                        group.get(i).guessedValue = o;
+                        group.get(i).guess = group.get(i).guess.substring(0, group.get(i).guess.indexOf("["));
+                    } else {
+                        Object o = getValue(group.get(i).jbmcVarname);
+                        group.get(i).guessedValue = o;
+                    }
                 }
             }
+            group = filterGroup(group);
             idx++;
             res.addAll(group);
         }
@@ -153,7 +163,7 @@ public class Trace {
                     key = key.replace(".", "");
                     String innerVal = val.substring(val.indexOf("=") + 1).trim();
 
-                    if (!key.startsWith("@")) {
+                    if (!key.startsWith("@") && !key.contains("this$0")) {
                         vals.put(key, getValue(innerVal, idx));
                     }
                 }
@@ -209,7 +219,9 @@ public class Trace {
             if (allAssignments.get(i).jbmcVarname.startsWith(varName + "[")) {
                 try {
                     String s = allAssignments.get(i).jbmcVarname;
-                    int index = Integer.parseInt(s.substring(s.indexOf("[") + 1, s.indexOf("]") - 1));
+                    s = s.replace("L]", "]");
+                    s = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
+                    int index = Integer.parseInt(s);
                     if(index >= valArray.size()) {
                         System.out.println("error updating array in trace.");
                     } else {
@@ -246,7 +258,7 @@ public class Trace {
                     v = v.trim().replace("this.", "");
                     rv = rv.trim().replace("this.", "");
                     if (v.equals(rv)) {
-                        finalVals.put(rv, a.value);
+                        finalVals.put(rv, a.guessedValue.toString());
                     }
                 }
             }
@@ -260,8 +272,10 @@ public class Trace {
     public void provideGuesses(List<Assignment> lineAssignments) {
         for (int i = 0; i < lineAssignments.size(); ++i) {
             Assignment a = lineAssignments.get(i);
+            a.value = cleanValue(a.value);
+            a.jbmcVarname = cleanLHS(a.jbmcVarname);
             if (isRelevantValue(a.value)) {
-                if (a.value.startsWith("&dynamic_") || a.value.startsWith("dynamic")) {
+                if (a.value.startsWith("dynamic_")) {
                     String value = cleanValue(a.value);
                     trackDynamicObject(a.jbmcVarname, value);
                 }

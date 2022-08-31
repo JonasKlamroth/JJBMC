@@ -5,6 +5,8 @@ public class Assignment {
     public String parameterName;
     public int lineNumber;
     public String value;
+
+    public Object guessedValue;
     public String guess;
     protected String jbmcVarname;
 
@@ -18,7 +20,9 @@ public class Assignment {
 
     @Override
     public String toString() {
-        return "in line " + lineNumber + ": " + TraceInformation.applyExpressionMap(this.guess) + " (" + jbmcVarname + ") = " + value;
+        String val = guessedValue == null ? value : guessedValue.toString();
+        String lhs = TraceInformation.applyExpressionMap(this.guess);
+        return "in line " + lineNumber + ": " + lhs + " (" + jbmcVarname + ") = " + val;
     }
 
     public String getJbmcVarname() {
