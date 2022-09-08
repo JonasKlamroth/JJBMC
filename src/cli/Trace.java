@@ -3,6 +3,7 @@ package cli;
 import static cli.TraceInformation.cleanLHS;
 import static cli.TraceInformation.cleanValue;
 import static cli.TraceInformation.isRelevantValue;
+import cli.ket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,7 +93,7 @@ public class Trace {
                     }
                 }
             }
-            group = filterGroup(group);
+            //group = filterGroup(group);
             idx++;
             res.addAll(group);
         }
@@ -106,7 +107,6 @@ public class Trace {
 
     private Object getValue(String value, int idx) {
         value = value.trim();
-        value = cleanValue(value);
         if (value.equals("null")) {
             return "null";
         }
@@ -180,14 +180,82 @@ public class Trace {
 
     }
 
+    private String simplifyQstate(List<ket> ketList){
+
+        /*
+        float currentVal = 0.0f;
+        for(int i = 0; i < coeffAndBit.size() / 2; i = i + 2){
+            currentVal = coeffAndBit.get(i);
+            for(int j = i; j < coeffAndBit.size(); j++){
+                if(coeffAndBit.get(j) == currentVal){
+                    //simplifiedList.add(currentVal);
+                   // simplifidList.add
+                }
+            }
+        }
+        */
+
+        return "";
+    }
+
+    private Assignment createQuantumAss(List<Assignment> qstates, int dim){
+        float qvalues[] = new float[dim];
+        int i = 0;
+        for(Assignment a : qstates){
+            qvalues[i] = Float.parseFloat(a.value.split(" /")[0]);
+            i++;
+        }
+
+        List<ket> ketList = new ArrayList<>();
+
+        String val = "";
+        for(i = 0; i < qvalues.length; i++){
+            if(qvalues[i] > 0.0f || qvalues[i] < 0.0f){
+                float coeff = qvalues[i];
+                val += "+" + Float.toString(coeff) + " * " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(i)).replace(' ', '0') + ">";
+
+                ket k = new ket();
+                k.coeff = coeff;
+                k.bitIndex = i;
+                ketList.add(k);
+            }
+        }
+
+        String simplifiedVal = simplifyQstate(ketList);
+        val = val.substring(1);
+
+        Assignment ass = new Assignment(10, "", val, "q_state", "");
+        return ass;
+    }
+
     private List<Assignment> filterGroup(List<Assignment> group) {
         //group = group.stream().filter(a -> !a.value.contains("dynamic_object")).collect(Collectors.toList());
         LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
+        List<Assignment> qstates = new ArrayList<>();
+
         for (Assignment a : group) {
             groupMap.put(a.guess, a);
         }
         List<Assignment> filtered = new ArrayList<>(groupMap.values());
-        return filtered;
+
+        for (Assignment a : filtered) {
+            if(a.guess != null) {
+                if (a.guess.startsWith("q_state_0[")) {
+                    qstates.add(a);
+                }
+            }
+        }
+        if(!qstates.isEmpty()){
+            Assignment qAss = createQuantumAss(qstates, qstates.size());
+
+            qstates.clear();
+            qstates.add(qAss);
+
+            filtered.add(qAss);
+        }
+
+
+        return qstates;
     }
 
     private Object findValue(String value, int maxIdx) {
