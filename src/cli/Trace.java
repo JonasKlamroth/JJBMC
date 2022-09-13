@@ -3,7 +3,6 @@ package cli;
 import static cli.TraceInformation.cleanLHS;
 import static cli.TraceInformation.cleanValue;
 import static cli.TraceInformation.isRelevantValue;
-import cli.ket;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,7 +92,7 @@ public class Trace {
                     }
                 }
             }
-            //group = filterGroup(group);
+            group = filterGroup(group);
             idx++;
             res.addAll(group);
         }
@@ -198,20 +197,37 @@ public class Trace {
         return "";
     }
 
-    private Assignment createQuantumAss(List<Assignment> qstates, int dim){
-        float qvalues[] = new float[dim];
-        int i = 0;
-        for(Assignment a : qstates){
-            qvalues[i] = Float.parseFloat(a.value.split(" /")[0]);
-            i++;
+    private void createQuantumAss(Assignment qstate){
+        List<Float> qvalues = new ArrayList<>();
+        if(qstate.guessedValue == null) {
+            return;
+        } else {
+            if(!(qstate.guessedValue instanceof ArrayList)) {
+                return;
+            }
+            List<Object> values = (ArrayList<Object>)qstate.guessedValue;
+            for(Object val : values) {
+                if(val instanceof Float) {
+                    qvalues.add((Float)val);
+                } else if(val instanceof String) {
+                    String sval = (String)val;
+                    sval = sval.substring(sval.indexOf("/*") + 2, sval.indexOf("*/"));
+                    sval = sval.trim();
+                    qvalues.add(Float.parseFloat(sval));
+                } else {
+                    throw new RuntimeException("Error parsing qstate.");
+                }
+            }
+
         }
+        int dim = qvalues.size();
 
         List<ket> ketList = new ArrayList<>();
 
         String val = "";
-        for(i = 0; i < qvalues.length; i++){
-            if(qvalues[i] > 0.0f || qvalues[i] < 0.0f){
-                float coeff = qvalues[i];
+        for(int i = 0; i < qvalues.size(); i++){
+            if(qvalues.get(i) > 0.0f || qvalues.get(i) < 0.0f){
+                float coeff = qvalues.get(i);
                 val += "+" + Float.toString(coeff) + " * " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(i)).replace(' ', '0') + ">";
 
                 ket k = new ket();
@@ -224,14 +240,13 @@ public class Trace {
         String simplifiedVal = simplifyQstate(ketList);
         val = val.substring(1);
 
-        Assignment ass = new Assignment(10, "", val, "q_state", "");
-        return ass;
+        //Assignment ass = new Assignment(10, "", val, "q_state", "");
+        qstate.guessedValue = val;
     }
 
     private List<Assignment> filterGroup(List<Assignment> group) {
         //group = group.stream().filter(a -> !a.value.contains("dynamic_object")).collect(Collectors.toList());
         LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
-        List<Assignment> qstates = new ArrayList<>();
 
         for (Assignment a : group) {
             groupMap.put(a.guess, a);
@@ -240,22 +255,13 @@ public class Trace {
 
         for (Assignment a : filtered) {
             if(a.guess != null) {
-                if (a.guess.startsWith("q_state_0[")) {
-                    qstates.add(a);
+                if (a.guess.startsWith("q_state_0")) {
+                    createQuantumAss(a);
                 }
             }
         }
-        if(!qstates.isEmpty()){
-            Assignment qAss = createQuantumAss(qstates, qstates.size());
 
-            qstates.clear();
-            qstates.add(qAss);
-
-            filtered.add(qAss);
-        }
-
-
-        return qstates;
+        return filtered;
     }
 
     private Object findValue(String value, int maxIdx) {
