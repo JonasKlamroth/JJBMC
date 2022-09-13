@@ -42,8 +42,13 @@ public final class BMCTree {
     /*@ private normal_behaviour
       @  assignable \nothing;
       @*/
-    private /*@ helper */ void build(int x, int[] splitters, int y, int z) {
-        //@ assume false;
+    private /*@ helper */ void build(int position, int[] sorted_splitters, int begin, int end) {
+        final int mid = begin + (end - begin) / 2;
+        this.tree[position] = sorted_splitters[mid];
+        if (2 * position + 1 < (1 << this.log_buckets)) {
+            this.build(2 * position, sorted_splitters, begin, mid);
+            this.build(2 * position + 1, sorted_splitters, mid, end);
+        }
     }
 
     /*@ pure */
