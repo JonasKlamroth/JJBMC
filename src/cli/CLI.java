@@ -113,7 +113,7 @@ public class CLI implements Runnable {
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
     static String fileName = null;
     @Parameters(index = "1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
-    static String functionName = null;
+    public static String functionName = null;
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
     static List<String> jbmcOptions = new ArrayList<>();
     @Option(names = {"-h", "-help"}, usageHelp = true,
@@ -121,7 +121,7 @@ public class CLI implements Runnable {
     static boolean usageHelpRequested;
     @Option(names = {"-rv", "-relevantVar"},
        description = "Names of variables whos values should be printed in a trace. (Has to be run with -tr option)")
-    static List<String> relevantVars = new ArrayList<>();
+    public static List<String> relevantVars = new ArrayList<>();
     @Option(names = {"-ft", "-fullTrace"}, description = "Prevents traces from being filtered for relevant variables and prints all values. " +
         "(Has to be run with -tr option)")
     public static boolean fullTraceRequested = false;
@@ -550,7 +550,7 @@ public class CLI implements Runnable {
             //String error = sb2.toString();
 
 
-            if (jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+            if ((jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) || keepTranslation) {
                 keepTranslation = true;
                 log.error("JBMC did not terminate as expected for function: " + functionName +
                     "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
