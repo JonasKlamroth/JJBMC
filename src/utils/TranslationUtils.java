@@ -108,7 +108,7 @@ public class TranslationUtils {
             return "\\nothing";
         }
         StringBuilder sb = new StringBuilder();
-        for(JCExpression e : assignables) {
+        for (JCExpression e : assignables) {
             sb.append(e.toString());
             sb.append(", ");
         }

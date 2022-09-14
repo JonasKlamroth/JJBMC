@@ -23,10 +23,10 @@ public class TraceInformation {
         "@class_identifier",
         "tmp",
         "assertionsDisabled"));
-    private final static SortedMap<Integer, Integer> lineMap = new TreeMap<>();
-    private final static SortedMap<Integer, String> methods = new TreeMap<>();
-    private final static SortedMap<Integer, Set<String>> assertVars = new TreeMap<>();
-    private final static SortedMap<Integer, String> asserts = new TreeMap<>();
+    private static final SortedMap<Integer, Integer> lineMap = new TreeMap<>();
+    private static final SortedMap<Integer, String> methods = new TreeMap<>();
+    private static final SortedMap<Integer, Set<String>> assertVars = new TreeMap<>();
+    private static final SortedMap<Integer, String> asserts = new TreeMap<>();
     private static final Map<String, String> expressionMap = new HashMap<>();
 
     public static void reset() {
@@ -51,6 +51,7 @@ public class TraceInformation {
     public static String getMethod(int lineNumber) {
         return methods.get(lineNumber);
     }
+
     private static boolean isRelevant(Set<String> relevantVars, String guess) {
         if (guess == null) {
             return false;

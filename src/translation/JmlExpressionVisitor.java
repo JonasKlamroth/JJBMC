@@ -592,7 +592,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitContinue(ContinueTree node, Void p) {
-        if(CLI.forceInliningLoops) {
+        if (CLI.forceInliningLoops) {
             return super.visitContinue(node, p);
         }
         throw new UnsupportedException("Continue-Statements are currently only supported when inlining.");
@@ -742,10 +742,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JCStatement> tmp = newStatements;
         newStatements = List.nil();
         JCTree.JCLabeledStatement lst = (JCTree.JCLabeledStatement) super.visitLabeledStatement(node, p);
-        if(newStatements.isEmpty()) {
+        if (newStatements.isEmpty()) {
             return lst;
         } else {
-            if(newStatements.size() == 1) {
+            if (newStatements.size() == 1) {
                 lst.body = newStatements.get(0);
                 newStatements = List.of(lst);
             } else {
@@ -1389,7 +1389,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                                 "$$param" + (paramVarCounter - sym.params.length() + i), cond);
                         }
                     }
-                    JCStatement assertion = TranslationUtils.makeAssertStatement(cond, "Illegal assignment to " + a + " conflicting with assignables " + TranslationUtils.assignablesToString(currentAssignable));
+                    JCStatement assertion = TranslationUtils.makeAssertStatement(cond,
+                            "Illegal assignment to " + a + " conflicting with assignables " +
+                                    TranslationUtils.assignablesToString(currentAssignable));
                     assertion.pos = copy.pos;
                     newStatements = newStatements.append(assertion);
                 }

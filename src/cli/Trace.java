@@ -39,7 +39,7 @@ public class Trace {
         if (var.startsWith("(") && var.endsWith(")")) {
             return false;
         }
-        if(var.contains("@")) {
+        if (var.contains("@")) {
             return false;
         }
         for (String s : relevantVars) {
@@ -83,8 +83,8 @@ public class Trace {
             group = filterGroup(group);
             for (int i = 0; i < group.size(); ++i) {
                 group.get(i).guessedValue = getValue(group.get(i).value, idx);
-                if(group.get(i).jbmcVarname.contains("_array") && group.get(i).jbmcVarname.startsWith("dynamic_")) {
-                    if(group.get(i).jbmcVarname.contains("[")) {
+                if (group.get(i).jbmcVarname.contains("_array") && group.get(i).jbmcVarname.startsWith("dynamic_")) {
+                    if (group.get(i).jbmcVarname.contains("[")) {
                         Object o = getValue(group.get(i).jbmcVarname.substring(0, group.get(i).jbmcVarname.indexOf("[")), idx);
                         group.get(i).guessedValue = o;
                         group.get(i).guess = group.get(i).guess.substring(0, group.get(i).guess.indexOf("["));
@@ -194,7 +194,7 @@ public class Trace {
 
     private Object findValue(String value, int maxIdx) {
         //all assignments in the same lane will be respected
-        while(maxIdx < allAssignments.size() - 1 && allAssignments.get(maxIdx).lineNumber == allAssignments.get(maxIdx + 1).lineNumber) {
+        while (maxIdx < allAssignments.size() - 1 && allAssignments.get(maxIdx).lineNumber == allAssignments.get(maxIdx + 1).lineNumber) {
             maxIdx++;
         }
         value = value.replace("&", "");
@@ -210,7 +210,7 @@ public class Trace {
                 return val;
             }
         }
-        if(value.startsWith("dynamic_object")) {
+        if (value.startsWith("dynamic_object")) {
             return performFieldUpdates(value, new HashMap<String, Object>(), 0, maxIdx);
         }
         return noValue;
@@ -225,7 +225,7 @@ public class Trace {
                     s = s.replace("L]", "]");
                     s = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                     int index = Integer.parseInt(s);
-                    if(index >= valArray.size()) {
+                    if (index >= valArray.size()) {
                         System.out.println("error updating array in trace.");
                     } else {
                         valArray.set(index, getValue(allAssignments.get(i).value, maxIdx));
@@ -283,20 +283,14 @@ public class Trace {
                     trackDynamicObject(a.jbmcVarname, value);
                 }
                 if (a.jbmcVarname.endsWith(".data") && a.value.contains("dynamic_") && a.value.contains("_array")) {
-                    //String guess = guessVariable(a.jbmcVarname);
                     String value = cleanValue(a.value);
-                    //if (guess != null) {
-                        //trackDynamicObject(guess, value);
-                    //} else {
-                        //trackDynamicObject(a.jbmcVarname, value);
-                    //}
                     trackDynamicObject(a.jbmcVarname.substring(0, a.jbmcVarname.length() - 5), value);
                 }
             }
         }
         for (int i = 0; i < lineAssignments.size(); ++i) {
             Assignment a = lineAssignments.get(i);
-            if(a.jbmcVarname.startsWith("array_data_init")) {
+            if (a.jbmcVarname.startsWith("array_data_init")) {
                 processArrayInit(lineAssignments, i);
             }
             if (isRelevantValue(a.value)) {
@@ -318,22 +312,22 @@ public class Trace {
         int arrayIdx = 0;
         String arrayName = lineAssignments.get(idx).value;
         int length = findArrayLength(arrayName, idx, lineAssignments);
-        if(length <= 0) {
+        if (length <= 0) {
             return;
         }
-        for(int i = idx; true; ++i) {
+        for (int i = idx; true; ++i) {
             Assignment a = lineAssignments.get(i);
-            if(a.jbmcVarname.startsWith("new_array_item")) {
+            if (a.jbmcVarname.startsWith("new_array_item")) {
                 a.jbmcVarname = arrayName + "[" + arrayIdx + "]";
             }
-            if(a.jbmcVarname.startsWith("array_init_iter")) {
+            if (a.jbmcVarname.startsWith("array_init_iter")) {
                 int newIdx = -1;
                 try {
                     newIdx = Integer.parseInt(a.value);
                 } catch (Exception e) {
                     System.out.println("Error parsing trace.");
                 }
-                if(newIdx == length) {
+                if (newIdx == length) {
                     break;
                 } else {
                     arrayIdx = newIdx;
@@ -343,17 +337,17 @@ public class Trace {
     }
 
     private int findArrayLength(String arrayName, int startIdx, List<Assignment> assignments) {
-        while(startIdx < assignments.size() - 1 && assignments.get(startIdx).lineNumber == assignments.get(startIdx + 1).lineNumber) {
+        while (startIdx < assignments.size() - 1 && assignments.get(startIdx).lineNumber == assignments.get(startIdx + 1).lineNumber) {
             startIdx++;
         }
-        while(arrayName.contains("array")) {
+        while (arrayName.contains("array")) {
             arrayName = objectMap.get(arrayName);
-            if(arrayName == null) {
+            if (arrayName == null) {
                 return -1;
             }
         }
-        for(int i = startIdx; 0 <= i; --i) {
-            if(assignments.get(i).jbmcVarname.equals(arrayName + ".length")) {
+        for (int i = startIdx; 0 <= i; --i) {
+            if (assignments.get(i).jbmcVarname.equals(arrayName + ".length")) {
                 return Integer.parseInt(assignments.get(i).value);
             }
         }
@@ -379,7 +373,7 @@ public class Trace {
             String object = getObjectName(lhs.substring(0, lhs.indexOf(".")));
             if (object == null && !lhs.contains("[")) {
                 return lhs;
-            } else if(object != null) {
+            } else if (object != null) {
                 String res = lhs.replace(lhs.substring(0, lhs.indexOf(".")), object);
                 if (res.endsWith(".data")) {
                     return res.substring(0, res.length() - 5);
@@ -409,11 +403,7 @@ public class Trace {
         if (lhs == null) {
             return null;
         }
-        //for (String s : TraceInformation.ignoredVars) {
-         //   if (lhs.contains(s)) {
-          //      return null;
-           // }
-        //}
+
         String res = applyObjectMap(lhs);
         String oldRes = null;
         while (!res.equals(oldRes)) {
@@ -421,12 +411,6 @@ public class Trace {
             res = applyObjectMap(res);
         }
 
-        //for (String s : TraceInformation.ignoredVars) {
-         //   if (res.contains(s)) {
-          //      return null;
-           // }
-        //}
-        //res = TraceInformation.applyExpressionMap(res);
         String tmpRes = res;
         String rest = "";
         if (tmpRes.contains("[")) {

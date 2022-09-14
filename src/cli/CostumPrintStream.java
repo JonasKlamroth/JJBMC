@@ -26,7 +26,7 @@ public class CostumPrintStream extends PrintStream {
 
     @Override
     public void print(String s) {
-        if(active) {
+        if (active) {
             if (!s.startsWith("class ")) {
                 if (s.contains(File.separator + "tmp" + File.separator)) {
                     super.print(s.replaceAll(File.separator + "tmp", ""));
@@ -43,7 +43,7 @@ public class CostumPrintStream extends PrintStream {
 
     @Override
     public void write(byte[] buf, int off, int len) {
-        if(active) {
+        if (active) {
             if (!filtered) {
                 String s = new String(buf, StandardCharsets.UTF_8);
                 if (s.contains(File.separator + "tmp" + File.separator)) {

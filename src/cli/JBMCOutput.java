@@ -64,7 +64,7 @@ public class JBMCOutput {
 
     private String printFinalVals(Trace trace) {
         StringBuilder sb = new StringBuilder();
-        for(String k : trace.finalVals.keySet()) {
+        for (String k : trace.finalVals.keySet()) {
             sb.append(TraceInformation.applyExpressionMap(k) + " = " + trace.finalVals.get(k));
             sb.append("\n");
         }
@@ -105,8 +105,9 @@ public class JBMCOutput {
 
     private String cutArrayString(String s, int size) {
         int pos = s.indexOf(",");
-        while (--size > 0 && pos != -1)
+        while (--size > 0 && pos != -1) {
             pos = s.indexOf(",", pos + 1);
+        }
         return s.substring(0, pos - 1) + "}";
     }
 

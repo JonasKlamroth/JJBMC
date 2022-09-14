@@ -173,7 +173,11 @@ public class TraceParser {
                                 reason,
                                 TraceInformation.getAssertForLine(lineNumber));
                         } else {
-                            res.addProperty(propertyElemnt.getAttribute("property"), trace, TraceInformation.getOriginalLine(lineNumber), reason, null);
+                            res.addProperty(propertyElemnt.getAttribute("property"),
+                                    trace,
+                                    TraceInformation.getOriginalLine(lineNumber),
+                                    reason,
+                                    null);
                         }
                     }
                 }

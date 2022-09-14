@@ -120,7 +120,7 @@ public class CLI implements Runnable {
         description = "Print usage help and exit.")
     static boolean usageHelpRequested;
     @Option(names = {"-rv", "-relevantVar"},
-       description = "Names of variables whos values should be printed in a trace. (Has to be run with -tr option)")
+            description = "Names of variables whos values should be printed in a trace. (Has to be run with -tr option)")
     public static List<String> relevantVars = new ArrayList<>();
     @Option(names = {"-ft", "-fullTrace"}, description = "Prevents traces from being filtered for relevant variables and prints all values. " +
         "(Has to be run with -tr option)")
