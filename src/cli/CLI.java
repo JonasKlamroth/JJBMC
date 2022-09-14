@@ -567,7 +567,7 @@ public class CLI implements Runnable {
 
             if (xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
                 long start1 = System.currentTimeMillis();
-                JBMCOutput output = XmlParser2.parse(xmlOutput, runWithTrace);
+                JBMCOutput output = TraceParser.parse(xmlOutput, runWithTrace);
                 printOutput(output, end - start, functionName);
                 long duration = System.currentTimeMillis() - start1;
                 log.debug("Parsing xml took: " + duration + "ms.");

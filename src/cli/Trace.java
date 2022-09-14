@@ -39,6 +39,9 @@ public class Trace {
         if (var.startsWith("(") && var.endsWith(")")) {
             return false;
         }
+        if(var.contains("@")) {
+            return false;
+        }
         for (String s : relevantVars) {
             String[] vars = var.split("=");
             for (String v : vars) {
@@ -56,7 +59,6 @@ public class Trace {
     }
 
     private List<Assignment> filterAssignments(Set<String> relevantVars) {
-        allAssignments.get(0).toString();
         List<Assignment> trace = allAssignments;
         //trace = trace.stream().filter(a -> !a.jbmcVarname.equals("this")).collect(Collectors.toList());
         trace = trace.stream().filter(a -> !a.jbmcVarname.contains("malloc")).collect(Collectors.toList());
@@ -83,11 +85,11 @@ public class Trace {
                 group.get(i).guessedValue = getValue(group.get(i).value, idx);
                 if(group.get(i).jbmcVarname.contains("_array") && group.get(i).jbmcVarname.startsWith("dynamic_")) {
                     if(group.get(i).jbmcVarname.contains("[")) {
-                        Object o = getValue(group.get(i).jbmcVarname.substring(0, group.get(i).jbmcVarname.indexOf("[")));
+                        Object o = getValue(group.get(i).jbmcVarname.substring(0, group.get(i).jbmcVarname.indexOf("[")), idx);
                         group.get(i).guessedValue = o;
                         group.get(i).guess = group.get(i).guess.substring(0, group.get(i).guess.indexOf("["));
                     } else {
-                        Object o = getValue(group.get(i).jbmcVarname);
+                        Object o = getValue(group.get(i).jbmcVarname, idx);
                         group.get(i).guessedValue = o;
                     }
                 }
@@ -226,7 +228,7 @@ public class Trace {
                     if(index >= valArray.size()) {
                         System.out.println("error updating array in trace.");
                     } else {
-                        valArray.set(index, getValue(allAssignments.get(i).value));
+                        valArray.set(index, getValue(allAssignments.get(i).value, maxIdx));
                     }
 
                 } catch (NumberFormatException e) {
@@ -375,14 +377,15 @@ public class Trace {
     private String applyObjectMap(String lhs) {
         if (lhs.contains(".")) {
             String object = getObjectName(lhs.substring(0, lhs.indexOf(".")));
-            if (object == null) {
+            if (object == null && !lhs.contains("[")) {
                 return lhs;
+            } else if(object != null) {
+                String res = lhs.replace(lhs.substring(0, lhs.indexOf(".")), object);
+                if (res.endsWith(".data")) {
+                    return res.substring(0, res.length() - 5);
+                }
+                return res;
             }
-            String res = lhs.replace(lhs.substring(0, lhs.indexOf(".")), object);
-            if (res.endsWith(".data")) {
-                return res.substring(0, res.length() - 5);
-            }
-            return res;
         }
         if (lhs.contains("[")) {
             String object = getObjectName(lhs.substring(0, lhs.indexOf("[")));

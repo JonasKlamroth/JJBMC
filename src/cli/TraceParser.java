@@ -26,8 +26,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class XmlParser2 {
-    private static final Logger log = LogManager.getLogger(XmlParser2.class);
+public class TraceParser {
+    private static final Logger log = LogManager.getLogger(TraceParser.class);
     private static final String jbmcBanner = "\n" +
         "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
         "* *                 Copyright (C) 2001-2018                 * *\n" +
