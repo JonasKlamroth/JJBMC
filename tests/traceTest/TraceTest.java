@@ -1,6 +1,7 @@
 package traceTest;
 
-import cli.CLI;
+import cli.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,9 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import cli.CostumPrintStream;
-import cli.JBMCOutput;
-import cli.XmlParser2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
@@ -80,7 +78,7 @@ public class TraceTest {
         String path = inputFile.substring(0, idx) + File.separator + "tmp" + File.separator + "xmlout.xml";
         File f = new File(path) ;
         assertTrue(f.exists());
-        JBMCOutput output = XmlParser2.parse(f, true);
+        JBMCOutput output = TraceParser.parse(f, true);
         String traces = output.printAllTraces();
         String[] traceSplits = traces.split("\n");
         List<String> assignments = new ArrayList<>();

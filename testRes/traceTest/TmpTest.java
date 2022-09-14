@@ -41,6 +41,6 @@ public class TmpTest {
     //@ ensures false;
     public void test3() {
         iotable = new IntObject[]{new IntObject(), new IntObject()};
-        //iotable[0].i = 5; TODO
+        iotable[0].i = 5;
     }
 }
