@@ -552,10 +552,12 @@ public class CLI implements Runnable {
 
             if ((jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) || keepTranslation) {
                 keepTranslation = true;
-                log.error("JBMC did not terminate as expected for function: " + functionName +
-                    "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
                 Files.write(Paths.get(tmpFolder.getAbsolutePath(), "xmlout.xml"), xmlOutput.getBytes());
-                return;
+                if(jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
+                    log.error("JBMC did not terminate as expected for function: " + functionName +
+                        "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
+                    return;
+                }
             } else {
                 log.debug("JBMC terminated normally.");
             }
