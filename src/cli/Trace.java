@@ -188,6 +188,9 @@ public class Trace {
         for (Assignment a : group) {
             groupMap.put(a.guess, a);
         }
+        if(groupMap.containsKey(null)) {
+            groupMap.remove(null);
+        }
         List<Assignment> filtered = new ArrayList<>(groupMap.values());
         return filtered;
     }
