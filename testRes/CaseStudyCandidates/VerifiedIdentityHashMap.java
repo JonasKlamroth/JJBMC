@@ -1417,7 +1417,7 @@ public class VerifiedIdentityHashMap
         IntObject k =  maskNull(key);
         IntObject[] tab =  table;
         int len =  tab.length;
-        int i =  hash(k, len);
+        int idx =  hash(k, len);
 
 
         /*+KEY@
@@ -1426,19 +1426,69 @@ public class VerifiedIdentityHashMap
           @ assignable i, modCount, size, tab[*];
           @*/
         while (true) {
-            IntObject item =  tab[i];
+            IntObject item =  tab[idx];
             if (item != null && item.hash == k.hash) {
                 modCount++;
                 size--;
-                IntObject oldValue = tab[i + 1];
-                tab[i + 1] = null;
-                tab[i] = null;
-                closeDeletion(i);
+                IntObject oldValue = tab[idx + 1];
+                tab[idx + 1] = null;
+                tab[idx] = null;
+                int d = idx;
+                /*@
+                @ assert d >= 0 && d < table.length && d % 2 == 0;
+                @*/
+                    /*@
+                @ assert table[d] == null && table[d + 1] == null;
+                @*/
+                /*@
+                @ assert
+                @   (\forall int i;
+                    @       0 <= i < table.length / 2;
+                    @       !isBetween(i*2, d + 2, nextNull(d)) ==>
+                @       table[2*i] != null && 2*i > hash(table[2*i], table.length) ==>
+                @       (\forall int j;
+                    @           hash(table[2*i], table.length) / 2 <= j < i;
+                    @           table[2*j] != null));
+                @*/
+                /*@
+                @ assert
+                @   (\forall int i;
+                    @       0 <= i < table.length / 2;
+                    @       !isBetween(i*2, d + 2, nextNull(d)) ==>
+                @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
+                @       (\forall int j;
+                    @           hash(table[2*i], table.length) / 2 <= j < table.length / 2;
+                    @           table[2*j] != null));
+                @*/
+                /*@
+                @ assert
+                @   (\forall int i;
+                    @       0 <= i < table.length / 2;
+                    @       !isBetween(i*2, d + 2, nextNull(d)) ==>
+                @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
+                @       (\forall int j;
+                    @           0 <= j < hash(table[2*i], table.length) / 2;
+                @           table[2*j] != null));
+                @*/
+                /*@
+                @ assert
+                @   (\forall int i;
+                    @         0 <= i && i < table.length / 2;
+                    @         (table[i * 2] == null ==> table[i * 2 + 1] == null));
+                @*/
+                /*@
+                @ assert
+                @ (\forall int i; 0 <= i && i < table.length / 2;
+                    @     (\forall int j;
+                        @     i <= j && j < table.length / 2;
+                        @     (table[2*i] != null && table[2*j] != null && table[2*i].hash == table[2*j].hash) ==> i == j));
+                @*/
+                closeDeletion(idx);
                 return oldValue;
             }
             if (item == null)
                 return null;
-            i = nextKeyIndex(i, len);
+            idx = nextKeyIndex(idx, len);
         }
     }
 
@@ -1495,7 +1545,7 @@ public class VerifiedIdentityHashMap
       @ requires
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       !isBetween(i, d + 2, nextNull(d)) ==>
+      @       !isBetween(i*2, d + 2, nextNull(d)) ==>
       @       table[2*i] != null && 2*i > hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           hash(table[2*i], table.length) / 2 <= j < i;
@@ -1504,7 +1554,7 @@ public class VerifiedIdentityHashMap
       @ requires
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       !isBetween(i, d + 2, nextNull(d)) ==>
+      @       !isBetween(i*2, d + 2, nextNull(d)) ==>
       @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           hash(table[2*i], table.length) / 2 <= j < table.length / 2;
@@ -1513,7 +1563,7 @@ public class VerifiedIdentityHashMap
       @ requires
       @   (\forall int i;
       @       0 <= i < table.length / 2;
-      @       !isBetween(i, d + 2, nextNull(d)) ==>
+      @       !isBetween(i*2, d + 2, nextNull(d)) ==>
       @       table[2*i] != null && 2*i < hash(table[2*i], table.length) ==>
       @       (\forall int j;
       @           0 <= j < hash(table[2*i], table.length) / 2;
@@ -1626,7 +1676,7 @@ public class VerifiedIdentityHashMap
                 return i;
             }
         }
-        return d == 0 ? table.length - 1 : d - 2;
+        return d == 0 ? table.length - 2 : d - 2;
     }
 
     private /* spec_public pure */ boolean isBetween(int idx, int start, int end) {
