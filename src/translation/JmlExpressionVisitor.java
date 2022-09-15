@@ -200,7 +200,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = List.nil();
             List<JCStatement> oldNeededVariableDefs = neededVariableDefs;
             neededVariableDefs = List.nil();
-            copy = super.copy(expr, p);
+            copy = super.copy(NormalizeVisitor.normalize(expr, context, M), p);
             newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = newStatements.prependList(neededVariableDefs);
             neededVariableDefs = oldNeededVariableDefs;
@@ -213,7 +213,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             newStatements = List.nil();
             List<JCStatement> oldNeededVariableDefs = neededVariableDefs;
             neededVariableDefs = List.nil();
-            copy = super.copy(expr, p);
+            copy = super.copy(NormalizeVisitor.normalize(expr, context, M), p);
             newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
             newStatements = newStatements.prependList(neededVariableDefs);
             neededVariableDefs = oldNeededVariableDefs;

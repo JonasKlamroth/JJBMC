@@ -1140,4 +1140,11 @@ public class TestSuite {
         }
     }
 
+    //@ requires iotable != null;
+    public void test() {
+        /*@
+          @ assert (\forall int i; 0 <= i < iotable.length; iotable[i] != null ==> iotable[i].i == 0);
+          @*/
+    }
+
 }
