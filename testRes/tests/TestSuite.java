@@ -1140,10 +1140,10 @@ public class TestSuite {
         }
     }
 
-    //@ requires iotable != null;
-    public void test() {
+    //@ requires objects != null;
+    void test() {
         /*@
-          @ assert (\forall int i; 0 <= i < iotable.length; iotable[i] != null ==> iotable[i].i == 0);
+          @ assert (\forall int i; 0 <= i < objects.length; objects[i] != null ==> objects[i].pubInt == 0);
           @*/
     }
 
