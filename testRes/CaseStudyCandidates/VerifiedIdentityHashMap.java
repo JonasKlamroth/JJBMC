@@ -143,78 +143,6 @@ public class VerifiedIdentityHashMap
         }
     }
 
-    /*+KEY@ // JML specifically for KeY
-      @ public invariant
-      @   table != null &&
-      @   MINIMUM_CAPACITY * (\bigint)2 <= table.length  &&
-      @   MAXIMUM_CAPACITY * (\bigint)2 >= table.length;
-      @
-      @ // For all key-value pairs: if key == null, then value == null
-      @ public invariant
-      @   (\forall \bigint i;
-      @         0 <= i && i < table.length / (\bigint)2;
-      @         (table[i * 2] == null ==> table[i * 2 + 1] == null));
-      @
-      @ // Non-empty keys are unique
-      @ public invariant
-      @   (\forall \bigint i; 0 <= i && i < table.length / (\bigint)2;
-      @       (\forall \bigint j;
-      @       i <= j && j < table.length / (\bigint)2;
-      @       (table[2 * i] != null && table[2 * i] == table[2 * j]) ==> i == j));
-      @
-      @ // Size equals the number of non-empty keys in the table
-      @ public invariant
-      @   size == (\num_of \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[2 * i] != null);
-      @
-      @ // Table length is a power of two
-      @ public invariant
-      @   (\exists \bigint i;
-      @       0 <= i < table.length;
-      @       \dl_pow(2,i) == table.length);
-      @
-      @ // Table length is always an even number
-      @ public invariant
-      @   table.length % (\bigint)2 == 0;
-      @
-      @ // Table must have at least one empty key-element to prevent
-      @ // infinite loops when a key is not present.
-      @ public invariant
-      @   (\exists \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[2 * i] == null);
-      @
-      @ // There are no gaps between a key's hashed index and its actual
-      @ // index (if the key is at a higher index than the hash code)
-      @ public invariant
-      @   (\forall \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[2 * i] != null && 2 * i > \dl_genHash(table[2 * i], table.length) ==>
-      @       (\forall \bigint j;
-      @           \dl_genHash(table[2 * i], table.length) / (\bigint)2 <= j < i;
-      @           table[2 * j] != null));
-      @
-      @ // There are no gaps between a key's hashed index and its actual
-      @ // index (if the key is at a lower index than the hash code)
-      @ public invariant
-      @   (\forall \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[2 * i] != null && 2 * i < \dl_genHash(table[2 * i], table.length) ==>
-      @       (\forall \bigint j;
-      @           \dl_genHash(table[2 * i], table.length) <= 2 * j < table.length || 0 <= 2 * j < 2 * i;
-      @           table[2 * j] != null));
-      @
-      @ // All keys and values are of type Object
-      @ public invariant
-      @   \typeof(table) == \type(Object[]);
-      @
-      @ // Field modCount is of type integer (limits:
-      @ // Integer.MIN_VALUE and Integer.MAX_VALUE)
-      @ public invariant
-      @   \dl_inInt(modCount);
-      @
-      @*/
          /*+OPENJML@ // JML for non-KeY tools, i.e. JJBMC
       @ public invariant
       @   table != null &&
@@ -376,18 +304,6 @@ public class VerifiedIdentityHashMap
      * Constructs a new, empty identity hash map with a default expected
      * maximum size (21).
      */
-    /*+KEY@
-      @ private normal_behavior
-      @   ensures
-      @     table != null &&
-      @     table.length == (\bigint)2 * DEFAULT_CAPACITY &&
-      @     keySet == null &&
-      @     values == null &&
-      @     entrySet == null &&
-      @     modCount == 0 &&
-      @     size == 0 &&
-      @     (\forall \bigint i; 0 <= i && i < table.length; table[i] == null);
-      @*/
     /*+OPENJML@
       @ private normal_behavior
       @   ensures
@@ -424,32 +340,6 @@ public class VerifiedIdentityHashMap
      * expectedMaxSize)/2, if such a number exists.  Otherwise returns
      * MAXIMUM_CAPACITY.
      */
-    /*+KEY@
-      @ private normal_behavior
-      @   requires
-      @     expectedMaxSize > MAXIMUM_CAPACITY / (\bigint)3;
-      @   ensures
-      @     \result == MAXIMUM_CAPACITY;
-      @
-      @ private normal_behavior
-      @   requires
-      @     expectedMaxSize <= MAXIMUM_CAPACITY / (\bigint)3 &&
-      @     expectedMaxSize <= (\bigint)2 * MINIMUM_CAPACITY / 3;
-      @   ensures
-      @     \result == MINIMUM_CAPACITY;
-      @
-      @ private normal_behavior
-      @   requires
-      @     expectedMaxSize <= MAXIMUM_CAPACITY / (\bigint)3 &&
-      @     expectedMaxSize > (\bigint)2 * MINIMUM_CAPACITY / 3;
-      @   ensures
-      @     \result <= ((\bigint)3 * expectedMaxSize) &&
-      @     (\bigint)2 * \result > ((\bigint)3 * expectedMaxSize);
-      @   ensures
-      @     (\exists \bigint i;
-      @       0 <= i < \result;
-      @       \dl_pow(2,i) == \result); // result is a power of two
-      @*/
     /*+OPENJML@
       @ private normal_behavior
       @   requires
@@ -487,21 +377,6 @@ public class VerifiedIdentityHashMap
      * capacity, which is assumed to be a power of two between
      * MINIMUM_CAPACITY and MAXIMUM_CAPACITY inclusive.
      */
-    /*+KEY@
-      @ private normal_behavior
-      @   requires
-      @     (\exists \bigint i; 0 <= i < initCapacity; \dl_pow(2,i) == initCapacity) &&
-      @     initCapacity >= MINIMUM_CAPACITY &&
-      @     initCapacity <= MAXIMUM_CAPACITY &&
-      @     \dl_inInt(modCount);
-      @   assignable
-      @     table;
-      @   ensures
-      @     table != null &&
-      @     \typeof(table) == \type(Object[]) &&
-      @     (\forall \bigint i; 0 <= i < table.length; table[i] == null) &&
-      @     table.length == (\bigint)2 * initCapacity;
-      @*/
     /*+OPENJML@
       @ private normal_behavior
       @   requires
@@ -511,8 +386,10 @@ public class VerifiedIdentityHashMap
       @   assignable
       @     table;
       @   ensures
-      @     table != null &&
-      @     (\forall int i; 0 <= i < table.length; table[i] == null) &&
+      @     table != null;
+      @   ensures
+      @     (\forall int i; 0 <= i < table.length; table[i] == null);
+      @   ensures
       @     table.length == 2 * initCapacity;
       @*/
     private /*@ helper @*/ void init(int initCapacity) {
@@ -556,15 +433,6 @@ public class VerifiedIdentityHashMap
     /**
      * Returns index for Object x.
      */
-    /*+KEY@
-      @ private normal_behavior
-      @   ensures
-      @     (x == null ==> \result == 0) &&
-      @     \result == \dl_genHash(x, length) &&
-      @     \result % 2 == 0 &&
-      @     \result < length &&
-      @     \result >= 0;
-      @*/
      /*+OPENJML@
       @ private normal_behavior
       @   ensures
@@ -609,29 +477,6 @@ public class VerifiedIdentityHashMap
      *
      * @see #put(Object, Object)
      */
-    /*+KEY@
-      @ // Key exists
-      @ also
-      @ public normal_behavior
-      @   requires
-      @     (\exists \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[i * 2] == maskNull(key));
-      @   ensures
-      @     (\exists \bigint i;
-      @        0 <= i < table.length / (\bigint)2;
-      @        table[i * 2] == maskNull(key) && \result == table[i * 2 + 1]);
-      @
-      @ // Key does not exist
-      @ also
-      @ public normal_behavior
-      @   requires
-      @     !(\exists \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[i * 2] == maskNull(key));
-      @   ensures
-      @     \result == null;
-      @*/
     /*+OPENJML@
       @ // Key exists
       @
@@ -704,14 +549,6 @@ public class VerifiedIdentityHashMap
      *          in this map
      * @see     #containsValue(Object)
      */
-     /*+KEY@
-       @ also
-       @ public normal_behavior
-       @   ensures
-       @     \result <==> (\exists \bigint j;
-       @         0 <= j < (table.length / (\bigint)2);
-       @         table[j * 2] == maskNull(key));
-       @*/
      /*+OPENJML@
        @
        @ public normal_behavior
@@ -770,22 +607,19 @@ public class VerifiedIdentityHashMap
      *         specified object reference
      * @see     #containsKey(Object)
      */
-    /*+KEY@
-      @ also
-      @ public normal_behavior
-      @   ensures
-      @     \result <==> (\exists \bigint j;
-      @         0 <= j < table.length / (\bigint)2;
-      @         table[j * (\bigint)2] != null && table[j * (\bigint)2 + 1] == value);
-      @*/
     /*+OPEN_JML@
       @ public normal_behavior
       @   ensures
+      @     value != null ==> (
       @     \result <==> (\exists int j;
       @         0 <= j < table.length / 2;
       @         table[j * 2] != null && (
-      @             (table[j * 2 + 1] == null && table[j * 2 + 1] == value) ||
-      @             (table[j * 2 + 1] != null && table[j * 2 + 1].hash == value.hash));
+      @             (table[j * 2 + 1] != null && table[j * 2 + 1].hash == value.hash)));
+      @     value == null ==> (
+      @     \result <==> (\exists int j;
+      @         0 <= j < table.length / 2;
+      @         table[j * 2] != null && (
+      @             (table[j * 2 + 1] == null)));
       @*/
     public /*@ pure @*/ boolean containsValue(/*@ nullable @*/ IntObject value) {
         IntObject[] tab =  table;
@@ -805,7 +639,7 @@ public class VerifiedIdentityHashMap
           @ assignable \strictly_nothing;
           @*/
         for (int i =  1; i < tab.length; i += 2)
-            if ((tab[i] == null && value == null) || (tab[i] != null && tab[i].hash == value.hash) && tab[i - 1] != null)
+            if (((tab[i] != null && value != null && tab[i].hash == value.hash) || tab[i] == value) && tab[i - 1] != null)
                 return true;
 
         return false;
@@ -819,13 +653,6 @@ public class VerifiedIdentityHashMap
      * @return  <code>true</code> if and only if the specified key-value
      *          mapping is in the map
      */
-    /*+KEY@
-      @ private normal_behavior
-      @   ensures
-      @     \result <==> (\exists \bigint i;
-      @       0 <= i < table.length / (\bigint)2;
-      @       table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
-      @*/
     /*+OPENJML@
       @ private normal_behavior
       @   requires value != null; //TODO only showing this for value != null. This could be changed
@@ -841,8 +668,6 @@ public class VerifiedIdentityHashMap
         IntObject[] tab =  table;
         int len =  tab.length;
         int i =  hash(k, len);
-
-        //+KEY@ ghost \bigint hash = i;
 
         /*+KEY@
           @ // Index i is always an even value within the array bounds
@@ -891,75 +716,6 @@ public class VerifiedIdentityHashMap
      * @see     #get(Object)
      * @see     #containsKey(Object)
      */
-    /*+KEY@
-      @ also
-      @ private exceptional_behavior
-      @   requires
-      @     size == MAXIMUM_CAPACITY - 1;
-      @   requires
-      @     // The key is not present in the table
-      @     !(\exists \bigint i;
-      @         0 <= i < table.length / (\bigint)2;
-      @         table[i * 2] == maskNull(key));
-      @   assignable
-      @     \nothing;
-      @   signals_only
-      @     IllegalStateException;
-      @   signals
-      @     (IllegalStateException e) true;
-      @ also
-      @ public normal_behavior
-      @   requires
-      @     // The key is already present in the table
-      @     (\exists \bigint i;
-      @         0 <= i < table.length / (\bigint)2;
-      @         table[i*2] == maskNull(key));
-      @   assignable
-      @     table[*];
-      @   ensures
-      @     // The new value is associated with key and
-      @     // the old value associated with key is returned
-      @     (\exists \bigint i;
-      @         0 <= i < table.length / (\bigint)2;
-      @         table[i*2] == maskNull(key) &&
-      @         \result == \old(table[i * 2 + 1]) &&
-      @         table[i * 2 + 1] == value);
-      @   ensures
-      @     // After execution, all keys are unchanged and all old values are unchanged
-      @     // except the old value that was associated with key
-      @     (\forall \bigint i;
-      @         0 <= i < \old(table.length) / (\bigint)2;
-      @         (\old(table[i * 2]) == table[i * 2]) &&
-      @         (\old(table[i * 2]) != maskNull(key) ==>
-      @             \old(table[i * 2 + 1]) == table[i * 2 + 1]));
-      @ also
-      @ public normal_behavior
-      @   requires
-      @     size < MAXIMUM_CAPACITY - 1;
-      @   requires
-      @     // The key is not present in the table
-      @     !(\exists \bigint i;
-      @         0 <= i < table.length / (\bigint)2;
-      @         table[i * 2] == maskNull(key));
-      @   assignable
-      @     size, table[*], modCount, table;
-      @   ensures
-      @     // size must be increased by 1, modCount must change, and null must be returned
-      @     size == \old(size) + 1 && modCount != \old(modCount) && \result == null;
-      @   ensures
-      @     // After execution, all old keys are still present and all old values are still present
-      @     (\forall \bigint i;
-      @         0 <= i < \old(table.length) / (\bigint)2;
-      @         (\exists \bigint j;
-      @             0 <= j < table.length / (\bigint)2;
-      @             (\old(table[i * 2]) == table[j * 2]) &&
-      @              \old(table[i * 2 + 1]) == table[j * 2 + 1]));
-      @   ensures
-      @     // After execution, the table contains the new key associated with the new value
-      @     (\exists \bigint i;
-      @         0 <= i < table.length / (\bigint)2;
-      @         table[i * 2] == maskNull(key) && table[i * 2 + 1] == value);
-      @*/
     /*+OPENJML@
       @
       @ public normal_behavior
@@ -1083,88 +839,6 @@ public class VerifiedIdentityHashMap
      * @param newCapacity the new capacity, must be a power of two.
      * @return whether a resize did in fact take place
      */
-    /*+KEY@
-      @ // Throws an exception when table.length == 2 * MAXIMUM_CAPACITY &&
-      @ // size == MAXIMUM_CAPACITY - 1.
-      @ private exceptional_behavior
-      @   requires
-      @     table.length == (\bigint)2 * MAXIMUM_CAPACITY &&
-      @     size == MAXIMUM_CAPACITY - 1;
-      @   assignable
-      @     \nothing;
-      @   signals_only
-      @     IllegalStateException;
-      @   signals
-      @     (IllegalStateException e) true;
-      @
-      @ // Nothing changes if table.length == 2 * MAXIMUM_CAPACITY &&
-      @ // size < MAXIMUM_CAPACITY - 1.
-      @ private normal_behavior
-      @   requires
-      @     table.length == (\bigint)2 * MAXIMUM_CAPACITY &&
-      @     size < MAXIMUM_CAPACITY - 1;
-      @   assignable
-      @     \strictly_nothing;
-      @   ensures
-      @     \result == false;
-      @
-      @ // Nothing changes when table.length < 2 * MAXIMUM_CAPACITY &&
-      @ // table.length >= 2 * newCapacity.
-      @ private normal_behavior
-      @   requires
-      @     table.length < (\bigint)2 * MAXIMUM_CAPACITY &&
-      @     table.length >= (\bigint)2 * newCapacity &&
-      @     newCapacity >= MINIMUM_CAPACITY &&
-      @     newCapacity <= (\bigint)2 * MAXIMUM_CAPACITY;
-      @
-      @   assignable
-      @     \strictly_nothing;
-      @
-      @   ensures
-      @     // Map is unchanged, so return false
-      @     \result == false;
-      @
-      @
-      @ // If we actually resize (table.length < 2 * MAXIMUM_CAPACITY && table.length < 2 * newCapacity)
-      @ // then rehash the table with the new length to re-establish the class invariant.
-      @ private normal_behavior
-      @   requires
-      @     table.length < (\bigint)2 * newCapacity &&
-      @     newCapacity <= MAXIMUM_CAPACITY &&
-      @     newCapacity >= MINIMUM_CAPACITY &&
-      @     (\exists \bigint i;
-      @       0 <= i < newCapacity;
-      @       \dl_pow(2,i) == newCapacity);
-      @
-      @   assignable
-      @     table, table[*];
-      @
-      @   ensures
-      @     table.length == (newCapacity * (\bigint)2);
-      @
-      @   ensures
-      @     // After execution, all old entries are still present
-      @     (\forall \bigint i;
-      @       0 <= i < \old(table.length) && i % 2 == 0;
-      @       (\exists \bigint j;
-      @         0 <= j < table.length && j % 2 == 0;
-      @         \old(table[i]) == table[j] && \old(table[i + 1]) == table[j + 1]));
-      @
-      @   ensures
-      @     // Map is changed, so return true
-      @     \result == true;
-      @
-      @   ensures
-      @     \fresh(table);
-      @
-      @   ensures
-      @     // All entries in the new table were also present in \old(table)
-      @     (\forall \bigint n;
-      @       0 <= n < table.length / (\bigint)2;
-      @       (\exists \bigint m;
-      @         0 <= m < \old(table.length) / (\bigint)2;
-      @         table[2*n] == \old(table[2*m]) && table[2*n + 1] == \old(table[2*m + 1])));
-      @*/
     /*+OPENJML@
       @ // If we actually resize (table.length < 2 * MAXIMUM_CAPACITY && table.length < 2 * newCapacity)
       @ // then rehash the table with the new length to re-establish the class invariant.
@@ -1186,14 +860,12 @@ public class VerifiedIdentityHashMap
       @   ensures
       @     // After execution, all old entries are still present
       @     (\forall int i;
-      @       0 <= i < \old(table.length);
-      @       i % 2 == 0 ==>
+      @       0 <= i < \old(table.length)/2;
       @       (\exists int j;
-      @         0 <= j < table.length;
-      @         j % 2 == 0 ==>
-      @         \old(table[i]) == table[j] && \old(table[i + 1]) == table[j + 1]));
+      @         0 <= j < table.length/2;
+      @         \old(table[i * 2]) == table[j * 2] && \old(table[i * 2 + 1]) == table[j * 2 + 1]));
       @
-      @   ensures
+      @   ensure
       @     // Map is changed, so return true
       @     \result == true;
       @
@@ -1689,24 +1361,11 @@ public class VerifiedIdentityHashMap
      * Removes all of the mappings from this map.
      * The map will be empty after this call returns.
      */
-    /*+KEY@
-      @ also
-      @ public normal_behavior
-      @   assignable
-      @     modCount, size, table[0 .. table.length - (\bigint)1];
-      @   ensures
-      @     \old(modCount) != modCount &&
-      @     \old(table.length) == table.length &&
-      @     size == 0 &&
-      @     (\forall \bigint i;
-      @        0 <= i < table.length;
-      @        table[i] == null);
-      @*/
     /*+OPENJML@
       @
       @ public normal_behavior
       @   assignable
-      @     modCount, size, table[0 .. table.length - 1];
+      @     modCount, size, table[*];
       @   ensures
       @     \old(modCount) != modCount &&
       @     \old(table.length) == table.length &&
