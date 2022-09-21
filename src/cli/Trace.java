@@ -5,6 +5,7 @@ import static cli.TraceInformation.cleanValue;
 import static cli.TraceInformation.isRelevantValue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -83,7 +84,8 @@ public class Trace {
             group = filterGroup(group);
             for (int i = 0; i < group.size(); ++i) {
                 group.get(i).guessedValue = getValue(group.get(i).value, idx);
-                if (group.get(i).jbmcVarname.contains("_array") && group.get(i).jbmcVarname.startsWith("dynamic_")) {
+                if ((group.get(i).jbmcVarname.contains("_object") || group.get(i).jbmcVarname.contains("_array")) &&
+                        group.get(i).jbmcVarname.startsWith("dynamic_")) {
                     if (group.get(i).jbmcVarname.contains("[")) {
                         Object o = getValue(group.get(i).jbmcVarname.substring(0, group.get(i).jbmcVarname.indexOf("[")), idx);
                         group.get(i).guessedValue = o;
@@ -109,6 +111,10 @@ public class Trace {
     private Object getValue(String value, int idx) {
         value = value.trim();
         value = cleanValue(value);
+        if (value.contains("#")) {
+            //not sure if this is always correct
+            return new ArrayList<>(Arrays.asList(new Object[CLI.maxArraySize]));
+        }
         if (value.equals("null")) {
             return "null";
         }

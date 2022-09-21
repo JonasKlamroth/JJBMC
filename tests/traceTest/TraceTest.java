@@ -49,18 +49,30 @@ public class TraceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
         List<Object[]> params = new ArrayList<>();
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTest.java",
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut.txt",
                 new ArrayList<>(Arrays.asList(new String[]{"k", "tt", "table"})),
                 "test"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTest.java",
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut2.txt",
                 new ArrayList<>(),
                 "test2"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTest.java",
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut3.txt",
                 new ArrayList<>(Arrays.asList(new String[]{"iotable"})),
                 "test3"});
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut4.txt",
+                new ArrayList<>(),
+                "test4"});
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut5.txt",
+                new ArrayList<>(),
+                "test5"});
+        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut6.txt",
+                new ArrayList<>(),
+                "test6"});
 
         return params;
     }

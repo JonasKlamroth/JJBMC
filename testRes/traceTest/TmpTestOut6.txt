@@ -1,0 +1,3 @@
+in line 56: this.iotable (dynamic_object1.iotable) = null
+in line 56: size (size) = 2
+in line 59: this.iotable (dynamic_object1.iotable) = [null, null, null, null, null]
