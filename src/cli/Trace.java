@@ -179,22 +179,125 @@ public class Trace {
 
     }
 
-    private String simplifyQstate(List<ket> ketList){
+    private String simplifyKetList(List<ket> ketListSameCoeff, int dim){
+        String fin = "";
+        StringBuilder res = new StringBuilder("");
+        List<ket> helperList = new ArrayList<>(ketListSameCoeff);
+        List<Integer> bitpositions = new ArrayList<>();
 
-        /*
-        float currentVal = 0.0f;
-        for(int i = 0; i < coeffAndBit.size() / 2; i = i + 2){
-            currentVal = coeffAndBit.get(i);
-            for(int j = i; j < coeffAndBit.size(); j++){
-                if(coeffAndBit.get(j) == currentVal){
-                    //simplifiedList.add(currentVal);
-                   // simplifidList.add
+        for(int i = 0; i < ketListSameCoeff.size() - 1; i = i + 2){
+            int checkInt = (ketListSameCoeff.get(i).bitIndex^ketListSameCoeff.get(i+1).bitIndex);
+            if( checkInt != 0 && (checkInt & (checkInt-1))==0){
+                helperList.remove(ketListSameCoeff.get(i));
+                helperList.remove(ketListSameCoeff.get(i + 1));
+                //exactly one bit is set => the numbers differ by only one bit
+                int c;
+                int bitposition = 0;
+                while (checkInt != 0)
+                {
+                    c = checkInt & (0 - checkInt);
+                    bitposition = Integer.numberOfTrailingZeros(c);
+                    checkInt = checkInt ^ c;
+                }
+                bitpositions.add(bitposition);
+                res = new StringBuilder("|" + String.format("%" + dim + "s", Integer.toBinaryString(ketListSameCoeff.get(i).bitIndex)).replace(' ', '0') + ">");
+                res.setCharAt( res.length() - bitposition - 2, 'x');
+
+            }else{
+                //return unprocessed term
+                for(int j = 0; j < helperList.size(); j++){
+                    if (j == 0 && res.length() == 0) {
+                        fin += "|" + String.format("%" + dim + "s", Integer.toBinaryString(helperList.get(j).bitIndex)).replace(' ', '0') + ">";
+                        continue;
+                    }
+                    fin += " + " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(helperList.get(j).bitIndex)).replace(' ', '0') + ">";
+
+                }
+                break;
+            }
+
+            if(fin == ""){
+                fin += res.toString();
+            }else{
+                fin += " + ";
+                fin += res.toString();
+            }
+        }
+
+
+        if(bitpositions.size() == 2){
+            if(bitpositions.get(0) == bitpositions.get(1)){
+                res = new StringBuilder("|" + String.format("%" + dim + "s", Integer.toBinaryString(ketListSameCoeff.get(0).bitIndex)).replace(' ', '0') + ">");
+                res.setCharAt( res.length() - bitpositions.get(0) - 2, 'x');
+                res.setCharAt( res.length() - bitpositions.get(1) - 3, 'x');
+            }
+            fin = res.toString();
+        }
+
+        return fin;
+    }
+
+    private String simplifyQstate(List<ket> ketList, int dim){
+
+        List<ket> ketListSameCoeff = new ArrayList<>();
+        List<List<ket>> ketketList = new ArrayList<>();
+        float currentCoeff = 0.0f;
+
+        for(int i = 0; i < ketList.size(); i ++){
+            currentCoeff = ketList.get(i).coeff;
+            ketListSameCoeff.add(ketList.get(i));
+            for(int j = i + 1; j < ketList.size(); j++){
+                if(ketList.get(j).coeff == currentCoeff){
+                    ketListSameCoeff.add(ketList.get(j));
+                    ketList.remove(ketList.get(j));
+                    j = j - 1;
+                }
+            }
+            ketketList.add((List<ket>) ((ArrayList<ket>) ketListSameCoeff).clone());
+            ketListSameCoeff.clear();
+        }
+
+        String valval = "";
+
+
+        for(int i = 0; i < ketketList.size(); i++){
+            if(ketketList.get(i).size() > 1){
+                valval += Float.toString(ketketList.get(i).get(0).coeff) + " * (";
+                valval += simplifyKetList(ketketList.get(i), dim);
+                valval += ")";
+            }else{
+                for (int j = 0; j < ketketList.get(i).size(); j++) {
+                    valval += Float.toString(ketketList.get(i).get(0).coeff) + " * ";
+                    valval += "|" + String.format("%" + dim + "s", Integer.toBinaryString(ketketList.get(i).get(j).bitIndex)).replace(' ', '0') + ">";
+
                 }
             }
         }
-        */
 
-        return "";
+
+        valval += "----";
+
+
+
+        for(int j = 0; j < ketketList.size(); j++) {
+
+            String val = Float.toString(ketketList.get(j).get(0).coeff) + " * (";
+            for (int i = 0; i < ketketList.get(j).size(); i++) {
+
+                if (i == 0) {
+                    val += "|" + String.format("%" + dim + "s", Integer.toBinaryString(ketketList.get(j).get(i).bitIndex)).replace(' ', '0') + ">";
+                    continue;
+                }
+                val += " + " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(ketketList.get(j).get(i).bitIndex)).replace(' ', '0') + ">";
+            }
+
+            val += ")";
+            valval += val;
+        }
+
+
+
+        return valval;
     }
 
     private void createQuantumAss(Assignment qstate){
@@ -228,7 +331,7 @@ public class Trace {
         for(int i = 0; i < qvalues.size(); i++){
             if(qvalues.get(i) > 0.0f || qvalues.get(i) < 0.0f){
                 float coeff = qvalues.get(i);
-                val += "+" + Float.toString(coeff) + " * " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(i)).replace(' ', '0') + ">";
+                val += " + " + Float.toString(coeff) + " * " + "|" + String.format("%" + dim + "s", Integer.toBinaryString(i)).replace(' ', '0') + ">";
 
                 ket k = new ket();
                 k.coeff = coeff;
@@ -236,12 +339,22 @@ public class Trace {
                 ketList.add(k);
             }
         }
+        ket k1 = new ket();
+        k1.coeff = 0.3f;
+        k1.bitIndex = 4;
 
-        String simplifiedVal = simplifyQstate(ketList);
+        ket k2 = new ket();
+        k2.coeff = 0.3f;
+        k2.bitIndex = 1;
+        //ketList.add(k1);
+        //ketList.add(k2);
+
+        String simplifiedVal = simplifyQstate(ketList, dim);
         val = val.substring(1);
 
         //Assignment ass = new Assignment(10, "", val, "q_state", "");
         qstate.guessedValue = val;
+        qstate.guessedValue = simplifiedVal;
     }
 
     private List<Assignment> filterGroup(List<Assignment> group) {
