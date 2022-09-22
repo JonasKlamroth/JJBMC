@@ -489,6 +489,11 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                                 treeutils.makeIdent(TranslationUtils.getCurrentPosition(), v), maker.Literal(CLI.maxArraySize)));
                     }
                     JCStatement body = treeutils.makeAssignStat(TranslationUtils.getCurrentPosition(), bodyExp, argCopy);
+                    body = M.Try(M.Block(0L, List.of(body)),
+                            List.of(M.Catch(
+                                    treeutils.makeVarDef( syms.runtimeExceptionType.tsym.type, M.Name("e"), currentSymbol, TranslationUtils.getCurrentPosition()),
+                                    M.Block(0L, List.nil()))),
+                            null);
                     JCStatement oldInit = null;
                     List<Symbol.VarSymbol> quanVars = List.from(quantifierVars.keySet());
                     quanVars = quanVars.reverse();
@@ -497,7 +502,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
                         JCExpression c = super.copy(quantifierVars.get(v).snd);
                         oldInit = maker.ForLoop(List.of(in), maker.Binary(Tag.LE, maker.Ident(in.sym), c),
-                            List.of(maker.Exec(maker.Unary(Tag.PREINC, maker.Ident(in.sym)))), body);
+                            List.of(maker.Exec(maker.Unary(Tag.PREINC, maker.Ident(in.sym)))), M.Block(0L, List.of(body)));
                         body = oldInit;
                     }
                     oldInits = oldInits.append(oldInit);
