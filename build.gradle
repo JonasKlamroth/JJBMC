@@ -30,7 +30,7 @@ sourceSets {
          srcDir 'tests'
       }
       resources {
-          srcDir 'resources'
+          srcDir 'testRes'
       }
    }
 }
@@ -47,6 +47,10 @@ checkstyleTest {
     source ='tests/'
 }
 
+test {
+    useJUnitPlatform()
+}
+
 
 
 // In this section you declare where to find the dependencies of your project
@@ -58,6 +62,9 @@ repositories {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'lib')
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
 }

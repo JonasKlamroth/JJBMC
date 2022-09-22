@@ -9,81 +9,66 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(Parameterized.class)
+
 public class TraceTest {
 
-    @Parameterized.Parameter(value = 0)
-    public String inputFile;
-
-    @Parameterized.Parameter(value = 1)
-    public String outFile;
-
-    @Parameterized.Parameter(value = 2)
-    public List<String> relevantVars;
-
-    @Parameterized.Parameter(value = 3)
-    public String functionName;
-
-    @BeforeClass
     public static void init() {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
     }
-    @AfterClass
     public static void after() {
         CLI.cleanUp();
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> getParameters() {
-        List<Object[]> params = new ArrayList<>();
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+    public static Stream<Arguments> getParameters() {
+        List<Arguments> params = new ArrayList<>();
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut.txt",
                 new ArrayList<>(Arrays.asList(new String[]{"k", "tt", "table"})),
-                "test"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "test"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut2.txt",
                 new ArrayList<>(),
-                "test2"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "test2"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut3.txt",
                 new ArrayList<>(Arrays.asList(new String[]{"iotable"})),
-                "test3"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "test3"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut4.txt",
                 new ArrayList<>(),
-                "test4"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "test4"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut5.txt",
                 new ArrayList<>(),
-                "test5"});
-        params.add(new Object[]{"." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
+                "test5"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut6.txt",
                 new ArrayList<>(),
-                "test6"});
+                "test6"));
 
-        return params;
+        return params.stream();
     }
 
-    @Test
-    public void traceTest() {
+    @ParameterizedTest
+    @MethodSource("getParameters")
+    public void traceTest(String inputFile, String outFile, ArrayList<String> relevantVars, String functionName) {
         Logger log = LogManager.getLogger(CLI.class);
         CLI.reset();
         CLI.runWithTrace = true;
         CLI.keepTranslation = true;
-        CLI.functionName = this.functionName;
+        CLI.functionName = functionName;
         CLI.relevantVars.addAll(relevantVars);
         CLI.translateAndRunJBMC(inputFile);
         int idx = inputFile.lastIndexOf(File.separator);
@@ -100,7 +85,7 @@ public class TraceTest {
             }
         }
         File reference = new File(outFile);
-        assertTrue("Outfile " + outFile + " does not exist.", reference.exists());
+        assertTrue(reference.exists());
         try {
             List<String> lines = Files.readAllLines(reference.toPath());
             assertEquals(lines.size(), assignments.size());

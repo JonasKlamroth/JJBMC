@@ -1,8 +1,5 @@
 package utils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import cli.CLI;
 import exceptions.TranslationException;
 import java.io.BufferedReader;
@@ -15,10 +12,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.params.provider.Arguments;
 import translation.FunctionNameVisitor;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by jklamroth on 12/3/18.
@@ -30,16 +32,16 @@ public class Utils {
     private static boolean filterOutput = false;
     private boolean doCleanup = false;
 
-    public static Collection<Object[]> assignableParameter() {
+    public static Stream<Arguments> assignableParameter() {
         return prepareParameters(baseTestFolder + "tests" + File.separator + "AssignableTests.java");
     }
 
-    public static Collection<Object[]> assignable2Parameter() {
+    public static Stream<Arguments> assignable2Parameter() {
         return prepareParameters(baseTestFolder + "tests" + File.separator + "AssignableTests2.java");
     }
 
-    public static Collection<Object[]> prepareParameters(String fileName) {
-        ArrayList<Object[]> params = new ArrayList<>();
+    public static Stream<Arguments> prepareParameters(String fileName) {
+        ArrayList<Arguments> params = new ArrayList<>();
         createAnnotationsFolder(fileName);
         CLI.keepTranslation = keepTmpFile;
         CLI.debugMode = true;
@@ -65,11 +67,11 @@ public class Utils {
                     int dotIdx = name.lastIndexOf(":");
                     name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
                 }
-                params.add(new Object[] {classFile, name, unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()});
+                params.add(Arguments.of(classFile, name, unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()));
             }
         }
         log.debug("Found " + params.size() + " functions.");
-        return params;
+        return params.stream();
     }
 
     private static void createAnnotationsFolder(String fileName) {
@@ -173,9 +175,9 @@ public class Utils {
                 log.info(out);
                 log.info(errOut);
             }
-            assertFalse(out.toString(), out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
-            assertFalse(out.toString(), out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
-            assertTrue(out.toString(), out.toString().contains("VERIFICATION"));
+            assertFalse(out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
+            assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
+            assertTrue(out.toString().contains("VERIFICATION"));
 
         } else {
             log.warn("Function: " + function + " ignored due to missing annotation.");

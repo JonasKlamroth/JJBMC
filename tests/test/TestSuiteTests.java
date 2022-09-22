@@ -5,49 +5,42 @@ import cli.CostumPrintStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
-import utils.Parallelized;
 import utils.Utils;
 
-@RunWith(Parallelized.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class TestSuiteTests {
     public static final int numThreads = 16;
 
-    @Parameterized.Parameter(value = 0)
-    public String classFile;
-    @Parameterized.Parameter(value = 1)
-    public String function;
-    @Parameterized.Parameter(value = 2)
-    public String unwind;
-    @Parameterized.Parameter(value = 3)
-    public FunctionNameVisitor.TestBehaviour behaviour;
-    @Parameterized.Parameter(value = 4)
-    public String parentFolder;
-
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
     }
 
-    @AfterClass
-    public static void after() {
+    @AfterEach
+    public void after() {
         CLI.cleanUp();
     }
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> getParameters() {
+    public static Stream<Arguments> getParameters() {
         init();
         return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "TestSuite.java");
     }
 
-    @Test
-    public void runTestSuite() throws IOException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("getParameters")
+    public void runTestSuite(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour,
+                             String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 
