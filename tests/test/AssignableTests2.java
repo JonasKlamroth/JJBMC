@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -18,7 +19,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
 import utils.Utils;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Order(value = 2)
+//@Execution(ExecutionMode.CONCURRENT)
 public class AssignableTests2 {
 
     @BeforeAll

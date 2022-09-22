@@ -88,6 +88,7 @@ public class Utils {
                 new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println(e.getMessage());
             throw new TranslationException("Error trying to copy TestAnnotations");
         }
         f = new File(fileName);

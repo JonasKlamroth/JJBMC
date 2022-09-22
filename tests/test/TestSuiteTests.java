@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,9 +18,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
 import utils.Utils;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Order(value = 0)
+//@Execution(ExecutionMode.CONCURRENT)
 public class TestSuiteTests {
-    public static final int numThreads = 16;
 
     @BeforeAll
     public static void init() {

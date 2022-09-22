@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import translation.FunctionNameVisitor;
@@ -16,7 +17,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import java.util.stream.Stream;
 
-@Execution(ExecutionMode.CONCURRENT)
+@Order(value = 1)
+//@Execution(ExecutionMode.CONCURRENT)
 public class AssignableTests {
 
     @BeforeAll
