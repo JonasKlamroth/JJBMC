@@ -1,0 +1,20 @@
+in line 522: val (val) = 1
+in line 522: \result (returnVar) = 0
+in line 534: q_state_0 (dynamic_13_array[3L]) = 1.0 * |0000>
+in line 536: q_state_0 (dynamic_17_array[3L]) = 0.707107 * (|00x0>)
+in line 538: q_state_0 (dynamic_21_array[3L]) = 0.5 * (|00xx>)
+in line 540: q_state_0 (dynamic_25_array[3L]) = -0.5 * (|000x>) + 0.5 * (|001x>)
+in line 542: q_state_0 (dynamic_29_array[3L]) = -0.707107 * (|001x>)
+in line 544: q_state_0 (dynamic_33_array[3L]) = -1.0 * |0010>
+in line 546: q_state_0 (dynamic_37_array[3L]) = 1.0 * |0010>
+in line 548: q_state_0 (dynamic_41_array[3L]) = 1.0 * |0010>
+in line 550: q_state_0 (dynamic_45_array[3L]) = 1.0 * |0010>
+in line 552: q_state_0 (dynamic_49_array[3L]) = 0.707107 * |0000> + -0.707107 * |0010>
+in line 560: q_state_0 (dynamic_57_array[3L]) = 0.707107 * |0000>
+in line 571: q_state_0 (dynamic_65_array[3L]) = 0.707107 * |0000>
+in line 576: \result (returnVar) = 0
+Fail in line 525: ensures ((val >= 0 && val < 4) ==> \result == val) && ((val < 0 || val > 3) ==> \result == -1);  (assertion at file Grover.java line 1768 function java::Grover.grover2brokenVerf:(I)I bytecode-index 1065)
+with concrete values: 
+val = 1
+\result = 0
+q_state_0 = 0.707107 * |0000>

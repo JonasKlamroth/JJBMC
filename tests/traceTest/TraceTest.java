@@ -66,6 +66,10 @@ public class TraceTest {
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut6.txt",
                 new ArrayList<>(),
                 "test6"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "Grover.java",
+                "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "Grover2BrokenOut.txt",
+                new ArrayList<>(Arrays.asList(new String[]{"-tr -t 600000 -rv q_state_0"})),
+                "grover2broken"));
 
         return params.stream();
     }
