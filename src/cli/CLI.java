@@ -106,6 +106,10 @@ public class CLI implements Runnable {
         description = "Adds a check for each method if assumptions are equals to false.",
         arity = "0..1")
     public static boolean doSanityCheck = false;
+    @Option(names = {"-qt", "-quantumTrace"},
+            description = "rewrites the trace output to bra-ket notation",
+            arity = "0..1")
+    public static boolean enableQuantumTrace = false;
     @Option(names = {"-d", "-debug"},
         description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
     public static boolean debugMode = false;

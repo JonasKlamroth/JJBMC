@@ -70,6 +70,10 @@ public class TraceTest {
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "Grover2BrokenOut.txt",
                 new ArrayList<>(Arrays.asList(new String[]{"-tr -t 600000 -rv q_state_0"})),
                 "grover2broken"));
+        params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "Deutsch.java",
+                "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "Deutsch1Broken.txt",
+                new ArrayList<>(Arrays.asList(new String[]{"-tr -t 600000 -rv q_state_0"})),
+                "isBalanced1BitBroken"));
 
         return params.stream();
     }

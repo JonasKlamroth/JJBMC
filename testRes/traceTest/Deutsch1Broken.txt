@@ -1,0 +1,21 @@
+in line 8: f (dynamic_2_array[4L]) = [false, false, false, false, false]
+in line 8: f.length (dynamic_object1.length) = 2
+in line 4: \result (returnVar) = true
+in line 20: q_state_0 (dynamic_15_array[3L]) = 1.0 * |0000>
+in line 22: q_state_0 (dynamic_19_array[3L]) = 0.707107 * (|000x>)
+in line 24: q_state_0 (dynamic_23_array[3L]) = 0.5 * (|00xx>)
+in line 26: q_state_0 (dynamic_27_array[3L]) = 0.5 * (|00xx>)
+in line 28: q_state_0 (dynamic_31_array[3L]) = 0.707107 * (|000x>)
+in line 36: q_state_0 (dynamic_39_array[3L]) = 0.707107 * (|000x>)
+in line 40: \result (returnVar) = false
+in line 10: f ($$param2) = null
+in line 10: f = f ($$param2) = [false, false, false, false, false]
+in line 10: f = f (f) = [false, false, false, false, false]
+in line 0: \result (returnVar) = 1
+Fail in line 10: ensures \result <==> (count(f) == f.length / 2);  (assertion at file Deutsch.java line 125 function java::Deutsch.isBalanced1BitBrokenVerf:([Z)Z bytecode-index 799)
+with concrete values: 
+f = [false, false, false, false, false]
+\result = 1
+q_state_0 = 0.707107 * (|000x>)
+f = [false, false, false, false, false]
+f.length = 2
