@@ -204,7 +204,7 @@ public class TraceParser {
     }
 
     public static Trace extractTrace(List<Assignment> assignments) {
-        return new Trace(assignments);
+        return new QuantumTrace(assignments);
     }
 
     private static String getOriginalName(String[] exprs, Map<String, String> exprMap) {

@@ -188,7 +188,7 @@ public class Trace {
 
     }
 
-    private List<Assignment> filterGroup(List<Assignment> group) {
+    protected List<Assignment> filterGroup(List<Assignment> group) {
         //group = group.stream().filter(a -> !a.value.contains("dynamic_object")).collect(Collectors.toList());
         LinkedHashMap<String, Assignment> groupMap = new LinkedHashMap<>();
         for (Assignment a : group) {
