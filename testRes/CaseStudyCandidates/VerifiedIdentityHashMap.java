@@ -865,7 +865,7 @@ public class VerifiedIdentityHashMap
       @         0 <= j < table.length/2;
       @         \old(table[i * 2]) == table[j * 2] && \old(table[i * 2 + 1]) == table[j * 2 + 1]));
       @
-      @   ensure
+      @   ensures
       @     // Map is changed, so return true
       @     \result == true;
       @
@@ -1037,24 +1037,24 @@ public class VerifiedIdentityHashMap
       @     size, table, table[*], modCount;
       @   ensures
       @     // Size is subtracted by 1
-      @     !(\exists int i;
+      @     (\exists int i;
       @        0 <= i < table.length / 2;
-      @        table[i*2] != null &&
-      @        table[i*2].hash == maskNull(key).hash) || size == \old(size) - 1;
+      @        \old(table[i*2]) != null &&
+      @        \old(table[i*2]).hash == maskNull(key).hash) ==> size == \old(size) - 1;
       @
       @   ensures
       @     // modCount is changed
-      @     !(\exists int i;
+      @     (\exists int i;
       @        0 <= i < table.length / 2;
-      @        table[i*2] != null &&
-      @        table[i*2].hash == maskNull(key).hash) || modCount != \old(modCount);
+      @        \old(table[i*2]) != null &&
+      @        \old(table[i*2]).hash == maskNull(key).hash) ==> modCount != \old(modCount);
       @
       @   ensures
       @     // Result is the removed value if key is present
       @     (\exists int i;
       @        0 <= i < table.length / 2;
-      @        table[i*2] != null &&
-      @        table[i*2].hash == maskNull(key).hash)
+      @        \old(table[i*2]) != null &&
+      @        \old(table[i*2]).hash == maskNull(key).hash)
       @         ==>
       @     (\exists int j;
       @       0 <= j < \old(table.length) / 2;
@@ -1065,8 +1065,8 @@ public class VerifiedIdentityHashMap
       @     // Result is null if key is not present
       @     !(\exists int i;
       @        0 <= i < table.length / 2;
-      @        table[i*2] != null &&
-      @        table[i*2].hash == maskNull(key).hash) || \result == null;
+      @        \old(table[i*2]) != null &&
+      @        \old(table[i*2]).hash == maskNull(key).hash) ==> \result == null;
       @
       @   ensures
       @     // All not-to-be-removed elements are still present
