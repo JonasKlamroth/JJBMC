@@ -118,9 +118,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
         expressionVisitor.inConstructor = this.inConstructor;
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, maker);
-        //if(translationMode == ASSUME) {
-            //return that;
-        //}
+
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
@@ -234,7 +232,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             bodyStats = bodyStats.append(oldInit);
         }
 
-        if(CLI.proofPreconditions) {
+        if (CLI.proofPreconditions) {
             bodyStats = copy.body.stats;
         } else {
             if (currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
@@ -270,7 +268,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
         l = l.appendList(bodyStats);
 
-        if(!CLI.proofPreconditions) {
+        if (!CLI.proofPreconditions) {
             if (ensCases.size() > 1) {
                 for (int i = 0; i < ensCases.size(); ++i) {
                     JCExpression innerReqExpr = maker.Literal(true);

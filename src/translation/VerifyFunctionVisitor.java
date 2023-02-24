@@ -271,7 +271,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
 
         List<JCTree.JCCatch> catches = List.of(maker.Catch(catchVarb, maker.Block(0L, List.nil())));
-        for(JCExpression exceptionType : signaledExceptions) {
+        for (JCExpression exceptionType : signaledExceptions) {
             JCVariableDecl catchVar =
                     treeutils.makeVarDef(exceptionType.type, maker.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
             JCStatement assumeFalse = TranslationUtils.makeAssumeStatement(M.Literal(false));

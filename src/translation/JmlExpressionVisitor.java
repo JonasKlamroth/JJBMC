@@ -49,7 +49,26 @@ import static org.jmlspecs.openjml.JmlTree.Maker;
 import cli.CLI;
 import cli.ErrorLogger;
 import cli.TraceInformation;
-import com.sun.source.tree.*;
+import com.sun.source.tree.AssignmentTree;
+import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.BlockTree;
+import com.sun.source.tree.BreakTree;
+import com.sun.source.tree.CaseTree;
+import com.sun.source.tree.CatchTree;
+import com.sun.source.tree.CompoundAssignmentTree;
+import com.sun.source.tree.ConditionalExpressionTree;
+import com.sun.source.tree.ContinueTree;
+import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.IfTree;
+import com.sun.source.tree.LabeledStatementTree;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ReturnTree;
+import com.sun.source.tree.SwitchTree;
+import com.sun.source.tree.TryTree;
+import com.sun.source.tree.UnaryTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -60,7 +79,6 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.util.Pair;
-import com.sun.tools.javac.util.Position;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
 import java.util.ArrayList;
@@ -473,7 +491,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     JCStatement body = treeutils.makeAssignStat(TranslationUtils.getCurrentPosition(), bodyExp, argCopy);
                     body = M.Try(M.Block(0L, List.of(body)),
                             List.of(M.Catch(
-                                    treeutils.makeVarDef( syms.runtimeExceptionType.tsym.type, M.Name("e"), currentSymbol, TranslationUtils.getCurrentPosition()),
+                                    treeutils.makeVarDef(syms.runtimeExceptionType.tsym.type,
+                                            M.Name("e"),
+                                            currentSymbol,
+                                            TranslationUtils.getCurrentPosition()),
                                     M.Block(0L, List.nil()))),
                             null);
                     JCStatement oldInit = null;
@@ -571,9 +592,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     public JCTree visitBlock(BlockTree node, Void p) {
         List<JCStatement> res = List.nil();
         List<JCStatement> tmp = newStatements;
-        for(JCStatement statement : ((JCBlock)node).getStatements()) {
+        for (JCStatement statement : ((JCBlock) node).getStatements()) {
             JCStatement copy = this.copy(statement);
-            if(newStatements.size() > 0) {
+            if (newStatements.size() > 0) {
                 res = res.appendList(newStatements);
                 newStatements = List.nil();
             } else {
