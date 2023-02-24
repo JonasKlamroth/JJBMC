@@ -110,8 +110,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         JmlExpressionVisitor expressionVisitor =
             new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
         if (that.clauseKind.name().equals("ensures")) {
-            expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSUME);
-            translationMode = VerifyFunctionVisitor.TranslationMode.ASSUME;
+            expressionVisitor.setTranslationMode(ASSUME);
+            translationMode = ASSUME;
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
@@ -126,7 +126,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         oldVars = expressionVisitor.getOldVars();
         oldInits = expressionVisitor.getOldInits();
-        if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME) {
+        if (translationMode == ASSUME) {
             newStatements = newStatements.append(TranslationUtils.makeAssumeStatement(copy));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
@@ -224,10 +224,6 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             copy.restype = maker.Ident(copy.sym.owner.name);
             inConstructor = false;
         }
-        JCVariableDecl catchVar = treeutils.makeVarDef(syms.exceptionType, maker.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
-        JCExpression ty = maker.at(that).Type(syms.runtimeExceptionType);
-        JCExpression msg = treeutils.makeStringLiteral(that.pos, "Specification is not well defined for method " + that.getName());
-        JCThrow throwStmt = maker.Throw(maker.NewClass(null, null, ty, List.of(msg), null));
 
         List<JCStatement> bodyStats = List.nil();
         for (JCVariableDecl variableDecl : oldVars.values()) {
@@ -238,10 +234,14 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             bodyStats = bodyStats.append(oldInit);
         }
 
-        if (currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
-            throw new UnsupportedException("Havocing \\everything is not supported. For invoked method: " + that.name);
+        if(CLI.proofPreconditions) {
+            bodyStats = copy.body.stats;
+        } else {
+            if (currentAssignable.size() == 0 && !that.name.toString().equals("<init>")) {
+                throw new UnsupportedException("Havocing \\everything is not supported. For invoked method: " + that.name);
+            }
+            bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
         }
-        bodyStats = bodyStats.appendList(TranslationUtils.havoc(currentAssignable, copy.sym, this));
 
         List<JCStatement> l = List.nil();
         List<JCExpression> asserts = List.nil();
@@ -265,27 +265,29 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
             l = l.appendList(reqCases.get(0));
         }
 
-        if (hasReturn && returnVar != null) {
+        if (hasReturn && returnVar != null && !CLI.proofPreconditions) {
             l = l.append(returnVar);
         }
         l = l.appendList(bodyStats);
 
-        if (ensCases.size() > 1) {
-            for (int i = 0; i < ensCases.size(); ++i) {
-                JCExpression innerReqExpr = maker.Literal(true);
-                for (int j = 0; j < ensCases.get(i).size(); ++j) {
-                    JCExpression expr = TranslationUtils.extractAssumeExpr(ensCases.get(i).get(j));
-                    if (expr != null) {
-                        innerReqExpr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), innerReqExpr, expr);
-                    } else {
-                        l = l.append(ensCases.get(i).get(j));
+        if(!CLI.proofPreconditions) {
+            if (ensCases.size() > 1) {
+                for (int i = 0; i < ensCases.size(); ++i) {
+                    JCExpression innerReqExpr = maker.Literal(true);
+                    for (int j = 0; j < ensCases.get(i).size(); ++j) {
+                        JCExpression expr = TranslationUtils.extractAssumeExpr(ensCases.get(i).get(j));
+                        if (expr != null) {
+                            innerReqExpr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), innerReqExpr, expr);
+                        } else {
+                            l = l.append(ensCases.get(i).get(j));
+                        }
                     }
+                    JCIf ifstmt = maker.If(asserts.get(i), TranslationUtils.makeAssumeStatement(innerReqExpr), null);
+                    l = l.append(ifstmt);
                 }
-                JCIf ifstmt = maker.If(asserts.get(i), TranslationUtils.makeAssumeStatement(innerReqExpr), null);
-                l = l.append(ifstmt);
+            } else if (ensCases.size() == 1) {
+                l = l.appendList(ensCases.get(0));
             }
-        } else if (ensCases.size() == 1) {
-            l = l.appendList(ensCases.get(0));
         }
 
         if (copy.name.toString().equals("<init>")) {
@@ -293,7 +295,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
                 treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), maker.Ident(returnVar),
                     treeutils.makeNullLiteral(TranslationUtils.getCurrentPosition())), ASSUME));
         }
-        if (hasReturn && returnVar != null) {
+        if (hasReturn && returnVar != null && !CLI.proofPreconditions) {
             JCReturn returnStmt = maker.Return(maker.Ident(returnVar));
             l = l.append(returnStmt);
         }

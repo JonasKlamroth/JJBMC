@@ -125,6 +125,10 @@ public class CLI implements Runnable {
     @Option(names = {"-ft", "-fullTrace"}, description = "Prevents traces from being filtered for relevant variables and prints all values. " +
         "(Has to be run with -tr option)")
     public static boolean fullTraceRequested = false;
+
+    @Option(names = {"-pp", "-proofPreconditions"}, description = "Adds additional assertions proving the preconditions " +
+            "of called methods while still inlining them. (implies -fim option)")
+    public static boolean proofPreconditions = false;
     static File tmpFolder = null;
     private static boolean didCleanUp = false;
     private static Process jbmcProcess = null;

