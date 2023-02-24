@@ -944,11 +944,40 @@ public class TestSuite {
         return res;
     }
 
+    //@ requires i > 0;
+    //@ ensures \result == i + 1;
+    //@ assignable \nothing;
+    private int inc2(int i) {
+        return i + 1;
+    }
+
+    //@ assignable \nothing;
+    @Verifyable
+    private void testSymbInLoop2() {
+        for (int i = 1; i < 3; ++i) {
+            try {
+                inc2(i);
+            } catch (Exception e) {}
+        }
+    }
+
+    //@ assignable \nothing;
+    @Fails
+    private void testSymbInLoop() {
+        for (int i = 0; i < 3; ++i) {
+            try {
+                inc2(i);
+            } catch (Exception e) {}
+        }
+    }
+
+
     //@ ensures \result == i + 1;
     //@ assignable \nothing;
     private int inc(int i) {
         return i+1;
     }
+
 
 
     private boolean boolFunct(int i) {
@@ -1147,4 +1176,30 @@ public class TestSuite {
           @*/
     }
 
+
+    //@ ensures \result > 0;
+    //@ signals_only RuntimeException;
+    @Fails
+    public int testSignalsOnly1(int i) {
+        if(i < 0) {
+            throw new RuntimeException();
+        }
+        return i;
+    }
+
+    //@ ensures \result > 0;
+    //@ signals_only RuntimeException;
+    @Verifyable
+    public int testSignalsOnly2(int i) {
+        if(i <= 0) {
+            throw new RuntimeException();
+        }
+        return i;
+    }
+
+    //@ signals_only RuntimeException;
+    @Verifyable
+    public void testSignalsOnly() {
+        throw new RuntimeException();
+    }
 }

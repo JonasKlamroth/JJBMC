@@ -1,7 +1,6 @@
 package translation;
 
 import com.sun.source.tree.AnnotatedTypeTree;
-import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BreakTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.CatchTree;
@@ -130,14 +129,14 @@ public class FilterVisitor extends JmlTreeCopier {
         //return super.visitJmlMethodClauseSignals(that, p);
     }
 
-    @Override
+    /*@Override
     public JCTree visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly that, Void p) {
         if (!that.defaultClause) {
             throw new UnsupportedException(that.toString());
         } else {
             return super.visitJmlMethodClauseSigOnly(that, p);
         }
-    }
+    }*/
 
     @Override
     public JCTree visitJmlModelProgramStatement(JmlTree.JmlModelProgramStatement that, Void p) {

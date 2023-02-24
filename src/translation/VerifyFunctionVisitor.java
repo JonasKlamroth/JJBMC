@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import javax.lang.model.element.Modifier;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
+import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeUtils;
 import utils.NormalizeVisitor;
 import utils.TranslationUtils;
@@ -63,6 +64,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private List<List<JCStatement>> reqCases = List.nil();
     private List<List<JCStatement>> ensCases = List.nil();
     private List<List<JCExpression>> assCases = List.nil();
+    private List<JCExpression> signaledExceptions = List.nil();
     private Symbol returnVarSym = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
@@ -158,6 +160,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         combinedNewReqStatements = List.nil();
         currentAssignable = List.nil();
         return copy;
+    }
+
+    @Override
+    public JCTree visitJmlMethodClauseSigOnly(JmlTree.JmlMethodClauseSignalsOnly that, Void p) {
+        signaledExceptions = signaledExceptions.appendList(that.list);
+        return super.visitJmlMethodClauseSigOnly(that, p);
     }
 
     @Override
@@ -262,10 +270,16 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             }
         }
 
+        List<JCTree.JCCatch> catches = List.of(maker.Catch(catchVarb, maker.Block(0L, List.nil())));
+        for(JCExpression exceptionType : signaledExceptions) {
+            JCVariableDecl catchVar =
+                    treeutils.makeVarDef(exceptionType.type, maker.Name("e"), currentMethod.sym, TranslationUtils.getCurrentPosition());
+            JCStatement assumeFalse = TranslationUtils.makeAssumeStatement(M.Literal(false));
+            catches = catches.append(maker.Catch(catchVar, maker.Block(0L, List.of(assumeFalse))));
+        }
+
         JCTry bodyTry = maker.Try(maker.Block(0L, body),
-            List.of(
-                maker.Catch(catchVarb, maker.Block(0L, List.nil()))
-            ),
+            catches,
             null);
 
         //assume invariants if its not a constructor
@@ -319,6 +333,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         reqCases = List.nil();
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
+        signaledExceptions = List.nil();
         if (!currentMethod.name.toString().equals("<init>")) {
             currentMethod.name = maker.Name(currentMethod.name.toString() + "Verf");
         }
