@@ -23,7 +23,9 @@ import static org.jmlspecs.openjml.JmlTree.JmlStatementSpec;
 import static org.jmlspecs.openjml.JmlTree.JmlStoreRefArrayRange;
 import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
 import static org.jmlspecs.openjml.JmlTree.Maker;
+import static translation.VerifyFunctionVisitor.TranslationMode.ASSUME;
 
+import cli.CLI;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -116,6 +118,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         }
         expressionVisitor.inConstructor = this.inConstructor;
         JCExpression normalized = NormalizeVisitor.normalize(that.expression, context, maker);
+        //if(translationMode == ASSUME) {
+            //return that;
+        //}
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
@@ -286,7 +291,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         if (copy.name.toString().equals("<init>")) {
             l = l.append(TranslationUtils.makeAssumeOrAssertStatement(
                 treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), maker.Ident(returnVar),
-                    treeutils.makeNullLiteral(TranslationUtils.getCurrentPosition())), VerifyFunctionVisitor.TranslationMode.ASSUME));
+                    treeutils.makeNullLiteral(TranslationUtils.getCurrentPosition())), ASSUME));
         }
         if (hasReturn && returnVar != null) {
             JCReturn returnStmt = maker.Return(maker.Ident(returnVar));
