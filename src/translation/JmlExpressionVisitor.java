@@ -49,25 +49,7 @@ import static org.jmlspecs.openjml.JmlTree.Maker;
 import cli.CLI;
 import cli.ErrorLogger;
 import cli.TraceInformation;
-import com.sun.source.tree.AssignmentTree;
-import com.sun.source.tree.BinaryTree;
-import com.sun.source.tree.BreakTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.CompoundAssignmentTree;
-import com.sun.source.tree.ConditionalExpressionTree;
-import com.sun.source.tree.ContinueTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.LabeledStatementTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.NewClassTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.UnaryTree;
+import com.sun.source.tree.*;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
@@ -578,11 +560,28 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             catchers = catchers.append((JCCatch) this.visitCatch(c, p));
         }
         List<JCStatement> tmp = newStatements;
-        JCBlock body = (JCBlock) super.visitBlock(node.getBlock(), p);
+        JCBlock body = (JCBlock) this.visitBlock(node.getBlock(), p);
         JCTry newTry = maker.Try(body, catchers, null);
         newStatements = tmp;
         newStatements = newStatements.append(newTry);
         return newTry;
+    }
+
+    @Override
+    public JCTree visitBlock(BlockTree node, Void p) {
+        List<JCStatement> res = List.nil();
+        List<JCStatement> tmp = newStatements;
+        for(JCStatement statement : ((JCBlock)node).getStatements()) {
+            JCStatement copy = this.copy(statement);
+            if(newStatements.size() > 0) {
+                res = res.appendList(newStatements);
+                newStatements = List.nil();
+            } else {
+                res = res.append(copy);
+            }
+        }
+        newStatements = tmp;
+        return M.Block(0L, List.from(res));
     }
 
     @Override
@@ -1349,7 +1348,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             //  return (JCMethodInvocation)node;
         }
         JCMethodInvocation copy = (JCMethodInvocation) super.visitMethodInvocation(node, p);
-        if (CLI.forceInliningMethods) {
+        if (CLI.forceInliningMethods && !CLI.proofPreconditions) {
             return copy;
         }
         String functionName = "";
