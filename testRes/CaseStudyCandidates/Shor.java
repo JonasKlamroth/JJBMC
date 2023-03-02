@@ -1,15 +1,11 @@
 public class Shor {
 
-    public Shor() {
-        super();
-    }
     /*@
       requires 2 <= n <= 15;
       ensures (\exists int i; 2 <= i < n; n % i == 0) ==> \result != null && \result.length == 2 && \result[0] * \result[1] == n;
       ensures !(\exists int i; 2 <= i < n; n % i == 0) ==> \result == null;
       assignable \nothing;
    */
-
     public static int[] factorize(int n) {
         for (int a = n - 1; a > 1; --a) {
             int K = gcd(a, n);
@@ -59,13 +55,13 @@ public class Shor {
         return r_0;
     }
     /*@
-      requires a == 14;
-      ensures \result == 0 || \result == 4;
+      requires a == 14 && n == 15;
+      ensures pow(a, \result)  % n == 1;
       assignable \nothing;
       signals_only RuntimeException;
    */
 
-    private static int findPeriodCircuit(int a, boolean $$_tmp_measureParam_0, boolean $$_tmp_measureParam_1, boolean $$_tmp_measureParam_2) {
+    private static int findPeriodCircuit(int a, int n, boolean $$_tmp_measureParam_0, boolean $$_tmp_measureParam_1, boolean $$_tmp_measureParam_2) {
         double PI = 3.141592653;
         float[] q0 = new float[]{1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
         float[] q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
@@ -169,18 +165,17 @@ public class Shor {
     }
     /*@
       requires n > 2 && n <= 15 && 0 < a < n;
-      ensures (a == 14 && n == 15) ==> \result == 4;
+      ensures (a == 14 && n == 15) ==> (\result != 0 && pow(a, \result) == 1);
       ensures !(a == 14 && n == 15) ==> \result == -1;
       assignable \nothing;
    */
-
     private static int findPeriod(int a, int n) {
         if (n < 15 || a != 14) {
             return -1;
         }
         for (int i = 0; i < 8; ++i) {
             try {
-                findPeriodCircuit(a, (i & 1) == 0, (i & 2) == 0, (i & 4) == 0);
+                findPeriodCircuit(a, n, (i & 1) == 0, (i & 2) == 0, (i & 4) == 0);
                 /*@ non_null */
                 int[] fraction = getFraction((float)i / (float)n, 3);
                 if (pow(a, fraction[1]) % n == 1) {
@@ -192,13 +187,13 @@ public class Shor {
         }
         return -1;
     }
+
     /*@
       requires (\exists int k; 0 <= k <= 100; val == 0.01 * k);
       requires 3 <= numConsideredDigits < 5;
       ensures \result != null & \result.length == 2 && (float)\result[0] / (float)\result[1] == val;
       assignable \nothing;
    */
-
     private static int[] getFraction(float val, int numConsideredDigits) {
         if (val == 0.0F) {
             return new int[]{0, 1};
