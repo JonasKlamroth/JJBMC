@@ -6,28 +6,37 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectPacka
 
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
+
+import java.io.PrintWriter;
 
 public class TestRunner {
-    static SummaryGeneratingListener listener = new SummaryGeneratingListener();
+
+    static SummaryGeneratingListener summaryGeneratingListener = new SummaryGeneratingListener();
+
     public static void main(String[] args) {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectPackage("test"))
-            .filters(includeClassNamePatterns(".*Tests"))
-            .build();
-        Launcher launcher = LauncherFactory.create();
-        TestPlan testPlan = launcher.discover(request);
-        launcher.registerTestExecutionListeners(listener);
-        launcher.execute(request);
-
-
-        request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectPackage("traceTest"))
             .filters(includeClassNamePatterns(".*Tests"))
             .build();
+        Launcher launcher = LauncherFactory.create();
+        launcher.registerTestExecutionListeners(summaryGeneratingListener);
         launcher.execute(request);
+
+
+        TestExecutionSummary summary = summaryGeneratingListener.getSummary();
+
+        summaryGeneratingListener.getSummary().printFailuresTo(new PrintWriter(System.out));
+        summary.printTo(new PrintWriter(System.out));
+
+        if(summaryGeneratingListener.getSummary().getTestsFailedCount() > 0) {
+            System.exit(1);
+        }
     }
+
+
 }

@@ -1,0 +1,1 @@
+in line 52: this.table (dynamic_object$46[4L]) = [0, 0, 0, 0, 0]

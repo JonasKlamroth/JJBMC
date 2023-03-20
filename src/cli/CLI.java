@@ -348,10 +348,11 @@ public class CLI implements Runnable {
     private static boolean verifyJBMCVersion() {
         try {
             String[] commands = new String[] {jbmcBin};
+            if(isWindows) {
+                commands = new String[] {"cmd.exe", "/c", jbmcBin};
+            }
 
             Runtime rt = Runtime.getRuntime();
-            rt.addShutdownHook(new Thread(CLI::cleanUp));
-            long start = System.currentTimeMillis();
 
             Process process = rt.exec(commands);
 
