@@ -91,7 +91,7 @@ public class TraceTests {
                 assignments.add(s);
             }
         }
-        File reference = System.getProperty("os.name").toLowerCase().contains("nix") ? new File(outFile) : new File(outFile.replace("TmpTest", "WinTmpTest"));
+        File reference = System.getProperty("os.name").toLowerCase().contains("nux") ? new File(outFile) : new File(outFile.replace("TmpTest", "WinTmpTest"));
 
         assertTrue(reference.exists());
         try {

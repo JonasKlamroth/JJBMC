@@ -348,7 +348,7 @@ public class CLI implements Runnable {
     private static boolean verifyJBMCVersion() {
         try {
             String[] commands = new String[] {jbmcBin};
-            if(isWindows) {
+            if (isWindows) {
                 commands = new String[] {"cmd.exe", "/c", jbmcBin};
             }
 
