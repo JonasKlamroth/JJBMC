@@ -1,7 +1,0 @@
-in line 22: this.tt (dynamic_object.tt) = null
-in line 22: this.table (dynamic_object.table) = null
-in line 22: j (j) = 3
-in line 26: k (k) = 0
-in line 28: this.tt (dynamic_object.tt) = {privInt=2, tt=null, iotable=null, otable=null, table=[0, 0], pubInt=0}
-in line 29: this.table (dynamic_array$17[3L]) = [1, 2, 3, 4]
-in line 30: this.table (dynamic_array$17[2L]) = [1, 2, 3, 2]

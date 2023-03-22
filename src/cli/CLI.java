@@ -385,7 +385,7 @@ public class CLI implements Runnable {
             String error = sb2.toString();
             if (output.toLowerCase().contains("jbmc version")) {
                 log.debug("Found valid jbmc version: " + output);
-                Pattern pattern = Pattern.compile("jbmc version (\\d*)\\.(\\d*)\\.(\\d*) \\(", Pattern.CASE_INSENSITIVE);
+                Pattern pattern = Pattern.compile("jbmc version (\\d*)\\.(\\d*)\\.(\\d*)? \\(", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(output);
                 boolean matchFound = matcher.find();
                 if (Integer.parseInt(matcher.group(1)) < jbmcMajorVer) {
