@@ -19,6 +19,7 @@ public class Main {
             System.setOut(new CostumPrintStream(System.out));
         }
         CLI.reset();
-        CommandLine.run(new CLI(), args);
+        CommandLine cmd = new CommandLine(new CLI());
+        cmd.execute(args);
     }
 }

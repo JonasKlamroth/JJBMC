@@ -62,10 +62,12 @@ repositories {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'lib')
+    testImplementation 'org.hamcrest:hamcrest:2.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+    implementation 'info.picocli:picocli:4.7.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
 }
