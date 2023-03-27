@@ -13,5 +13,6 @@ WORKDIR /JJBMC
 
 RUN gradle wrapper
 RUN ./gradlew fatJar
+RUN echo 'alias jjbmc="java -jar JJBMC.jar"' >> ~/.bashrc
 
 CMD /bin/sh
