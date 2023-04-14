@@ -69,7 +69,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     //Has to perserve order (e.g. LinkedHashMap)
-    private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private List<JCExpression> currentAssignable = null;
 
@@ -201,7 +201,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         currentMethod.sym = that.sym;
         List<JCStatement> invariantAssert = List.nil();
         List<JCStatement> oldInitsInv = List.nil();
-        LinkedHashMap<String, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
+        LinkedHashMap<JCExpression, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
         for (JCExpression expression : baseVisitor.getInvariants()) {
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =

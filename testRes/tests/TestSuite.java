@@ -1232,4 +1232,10 @@ public class TestSuite {
     public int inlineOptionTestCallee2(int i) {
         return i - 1;
     }
+
+    //@ ensures (\forall int i; 0 <= i < 5; \old(i < 5));
+    //@ ensures (\forall int i; 1 <= i < 6; \old(i < 5));
+    @Fails
+    public void testMutableOld() {
+    }
 }
