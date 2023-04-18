@@ -927,7 +927,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCExpression cond = editAssignable(assign.getVariable());
         if (cond != null) {
             cond = treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond);
-            JCStatement expr = TranslationUtils.makeAssertStatement(cond);
+            JCStatement expr = TranslationUtils.makeAssertStatement(cond,
+                    "Illegal assignment to " + node + " conflicting with assignables " +
+                            TranslationUtils.assignablesToString(currentAssignable));
             newStatements = newStatements.append(expr);
             //newStatements = newStatements.append(M.Exec(assign));
         }
