@@ -1,11 +1,17 @@
 package translation;
 
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
+
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import exceptions.UnsupportedException;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -16,15 +22,21 @@ import utils.TranslationUtils;
 /**
  * Created by jklamroth on 12/17/18.
  */
-public class FunctionCallsVisitor extends JmlTreeCopier {
+public class PrecomputationVisitor extends JmlTreeCopier {
     JmlTree.JmlMethodDecl currentMethod = null;
     private final Set<String> calledFunctions = new HashSet<>();
     private final Set<String> specifiedFunctions = new HashSet<>();
     private List<JCTree.JCExpression> assignables = List.nil();
+
+    private static final Map<Symbol, Set<Symbol>> freshLocations = new HashMap<>();
     private boolean foundNothing = false;
 
-    public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
+    public PrecomputationVisitor(Context context, JmlTree.Maker maker) {
         super(context, maker);
+    }
+
+    public static Map<Symbol, Set<Symbol>> getFreshLocations() {
+        return freshLocations;
     }
 
     @Override
@@ -53,6 +65,27 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
             }
         }
         return super.visitJmlMethodClauseStoreRef(that, p);
+    }
+
+    @Override
+    public JCTree visitJmlMethodInvocation(JmlTree.JmlMethodInvocation that, Void p) {
+        if(that.token == JmlTokenKind.BSFRESH) {
+            Set<Symbol> currentFreshLocations = freshLocations.get(currentMethod.sym);
+            if(currentFreshLocations == null) {
+                freshLocations.put(currentMethod.sym, new HashSet<>());
+                currentFreshLocations = freshLocations.get(currentMethod.sym);
+            }
+            for(JCTree.JCExpression arg : that.args) {
+                if(arg instanceof JCTree.JCIdent) {
+                    currentFreshLocations.add(((JCTree.JCIdent) arg).sym);
+                } else if(arg instanceof JCTree.JCFieldAccess) {
+                    currentFreshLocations.add(((JCTree.JCFieldAccess) arg).sym);
+                } else {
+                    throw new UnsupportedException("\\fresh-expression " + that + " not supported");
+                }
+            }
+        }
+        return super.visitJmlMethodInvocation(that, p);
     }
 
     @Override

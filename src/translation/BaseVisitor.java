@@ -103,7 +103,7 @@ public class BaseVisitor extends FilterVisitor {
             }
         }
         newDefs = List.nil();
-        FunctionCallsVisitor fcv = new FunctionCallsVisitor(context, M);
+        PrecomputationVisitor fcv = new PrecomputationVisitor(context, M);
         for (JCTree def : that.defs) {
             if (def instanceof JmlMethodDecl && !((JmlMethodDecl) def).getName().toString().equals("<init>")) {
                 fcv.copy(def);

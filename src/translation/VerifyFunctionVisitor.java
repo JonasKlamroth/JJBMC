@@ -36,6 +36,8 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import javax.lang.model.element.Modifier;
 import org.jmlspecs.openjml.JmlSpecs;
@@ -334,6 +336,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         combinedNewEnsStatements = List.nil();
         combinedNewReqStatements = List.nil();
         signaledExceptions = List.nil();
+        JmlExpressionVisitor.currentFreshLocations = new ArrayList<>();
         if (!currentMethod.name.toString().equals("<init>")) {
             currentMethod.name = maker.Name(currentMethod.name.toString() + "Verf");
         }

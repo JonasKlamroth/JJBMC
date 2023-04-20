@@ -639,4 +639,39 @@ public class AssignableTests {
             privInt = i;
         }
     }
+
+    //@ requires a != null && a.length > 1;
+    //@ assignable a[0];
+    @Verifyable
+    public void testAssignableParameterTest1(int[] a) {
+        a[0] = 0;
+    }
+
+    //@ requires a != null && a.length > 1;
+    //@ assignable a[1];
+    @Fails
+    public void testAssignableParameterTest2(int[] a) {
+        a[0] = 0;
+    }
+
+    //@ requires a != null && a.length > 0;
+    //@ assignable \nothing;
+    @Fails
+    public void testAssignableParameterTest3(int[] a) {
+        a[0] = 0;
+    }
+
+    //@ assignable \nothing;
+    @Verifyable
+    public void testAssignableParameterTest5(int[] a) {
+        a = new int[3];
+    }
+
+    //@ assignable \nothing;
+    @Verifyable
+    public void testAssignableParameterTest4(int[] a) {
+        a = new int[3];
+        a[0] = 0;
+    }
+
 }

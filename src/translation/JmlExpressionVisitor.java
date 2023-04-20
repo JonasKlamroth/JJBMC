@@ -137,6 +137,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private boolean ignoreLocals = false;
     private List<JCVariableDecl> currentLoopVars = List.nil();
     private List<JCExpression> changedLocalVars = List.nil();
+    public static ArrayList<Symbol> currentFreshLocations = new ArrayList<>();
 
 
     public JmlExpressionVisitor(Context context, Maker maker,
@@ -924,6 +925,23 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
+        if(!assign.type.isPrimitive()) {
+            if (assign.rhs instanceof JCNewClass || assign.rhs instanceof JCTree.JCNewArray) {
+                if (assign.lhs instanceof JCIdent || assign.lhs instanceof JCFieldAccess) {
+                    Symbol sym = TranslationUtils.getSymbol(assign.lhs);
+                    currentFreshLocations.add(sym);
+                } else {
+                    throw new UnsupportedException("Unsupported assignment: " + assign);
+                }
+            } else if (assign.rhs instanceof JCIdent || assign.rhs instanceof JCFieldAccess) {
+                Symbol sym = TranslationUtils.getSymbol(assign.rhs);
+                if (currentFreshLocations.contains(sym)) {
+                    currentFreshLocations.add(TranslationUtils.getSymbol(assign.lhs));
+                } else {
+                    currentFreshLocations.remove(TranslationUtils.getSymbol(assign.lhs));
+                }
+            }
+        }
         JCExpression cond = editAssignable(assign.getVariable());
         if (cond != null) {
             cond = treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond);
@@ -999,25 +1017,31 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 return maker.Literal(false);
             }
+            if(currentFreshLocations.contains(((JCIdent) e).sym)) {
+                return maker.Literal(false);
+            }
             return editAssignable((JCIdent) e);
         } else if (e instanceof JmlStoreRefArrayRange) {
             return editAssignable((JmlStoreRefArrayRange) e);
         } else if (e instanceof JCArrayAccess) {
-            JCExpression expr = ((JCArrayAccess) e).indexed;
-            if (expr instanceof JCIdent) {
-                if (((JCIdent) expr).sym.owner.equals(currentSymbol)) {
-                    return maker.Literal(false);
-                }
-            } else if (expr instanceof JCFieldAccess) {
-                if (((JCFieldAccess) expr).sym.owner.equals(currentSymbol)) {
-                    return maker.Literal(false);
-                }
-            }
             return editAssignable((JCArrayAccess) e);
         } else if (e instanceof JCFieldAccess) {
             /*if (((JCFieldAccess) e).sym.owner.equals(currentSymbol) && !params.contains(((JCFieldAccess) e).sym)) {
                 return M.Literal(false);
             }*/
+            JCExpression fa = e;
+            do {
+                fa = ((JCFieldAccess) fa).selected;
+                if (fa instanceof JCFieldAccess && currentFreshLocations.contains(((JCFieldAccess) fa).sym)) {
+                    return maker.Literal(false);
+                }
+                if (fa instanceof JCIdent && currentFreshLocations.contains(((JCIdent) fa).sym)) {
+                    return maker.Literal(false);
+                }
+
+            } while(fa instanceof JCFieldAccess);
+
+
             return editAssignable((JCFieldAccess) e);
         } else if (e instanceof JmlStoreRefKeyword) {
             JmlStoreRefKeyword k = (JmlStoreRefKeyword) e;
@@ -1101,7 +1125,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
             .map(arr -> ((JmlStoreRefArrayRange) arr))
             .collect(Collectors.toList()));
-        JCExpression expr = editAssignable(e.indexed);
+        JCExpression expr = editAssignable(e.indexed, true);
         if (pot.size() == 0) {
             return expr;
         }
