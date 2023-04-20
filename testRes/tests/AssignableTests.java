@@ -674,4 +674,28 @@ public class AssignableTests {
         a[0] = 0;
     }
 
-}
+    //@ requires t != null;
+    //@ assignable \nothing;
+    @Fails
+    public void freshTest(TmpTest t) {
+        t.pubInt = 0;
+    }
+
+    //@ requires t != null;
+    //@ assignable \nothing;
+    @Verifyable
+    public void freshTest2(TmpTest t) {
+        t = new TmpTest();
+        t.pubInt = 0;
+    }
+
+
+    //@ requires t != null;
+    //@ requires tt != null;
+    //@ assignable \nothing;
+    @Fails
+    private void freshTest3(TmpTest t) {
+        t = new TmpTest();
+        t = this.tt;
+        t.pubInt = 0;
+    }
