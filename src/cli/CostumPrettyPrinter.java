@@ -119,7 +119,6 @@ public class CostumPrettyPrinter extends JmlPretty {
                 }
                 this.println();
             }
-            this.println();
             this.undent();
             this.align();
             this.print("}");
