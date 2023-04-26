@@ -32,7 +32,6 @@ public class AssignableTests {
     B b;
 
 
-
     /*@ assignable privInt;
       @ */
     @Verifyable
@@ -98,9 +97,16 @@ public class AssignableTests {
     }
 
     //@ assignable this.*;
-    @Fails
+    @Verifyable
     private void asteriskTest() {
         t2 = new TestSuite();
+        t2.pubInt = 1;
+    }
+
+    //@ requires t2 != null;
+    //@ assignable this.*;
+    @Fails
+    private void asteriskTest2() {
         t2.pubInt = 1;
     }
 
@@ -180,17 +186,15 @@ public class AssignableTests {
     }
 
 
-
     /*@ assignable t2.t2.pubInt;
       @ */
-    @Fails
+    @Verifyable
     private void assignalbeTest6(TestSuite t3) {
         t3 = new TestSuite();
         t3.pubInt = 5;
         t3.t2 = new TestSuite();
         t3.t2.pubInt = 10;
     }
-
 
 
     @Verifyable
@@ -258,9 +262,21 @@ public class AssignableTests {
         assert i == 1;
     }
 
-    /*@ assignable t2.*;
+    /*@ requires t3 != null;
+      @ assignable t2.*;
       @ */
     @Fails
+    private void assignalbeTest51(TestSuite t3) {
+        t3.pubInt = 5;
+        t3.t2 = new TestSuite();
+        t3.t2.pubInt = 10;
+        t3.arr = new int[10];
+        t3.arr[5] = 10;
+    }
+
+    /*@ assignable t2.*;
+      @ */
+    @Verifyable
     private void assignalbeTest5(TestSuite t3) {
         t3 = new TestSuite();
         t3.pubInt = 5;
@@ -347,7 +363,7 @@ public class AssignableTests {
     @Verifyable
     @Unwind(number = 12)
     private void assignableTest19() {
-       for (; privInt < 10; privInt++) {
+        for (; privInt < 10; privInt++) {
             int i = 0;
         }
     }
@@ -358,7 +374,7 @@ public class AssignableTests {
     @Fails
     @Unwind(number = 11)
     private void assignableTest20() {
-       for (; privInt < 10; privInt++) {
+        for (; privInt < 10; privInt++) {
             int i = 0;
         }
     }
@@ -512,24 +528,29 @@ public class AssignableTests {
 
 
     //@ assignable \everything;
-    private void test() {}
+    private void test() {
+    }
 
     //@ assignable arr[1..3];
-    private void test1() {}
+    private void test1() {
+    }
 
     //@ assignable t2;
-    private void test2() {}
+    private void test2() {
+    }
 
     //@ assignable objects;
-    private void test3() {}
+    private void test3() {
+    }
 
     //@ assignable arr[*];
-    private void test4(int[] arr) {}
+    private void test4(int[] arr) {
+    }
 
     //@ requires t2 != null && t3 != null;
     //@ assignable t2, t2.t2;
     @Fails
-    private void testOld(){
+    private void testOld() {
         t2 = t3;
         t2.t2 = new TestSuite();
     }
@@ -598,7 +619,7 @@ public class AssignableTests {
     @Verifyable
     public void loopLocalVarTest() {
         //@ loop_modifies \nothing;
-       for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             int x = 0;
             x = 3;
         }
@@ -621,7 +642,7 @@ public class AssignableTests {
     void testLoopModField1() {
         //@ loop_invariant true;
         //@ assignable privInt;
-       for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
     }
@@ -635,7 +656,7 @@ public class AssignableTests {
     @Verifyable
     void testLoopModField() {
         //@ loop_invariant true;
-       for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
     }
@@ -677,25 +698,56 @@ public class AssignableTests {
     //@ requires t != null;
     //@ assignable \nothing;
     @Fails
-    public void freshTest(TmpTest t) {
+    public void freshTest(TestSuite t) {
         t.pubInt = 0;
     }
 
     //@ requires t != null;
     //@ assignable \nothing;
     @Verifyable
-    public void freshTest2(TmpTest t) {
-        t = new TmpTest();
+    public void freshTest2(TestSuite t) {
+        t = new TestSuite();
         t.pubInt = 0;
     }
 
 
     //@ requires t != null;
-    //@ requires tt != null;
+    //@ requires t2 != null;
     //@ assignable \nothing;
     @Fails
-    private void freshTest3(TmpTest t) {
-        t = new TmpTest();
-        t = this.tt;
+    private void freshTest3(TestSuite t) {
+        t = new TestSuite();
+        t = this.t2;
         t.pubInt = 0;
     }
+
+
+    //@ requires arr != null && arr.length >= 3;
+    //@ assignable arr[0];
+    @Verifyable
+    private void loopModifiesTest() {
+        arr = new int[4];
+        //@ loop_modifies arr[0..2];
+        for (int i = 0; i < 3; ++i) {
+        }
+    }
+
+    //@ requires arr != null && arr.length >= 3;
+    //@ assignable arr[0];
+    @Fails
+    private void loopModifiesTest1() {
+        //@ loop_modifies arr[0..2];
+        for (int i = 0; i < 3; ++i) {
+        }
+    }
+
+    //@ requires arr != null && arr.length >= 3;
+    //@ assignable arr[*];
+    @Verifyable
+    private void loopModifiesTest2() {
+        //@ loop_modifies arr[0..2];
+        for(int i = 0; i < 3; ++i) {
+
+        }
+    }
+}

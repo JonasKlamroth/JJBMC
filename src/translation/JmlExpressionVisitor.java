@@ -931,7 +931,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     Symbol sym = TranslationUtils.getSymbol(assign.lhs);
                     currentFreshLocations.add(sym);
                 } else {
-                    throw new UnsupportedException("Unsupported assignment: " + assign);
+                    //This may throw false positives but is not statically checkable(?)
+                    //throw new UnsupportedException("Unsupported assignment: " + assign);
                 }
             } else if (assign.rhs instanceof JCIdent || assign.rhs instanceof JCFieldAccess) {
                 Symbol sym = TranslationUtils.getSymbol(assign.rhs);
