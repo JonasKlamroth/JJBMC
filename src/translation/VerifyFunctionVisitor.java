@@ -36,7 +36,6 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Name;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import javax.lang.model.element.Modifier;

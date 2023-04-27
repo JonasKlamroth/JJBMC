@@ -921,11 +921,19 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         return res;
     }
 
-
     @Override
     public JCTree visitAssignment(AssignmentTree node, Void p) {
         JCAssign assign = (JCAssign) node;
-        if(!assign.type.isPrimitive()) {
+        JCExpression cond = editAssignable(assign.getVariable());
+        if (cond != null) {
+            cond = treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond);
+            JCStatement expr = TranslationUtils.makeAssertStatement(cond,
+                    "Illegal assignment to " + node + " conflicting with assignables " +
+                            TranslationUtils.assignablesToString(currentAssignable));
+            newStatements = newStatements.append(expr);
+            //newStatements = newStatements.append(M.Exec(assign));
+        }
+        if (!assign.type.isPrimitive()) {
             if (assign.rhs instanceof JCNewClass || assign.rhs instanceof JCTree.JCNewArray) {
                 if (assign.lhs instanceof JCIdent || assign.lhs instanceof JCFieldAccess) {
                     Symbol sym = TranslationUtils.getSymbol(assign.lhs);
@@ -943,15 +951,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
             }
         }
-        JCExpression cond = editAssignable(assign.getVariable());
-        if (cond != null) {
-            cond = treeutils.makeNot(TranslationUtils.getCurrentPosition(), cond);
-            JCStatement expr = TranslationUtils.makeAssertStatement(cond,
-                    "Illegal assignment to " + node + " conflicting with assignables " +
-                            TranslationUtils.assignablesToString(currentAssignable));
-            newStatements = newStatements.append(expr);
-            //newStatements = newStatements.append(M.Exec(assign));
-        }
+
         return super.visitAssignment(node, p);
     }
 
@@ -1018,7 +1018,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 }
                 return maker.Literal(false);
             }
-            if(currentFreshLocations.contains(((JCIdent) e).sym)) {
+            if (currentFreshLocations.contains(((JCIdent) e).sym)) {
                 return maker.Literal(false);
             }
             return editAssignable((JCIdent) e);
@@ -1040,7 +1040,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                     return maker.Literal(false);
                 }
 
-            } while(fa instanceof JCFieldAccess);
+            } while (fa instanceof JCFieldAccess);
 
 
             return editAssignable((JCFieldAccess) e);
@@ -1123,71 +1123,21 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     }
 
     public JCExpression editAssignable(JCArrayAccess e) {
-        List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
-            .map(arr -> ((JmlStoreRefArrayRange) arr))
-            .collect(Collectors.toList()));
-        JCExpression expr = editAssignable(e.indexed, true);
-        if (pot.size() == 0) {
-            return expr;
-        }
-        JmlMethodInvocation oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, pot.get(0).expression);
-        forceOld = true;
-        JCExpression oldEx = this.copy(oldExpr);
-        forceOld = false;
-        JCExpression exprs = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), oldEx, e.indexed);
-        if (pot.get(0).lo != null || pot.get(0).hi != null) {
-            JCExpression hi = pot.get(0).hi;
-            JCExpression lo = pot.get(0).lo;
-            if (!(hi instanceof JCIdent || hi instanceof JCLiteral || lo instanceof JCIdent || lo instanceof JCLiteral)) {
-                throw new UnsupportedException("Only sidecondition free array indices supported. (" + e + ")");
-            }
-            if (hi == null) {
-                hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS,
-                    treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(0).expression), maker.Literal(1));
-            }
-            if (lo == null) {
-                lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), maker.Literal(0));
-            }
-            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs,
-                treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.getIndex(), hi));
-            exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs,
-                treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.getIndex(), lo));
-        }
-        expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, exprs);
-        for (int i = 1; i < pot.size(); ++i) {
-            JmlMethodInvocation oldExpr1 = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, pot.get(i).expression);
-            forceOld = true;
-            JCExpression oldEx1 = this.copy(oldExpr1);
-            forceOld = false;
-            JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), oldEx1, e.indexed);
-            if (pot.get(i).lo != null || pot.get(0).hi != null) {
-                JCExpression hi = pot.get(i).hi;
-                JCExpression lo = pot.get(i).lo;
-                if (hi == null) {
-                    hi = treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.MINUS,
-                        treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), pot.get(i).expression), maker.Literal(1));
-                }
-                if (lo == null) {
-                    lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), maker.Literal(0));
-                }
-                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1,
-                    treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.getIndex(), hi));
-                expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1,
-                    treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.LT, e.getIndex(), lo));
-            }
-            expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, expr1);
-        }
-        return expr;
+        JCExpression bound = this.copy(e.getIndex());
+        JmlStoreRefArrayRange tmp = M.JmlStoreRefArrayRange(this.copy(e.getExpression()), bound, bound);
+        return editAssignable(tmp);
     }
 
     public JCExpression editAssignable(JmlStoreRefArrayRange e) {
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
             .map(arr -> ((JmlStoreRefArrayRange) arr))
             .collect(Collectors.toList()));
-        JCExpression expr = editAssignable(e.expression);
-        if (pot.size() == 0) {
-            return expr;
+        boolean isFresh = (e.expression instanceof JCFieldAccess || e.expression instanceof JCIdent)  &&
+                currentFreshLocations.contains(TranslationUtils.getSymbol(e.expression));
+        if (isFresh || pot.size() == 0) {
+            return M.Literal(!isFresh);
         }
+        JCExpression expr = M.Literal(true);
         JmlMethodInvocation oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, pot.get(0).expression);
         forceOld = true;
         JCExpression oldEx = this.copy(oldExpr);
@@ -1203,6 +1153,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             if (lo == null) {
                 lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), maker.Literal(0));
             }
+            forceOld = true;
+            oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, hi);
+            hi = this.copy(oldExpr);
+            oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, lo);
+            lo = this.copy(oldExpr);
+            forceOld = false;
             exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs,
                 treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.hi, hi));
             exprs = treeutils.makeOr(TranslationUtils.getCurrentPosition(), exprs,
@@ -1211,7 +1167,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         expr = treeutils.makeAnd(TranslationUtils.getCurrentPosition(), expr, exprs);
         for (int i = 1; i < pot.size(); ++i) {
             JCExpression expr1 = treeutils.makeNeqObject(TranslationUtils.getCurrentPosition(), pot.get(i).expression, e.expression);
-            if (pot.get(i).lo != null || pot.get(0).hi != null) {
+            if (pot.get(i).lo != null || pot.get(i).hi != null) {
                 JCExpression hi = pot.get(i).hi;
                 JCExpression lo = pot.get(i).lo;
                 if (hi == null) {
@@ -1221,6 +1177,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 if (lo == null) {
                     lo = treeutils.makeArrayLength(TranslationUtils.getCurrentPosition(), maker.Literal(0));
                 }
+                forceOld = true;
+                oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, hi);
+                hi = this.copy(oldExpr);
+                oldExpr = maker.JmlMethodInvocation(JmlTokenKind.BSOLD, lo);
+                lo = this.copy(oldExpr);
+                forceOld = false;
                 expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1,
                     treeutils.makeBinary(TranslationUtils.getCurrentPosition(), Tag.GT, e.hi, hi));
                 expr1 = treeutils.makeOr(TranslationUtils.getCurrentPosition(), expr1,
@@ -1238,7 +1200,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             .collect(Collectors.toList()));
         List<JCIdent> pot1 = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
             .map(arr -> ((JCIdent) arr))
-            //.filter(i -> !i.type.isPrimitive())
+            .filter(i -> (i.type.isPrimitive() == f.type.isPrimitive()))
             .collect(Collectors.toList()));
 
         JCExpression expr = null;
@@ -1377,6 +1339,25 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JmlVariableDecl copy = (JmlVariableDecl) super.visitJmlVariableDecl(that, p);
         newStatements = newStatements.append(copy);
         loopLocalVars = loopLocalVars.append(copy.sym);
+
+
+        if (!that.type.isPrimitive()) {
+            if (that.init != null) {
+                if (that.init instanceof JCNewClass || that.init instanceof JCTree.JCNewArray || that.init instanceof JCLiteral) {
+                    currentFreshLocations.add(copy.sym);
+                } else if (that.init instanceof JCIdent || that.init instanceof JCFieldAccess) {
+                    Symbol sym = TranslationUtils.getSymbol(that.init);
+                    if (currentFreshLocations.contains(sym)) {
+                        currentFreshLocations.add(copy.sym);
+                    } else {
+                        currentFreshLocations.remove(copy.sym);
+                    }
+                }
+            } else {
+                currentFreshLocations.add(copy.sym);
+            }
+        }
+
         return copy;
     }
 

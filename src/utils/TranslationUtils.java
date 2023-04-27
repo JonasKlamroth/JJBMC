@@ -708,10 +708,10 @@ public class TranslationUtils {
     }
 
     public static Symbol getSymbol(JCExpression e) {
-        if(e instanceof JCIdent) {
+        if (e instanceof JCIdent) {
             return ((JCIdent) e).sym;
         }
-        if(e instanceof JCFieldAccess) {
+        if (e instanceof JCFieldAccess) {
             return ((JCFieldAccess) e).sym;
         }
         throw new UnsupportedException("Could not extract symbol from expression: " + e);

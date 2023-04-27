@@ -5,13 +5,11 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
-
+import exceptions.UnsupportedException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import exceptions.UnsupportedException;
 import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
@@ -69,16 +67,16 @@ public class PrecomputationVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodInvocation(JmlTree.JmlMethodInvocation that, Void p) {
-        if(that.token == JmlTokenKind.BSFRESH) {
+        if (that.token == JmlTokenKind.BSFRESH) {
             Set<Symbol> currentFreshLocations = freshLocations.get(currentMethod.sym);
-            if(currentFreshLocations == null) {
+            if (currentFreshLocations == null) {
                 freshLocations.put(currentMethod.sym, new HashSet<>());
                 currentFreshLocations = freshLocations.get(currentMethod.sym);
             }
-            for(JCTree.JCExpression arg : that.args) {
-                if(arg instanceof JCTree.JCIdent) {
+            for (JCTree.JCExpression arg : that.args) {
+                if (arg instanceof JCTree.JCIdent) {
                     currentFreshLocations.add(((JCTree.JCIdent) arg).sym);
-                } else if(arg instanceof JCTree.JCFieldAccess) {
+                } else if (arg instanceof JCTree.JCFieldAccess) {
                     currentFreshLocations.add(((JCTree.JCFieldAccess) arg).sym);
                 } else {
                     throw new UnsupportedException("\\fresh-expression " + that + " not supported");

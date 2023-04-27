@@ -32,7 +32,7 @@ public class NormalizeVisitor extends JmlTreeCopier {
 
     @Override
     public JCTree visitJmlMethodInvocation(JmlTree.JmlMethodInvocation that, Void p) {
-        if(that.token == JmlTokenKind.BSFRESH) {
+        if (that.token == JmlTokenKind.BSFRESH) {
             throw new UnsupportedException("\\fresh-expressions are currently not supported in a negated context.");
         }
         return super.visitJmlMethodInvocation(that, p);

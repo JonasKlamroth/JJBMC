@@ -224,6 +224,31 @@ public class AssignableTests {
     }
 
     //@ requires t2 != null;
+    //@ assignable \nothing;
+    @Fails
+    private void assignableTest113() {
+        TestSuite testSuite = t2;
+        testSuite.pubInt = 2;
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.*;
+    @Verifyable
+    private void assignableTest112() {
+        TestSuite testSuite = t2;
+        testSuite.pubInt = 2;
+    }
+
+    //@ requires t2 != null;
+    //@ assignable t2.*;
+    @Verifyable
+    private void assignableTest114() {
+        TestSuite testSuite = null;
+        testSuite = t2;
+        testSuite.arr = new int[10];
+    }
+
+    //@ requires t2 != null;
     //@ assignable t2.*;
     @Verifyable
     private void assignableTest11() {
@@ -234,7 +259,7 @@ public class AssignableTests {
 
     //@ requires t2 != null;
     //@ assignable t2.*;
-    @Fails
+    @Verifyable
     private void assignableTest111() {
         TestSuite testSuite = new TestSuite();
         testSuite.arr = new int[10];
@@ -318,7 +343,7 @@ public class AssignableTests {
 
     //@ requires t2 != null;
     //@ assignable t2.t2;
-    @Fails
+    @Verifyable
     //i think this is theoretically wrong but its a sound overapproximation?
     private void assignableTest174() {
         TestSuite t2 = new TestSuite();
@@ -488,13 +513,13 @@ public class AssignableTests {
 
     //@ assignable this.*;
     //@ requires arr != null && arr.length > 3;
-    @Verifyable
+    @Fails
     private void methodInvAss4(int i) {
         test1();
     }
 
     //@ assignable t2;
-    @Fails
+    @Verifyable
     private void methodInvAss5(int i) {
         test();
     }
@@ -527,7 +552,7 @@ public class AssignableTests {
     }
 
 
-    //@ assignable \everything;
+    //@ assignable t2;
     private void test() {
     }
 
@@ -654,8 +679,19 @@ public class AssignableTests {
     }
 
     @Verifyable
+    void testLoopModField2() {
+        int j = 0;
+        //@ loop_invariant true;
+        //@ assignable \nothing;
+        for (int i = 0; i < 3; ++i) {
+            j = i;
+        }
+    }
+
+    @Fails
     void testLoopModField() {
         //@ loop_invariant true;
+        //@ assignable \nothing;
         for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
@@ -723,7 +759,7 @@ public class AssignableTests {
 
 
     //@ requires arr != null && arr.length >= 3;
-    //@ assignable arr[0];
+    //@ assignable arr;
     @Verifyable
     private void loopModifiesTest() {
         arr = new int[4];
@@ -750,4 +786,37 @@ public class AssignableTests {
 
         }
     }
+
+    //@ requires t2 != null;
+    //@ assignable t2.pubInt;
+    @Verifyable
+    private void assignableModular1(TestSuite t) {
+        callee4(t2);
+    }
+
+    //@ requires t2 != null;
+    //@ requires t != null;
+    //@ assignable t2;
+    @Fails
+    private void assignableModular2(TestSuite t) {
+        callee4(t);
+    }
+
+    //@ assignable t1.pubInt;
+    private void callee4(TestSuite t1) {
+    }
+
+    //@ assignable \nothing;
+    private void callee5(TestSuite t) {
+    }
+
+    //@ requires arr != null;
+    //@ requires 0 <= i < arr.length - 1;
+    //@ assignable arr[i];
+    @Fails
+    private void modifiedIndexTest(int i) {
+        i++;
+        arr[i] = 0;
+    }
+
 }
