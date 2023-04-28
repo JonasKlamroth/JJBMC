@@ -127,18 +127,22 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
     @Override
     public JCTree visitJmlMethodClauseStoreRef(JmlMethodClauseStoreRef that, Void p) {
-        TranslationUtils.setCurrentASTNode(that);
-        if (currentAssignable == null) {
-            currentAssignable = List.nil();
-        }
-        if (that.list != null) {
-            currentAssignable = currentAssignable.appendList(that.list);
-            TranslationUtils.setCurrentAssignable(M.JmlMethodClauseStoreRef(that.keyword, that.clauseKind, currentAssignable));
-        }
+        if(that.clauseKind == AssignableClauseExtension.assignableClauseKind) {
+            TranslationUtils.setCurrentASTNode(that);
+            if (currentAssignable == null) {
+                currentAssignable = List.nil();
+            }
+            if (that.list != null) {
+                currentAssignable = currentAssignable.appendList(that.list);
+                TranslationUtils.setCurrentAssignable(M.JmlMethodClauseStoreRef(that.keyword, that.clauseKind, currentAssignable));
+            }
 
-        return M.JmlMethodClauseStoreRef("assignable",
-                AssignableClauseExtension.assignableClauseKind,
-                List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING)));
+
+            return M.JmlMethodClauseStoreRef("assignable",
+                    AssignableClauseExtension.assignableClauseKind,
+                    List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING)));
+        }
+        return super.visitJmlMethodClauseStoreRef(that, p);
     }
 
     @Override
