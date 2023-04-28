@@ -43,6 +43,7 @@ import org.jmlspecs.openjml.JmlSpecs;
 import org.jmlspecs.openjml.JmlTokenKind;
 import org.jmlspecs.openjml.JmlTree;
 import org.jmlspecs.openjml.JmlTreeUtils;
+import org.jmlspecs.openjml.ext.AssignableClauseExtension;
 import utils.NormalizeVisitor;
 import utils.TranslationUtils;
 
@@ -135,7 +136,9 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             TranslationUtils.setCurrentAssignable(M.JmlMethodClauseStoreRef(that.keyword, that.clauseKind, currentAssignable));
         }
 
-        return super.visitJmlMethodClauseStoreRef(that, p);
+        return M.JmlMethodClauseStoreRef("assignable",
+                AssignableClauseExtension.assignableClauseKind,
+                List.of(M.JmlStoreRefKeyword(JmlTokenKind.BSNOTHING)));
     }
 
     @Override
