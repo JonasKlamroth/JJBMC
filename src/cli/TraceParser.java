@@ -1,6 +1,5 @@
 package cli;
 
-import com.sun.tools.javac.util.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,6 +16,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import com.github.javaparser.utils.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -28,12 +29,13 @@ import org.xml.sax.SAXException;
 
 public class TraceParser {
     private static final Logger log = LogManager.getLogger(TraceParser.class);
-    private static final String jbmcBanner = "\n" +
-        "* *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *\n" +
-        "* *                 Copyright (C) 2001-2018                 * *\n" +
-        "* *              Daniel Kroening, Edmund Clarke             * *\n" +
-        "* * Carnegie Mellon University, Computer Science Department * *\n" +
-        "* *                  kroening@kroening.com                  * *";
+    private static final String jbmcBanner = """
+
+            * *             JBMC 5.22.0 (cbmc-5.22.0) 64-bit            * *
+            * *                 Copyright (C) 2001-2018                 * *
+            * *              Daniel Kroening, Edmund Clarke             * *
+            * * Carnegie Mellon University, Computer Science Department * *
+            * *                  kroening@kroening.com                  * *""";
 
     public static JBMCOutput parse(File xmlFile, boolean printTrace) {
         DocumentBuilder builder;
@@ -140,7 +142,7 @@ public class TraceParser {
                                 Element value = (Element) assignment.getElementsByTagName("full_lhs_value").item(0);
                                 int line = Integer.parseInt(location1.getAttribute("line"));
                                 //int origLine = TraceInformation.getOriginalLine(line);
-                                if (line > lastLine && line < relevantRange.snd && line >= relevantRange.fst) {
+                                if (line > lastLine && line < relevantRange.b && line >= relevantRange.a) {
                                     //trace.provideGuesses(lineAssignments);
                                     lineAssignments = new ArrayList<>();
                                     lastLine = line;

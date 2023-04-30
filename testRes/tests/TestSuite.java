@@ -120,7 +120,7 @@ public class TestSuite {
         int i = 0;
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 11 - i;
         while (i < 10) {
             //@ assume i > 0;
@@ -136,7 +136,7 @@ public class TestSuite {
         int i = 0;
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 11 - i;
         while (i < 10) {
             arr[i] = i;
@@ -150,7 +150,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 11 - i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -163,7 +163,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 11 + i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -176,7 +176,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 11 + i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -189,7 +189,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 9 - i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -202,7 +202,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 10 - i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -215,7 +215,7 @@ public class TestSuite {
         int[] arr = new int[10];
         //@ loop_invariant i > -1 && i <= 10;
         //@ loop_invariant (\forall int j; j >= 0 && j < i; arr[j] == j);
-        //@ loop_modifies arr[*];
+        //@ assignable arr[*];
         //@ decreases 5 - i;
        for (int i = 0; i < 10; ++i) {
             arr[i] = i;
@@ -923,7 +923,7 @@ public class TestSuite {
         int[] b = new int[arr.length];
 
         /*@ loop_invariant i >= 1 && i <= arr.length && (\forall int j; j >= 1 && j < i; b[j] == arr[j] + 1);
-          @ loop_modifies i, b[1..arr.length - 1];
+          @ assignable i, b[1..arr.length - 1];
           @ decreases arr.length - i;
          */
        for (int i = 1; i < arr.length; ++i) {
@@ -1052,7 +1052,7 @@ public class TestSuite {
     @Verifyable
     private void loopInvModTest3() {
         //@ loop_invariant 0 <= privInt <= 3;
-        //@ loop_modifies privInt;
+        //@ assignable privInt;
         while(privInt < 3) {
             incPrivInt();
         }

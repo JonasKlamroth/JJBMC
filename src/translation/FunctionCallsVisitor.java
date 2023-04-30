@@ -1,58 +1,57 @@
 package translation;
 
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.jml.clauses.JmlAccessibleClause;
+import com.github.javaparser.ast.jml.clauses.JmlMultiExprClause;
+import com.github.javaparser.ast.jml.clauses.JmlSimpleExprClause;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.List;
+
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
-import org.jmlspecs.openjml.JmlSpecs;
-import org.jmlspecs.openjml.JmlTokenKind;
-import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.JmlTreeCopier;
-import utils.TranslationUtils;
 
 
 /**
  * Created by jklamroth on 12/17/18.
  */
-public class FunctionCallsVisitor extends JmlTreeCopier {
-    JmlTree.JmlMethodDecl currentMethod = null;
+public class FunctionCallsVisitor extends VoidVisitorAdapter<Object> {
+    private MethodDeclaration currentMethod = null;
     private final Set<String> calledFunctions = new HashSet<>();
     private final Set<String> specifiedFunctions = new HashSet<>();
-    private List<JCTree.JCExpression> assignables = List.nil();
+    private List<Expression> assignables = new LinkedList<>();
     private boolean foundNothing = false;
 
-    public FunctionCallsVisitor(Context context, JmlTree.Maker maker) {
-        super(context, maker);
-    }
-
     @Override
-    public JCTree visitMethodInvocation(MethodInvocationTree that, Void p) {
-        if (((JCTree.JCMethodInvocation) that).meth instanceof JCTree.JCIdent) {
-            calledFunctions.add(((JCTree.JCIdent) ((JCTree.JCMethodInvocation) that).meth).getName().toString());
+    public void visit(MethodCallExpr that, Object arg) {
+        calledFunctions.add(that.getNameAsString());
+        /*
+        if (that.getName() instanceof JCTree.JCIdent) {
         } else if ((((JCTree.JCMethodInvocation) that).meth instanceof JCTree.JCFieldAccess
-            && ((JCTree.JCMethodInvocation) that).meth.type.getReturnType().equals(currentMethod.sym.owner.type))) {
+                && ((JCTree.JCMethodInvocation) that).meth.type.getReturnType().equals(currentMethod.sym.owner.type))) {
             calledFunctions.add(((JCTree.JCFieldAccess) ((JCTree.JCMethodInvocation) that).meth).name.toString());
         }
-        return super.visitMethodInvocation(that, p);
+        return super.visitMethodInvocation(that, p);*/
     }
 
+
     @Override
-    public JCTree visitJmlMethodClauseStoreRef(JmlTree.JmlMethodClauseStoreRef that, Void p) {
-        if (that.list != null) {
-            if (that.list.stream().anyMatch(loc -> loc instanceof JmlTree.JmlStoreRefKeyword
-                && ((JmlTree.JmlStoreRefKeyword) loc).token.equals(JmlTokenKind.BSNOTHING))) {
+    public void visit(JmlMultiExprClause that, Object arg) {
+        if (that.getExpressions() != null) {
+            if (that.getExpressions().stream()
+                    .anyMatch(loc -> loc.isNameExpr() && loc.asNameExpr().getNameAsString().endsWith("\\nothing"))) {
                 foundNothing = true;
             } else {
-                for (JCTree.JCExpression e : that.list) {
+                for (Expression e : that.getExpressions()) {
                     if (!assignables.contains(e)) {
-                        assignables = assignables.append(e);
+                        assignables.add(e);
                     }
                 }
             }
         }
-        return super.visitJmlMethodClauseStoreRef(that, p);
     }
 
     @Override
@@ -89,11 +88,11 @@ public class FunctionCallsVisitor extends JmlTreeCopier {
         return calledFunctions;
     }
 
-    public List<JCTree.JCExpression> getAssignables() {
+    public List<Expression> getAssignables() {
         return assignables;
     }
 
     public void resetAssignables() {
-        assignables = List.nil();
+        assignables = new LinkedList<>();
     }
 }

@@ -2,6 +2,7 @@ package casestudy;
 
 import cli.CostumPrintStream;
 import cli.Main;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -51,8 +52,7 @@ public class CaseStudies {
     public List<List<String>> getConfigsForFile(String file) {
         if (configString == null) {
             readConfigString();
-            JsonParser parser = new JsonParser();
-            configs = (JsonObject) parser.parse(configString);
+            configs = (JsonObject) JsonParser.parseString(configString);
         }
         JsonArray config = (JsonArray) configs.get(file);
         if (config == null) {

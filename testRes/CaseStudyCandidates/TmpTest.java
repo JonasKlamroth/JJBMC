@@ -49,7 +49,7 @@ public class TmpTest {
         int[] array = new int[1];
         int t = 0;
         //@ loop_invariant t == 0;
-        //@ loop_modifies array[t];
+        //@ assignable array[t];
         while(true) {
             t = 0;
             mod(array, t);

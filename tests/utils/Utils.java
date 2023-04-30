@@ -2,22 +2,22 @@ package utils;
 
 import cli.CLI;
 import exceptions.TranslationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.params.provider.Arguments;
+import translation.FunctionNameVisitor;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.params.provider.Arguments;
-import translation.FunctionNameVisitor;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,10 +53,10 @@ public class Utils {
         String classFile = "tests" + File.separator + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
-        FunctionNameVisitor.parseFile(fileName, true);
-        List<FunctionNameVisitor.TestBehaviour> testBehaviours = FunctionNameVisitor.getFunctionBehaviours();
-        List<String> functionNames = FunctionNameVisitor.getFunctionNames();
-        List<String> unwinds = FunctionNameVisitor.getUnwinds();
+        var fnv = FunctionNameVisitor.parseFile(fileName, true);
+        List<FunctionNameVisitor.TestBehaviour> testBehaviours = fnv.getFunctionBehaviours();
+        List<String> functionNames = fnv.getFunctionNames();
+        List<String> unwinds = fnv.getUnwinds();
         assert (functionNames.size() == testBehaviours.size());
         assert (functionNames.size() == unwinds.size());
 
@@ -75,41 +75,32 @@ public class Utils {
     }
 
     private static void createAnnotationsFolder(String fileName) {
-        File f = new File(fileName);
-        File dir = new File(f.getParent(), "tmp" + File.separator + "testannotations");
-        log.debug("Copying Annotation files to " + dir.getAbsolutePath());
-        dir.mkdirs();
+        var f = Paths.get(fileName);
+        var dir = f.getParent().resolveSibling("tmp/testannotations");
+        log.debug("Copying Annotation files to " + dir.toAbsolutePath());
         try {
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Fails.java").toPath(),
-                new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Verifyable.java").toPath(),
-                new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Unwind.java").toPath(),
-                new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.createDirectories(dir);
+            Files.copy(Paths.get("./tests/testannotations/Fails.java"),
+                    dir.resolveSibling("Fails.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(Paths.get("./tests/testannotations/Verifyable.java"),
+                    dir.resolveSibling("Verifyable.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(Paths.get("./tests/testannotations/Unwind.java"),
+                    dir.resolveSibling("Unwind.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             throw new TranslationException("Error trying to copy TestAnnotations");
         }
-        f = new File(fileName);
-        dir = new File(f.getParent(), "tmp" + File.separator + "tests" + File.separator + "testannotations");
-        log.debug("Copying Annotation files to " + dir.getAbsolutePath());
-        dir.mkdirs();
-        try {
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Fails.java").toPath(),
-                new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Verifyable.java").toPath(),
-                new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Unwind.java").toPath(),
-                new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new TranslationException("Error trying to copy TestAnnotations");
-        }
     }
 
     public static void runTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
-        throws IOException, InterruptedException {
+            throws IOException, InterruptedException {
         if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};

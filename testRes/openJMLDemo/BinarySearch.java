@@ -12,7 +12,7 @@ public class BinarySearch {
 		int hi = a.length -1;
 		//@ loop_invariant 0<= lo && lo <= hi && hi < a.length && a[lo] <= value && value <= a[hi];
 		//@ decreases hi + 1 - lo;
-        //@ loop_modifies lo, hi;
+        //@ assignable lo, hi;
 		while (lo < hi) {
 			int mid = (lo + hi) / 2;
 			//@ assert mid >= lo && mid < hi; // Just checking the prover can do this arithmetic
@@ -43,7 +43,7 @@ public class BinarySearch {
 		int hi = a.length -1;
 		//@ loop_invariant 0<= lo && lo <= hi && hi < a.length && a[lo] <= value && value <= a[hi];
 		//@ decreases hi - lo;
-		//@ loop_modifies hi, lo;
+		//@ assignable hi, lo;
 		while (lo < hi) {
 			int mid = (lo + hi) / 2;
 			if (a[mid] == value) return mid;
@@ -71,7 +71,7 @@ public class BinarySearch {
 		int hi = a.length -1;
 		//@ loop_invariant 0<= lo && lo <= hi && hi < a.length && a[lo] <= value && value <= a[hi];
 		//@ decreases hi - lo;
-		//@ loop_modifies hi, lo;
+		//@ assignable hi, lo;
 		while (lo < hi) {
 			int mid = (lo + hi) / 2;
 			if (a[mid] == value) return mid;

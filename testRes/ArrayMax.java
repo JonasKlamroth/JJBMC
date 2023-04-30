@@ -35,7 +35,7 @@ public class ArrayMax {
 	  @      (\forall int j; j >= 0 && j < i; max >= a[j])
 	  @      &&
 	  @      (\exists int j; j >= 0 && j < i; max == a[j]);
-	  @ loop_modifies \nothing;
+	  @ assignable \nothing;
 	  @ decreases a.length - i + 2;
 	  @*/
 	while ( i < a.length ) {
