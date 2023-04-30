@@ -13,7 +13,7 @@ apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 20
 test.testLogging.showStandardStreams = true
 
 sourceSets {
@@ -52,16 +52,16 @@ test {
 }
 
 
-
-// In this section you declare where to find the dependencies of your project
 repositories {
-    // Use 'jcenter' for resolving your dependencies.
     mavenCentral()
+    mavenLocal()
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'lib')
     testImplementation 'org.hamcrest:hamcrest:2.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.9.0'
@@ -70,11 +70,11 @@ dependencies {
     implementation 'info.picocli:picocli:4.7.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
-}
+    testImplementation("com.google.code.gson:gson:2.10.1")
 
-task testJar2(type: Jar, dependsOn: testClasses) {
-    archiveBaseName = "test2"
-    from sourceSets.test.output
+    implementation 'io.github.jmltoolkit:jmlparser-core:3.25.1-SNAPSHOT'
+    implementation 'io.github.jmltoolkit:jmlparser-symbol-solver-core:3.25.1-SNAPSHOT'
+
 
     manifest {
         attributes "Main-Class": "test.TestRunner"

@@ -93,7 +93,7 @@ abstract class BeanCan {
         //@ loop_invariant num_white >= 0;
         //@ loop_invariant (num_white - \old(num_white)) %2 == 0;
         //@ decreases num_black + num_white;
-        //@ loop_modifies num_black, num_white;
+        //@ assignable num_black, num_white;
         while (num_black + num_white > 1) {
             boolean bean1 = pick_random();
             //@ assert (bean1 == WHITE) ==> num_white > 0;

@@ -1,6 +1,6 @@
 package cli;
 
-import com.sun.tools.javac.util.Pair;
+import com.github.javaparser.utils.Pair;
 import exceptions.TranslationException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,13 +141,13 @@ public class TraceInformation {
 
     public static boolean isActualNewLine(int oldLine, int newLine) {
         Pair<Integer, Integer> range = getRelevantRange(oldLine);
-        return newLine != oldLine && newLine >= range.fst && newLine < range.snd;
+        return newLine != oldLine && newLine >= range.a && newLine < range.b;
     }
 
 
     private void addRelevantVar(String guess, int lineNumber) {
         Pair<Integer, Integer> range = getRelevantRange(lineNumber);
-        for (int i = range.fst; i <= range.snd; ++i) {
+        for (int i = range.a; i <= range.b; ++i) {
             try {
                 Set<String> assertVarsForLine = getAssertVarsForLine(i);
                 if (assertVarsForLine != null) {

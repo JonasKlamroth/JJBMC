@@ -1,129 +1,132 @@
 package translation;
 
-import cli.CLI;
-import cli.CostumPrintStream;
 import cli.ErrorLogger;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import exceptions.TranslationException;
-import exceptions.UnsupportedException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jmlspecs.openjml.Factory;
-import org.jmlspecs.openjml.IAPI;
-import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.JmlTreeScanner;
 
-public class FunctionNameVisitor extends JmlTreeScanner {
+import javax.swing.text.html.parser.Parser;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+public class FunctionNameVisitor {
     private static final Logger log = LogManager.getLogger(FunctionNameVisitor.class);
-    private static List<String> functionNames = new ArrayList<>();
-    private static List<TestBehaviour> functionBehaviours = new ArrayList<>();
-    private static List<String> unwinds = new ArrayList<>();
-    private static final Map<String, List<String>> paramMap = new HashMap<>();
+    private List<String> unwinds = new ArrayList<>();
+    private List<String> functionNames = new ArrayList<>();
     private boolean getAll = false;
+    private HashMap<String, List<String>> paramMap = new HashMap<>();
+    private List<TestBehaviour> functionBehaviours = new LinkedList<>();
 
-    public static List<String> getFunctionNames() {
-        return functionNames;
+    public FunctionNameVisitor(CompilationUnit cu, boolean getAll) {
+        this.getAll = getAll;
+        if (cu.getPrimaryType().isPresent()) {
+            cu.getPrimaryType().get().getMembers().stream()
+                    .filter(BodyDeclaration::isMethodDeclaration)
+                    .forEach(it -> this.visit(it.asMethodDeclaration()));
+        }
     }
 
-    public static Map<String, List<String>> getParamMap() {
-        return paramMap;
+    public static FunctionNameVisitor parseFile(String fileName, boolean getAll) {
+        try {
+            var config = new ParserConfiguration();
+            config.setProcessJml(true);
+            TypeSolver typeSolver = new TypeSolverBuilder().withCurrentJRE().build();
+            config.setSymbolResolver(new JavaSymbolSolver(typeSolver));
+            var cu = new JavaParser(config).parse(Paths.get(fileName));
+            if (!cu.isSuccessful()) {
+                cu.getProblems().forEach(System.out::println);
+                throw new RuntimeException();
+            }
+            return new FunctionNameVisitor(cu.getResult().get(), getAll);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static List<String> getUnwinds() {
+    public List<String> getUnwinds() {
         return unwinds;
     }
 
-    public static List<TestBehaviour> getFunctionBehaviours() {
+    public List<String> getFunctionNames() {
+        return functionNames;
+    }
+
+    public List<TestBehaviour> getFunctionBehaviours() {
         return functionBehaviours;
     }
 
-    public static void parseFile(String fileName, boolean getAll) {
-        functionNames = new ArrayList<>();
-        functionBehaviours = new ArrayList<>();
-        unwinds = new ArrayList<>();
-        try {
-            String[] args = {fileName};
-            IAPI api = Factory.makeAPI(CLI.apiArgs);
-            java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
-            CostumPrintStream.turnOff();
-            int a = api.typecheck(cu);
-            CostumPrintStream.turnOn();
-            //System.out.printf("a=%d", a);
-
-            Context ctx = api.context();
-            FunctionNameVisitor fnv = new FunctionNameVisitor();
-            fnv.getAll = getAll;
-            for (JmlTree.JmlCompilationUnit it : cu) {
-                //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
-                ctx.dump();
-                it.accept(fnv);
-            }
-        } catch (Exception e) {
-            if (CLI.debugMode) {
-                e.printStackTrace();
-            }
-            throw new TranslationException("Error parsing for function names.");
-        }
+    public enum TestBehaviour {
+        Verifyable,
+        Fails,
+        Ignored
     }
 
-    public static void parseFile(String fileName) {
-        parseFile(fileName, false);
-    }
-
-    @Override
-    public void visitJmlMethodDecl(JmlTree.JmlMethodDecl that) {
+    public void visit(MethodDeclaration that) {
+        var rm = that.resolve();
         //not interested in methods of inner classes
-        if (that.sym.owner.flatName().toString().contains("$")) {
+        if (that.getName().toString().contains("$")) {
             return;
         }
-        String f = that.sym.owner.toString() + "." + that.getName().toString();
-
-
-        String rtString = returnTypeString(that.restype);
-        String paramString = getParamString(that.params);
+        String f = rm.getQualifiedName();
+        String rtString = typeToString(that.getType());
+        String paramString =
+                that.getDeclarationAsString(false, false, false);
         if (f.endsWith("Verf") || f.endsWith("<init>") || getAll) {
             functionNames.add(f + ":" + paramString + rtString);
         }
-        for (JCTree.JCVariableDecl p : that.params) {
+        for (var p : that.getParameters()) {
             String name = f;
-            if ((that.mods.flags & 8L) != 0) {
+            if (that.hasModifier(Modifier.DefaultKeyword.STATIC)) {
                 name = "$static_" + f;
             }
-            if (paramMap.containsKey(name)) {
-                paramMap.get(name).add(p.name.toString());
-            } else {
-                List<String> list = new ArrayList<>();
-                list.add(p.name.toString());
-                paramMap.put(name, list);
-            }
+            paramMap.computeIfAbsent(name, it -> new LinkedList<>())
+                    .add(p.getNameAsString());
         }
-        translateAnnotations(that.mods.annotations);
-        super.visitJmlMethodDecl(that);
+        translateAnnotations(that.getAnnotations());
     }
 
-    private void translateAnnotations(List<JCTree.JCAnnotation> annotations) {
-        for (JCTree.JCAnnotation annotation : annotations) {
-            if (annotation.annotationType.toString().equals("Fails")) {
-                functionBehaviours.add(TestBehaviour.Fails);
-            } else if (annotation.annotationType.toString().equals("Verifyable")) {
-                functionBehaviours.add(TestBehaviour.Verifyable);
-            } else if (annotation.annotationType.toString().equals("Unwind")) {
-                try {
-                    unwinds.add(((JCTree.JCAssign) annotation.args.get(0)).rhs.toString());
-                } catch (Exception e) {
-                    log.warn("Cannot parse annotation " + annotation);
+    private void translateAnnotations(NodeList<AnnotationExpr> annotations) {
+        for (var annotation : annotations) {
+            //var ra = annotation.resolve();
+            switch (annotation.getNameAsString()) {
+                case "Fails" -> functionBehaviours.add(TestBehaviour.Fails);
+                case "Verifyable" -> functionBehaviours.add(TestBehaviour.Verifyable);
+                case "Unwind" -> {
+                    try {
+                        unwinds.add(annotation.asSingleMemberAnnotationExpr()
+                                .getMemberValue().asIntegerLiteralExpr()
+                                .getValue());
+                    } catch (Exception e) {
+                        try {
+                            unwinds.add(annotation.asNormalAnnotationExpr()
+                                    .getPairs().getFirst().orElse(null)
+                                    .getValue().asIntegerLiteralExpr()
+                                    .getValue());
+                        } catch (Exception e1) {
+                            log.warn("Cannot parse annotation " + annotation);
+                        }
+                    }
                 }
-            } else if (annotation.annotationType.toString().contains(".Pure")) {
-                //do nothing
-            } else {
-                ErrorLogger.warn("Found unknown annotation: " + annotation);
+                default -> ErrorLogger.warn("Found unknown annotation: " + annotation);
             }
         }
+
         if (functionNames.size() != functionBehaviours.size()) {
             functionBehaviours.add(TestBehaviour.Ignored);
         }
@@ -132,20 +135,9 @@ public class FunctionNameVisitor extends JmlTreeScanner {
         }
     }
 
-    private String returnTypeString(JCTree.JCExpression rtType) {
-        return typeToString(rtType);
-    }
-
-    private String getParamString(List<JCTree.JCVariableDecl> params) {
-        String res = "(";
-        for (JCTree.JCVariableDecl p : params) {
-            res += typeToString(p.vartype);
-        }
-        return res + ")";
-    }
-
-    private String typeToString(JCTree.JCExpression type) {
-        if (type instanceof JCTree.JCPrimitiveTypeTree) {
+    private String typeToString(Type type) {
+        return type.resolve().toDescriptor();
+        /*if (type instanceof JCTree.JCPrimitiveTypeTree) {
             if (type.toString().equals("void")) {
                 return "V";
             }
@@ -185,12 +177,6 @@ public class FunctionNameVisitor extends JmlTreeScanner {
                 throw new UnsupportedException("Unkown type " + type + ". Cannot call JBMC.");
             }
         }
-        return "V";
-    }
-
-    public enum TestBehaviour {
-        Verifyable,
-        Fails,
-        Ignored
+        return "V";*/
     }
 }

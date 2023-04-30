@@ -48,7 +48,7 @@ public class Gcd {
 	      @                          <==>
 	      @                          (big % x == 0 && small % x == 0));
 	      @ decreases small;
-	      @ loop_modifies \nothing;
+	      @ assignable \nothing;
 	      @*/
 		while (small != 0) {
 			final int t = big % small;

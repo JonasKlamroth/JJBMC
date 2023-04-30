@@ -21,8 +21,8 @@ public class TestSuiteTests {
 
     @BeforeAll
     public static void init() {
-        System.setErr(new CostumPrintStream(System.err));
-        System.setOut(new CostumPrintStream(System.out));
+        //System.setErr(new CostumPrintStream(System.err));
+        //System.setOut(new CostumPrintStream(System.out));
     }
 
     @AfterEach

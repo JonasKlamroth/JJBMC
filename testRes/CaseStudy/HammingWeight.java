@@ -11,7 +11,7 @@ class HammingWeight {
         int result = 0;
         //@ loop_invariant result <= i * 32;
         //@ loop_invariant 0 <= i && i <= a.length;
-        //@ loop_modifies result;
+        //@ assignable result;
         for (int i = 0; i < a.length; i++) {
             int x = a[i];
             x = x - ((x >>> 1) & 0x55555555);
@@ -52,7 +52,7 @@ class HammingWeight {
         int result = 0;
         //@ loop_invariant result <= i * 32;
         //@ loop_invariant 0 <= i && i <= a.length;
-        //@ loop_modifies result;
+        //@ assignable result;
         for (int i = 0; i < a.length; i++) {
             int x = a[i];
             while (x != 0) {

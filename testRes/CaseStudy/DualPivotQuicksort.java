@@ -23,7 +23,7 @@ class DualPivotQuicksort {
           @  && (\forall int i; left < i && i < less+1; a[i] < pivot1)
           @  && (\exists int j; less+1 <= j && j < great; a[j] >= pivot1)
           @  && \old(less) <= less;
-          @  loop_modifies less;
+          @  assignable less;
           @  decreases great - less;
           @*/
         while (a[++less] < pivot1) {
@@ -51,7 +51,7 @@ class DualPivotQuicksort {
         @ loop_invariant (\forall int i; great-1 < i && i < right; a[i] > pivot2);
         @ loop_invariant (\exists int j; less <= j && j < great; a[j] <= pivot2);
         @ decreases great;
-        @ loop_modifies great;
+        @ assignable great;
         @*/
         while (a[--great] > pivot2) {
         }

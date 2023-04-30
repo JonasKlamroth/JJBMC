@@ -4,13 +4,10 @@ import cli.CLI;
 import cli.CostumPrintStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import translation.FunctionNameVisitor;
 import utils.Utils;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,8 +20,8 @@ public class AssignableTests {
 
     @BeforeAll
     public static void init() {
-        System.setErr(new CostumPrintStream(System.err));
-        System.setOut(new CostumPrintStream(System.out));
+    //    System.setErr(new CostumPrintStream(System.err));
+    //    System.setOut(new CostumPrintStream(System.out));
     }
 
     @AfterEach
@@ -39,7 +36,11 @@ public class AssignableTests {
 
     @ParameterizedTest
     @MethodSource("assignableParameter")
-    public void runAssignableTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder) throws IOException, InterruptedException {
+    public void runAssignableTests(String classFile, String function, String unwind,
+                                   FunctionNameVisitor.TestBehaviour behaviour,
+                                   String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
+
+
 }

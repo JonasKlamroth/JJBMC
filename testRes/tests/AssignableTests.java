@@ -113,7 +113,7 @@ public class AssignableTests {
     }
 
     /*@ requires arr != null && arr.length > 4;
-      @ assignable arr[4], arr[1..2], arr[3..];
+      @ assignable arr[4], arr[1 .. 2], arr[3 .. arr.length - 1];
       @ */
     @Verifyable
     private void assignalbeTest11() {
@@ -148,7 +148,7 @@ public class AssignableTests {
     }
 
     /*@ requires arr != null && arr.length > 4;
-      @ assignable arr[3..];
+      @ assignable arr[3 .. arr.length];
       @ */
     @Verifyable
     private void assignalbeTest4() {
@@ -156,7 +156,7 @@ public class AssignableTests {
     }
 
     /*@ requires arr != null && arr.length > 4;
-      @ assignable arr[1..], t2, t3;
+      @ assignable arr[1 .. arr.length], t2, t3;
       @ */
     @Verifyable
     private void assignalbeTest42() {
@@ -172,7 +172,7 @@ public class AssignableTests {
     }
 
     /*@ requires arr != null && arr.length > 5;
-      @ assignable arr[1..3], arr[4..5];
+      @ assignable arr[1 .. 3], arr[4 .. 5];
       @ */
     @Verifyable
     private void assignalbeTest43(int arr1[]) {
@@ -237,14 +237,14 @@ public class AssignableTests {
     }
 
     //@ requires objects != null && objects.length >= 1 && objects[0] != null;
-    //@ assignable objects[0..3].t2;
+    //@ assignable objects[0 .. 3].t2;
     @Verifyable
     private void assignableTest12() {
         objects[0].t2 = new TestSuite();
     }
 
     //@ requires objects != null && objects.length >= 1 && objects[0] != null;
-    //@ assignable objects[0..3].t2;
+    //@ assignable objects[0 .. 3].t2;
     @Fails
     private void assignableTest13() {
         objects[0] = new TestSuite();
@@ -451,14 +451,14 @@ public class AssignableTests {
         test();
     }
 
-    //@ assignable arr[2..4];
+    //@ assignable arr[2 ..4];
     @Fails
     private void methodInvAss1(int i) {
         test1();
     }
 
     //@ requires arr != null && arr.length > 3;
-    //@ assignable arr[1..3];
+    //@ assignable arr[1 ..3];
     @Verifyable
     private void methodInvAss2(int i) {
         test1();
@@ -514,7 +514,7 @@ public class AssignableTests {
     //@ assignable \everything;
     private void test() {}
 
-    //@ assignable arr[1..3];
+    //@ assignable arr[1 ..3];
     private void test1() {}
 
     //@ assignable t2;
@@ -570,7 +570,7 @@ public class AssignableTests {
 
     //@ requires a != null && a.length == 5;
     //@ requires i >= 0 && i < j && i < a.length;
-    //@ assignable a[0..3];
+    //@ assignable a[0 ..3];
     @Fails
     private void anotherCallTest(int[] a, int i, int j) {
         someAssign(a, 0, 4);
@@ -582,7 +582,7 @@ public class AssignableTests {
         int[] arr = new int[]{0, 0, 0};
         int i = 2;
         //@ loop_invariant 0 <= j <= arr.length;
-        //@ loop_modifies arr[0..i-1];
+        //@ assignable arr[0 .. i-1];
         for (int j = 0; j < arr.length; ++j) {
             mod(arr, j);
         }
@@ -597,7 +597,7 @@ public class AssignableTests {
 
     @Verifyable
     public void loopLocalVarTest() {
-        //@ loop_modifies \nothing;
+        //@ assignable \nothing;
        for (int i = 0; i < 3; ++i) {
             int x = 0;
             x = 3;
@@ -609,7 +609,7 @@ public class AssignableTests {
         int[] array = new int[1];
         int t = 0;
         //@ loop_invariant t == 0;
-        //@ loop_modifies array[t];
+        //@ assignable array[t];
         while (true) {
             t = 0;
             mod(array, t);

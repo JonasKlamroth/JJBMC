@@ -1,46 +1,35 @@
 package cli;
 
-import static picocli.CommandLine.Command;
-import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
-
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
+import com.github.javaparser.printer.DefaultPrettyPrinter;
+import com.github.javaparser.printer.SourcePrinter;
+import com.github.javaparser.printer.configuration.ConfigurationOption;
+import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.printer.configuration.PrinterConfiguration;
+import com.google.common.collect.ImmutableList;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.jmlspecs.openjml.Factory;
-import org.jmlspecs.openjml.IAPI;
-import org.jmlspecs.openjml.JmlTree;
-import translation.BaseVisitor;
-import translation.FunctionNameVisitor;
-import utils.TranslationUtils;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static picocli.CommandLine.*;
 
 
 /**
@@ -56,58 +45,58 @@ public class CLI implements Runnable {
     private static final Logger log = LogManager.getLogger(CLI.class);
     private static final int jbmcMajorVer = 5;
     private static final int jbmcMinorVer = 22;
-    public static String[] apiArgs;
+    public static String[] apiArgs = new String[0];
     @Option(names = {"-kt", "-keepTranslation"}, description = "Keep the temporary file which contains the translation of the given file.")
     public static boolean keepTranslation = false;
     @Option(names = {"-fi", "-forceInlining"},
-        description = "Inline methods and unroll loops even if a contract is available")
+            description = "Inline methods and unroll loops even if a contract is available")
     public static boolean forceInlining;
     @Option(names = {"-fil", "-forceInliningLoopsOnly"},
-        description = "Unroll loops even if a loop contract is available")
+            description = "Unroll loops even if a loop contract is available")
     public static boolean forceInliningLoops;
     @Option(names = {"-fim", "-forceInliningMethodsOnly"},
-        description = "Inline methods even if a method contract is available")
+            description = "Inline methods even if a method contract is available")
     public static boolean forceInliningMethods;
     @Option(names = {"-c", "-clock"},
-        description = "Print out timing information.")
+            description = "Print out timing information.")
     public static boolean timed;
     @Option(names = {"-dsa", "-dontsplitasserts"},
-        description = "Split assertions if possible.")
+            description = "Split assertions if possible.")
     public static boolean splitAssertions = true;
     @Option(names = {"-t", "-timeout"},
-        description = "Provide a timeout in ms for each jbmc call. (default 10s)",
-        arity = "0..1")
+            description = "Provide a timeout in ms for each jbmc call. (default 10s)",
+            arity = "0..1")
     public static int timeout = 10000;
     @Option(names = {"-u", "-unwind"},
-        description = "Number of times loops are unwound. (default 5)",
-        arity = "0..1")
+            description = "Number of times loops are unwound. (default 5)",
+            arity = "0..1")
     public static int unwinds = -1;
     @Option(names = {"-tr", "-trace"},
-        description = "Prints out traces for failing pvcs.")
+            description = "Prints out traces for failing pvcs.")
     public static boolean runWithTrace = false;
     @Option(names = {"-jbmc", "-jbmcBinary"},
-        description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
+            description = "allows to set the jbmc binary that is used for the verification (has to be relative or absolute path no alias)")
     public static String jbmcBin = "jbmc";
     @Option(names = {"-lf", "--libFiles"},
-        description = "Files to be copied to the translation folder.")
-    public static String[] libFiles = new String[] {};
+            description = "Files to be copied to the translation folder.")
+    public static String[] libFiles = new String[]{};
     @Option(names = {"-jc", "-javac"},
-        description = "allows to set the javac binary that is used for compilation of source files manually")
+            description = "allows to set the javac binary that is used for compilation of source files manually")
     public static String javacBin = "javac";
     @Option(names = {"-ci", "-contractIndex"},
-        description = "Allows to specify which of the contracts is going to be specified index from 0 upwards",
-        arity = "0..1")
+            description = "Allows to specify which of the contracts is going to be specified index from 0 upwards",
+            arity = "0..1")
     public static int caseIdx = 0;
     @Option(names = {"-mas", "-maxArraySize"},
-        description = "Sets the maximum size more nondeterministic arrays.",
-        arity = "0..1")
+            description = "Sets the maximum size more nondeterministic arrays.",
+            arity = "0..1")
     public static int maxArraySize = -1;
     @Option(names = {"-sc", "-sanityCheck"},
-        description = "Adds a check for each method if assumptions are equals to false.",
-        arity = "0..1")
+            description = "Adds a check for each method if assumptions are equals to false.",
+            arity = "0..1")
     public static boolean doSanityCheck = false;
     @Option(names = {"-d", "-debug"},
-        description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
+            description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
     public static boolean debugMode = false;
     public static Map<String, String> expressionMap = new HashMap<>();
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
@@ -117,13 +106,13 @@ public class CLI implements Runnable {
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
     static List<String> jbmcOptions = new ArrayList<>();
     @Option(names = {"-h", "-help"}, usageHelp = true,
-        description = "Print usage help and exit.")
+            description = "Print usage help and exit.")
     static boolean usageHelpRequested;
     @Option(names = {"-rv", "-relevantVar"},
             description = "Names of variables whos values should be printed in a trace. (Has to be run with -tr option)")
     public static List<String> relevantVars = new ArrayList<>();
     @Option(names = {"-ft", "-fullTrace"}, description = "Prevents traces from being filtered for relevant variables and prints all values. " +
-        "(Has to be run with -tr option)")
+            "(Has to be run with -tr option)")
     public static boolean fullTraceRequested = false;
 
     @Option(names = {"-pp", "-proofPreconditions"}, description = "Adds additional assertions proving the preconditions " +
@@ -134,7 +123,8 @@ public class CLI implements Runnable {
     private static Process jbmcProcess = null;
     private static File tmpFile;
     private static final boolean isWindows = System.getProperty("os.name")
-        .toLowerCase().startsWith("windows");
+            .toLowerCase().startsWith("windows");
+
 
     public static void reset() {
         timeout = 10000;
@@ -154,39 +144,33 @@ public class CLI implements Runnable {
         relevantVars = new ArrayList<>();
     }
 
-    public static String translate(File file) throws Exception {
-        String[] args = {file.getAbsolutePath()};
-        return translate(args);
+    public static CompilationUnit translate(File file) throws Exception {
+        return translate(file.toPath());
     }
 
-    public static String translate(File file, String[] apiArgs) throws Exception {
-        String[] args = {file.getAbsolutePath()};
-        return translate(args, apiArgs);
-    }
+    public static CompilationUnit translate(Path... fileNames) throws Exception {
+        ParserConfiguration config = new ParserConfiguration();
+        config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
+        config.setProcessJml(true);
+        JavaParser parser = new JavaParser(config);
 
-    public static String translate(String[] args) throws Exception {
-        return translate(args, new String[] {});
-    }
-
-    public static String translate(String[] args, String[] apiArgs) throws Exception {
-
-        IAPI api = Factory.makeAPI(apiArgs);
-        java.util.List<JmlTree.JmlCompilationUnit> cu = api.parseFiles(args);
-        int a = api.typecheck(cu);
-        if (a > 0) {
-            log.warn("OpenJml parser Error.");
-            return null;
+        List<CompilationUnit> compilationUnits = new ArrayList<>(32);
+        for (var arg : fileNames) {
+            ParseResult<CompilationUnit> result = parser.parse(arg);
+            if (result.isSuccessful()) {
+                compilationUnits.add(result.getResult().get());
+            } else {
+                System.out.println(arg);
+                result.getProblems().forEach(System.out::println);
+            }
         }
-        Context ctx = api.context();
 
 
-        for (JmlTree.JmlCompilationUnit it : cu) {
+        for (var it : compilationUnits) {
             //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
             try {
-                JCTree t = rewriteAssert(it, ctx);
+                return rewriteAssert(it);
                 //return api.prettyPrint(t);
-                PrettyPrintInformation ppi = CostumPrettyPrinter.prettyPrint(t);
-                return ppi.prettyPrinted;
             } catch (UnsupportedException e) {
                 log.error(e.getMessage());
                 if (debugMode) {
@@ -204,34 +188,13 @@ public class CLI implements Runnable {
         return null;
     }
 
-    public static void translateAndRunJBMC(String file) {
-        fileName = file;
-        translateAndRunJBMC();
-    }
-
     public static void translateAndRunJBMC(String file, String functionName) {
         CLI.functionName = functionName;
         fileName = file;
-        translateAndRunJBMC();
+        translateAndRunJBMC(file);
     }
 
-    public static File prepareForJBMC(String file, String[] apiArgs) {
-        fileName = file;
-        return prepareForJBMC(apiArgs);
-    }
-
-    public static File prepareForJBMC(String file) {
-        fileName = file;
-        return prepareForJBMC();
-    }
-
-    public static File prepareForJBMC() {
-        File f = new File(fileName);
-        apiArgs = new String[] {"-cp", new File(f.getParentFile(), "tmp").getAbsolutePath()};
-        return prepareForJBMC(apiArgs);
-    }
-
-    public static File prepareForJBMC(String[] apiArgs) {
+    public static File prepareForJBMC(String fileName) {
         didCleanUp = false;
 
         if (unwinds < 0) {
@@ -275,12 +238,13 @@ public class CLI implements Runnable {
 
             createCProverFolder(tmpFolder.getAbsolutePath());
             long start = System.currentTimeMillis();
-            String translation = translate(tmpFile, apiArgs);
+            var translation = translate(tmpFile);
             long finish = System.currentTimeMillis();
             log.debug("Translation.Translation took: " + (finish - start) + "ms");
 
             if (translation != null) {
-                String packageName = TranslationUtils.getPackageName();
+                String packageName = translation.getPackageDeclaration()
+                        .map(NodeWithName::getNameAsString).orElse("");
 
                 if (tmpFile.exists()) {
                     Files.delete(tmpFile.toPath());
@@ -291,7 +255,8 @@ public class CLI implements Runnable {
                 File packageFolder = new File(tmpFolder, packageName);
                 packageFolder.mkdirs();
                 tmpFile = new File(packageFolder, tmpFile.getName());
-                Files.write(tmpFile.toPath(), translation.getBytes(), StandardOpenOption.CREATE);
+                var content = pprint(translation);
+                Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
             } else {
                 return null;
             }
@@ -307,11 +272,11 @@ public class CLI implements Runnable {
 
         try {
             String[] commands = new String[apiArgs.length + 3];
-            if (!verifyJavaVersion(javacBin)) {
+            /*if (!verifyJavaVersion(javacBin)) {
                 log.error("The provided javac version doesn't seem to be a valid java 8 compiler. " +
-                    "Please make sure that the default javac is version 8 or provide a path to a javac binary manually via the option -javac.");
+                        "Please make sure that the default javac is version 8 or provide a path to a javac binary manually via the option -javac.");
                 return null;
-            }
+            }*/
 
             commands[0] = javacBin;
             commands[1] = "-g";
@@ -319,9 +284,9 @@ public class CLI implements Runnable {
             System.arraycopy(apiArgs, 0, commands, 3, apiArgs.length);
             log.debug("Compiling translated file: " + Arrays.toString(commands));
             ProcessBuilder pb = new ProcessBuilder().command(commands)
-                .redirectOutput(new File(tmpFolder, "compilationErrors.txt"))
-                .redirectErrorStream(true)
-                .directory(tmpFolder);
+                    .redirectOutput(new File(tmpFolder, "compilationErrors.txt"))
+                    .redirectErrorStream(true)
+                    .directory(tmpFolder);
             Process proc = pb.start();
 
             proc.waitFor();
@@ -345,11 +310,17 @@ public class CLI implements Runnable {
         return tmpFile;
     }
 
+    private static String pprint(Node translation) {
+        DefaultPrettyPrinter pp = new DefaultPrettyPrinter(
+                MyPPrintVisitor::new, new DefaultPrinterConfiguration());
+        return pp.print(translation);
+    }
+
     private static boolean verifyJBMCVersion() {
         try {
-            String[] commands = new String[] {jbmcBin};
+            String[] commands = new String[]{jbmcBin};
             if (isWindows) {
-                commands = new String[] {"cmd.exe", "/c", jbmcBin};
+                commands = new String[]{"cmd.exe", "/c", jbmcBin};
             }
 
             Runtime rt = Runtime.getRuntime();
@@ -357,10 +328,10 @@ public class CLI implements Runnable {
             Process process = rt.exec(commands);
 
             BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(process.getInputStream()));
+                    InputStreamReader(process.getInputStream()));
 
             BufferedReader stdError = new BufferedReader(new
-                InputStreamReader(process.getErrorStream()));
+                    InputStreamReader(process.getErrorStream()));
 
             StringBuilder sb = new StringBuilder();
             String line = stdInput.readLine();
@@ -393,7 +364,7 @@ public class CLI implements Runnable {
                     log.error("Found version: " + output);
                     log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
                     log.error("Either install jbmc and make sure it is included in the path or provide " +
-                        "a jbmc binary manually with the -jbmcBinary option");
+                            "a jbmc binary manually with the -jbmcBinary option");
                     log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
                 } else if (Integer.parseInt(matcher.group(2)) < jbmcMinorVer) {
@@ -401,7 +372,7 @@ public class CLI implements Runnable {
                     log.error("Found version: " + output);
                     log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
                     log.error("Either install jbmc and make sure it is included in the path or provide " +
-                        "a jbmc binary manually with the -jbmcBinary option");
+                            "a jbmc binary manually with the -jbmcBinary option");
                     log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
                 }
@@ -421,17 +392,20 @@ public class CLI implements Runnable {
         return true;
     }
 
-    public static void translateAndRunJBMC() {
-        File tmpFile = prepareForJBMC();
+    public static void translateAndRunJBMC(String fileName) {
+        File tmpFile = prepareForJBMC(fileName);
         if (tmpFile == null) {
             keepTranslation = true;
             log.error("Error preparing translation. Abort verification.");
             return;
         }
         log.debug("Parse function names.");
-        FunctionNameVisitor.parseFile(tmpFile.getAbsolutePath());
-        List<String> functionNames = FunctionNameVisitor.getFunctionNames();
-        Map<String, List<String>> paramMap = FunctionNameVisitor.getParamMap();
+
+        //TODO
+        //FunctionNameVisitor.parseFile(tmpFile.getAbsolutePath());
+        List<String> functionNames = null;//FunctionNameVisitor.getFunctionNames();
+        Map<String, List<String>> paramMap = null;// FunctionNameVisitor.getParamMap();
+
         List<String> allFunctionNames = new ArrayList<>(functionNames);
         if (functionName != null) {
             if (!functionName.endsWith("Verf")) {
@@ -520,10 +494,10 @@ public class CLI implements Runnable {
 
 
             BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(jbmcProcess.getInputStream()));
+                    InputStreamReader(jbmcProcess.getInputStream()));
 
             BufferedReader stdError = new BufferedReader(new
-                InputStreamReader(jbmcProcess.getErrorStream()));
+                    InputStreamReader(jbmcProcess.getErrorStream()));
 
 
             StringBuilder sb = new StringBuilder();
@@ -560,7 +534,7 @@ public class CLI implements Runnable {
                 Files.write(Paths.get(tmpFolder.getAbsolutePath(), "xmlout.xml"), xmlOutput.getBytes());
                 if (jbmcProcess.exitValue() != 0 && jbmcProcess.exitValue() != 10) {
                     log.error("JBMC did not terminate as expected for function: " + functionName +
-                        "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
+                            "\nif ran with -kt option jbmc output can be found in xmlout.xml in the tmp folder");
                     return;
                 }
             } else {
@@ -670,7 +644,7 @@ public class CLI implements Runnable {
         File[] tmpFiles = folder.listFiles();
         if (tmpFiles != null) {
             for (File f : tmpFiles) {
-                if (!keepTranslation || !f.getName().endsWith(new File(fileName).getName()) || all) {
+                if (!keepTranslation || fileName != null && !f.getName().endsWith(new File(fileName).getName()) || all) {
                     if (f.isDirectory()) {
                         if (!f.getName().contains("testannotations")) {
                             deleteFolder(f, all);
@@ -688,20 +662,20 @@ public class CLI implements Runnable {
         }
     }
 
-    static JCTree rewriteAssert(JmlTree.JmlCompilationUnit cu, Context context) {
-        context.dump();
-        TranslationUtils.init(context, cu);
-        JCTree res = cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
-        BaseVisitor.instance = null;
-        return res;
+    static CompilationUnit rewriteAssert(CompilationUnit cu) {
+        //TranslationUtils.init(context, cu);
+        //JCTree res = cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
+        //BaseVisitor.instance = null;
+
+        return cu;
     }
 
     private static boolean verifyJavaVersion(String binary) {
-        String[] commands = new String[] {binary, "-version"};
+        String[] commands = new String[]{binary, "-version"};
         Process p = null;
         try {
             ProcessBuilder pb = new ProcessBuilder().command(commands)
-                .redirectErrorStream(true);
+                    .redirectErrorStream(true);
             p = pb.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = reader.readLine();
@@ -724,10 +698,10 @@ public class CLI implements Runnable {
             forceInliningLoops = true;
             forceInliningMethods = true;
         }
-        translateAndRunJBMC();
+        translateAndRunJBMC(fileName);
         if (doSanityCheck) {
             doSanityCheck = false;
-            translateAndRunJBMC();
+            translateAndRunJBMC(fileName);
         }
         System.exit(0);
     }

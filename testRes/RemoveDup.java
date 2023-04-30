@@ -43,7 +43,7 @@ class RemoveDup {
           @    (\forall int i; 0<=i && i<k;
           @        (\exists int j; 0<=j && j<p; result[j] == a[i]));
           @ decreases a.length-k + 2;
-          @ loop_modifies result[*];
+          @ assignable result[*];
           @*/
        for (int k = 0; k < a.length; k++) {
             if (!contains(result, p, a[k])) {
@@ -64,7 +64,7 @@ class RemoveDup {
         /*@ loop_invariant 0<=i && i<=len &&
           @    (\forall int j; 0<=j && j<i; a[j] != v);
           @ decreases a.length-i + 2;
-          @ loop_modifies \nothing;
+          @ assignable \nothing;
           @*/
        for (int i = 0; i < len; i++) {
             if (a[i] == v) {
@@ -87,7 +87,7 @@ class RemoveDup {
         /*@ loop_invariant
           @   0 <= i && i <= length &&
           @   (\forall int j; 0<=j && j < i; result[j] == a[j]);
-          @ loop_modifies result[*];
+          @ assignable result[*];
           @ decreases length - i + 2;
           @*/
        for (int i = 0; i < length; i++) {

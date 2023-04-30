@@ -33,7 +33,7 @@ public class WrapUtils {
           @    s[a] != '\n');
           @ loop_invariant lastSpace != -1 ==> s[lastSpace] == ' ';
           @ decreases lastSpace == -1 ? 0 : s.length + 1 - lastSpace;
-          @ loop_modifies s[*], lastBreak, lastSpace;
+          @ assignable s[*], lastBreak, lastSpace;
           @*/
         while(lastSpace != -1) {
             if (lastSpace - lastBreak > lineLength) {
@@ -58,7 +58,7 @@ public class WrapUtils {
         /*@ loop_invariant from <= k && k <= s.length;
           @ loop_invariant (\forall int i; from <= i && i < k; s[i] != c);
           @ decreases s.length - k;
-          @ loop_modifies \nothing;
+          @ assignable \nothing;
           @*/
        for (int k = from; k < s.length; k++) {
             if (s[k] == c) {

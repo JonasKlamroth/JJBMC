@@ -20,7 +20,7 @@ public class LoopExamples {
         boolean found = false;
         //@ loop_invariant 0 <= i && i <= a.length;
         //@ loop_invariant (\exists int j; 0 <= j && j < i; a[j] == x) == found;
-        //@ loop_modifies found;
+        //@ assignable found;
         for (int i = 0; i < a.length; i++) {
             if (a[i] == x) {found = true;}
             else {}

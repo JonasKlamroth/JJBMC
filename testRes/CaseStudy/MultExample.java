@@ -14,7 +14,7 @@ public class MultExample {
         int res = 0;
         //@ loop_invariant res == i * x2;
         //@ loop_invariant 0 <= i && i <= x1;
-        //@ loop_modifies res;
+        //@ assignable res;
         //@ decreases (x1 - i) + 1;
         for (int i = 0; i < x1; ++i) {
             res += x2;
