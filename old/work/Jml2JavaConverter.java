@@ -1,89 +1,38 @@
 package translation;
 
-import static com.sun.tools.javac.tree.JCTree.JCAnnotation;
-import static com.sun.tools.javac.tree.JCTree.JCBlock;
-import static com.sun.tools.javac.tree.JCTree.JCExpression;
-import static com.sun.tools.javac.tree.JCTree.JCExpressionStatement;
-import static com.sun.tools.javac.tree.JCTree.JCIdent;
-import static com.sun.tools.javac.tree.JCTree.JCMethodDecl;
-import static com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
-import static com.sun.tools.javac.tree.JCTree.JCModifiers;
-import static com.sun.tools.javac.tree.JCTree.JCReturn;
-import static com.sun.tools.javac.tree.JCTree.JCStatement;
-import static com.sun.tools.javac.tree.JCTree.JCTry;
-import static com.sun.tools.javac.tree.JCTree.JCTypeParameter;
-import static com.sun.tools.javac.tree.JCTree.JCVariableDecl;
-import static org.jmlspecs.openjml.JmlTree.JmlAnnotation;
-import static org.jmlspecs.openjml.JmlTree.JmlMethodClauseExpr;
-import static org.jmlspecs.openjml.JmlTree.JmlMethodClauseStoreRef;
-import static org.jmlspecs.openjml.JmlTree.JmlMethodDecl;
-import static org.jmlspecs.openjml.JmlTree.JmlMethodSpecs;
-import static org.jmlspecs.openjml.JmlTree.JmlSpecificationCase;
-import static org.jmlspecs.openjml.JmlTree.JmlStatementSpec;
-import static org.jmlspecs.openjml.JmlTree.JmlStoreRefKeyword;
-import static org.jmlspecs.openjml.JmlTree.Maker;
-
 import cli.CLI;
 import cli.ErrorLogger;
-import com.sun.source.tree.MethodTree;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.jvm.ClassReader;
-import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.Name;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
-import java.util.LinkedHashMap;
-import javax.lang.model.element.Modifier;
-import org.jmlspecs.openjml.JmlSpecs;
-import org.jmlspecs.openjml.JmlTokenKind;
-import org.jmlspecs.openjml.JmlTree;
-import org.jmlspecs.openjml.JmlTreeUtils;
-import utils.NormalizeVisitor;
-import utils.TranslationUtils;
+
+import java.util.*;
+import java.util.LinkedList;
+
 
 /**
  * Created by jklamroth on 11/13/18.
  *
  * <p> This Visitor translates methods and their translation into Java!? </p>
  */
-public class VerifyFunctionVisitor extends FilterVisitor {
-    private final Maker maker;
-    private final Context context;
-    private final Symtab syms;
-    private final JmlTreeUtils treeutils;
-    private final ClassReader reader;
-    private final BaseVisitor baseVisitor;
-    protected JmlMethodDecl currentMethod;
-    private List<JCStatement> newStatements = List.nil();
-    private List<JCStatement> combinedNewReqStatements = List.nil();
-    private List<JCStatement> combinedNewEnsStatements = List.nil();
-    private List<List<JCStatement>> reqCases = List.nil();
-    private List<List<JCStatement>> ensCases = List.nil();
-    private List<List<JCExpression>> assCases = List.nil();
-    private List<JCExpression> signaledExceptions = List.nil();
-    private Symbol returnVarSym = null;
+public class Jml2JavaConverter extends VoidVisitorAdapter<Void> {
+    private NodeList<Statement> newStatements = new NodeList<>();
+    private List<Statement> combinedNewReqStatements = new LinkedList<>();
+    private List<Statement> combinedNewEnsStatements = new LinkedList<>();
+    private List<List<Statement>> reqCases = new LinkedList<>();
+    private List<List<Statement>> ensCases = new LinkedList<>();
+    private List<List<Expression>> assCases = new LinkedList<>();
+    private List<Expression> signaledExceptions = new LinkedList<>();
+    private com.github.javaparser.ast.expr.Expression returnVarSym = null;
     private boolean hasReturn = false;
-    private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
+    private Jml2JavaConverter.TranslationMode translationMode = Jml2JavaConverter.TranslationMode.JAVA;
     //Has to perserve order (e.g. LinkedHashMap)
     private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private List<JCExpression> currentAssignable = null;
-
-
-    public VerifyFunctionVisitor(Context context, Maker maker, BaseVisitor base) {
-        super(context, maker);
-        baseVisitor = base;
-        this.context = context;
-        this.maker = Maker.instance(context);
-        this.syms = Symtab.instance(context);
-        this.treeutils = JmlTreeUtils.instance(context);
-        this.reader = ClassReader.instance(context);
-        this.reader.init(syms);
-    }
 
     @Override
     public JCTree visitJmlMethodClauseExpr(JmlMethodClauseExpr that, Void p) {
@@ -119,7 +68,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             combinedNewReqStatements = combinedNewReqStatements.append(maker.Block(0L, newStatements));
         }
         newStatements = List.nil();
-        translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
+        translationMode = Jml2JavaConverter.TranslationMode.JAVA;
         return maker.JmlMethodClauseExpr(that.clauseKind.name(), that.clauseKind, copy);
     }
 

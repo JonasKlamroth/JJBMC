@@ -1,0 +1,52 @@
+- input: x
+  expected: |
+    x
+
+- input: (\forall int i; 0 <= i && i < arr.length; arr[i])
+  expected: |
+    int i = nondet_int();
+    if (0 <= i && i < arr.length) {
+    }
+
+- input: (\exists int i; 0 <= i && i < arr.length; arr[i])
+  expected: |
+    int i = nondet_int();
+    if (0 <= i && i < arr.length) {
+    }
+
+- input: (\let int myvar = 2; myvar)
+  expected: |
+    int i = nondet_int();
+    if (0 <= i && i < arr.length) {
+    }
+
+- input: true && false
+  expected: true && false
+
+- input: f() && true
+  expected: true && false
+
+- input: "22"
+  expected: |
+    {
+    }
+    22
+
+- input: "22.25"
+  expected: "22.25"
+
+- input: "true"
+  expected: |
+    {
+    }
+    true
+
+- input: "'c'"
+  expected: "'c'"
+
+- input: "\"c\""
+  expected: "\"c\""
+
+- input: " \"\"\"\n this is a block \"\"\"  "
+  expected: " \"\"\"\n this is a block \"\"\"  "
+
