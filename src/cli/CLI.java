@@ -7,10 +7,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
-import com.github.javaparser.printer.SourcePrinter;
-import com.github.javaparser.printer.configuration.ConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
-import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.collect.ImmutableList;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
@@ -18,6 +15,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import translation.jml2java.Jml2JavaFacade;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -341,7 +339,7 @@ public class CLI implements Runnable {
                 line = stdInput.readLine();
             }
 
-            StringBuilder sb2 = new StringBuilder();
+            String sb2 = "";
             String line2 = stdInput.readLine();
             while (line2 != null) {
                 sb.append(line);
@@ -353,7 +351,7 @@ public class CLI implements Runnable {
             process.waitFor();
 
             String output = sb.toString();
-            String error = sb2.toString();
+            String error = sb2;
             if (output.toLowerCase().contains("jbmc version")) {
                 log.debug("Found valid jbmc version: " + output);
                 Pattern pattern = Pattern.compile("jbmc version (\\d*)\\.(\\d*)\\.(\\d*)? \\(", Pattern.CASE_INSENSITIVE);
@@ -663,11 +661,7 @@ public class CLI implements Runnable {
     }
 
     static CompilationUnit rewriteAssert(CompilationUnit cu) {
-        //TranslationUtils.init(context, cu);
-        //JCTree res = cu.accept(new BaseVisitor(context, JmlTree.Maker.instance(context)), null);
-        //BaseVisitor.instance = null;
-
-        return cu;
+        return Jml2JavaFacade.translate(cu);
     }
 
     private static boolean verifyJavaVersion(String binary) {

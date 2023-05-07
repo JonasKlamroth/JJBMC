@@ -1,7 +1,5 @@
 package cli;
 
-import cli.CLI;
-import cli.CostumPrintStream;
 import picocli.CommandLine;
 
 /**
@@ -11,9 +9,7 @@ import picocli.CommandLine;
  * @version 1 (1.10.18)
  */
 public class Main {
-
-
-    public static final void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (!(System.err instanceof CostumPrintStream)) {
             System.setErr(new CostumPrintStream(System.err));
             System.setOut(new CostumPrintStream(System.out));

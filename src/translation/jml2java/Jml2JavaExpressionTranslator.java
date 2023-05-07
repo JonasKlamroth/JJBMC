@@ -6,18 +6,16 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jml.expr.*;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.ExpressionStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.*;
+import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
-import com.github.javaparser.resolution.types.ResolvedArrayType;
-import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
-import com.github.javaparser.resolution.types.ResolvedType;
 import translation.jml2java.Jml2JavaFacade.Result;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static translation.jml2java.Jml2JavaFacade.resolvedType2Type;
+import static translation.jml2java.Jml2JavaFacade.unroll;
 
 /**
  * Translates JML expressions into a bunch of Java statements and a final expression.
@@ -71,25 +69,116 @@ public class Jml2JavaExpressionTranslator {
 
         @Override
         public Result visit(ConditionalExpr n, TranslationMode arg) {
+
             return super.visit(n, arg);
         }
 
         @Override
         public Result visit(JmlQuantifiedExpr n, TranslationMode arg) {
             if (n.getBinder() == JmlQuantifiedExpr.JmlDefaultBinder.FORALL)
-                return visitForall(n, arg);
+                return arg == TranslationMode.ASSERT ? visitForall(n, arg) : visitForallLoop(n, arg);
             if (n.getBinder() == JmlQuantifiedExpr.JmlDefaultBinder.EXISTS)
-                return visitExists(n, arg);
+                return arg == TranslationMode.ASSUME ? visitExists(n, arg) : visitExistsLoop(n, arg);
 
             throw new IllegalArgumentException("Unsupport quantifier " + n.getBinder());
         }
+
+        /**
+         * Translate a universal quantification into a for loop over the range
+         */
+        private Result visitForallLoop(JmlQuantifiedExpr n, TranslationMode arg) {
+            final var b = new BlockStmt();
+            final var boolVar = "b" + counter.getAndIncrement();
+            final var loopVar = "i" + counter.getAndIncrement();
+
+            var lowerBound = quantifierSplitter.getLowerBound(n);
+            var upperBound = quantifierSplitter.getUpperBound(n);
+
+            // add: boolean bN = true
+            b.addStatement(
+                    new VariableDeclarationExpr(
+                            new VariableDeclarator(
+                                    new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+                                    boolVar,
+                                    new BooleanLiteralExpr(true))));
+
+            //
+            var init = new VariableDeclarationExpr(
+                    new VariableDeclarator(
+                            new PrimitiveType(PrimitiveType.Primitive.INT),
+                            loopVar, lowerBound));
+            var compare = new BinaryExpr(new NameExpr(loopVar), upperBound, BinaryExpr.Operator.LESS);
+            var update = new UnaryExpr(new NameExpr(loopVar), UnaryExpr.Operator.PREFIX_INCREMENT);
+            BlockStmt forBody = new BlockStmt();
+
+
+            var res = n.getExpressions().getLast().get().accept(this, arg);
+            forBody.getStatements().addAll(res.statements);
+
+            // boolVar = (boolVar && val)
+            forBody.addStatement(
+                    new AssignExpr(new NameExpr(boolVar),
+                            new EnclosedExpr(
+                                    new BinaryExpr(new NameExpr(boolVar), res.value, BinaryExpr.Operator.AND)),
+                            AssignExpr.Operator.ASSIGN));
+
+
+            b.addStatement(new ForStmt(new NodeList<>(init), compare, new NodeList<>(update), forBody));
+            return new Result(b.getStatements(), new NameExpr(boolVar));
+        }
+
+
+        /**
+         * Translate a universal quantification into a for loop over the range
+         */
+        private Result visitExistsLoop(JmlQuantifiedExpr n, TranslationMode arg) {
+            final var b = new BlockStmt();
+            final var boolVar = "b" + counter.getAndIncrement();
+            final var loopVar = "i" + counter.getAndIncrement();
+
+            var lowerBound = quantifierSplitter.getLowerBound(n);
+            var upperBound = quantifierSplitter.getUpperBound(n);
+
+            // add: boolean bN = false
+            b.addStatement(
+                    new VariableDeclarationExpr(
+                            new VariableDeclarator(
+                                    new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
+                                    boolVar,
+                                    new BooleanLiteralExpr(false))));
+
+            //
+            var init = new VariableDeclarationExpr(
+                    new VariableDeclarator(
+                            new PrimitiveType(PrimitiveType.Primitive.INT),
+                            loopVar, lowerBound));
+            var compare = new BinaryExpr(new NameExpr(loopVar), upperBound, BinaryExpr.Operator.LESS);
+            var update = new UnaryExpr(new NameExpr(loopVar), UnaryExpr.Operator.PREFIX_INCREMENT);
+            BlockStmt forBody = new BlockStmt();
+
+
+            var res = n.getExpressions().getLast().get().accept(this, arg);
+            forBody.getStatements().addAll(res.statements);
+
+            // boolVar = (boolVar || val)
+            forBody.addStatement(
+                    new AssignExpr(new NameExpr(boolVar),
+                            new EnclosedExpr(
+                                    new BinaryExpr(new NameExpr(boolVar), res.value, BinaryExpr.Operator.OR)),
+                            AssignExpr.Operator.ASSIGN));
+
+
+            b.addStatement(new ForStmt(new NodeList<>(init), compare, new NodeList<>(update), forBody));
+            return new Result(b.getStatements(), new NameExpr(boolVar));
+        }
+
 
         private Result visitForall(JmlQuantifiedExpr n, TranslationMode arg) {
             var para = quantifierSplitter.getVariable(n);
             var s = assignNondet(para);
             var newExpr = new BinaryExpr(
-                    n.getExpressions().get(0),
-                    n.getExpressions().get(1),
+                    new EnclosedExpr(n.getExpressions().get(0)),
+                    new EnclosedExpr(n.getExpressions().get(1)),
                     BinaryExpr.Operator.IMPLICATION)
                     .accept(this, arg);
             newExpr.statements.addFirst(s);
@@ -139,13 +228,14 @@ public class Jml2JavaExpressionTranslator {
         @Override
         public Result visit(JmlLetExpr n, TranslationMode arg) {
             var inner = new BlockStmt();
-            var outer = new BlockStmt(new NodeList<>(inner));
+            var outer = new BlockStmt();
 
             SimpleName target = newTargetForAssignment();
             var type = n.getBody().calculateResolvedType();
             outer.addAndGetStatement(
                     new ExpressionStmt(new VariableDeclarationExpr(resolvedType2Type(type),
                             target.asString())));
+            outer.addStatement(inner);
 
             for (VariableDeclarator variable : n.getVariables().getVariables()) {
                 var v = accept(variable.getInitializer().get(), arg);
@@ -211,9 +301,13 @@ public class Jml2JavaExpressionTranslator {
             return new IfStmt(value, new BlockStmt(statements), null);
         }
 
+
         @Override
         public Result visit(ArrayAccessExpr n, TranslationMode arg) {
-            return super.visit(n, arg);
+            var name = n.getName().accept(this, arg);
+            var index = n.getIndex().accept(this, arg);
+            name.statements.addAll(index.statements);
+            return new Result(name.statements, new ArrayAccessExpr(name.getValue(), index.value));
         }
 
         @Override
@@ -296,6 +390,10 @@ public class Jml2JavaExpressionTranslator {
 
         @Override
         public Result visit(MethodCallExpr n, TranslationMode arg) {
+            if (n.getNameAsString().equals("\\old")) {
+                return new Result(new NameExpr("old_" + n.getArgument(0).hashCode()));
+            }
+
             Expression scope = null;
             NodeList<Statement> statements = new NodeList<>();
 
@@ -354,7 +452,7 @@ public class Jml2JavaExpressionTranslator {
 
         @Override
         public Result visit(UnaryExpr n, TranslationMode arg) {
-            var inner = n.getExpression().accept(this, arg);
+            var inner = n.getExpression().accept(this, arg.switchPolarity());
             return new Result(inner.statements,
                     new UnaryExpr(inner.value, n.getOperator()));
         }
@@ -412,55 +510,5 @@ public class Jml2JavaExpressionTranslator {
         }
     }
 
-    public static Expression unroll(JmlMultiCompareExpr n) {
-        Expression r;
-        if (n.getExpressions().isEmpty()) {
-            r = new BooleanLiteralExpr(true);
-        } else if (n.getExpressions().size() == 1) {
-            r = n.getExpressions().get(0);
-        } else {
-            Expression e = null;
-            for (int i = 0; i < n.getExpressions().size() - 1; i++) {
-                BinaryExpr cmp = new BinaryExpr(
-                        n.getExpressions().get(i).clone(),
-                        n.getExpressions().get(i + 1).clone(),
-                        n.getOperators().get(i));
-                e = e == null ? cmp : new BinaryExpr(e, cmp, BinaryExpr.Operator.AND);
-            }
-            r = e;
-        }
-        r.setParentNode(n.getParentNode().orElse(null));
-        return r;
-    }
-
-    public static Type resolvedType2Type(ResolvedType type) {
-        if (type.isPrimitive()) {
-            ResolvedPrimitiveType rType = type.asPrimitive();
-            return new PrimitiveType(
-                    switch (rType) {
-                        case BYTE -> PrimitiveType.Primitive.BYTE;
-                        case SHORT -> PrimitiveType.Primitive.SHORT;
-                        case CHAR -> PrimitiveType.Primitive.CHAR;
-                        case INT -> PrimitiveType.Primitive.INT;
-                        case LONG -> PrimitiveType.Primitive.LONG;
-                        case BOOLEAN -> PrimitiveType.Primitive.BOOLEAN;
-                        case FLOAT -> PrimitiveType.Primitive.FLOAT;
-                        case DOUBLE -> PrimitiveType.Primitive.DOUBLE;
-                    }
-            );
-        }
-
-        if (type.isArray()) {
-            ResolvedArrayType aType = type.asArrayType();
-            return new ArrayType(resolvedType2Type(aType.getComponentType()));
-        }
-
-        if (type.isReferenceType()) {
-            var rType = type.asReferenceType();
-            return new ClassOrInterfaceType(rType.getQualifiedName());
-        }
-
-        throw new RuntimeException("Unsupported type");
-    }
 
 }
