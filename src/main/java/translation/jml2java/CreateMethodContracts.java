@@ -39,7 +39,7 @@ public class CreateMethodContracts extends VoidVisitorAdapter<Object> {
     public void visit(MethodDeclaration n, Object arg) {
         if (n.getContracts().isPresent()) {
             var contracts = n.getContracts().get();
-            // Only one conract currently supported
+            // Only one contract currently supported
             if (contracts.getFirst().isEmpty() || contracts.size() != 1) {
                 throw new IllegalStateException("The number of contracts is " + contracts.size() + " only 1 contract supported.");
             }

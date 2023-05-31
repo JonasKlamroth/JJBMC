@@ -27,10 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class Utils {
     public static final String baseTestFolder = "." + File.separator + "testRes" + File.separator;
-    private static Logger log = LogManager.getLogger(Utils.class);
-    private static boolean keepTmpFile = true;
-    private static boolean filterOutput = false;
-    private boolean doCleanup = false;
+    private static final Logger log = LogManager.getLogger(Utils.class);
+    private static final boolean keepTmpFile = true;
+    private static final boolean filterOutput = false;
+    private final boolean doCleanup = false;
 
     public static Stream<Arguments> assignableParameter() {
         return prepareParameters(baseTestFolder + "tests" + File.separator + "AssignableTests.java");

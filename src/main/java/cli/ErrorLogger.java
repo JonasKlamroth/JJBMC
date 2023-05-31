@@ -1,8 +1,9 @@
 package cli;
 
+import org.apache.logging.log4j.LogManager;
+
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.logging.log4j.LogManager;
 
 public class ErrorLogger {
     private static final org.apache.logging.log4j.Logger log = LogManager.getLogger(ErrorLogger.class);

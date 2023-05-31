@@ -66,6 +66,7 @@ public class Jml2JavaFacade {
                 seq.add(i.getArgument(0));
             }
         });
+
         return seq;
     }
 

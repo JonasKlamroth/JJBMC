@@ -3,7 +3,6 @@ package translation;
 import cli.ErrorLogger;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -17,7 +16,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuild
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.text.html.parser.Parser;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -27,11 +25,11 @@ import java.util.List;
 
 public class FunctionNameVisitor {
     private static final Logger log = LogManager.getLogger(FunctionNameVisitor.class);
-    private List<String> unwinds = new ArrayList<>();
-    private List<String> functionNames = new ArrayList<>();
+    private final List<String> unwinds = new ArrayList<>();
+    private final List<String> functionNames = new ArrayList<>();
     private boolean getAll = false;
-    private HashMap<String, List<String>> paramMap = new HashMap<>();
-    private List<TestBehaviour> functionBehaviours = new LinkedList<>();
+    private final HashMap<String, List<String>> paramMap = new HashMap<>();
+    private final List<TestBehaviour> functionBehaviours = new LinkedList<>();
 
     public FunctionNameVisitor(CompilationUnit cu, boolean getAll) {
         this.getAll = getAll;

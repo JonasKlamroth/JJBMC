@@ -1,21 +1,12 @@
 package cli;
 
-import static cli.TraceInformation.cleanLHS;
-import static cli.TraceInformation.cleanValue;
-import static cli.TraceInformation.isRelevantValue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static cli.TraceInformation.*;
+
 public class Trace {
-    private Object noValue = new Object();
+    private final Object noValue = new Object();
     List<Assignment> filteredAssignments;
     List<Assignment> allAssignments;
     Set<String> relevantVars = new HashSet<>();
@@ -194,9 +185,7 @@ public class Trace {
         for (Assignment a : group) {
             groupMap.put(a.guess, a);
         }
-        if (groupMap.containsKey(null)) {
-            groupMap.remove(null);
-        }
+        groupMap.remove(null);
         List<Assignment> filtered = new ArrayList<>(groupMap.values());
         return filtered;
     }

@@ -2,10 +2,12 @@ package casestudy;
 
 import cli.CostumPrintStream;
 import cli.Main;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,14 +15,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class CaseStudies {
     private String configString = null;
-    private Path configFilePath = new File("testRes" + File.separator + "CaseStudyConfig.json").toPath();
+    private final Path configFilePath = new File("testRes" + File.separator + "CaseStudyConfig.json").toPath();
     private JsonObject configs = null;
-    private Logger log = LogManager.getLogger(CaseStudies.class);
+    private final Logger log = LogManager.getLogger(CaseStudies.class);
 
     public static void main(String[] args) {
         try {

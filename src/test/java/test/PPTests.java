@@ -2,10 +2,7 @@ package test;
 
 import cli.CLI;
 import cli.CostumPrintStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.stream.Stream;
-
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -15,14 +12,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
 import utils.Utils;
 
-@Order(value = 2)
+import java.io.File;
+import java.io.IOException;
+import java.util.stream.Stream;
+
+@Order(value = 3)
 //@Execution(ExecutionMode.CONCURRENT)
-public class Assignable2Tests {
+public class PPTests {
 
     @BeforeAll
     public static void init() {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
+        CLI.proofPreconditions = true;
     }
 
     @AfterEach
@@ -30,15 +32,21 @@ public class Assignable2Tests {
         CLI.cleanUp();
     }
 
-    public static Stream<Arguments> assignableParameter2() {
+    @AfterAll
+    public static void setBack() {
+        CLI.proofPreconditions = false;
+    }
+
+    public static Stream<Arguments> getParameters() {
         init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "AssignableTests2.java");
+        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "PPTests.java");
     }
 
     @ParameterizedTest
-    @MethodSource("assignableParameter2")
-    public void runAssignableTests2(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour,
-                                    String parentFolder) throws IOException, InterruptedException {
+    @MethodSource("getParameters")
+    public void runTestSuite(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour,
+                             String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
+
 }

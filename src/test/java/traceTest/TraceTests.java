@@ -1,15 +1,9 @@
 package traceTest;
 
-import cli.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
+import cli.CLI;
+import cli.CostumPrintStream;
+import cli.JBMCOutput;
+import cli.TraceParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +13,14 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +44,7 @@ public class TraceTests {
         List<Arguments> params = new ArrayList<>();
         params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut.txt",
-                new ArrayList<>(Arrays.asList(new String[]{"k", "tt", "table"})),
+                new ArrayList<>(Arrays.asList("k", "tt", "table")),
                 "test"));
         params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut2.txt",
@@ -50,7 +52,7 @@ public class TraceTests {
                 "test2"));
         params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut3.txt",
-                new ArrayList<>(Arrays.asList(new String[]{"iotable"})),
+                new ArrayList<>(Arrays.asList("iotable")),
                 "test3"));
         params.add(Arguments.of("." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TraceTestCases.java",
                 "." + File.separator + "testRes" + File.separator + "traceTest" + File.separator + "TmpTestOut4.txt",

@@ -2,14 +2,8 @@ package cli;
 
 import com.github.javaparser.utils.Pair;
 import exceptions.TranslationException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+
+import java.util.*;
 
 public class TraceInformation {
     public static final List<String> ignoredVars = new ArrayList<>(Arrays.asList("enableAssume",
@@ -38,10 +32,7 @@ public class TraceInformation {
     }
 
     public static boolean isRelevantValue(String value) {
-        if (value.contains("@class_identifier")) {
-            return false;
-        }
-        return true;
+        return !value.contains("@class_identifier");
         //return !value.contains("{");
         //if (value.contains("dynamic")) {
         //return false;

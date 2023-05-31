@@ -16,25 +16,6 @@ apply plugin: 'checkstyle'
 sourceCompatibility = 17
 test.testLogging.showStandardStreams = true
 
-sourceSets {
-   main {
-      java {
-         srcDir 'src'
-      }
-        resources {
-            srcDir 'resources'
-        }
-   }
-   test {
-      java {
-         srcDir 'tests'
-      }
-      resources {
-          srcDir 'testRes'
-      }
-   }
-}
-
 checkstyle {
     toolVersion '8.45.1'    // your choice here
 }
