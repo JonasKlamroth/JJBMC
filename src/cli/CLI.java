@@ -106,11 +106,11 @@ public class CLI implements Runnable {
         description = "Adds a check for each method if assumptions are equals to false.",
         arity = "0..1")
     public static boolean doSanityCheck = false;
-    @Option(names = {"-d", "-debug"},
-        description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
     @Option(names = { "-ua",
             "-unwindAssertions" }, description = "Adds a check for each loop if unwind bound is reached but loop is not done yet.", arity = "0..1")
     public static boolean doUnwindAssertions = false;
+    @Option(names = { "-d",
+            "-debug" }, description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
     public static boolean debugMode = false;
     public static Map<String, String> expressionMap = new HashMap<>();
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
