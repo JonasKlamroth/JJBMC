@@ -108,6 +108,9 @@ public class CLI implements Runnable {
     public static boolean doSanityCheck = false;
     @Option(names = {"-d", "-debug"},
         description = "Runs JJBMC in debug mode. More outputs and preventing clean up of temporary files.")
+    @Option(names = { "-ua",
+            "-unwindAssertions" }, description = "Adds a check for each loop if unwind bound is reached but loop is not done yet.", arity = "0..1")
+    public static boolean doUnwindAssertions = false;
     public static boolean debugMode = false;
     public static Map<String, String> expressionMap = new HashMap<>();
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
@@ -503,6 +506,11 @@ public class CLI implements Runnable {
             tmp.add(String.valueOf(maxArraySize));
 
             jbmcOptions = prepareJBMCOptions(jbmcOptions);
+
+            if (doUnwindAssertions && !jbmcOptions.contains("--unwinding-assertions")) {
+                jbmcOptions.add("--unwinding-assertions");
+            }
+
             tmp.addAll(jbmcOptions);
             tmp.add("--xml-ui");
             //tmp.add("--cp");
