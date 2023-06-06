@@ -44,6 +44,33 @@ public class NormalizeVisitor extends JmlTreeCopier {
     public JCTree visitBinary(BinaryTree node, Void p) {
         selfNegated = false;
         JCBinary binary = (JCBinary) node;
+
+        if (binary.lhs.type.getTag() == TypeTag.INT && binary.rhs.type.getTag() == TypeTag.INT) {
+            // Temporarily store the value of negated and set it to false
+            boolean oldNegated = negated;
+            negated = false;
+
+            // Copy the binary expression without modifications
+            JCExpression expr1 = super.copy(binary.getLeftOperand());
+            JCExpression expr2 = super.copy(binary.getRightOperand());
+
+            // Restore the original value of negated
+            negated = oldNegated;
+
+            JCBinary b = M.Binary(((JCBinary) node).getTag(), expr1, expr2);
+            b = (JCBinary) b.setType(binary.type);
+            b.operator = binary.operator;
+
+            // If negated is true, negate the binary expression
+            if (negated) {
+                selfNegated = true;
+                negated = false;
+                return negateExpression(b);
+            } else {
+                return b;
+            }
+        }
+
         if (binary.getTag() == Tag.EQ) {
             if (binary.rhs.type.getTag() == TypeTag.BOOLEAN) {
                 boolean oldNegated = negated;
