@@ -31,7 +31,7 @@ JJBMC is a tool that is developed both at [FZI](https://www.fzi.de) and [KIT](ht
 - In general, you can run JJBMC via ``java -jar JJBMC.jar JAVA_FILE METHOD_NAME -j="JBMC_OPTIONS"``, where **JAVA_FILE** should be replaced by the JML-specified Java file that you want to analyze, **METHOD_NAME** can be replaced by a name of a method you would like to verify (if left out all methods are verified), and **JBMC_OPTIONS** should be replaced by the JBMC options that you want to set, e.g., a bound for loop unrollings via ``--unwind BOUND`` (**BOUND** should be replaced by the size of the desired bound). For examples, see the section below.
 
 ## Examples
-- You can analyze a correct modular [Bubblesort example](testRes/BubbleSort.java) via
+- You can analyze a correct modular [Bubblesort example](https://github.com/JonasKlamroth/JJBMC/blob/master/testRes/CaseStudy/BubbleSort.java) via
 ```
 java -jar JJBMC.jar testRes/BubbleSort.java sort
 ```
@@ -39,11 +39,11 @@ java -jar JJBMC.jar testRes/BubbleSort.java sort
 ```
 java -jar JJBMC.jar testRes/BubbleSort.java broken_sort 
 ```
-- You can analyze force a non modular verification (inlining all loop invariants and methods) of the [Bubblesort example](testRes/BubbleSort.java) via
+- You can analyze force a non modular verification (inlining all loop invariants and methods) of the [Bubblesort example](testRes/BubbleSort.java](https://github.com/JonasKlamroth/JJBMC/blob/master/testRes/CaseStudy/BubbleSort.java) via
 ```
 java -jar JJBMC.jar testRes/BubbleSort.java -fi 
 ```
-- You can analyze the [Hammingweight example](testRes/NormalHammingWeight.java) via
+- You can analyze the [Hammingweight example](https://github.com/JonasKlamroth/JJBMC/blob/master/testRes/CaseStudy/NormalHammingWeight.java) via
 ```
 java -jar JJBMC.jar testRes/NormalHammingWeight.java -u 33
 ```
