@@ -1,7 +1,6 @@
 package translation.jml2java;
 
 import cli.CLI;
-import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -14,12 +13,14 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -66,8 +67,8 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
     @Override
     public Visitable visit(MethodDeclaration n, Object arg) {
-        if (n.getContracts().isPresent() && !Jml2JavaFacade.ignoreNodeByAnnotation(n)) {
-            var contracts = n.getContracts().get();
+        if (!Jml2JavaFacade.ignoreNodeByAnnotation(n)) {
+            var contracts = n.getContracts();
             Expression ensures = new BooleanLiteralExpr(true);
             Expression requires = new BooleanLiteralExpr(true);
             List<Expression> assignable = new ArrayList<>();
@@ -81,7 +82,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
             if(n.getParentNode().isPresent()) {
                 var copy = n.clone();
                 ClassOrInterfaceDeclaration parentClass = (ClassOrInterfaceDeclaration) n.getParentNode().get();
-                copy.getContracts().get().clear();
+                copy.getContracts().clear();
                 parentClass.addMember(copy);
             }
 
@@ -167,15 +168,15 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
     @Override
     public Visitable visit(WhileStmt n, Object arg) {
-        if (n.getContracts().isPresent() && n.getContracts().get().size() == 1) {
-            var contract = n.getContracts().get().getFirst().get();
+        if (n.getContracts().size() == 1) {
+            var contract = n.getContracts().getFirst().get();
             var loopInvar = gather(contract, JmlClauseKind.LOOP_INVARIANT);
             var assignables = gather(contract, JmlClauseKind.ASSIGNABLE);
             var decreases = gather(contract, JmlClauseKind.DECREASES);
 
             if (decreases.size() != 1) {
                 throw new IllegalStateException("Only exactly one decreases clause supported. However found " +
-                        decreases.size() + " in " + n.getContracts().get());
+                        decreases.size() + " in " + n.getContracts());
             }
             return handleLoop(loopInvar, assignables, decreases.get(0), n.getCondition(), n.getBody(), new NodeList<>(), n);
         }
@@ -184,7 +185,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
     @Override
     public Visitable visit(ForStmt n, Object arg) {
-        if (n.getContracts().isPresent() && n.getContracts().get().size() == 1) {
+        if (n.getContracts().size() == 1) {
 
             var body = ensureBlock(n.getBody().clone());
             body.setParentNode(n);
@@ -192,7 +193,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
                 body.addStatement(expression);
             }
 
-            var contract = n.getContracts().get().getFirst().get();
+            var contract = n.getContracts().getFirst().get();
             var loopInvar = gather(contract, JmlClauseKind.LOOP_INVARIANT);
             var assignables = gather(contract, JmlClauseKind.ASSIGNABLE);
             var decreases = gather(contract, JmlClauseKind.DECREASES);
