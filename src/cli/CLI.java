@@ -8,6 +8,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.google.common.collect.ImmutableList;
 import exceptions.TranslationException;
 import exceptions.UnsupportedException;
@@ -15,6 +17,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import translation.FunctionNameVisitor;
 import translation.jml2java.Jml2JavaFacade;
 
 import java.io.*;
@@ -122,6 +125,7 @@ public class CLI implements Runnable {
     private static File tmpFile;
     private static final boolean isWindows = System.getProperty("os.name")
             .toLowerCase().startsWith("windows");
+    private static List<String> functionNames;
 
 
     public static void reset() {
@@ -146,26 +150,27 @@ public class CLI implements Runnable {
         return translate(file.toPath());
     }
 
-    public static CompilationUnit translate(Path... fileNames) throws Exception {
+    public static CompilationUnit translate(Path fileName) throws Exception {
         ParserConfiguration config = new ParserConfiguration();
         config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
         config.setProcessJml(true);
+        //TODO this should be checked if this is fine
+        config.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(fileName.getParent())));
         JavaParser parser = new JavaParser(config);
 
         List<CompilationUnit> compilationUnits = new ArrayList<>(32);
-        for (var arg : fileNames) {
-            ParseResult<CompilationUnit> result = parser.parse(arg);
-            if (result.isSuccessful()) {
-                compilationUnits.add(result.getResult().get());
-            } else {
-                System.out.println(arg);
-                result.getProblems().forEach(System.out::println);
-            }
+        ParseResult<CompilationUnit> result = parser.parse(fileName);
+        if (result.isSuccessful()) {
+            compilationUnits.add(result.getResult().get());
+        } else {
+            System.out.println(fileName);
+            result.getProblems().forEach(System.out::println);
         }
 
 
         for (var it : compilationUnits) {
-            //log.info(api.prettyPrint(rewriteRAC(it, ctx)));
+            functionNames = new ArrayList<>();
+            it.accept(new FunctionNameVisitor(), functionNames);
             try {
                 return rewriteAssert(it);
                 //return api.prettyPrint(t);
@@ -399,17 +404,11 @@ public class CLI implements Runnable {
         }
         log.debug("Parse function names.");
 
-        //TODO
-        //FunctionNameVisitor.parseFile(tmpFile.getAbsolutePath());
-        List<String> functionNames = null;//FunctionNameVisitor.getFunctionNames();
-        Map<String, List<String>> paramMap = null;// FunctionNameVisitor.getParamMap();
 
-        List<String> allFunctionNames = new ArrayList<>(functionNames);
+        List<String> allFunctionNames = functionNames;
         if (functionName != null) {
-            if (!functionName.endsWith("Verf")) {
-                functionName = functionName + "Verf";
-            }
-            functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
+            //functionNames = functionNames.stream().filter(f -> f.contains("." + functionName + ":")).collect(Collectors.toList());
+            functionNames = functionNames.stream().filter(f -> f.contains("." + functionName)).collect(Collectors.toList());
             if (functionNames.size() == 0) {
                 log.warn("Function " + functionName + " could not be found in the specified file.");
                 log.warn("Found the following functions: " + allFunctionNames);
@@ -419,6 +418,9 @@ public class CLI implements Runnable {
         log.info("Run jbmc for " + functionNames.size() + " functions.");
 
         for (String functionName : functionNames) {
+            if (!functionName.endsWith("Verification")) {
+                functionName = functionName + "Verification";
+            }
             if (isWindows) {
                 if (functionName.contains("()")) {
                     functionName = functionName.replace("<init>", "<clinit>");
@@ -427,7 +429,7 @@ public class CLI implements Runnable {
             }
             ExecutorService executerService = Executors.newSingleThreadExecutor();
             String finalFunctionName = functionName;
-            Runnable worker = () -> runJBMC(tmpFile, finalFunctionName, paramMap);
+            Runnable worker = () -> runJBMC(tmpFile, finalFunctionName);
 
             final Future handler = executerService.submit(worker);
             try {
@@ -451,7 +453,7 @@ public class CLI implements Runnable {
         return res;
     }
 
-    public static void runJBMC(File tmpFile, String functionName, Map<String, List<String>> paramMap) {
+    public static void runJBMC(File tmpFile, String functionName) {
         try {
             log.debug("Running jbmc for function: " + functionName);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
@@ -546,7 +548,8 @@ public class CLI implements Runnable {
 
             if (xmlOutput.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
                 long start1 = System.currentTimeMillis();
-                JBMCOutput output = TraceParser.parse(xmlOutput, runWithTrace);
+                //JBMCOutput output = TraceParser.parse(xmlOutput, runWithTrace);
+                JBMCOutput output = TraceParser.parse(xmlOutput, false);
                 printOutput(output, end - start, functionName);
                 long duration = System.currentTimeMillis() - start1;
                 log.debug("Parsing xml took: " + duration + "ms.");

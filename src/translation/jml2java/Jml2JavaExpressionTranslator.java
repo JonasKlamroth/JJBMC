@@ -24,7 +24,7 @@ import static translation.jml2java.Jml2JavaFacade.unroll;
  * @version 1 (04.10.22)
  */
 public class Jml2JavaExpressionTranslator {
-    private final AtomicInteger counter = new AtomicInteger();
+    public static final AtomicInteger counter = new AtomicInteger();
 
     public Result accept(Expression e, TranslationMode arg) {
         if (Jml2JavaFacade.containsJmlExpression(e)) {
@@ -80,7 +80,7 @@ public class Jml2JavaExpressionTranslator {
             if (n.getBinder() == JmlQuantifiedExpr.JmlDefaultBinder.EXISTS)
                 return arg == TranslationMode.ASSUME ? visitExists(n, arg) : visitExistsLoop(n, arg);
 
-            throw new IllegalArgumentException("Unsupport quantifier " + n.getBinder());
+            throw new IllegalArgumentException("Unsupported quantifier " + n.getBinder());
         }
 
         /**
@@ -88,19 +88,25 @@ public class Jml2JavaExpressionTranslator {
          */
         private Result visitForallLoop(JmlQuantifiedExpr n, TranslationMode arg) {
             final var b = new BlockStmt();
+            b.setParentNode(n.getParentNodeForChildren());
             final var boolVar = "b" + counter.getAndIncrement();
-            final var loopVar = "i" + counter.getAndIncrement();
+            //final var loopVar = "i" + counter.getAndIncrement();
+            final var loopVar = n.getVariables().get(0).getNameAsString();
 
-            var lowerBound = quantifierSplitter.getLowerBound(n);
-            var upperBound = quantifierSplitter.getUpperBound(n);
+            var lowerBoundRes = quantifierSplitter.getLowerBound(n).accept(this, arg);
+            var upperBoundRes = quantifierSplitter.getUpperBound(n).accept(this, arg);
+            var lowerBound = lowerBoundRes.value;
+            var upperBound = upperBoundRes.value;
+            b.getStatements().addAll(lowerBoundRes.getStatements());
+            b.getStatements().addAll(upperBoundRes.getStatements());
 
             // add: boolean bN = true
-            b.addStatement(
+            NodeList<Statement> varDefs = new NodeList<>(new ExpressionStmt(
                     new VariableDeclarationExpr(
                             new VariableDeclarator(
                                     new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
                                     boolVar,
-                                    new BooleanLiteralExpr(true))));
+                                    new BooleanLiteralExpr(true)))));
 
             //
             var init = new VariableDeclarationExpr(
@@ -111,9 +117,11 @@ public class Jml2JavaExpressionTranslator {
             var update = new UnaryExpr(new NameExpr(loopVar), UnaryExpr.Operator.PREFIX_INCREMENT);
             BlockStmt forBody = new BlockStmt();
 
-
-            var res = n.getExpressions().getLast().get().accept(this, arg);
+            var clone = n.getExpressions().getLast().get().clone();
+            var res = clone.accept(this, arg);
+            res.value = (Expression) res.value.accept(new ReplaceVariable(n.getVariables().get(0), init.getVariable(0).getNameAsString()), null);
             forBody.getStatements().addAll(res.statements);
+            varDefs.addAll(res.necessaryVars);
 
             // boolVar = (boolVar && val)
             forBody.addStatement(
@@ -124,7 +132,7 @@ public class Jml2JavaExpressionTranslator {
 
 
             b.addStatement(new ForStmt(new NodeList<>(init), compare, new NodeList<>(update), forBody));
-            return new Result(b.getStatements(), new NameExpr(boolVar));
+            return new Result(b.getStatements(), new NameExpr(boolVar), varDefs);
         }
 
 
@@ -133,19 +141,21 @@ public class Jml2JavaExpressionTranslator {
          */
         private Result visitExistsLoop(JmlQuantifiedExpr n, TranslationMode arg) {
             final var b = new BlockStmt();
+            b.setParentNode(n.getParentNodeForChildren());
             final var boolVar = "b" + counter.getAndIncrement();
             final var loopVar = "i" + counter.getAndIncrement();
 
             var lowerBound = quantifierSplitter.getLowerBound(n);
             var upperBound = quantifierSplitter.getUpperBound(n);
 
+
             // add: boolean bN = false
-            b.addStatement(
+            NodeList<Statement> varDefs = new NodeList<>(new ExpressionStmt(
                     new VariableDeclarationExpr(
                             new VariableDeclarator(
                                     new PrimitiveType(PrimitiveType.Primitive.BOOLEAN),
                                     boolVar,
-                                    new BooleanLiteralExpr(false))));
+                                    new BooleanLiteralExpr(false)))));
 
             //
             var init = new VariableDeclarationExpr(
@@ -157,8 +167,12 @@ public class Jml2JavaExpressionTranslator {
             BlockStmt forBody = new BlockStmt();
 
 
-            var res = n.getExpressions().getLast().get().accept(this, arg);
+            var clone = n.getExpressions().getLast().get().clone();
+            var res = clone.accept(this, arg);
             forBody.getStatements().addAll(res.statements);
+            res.value = (Expression) res.value.accept(new ReplaceVariable(n.getVariables().get(0), init.getVariable(0).getNameAsString()), null);
+            varDefs.addAll(res.necessaryVars);
+
 
             // boolVar = (boolVar || val)
             forBody.addStatement(
@@ -169,11 +183,12 @@ public class Jml2JavaExpressionTranslator {
 
 
             b.addStatement(new ForStmt(new NodeList<>(init), compare, new NodeList<>(update), forBody));
-            return new Result(b.getStatements(), new NameExpr(boolVar));
+            return new Result(b.getStatements(), new NameExpr(boolVar), varDefs);
         }
 
 
         private Result visitForall(JmlQuantifiedExpr n, TranslationMode arg) {
+            n = n.clone();
             var para = quantifierSplitter.getVariable(n);
             var s = assignNondet(para);
             var newExpr = new BinaryExpr(
@@ -207,7 +222,7 @@ public class Jml2JavaExpressionTranslator {
             return new ExpressionStmt(
                     new VariableDeclarationExpr(
                             new VariableDeclarator(para.getType(), para.getNameAsString(),
-                                    new MethodCallExpr("nondet_int")
+                                    new MethodCallExpr("CProver.nondetInt")
                             )));
         }
 
@@ -260,7 +275,7 @@ public class Jml2JavaExpressionTranslator {
         public Result visit(BinaryExpr n, TranslationMode arg) {
             var left = accept(n.getLeft(), arg);
             var right = accept(n.getRight(), arg);
-            return switch (n.getOperator()) {
+            var res =  switch (n.getOperator()) {
                 case AND -> combine(left.statements,
                         ifThen(left.value, right.statements),
                         new BinaryExpr(left.value, right.value, BinaryExpr.Operator.AND));
@@ -279,12 +294,17 @@ public class Jml2JavaExpressionTranslator {
                 default -> combine(left, right,
                         new BinaryExpr(left.value, right.getValue(), n.getOperator()));
             };
+            res.necessaryVars = left.necessaryVars;
+            res.necessaryVars.addAll(right.necessaryVars);
+            return res;
         }
 
         private Result combine(Result left, Result right, BinaryExpr expr) {
             var n = new NodeList<>(left.statements);
             n.addAll(right.statements);
-            return new Result(n, expr);
+            var n1 = new NodeList<>(left.necessaryVars);
+            n1.addAll(right.necessaryVars);
+            return new Result(n, expr, n1);
         }
 
         private Expression negate(Expression value) {
@@ -307,7 +327,7 @@ public class Jml2JavaExpressionTranslator {
             var name = n.getName().accept(this, arg);
             var index = n.getIndex().accept(this, arg);
             name.statements.addAll(index.statements);
-            return new Result(name.statements, new ArrayAccessExpr(name.getValue(), index.value));
+            return new Result(name.statements, new ArrayAccessExpr(name.getValue(), index.value), name.necessaryVars);
         }
 
         @Override
@@ -339,7 +359,7 @@ public class Jml2JavaExpressionTranslator {
         public Result visit(CastExpr n, TranslationMode arg) {
             var inner = n.getExpression().accept(this, arg);
             return new Result(inner.statements,
-                    new CastExpr(n.getType(), inner.value));
+                    new CastExpr(n.getType(), inner.value), inner.necessaryVars);
         }
 
         @Override
@@ -355,7 +375,7 @@ public class Jml2JavaExpressionTranslator {
         @Override
         public Result visit(EnclosedExpr n, TranslationMode arg) {
             var inner = n.getInner().accept(this, arg);
-            return new Result(inner.statements, new EnclosedExpr(inner.value));
+            return new Result(inner.statements, new EnclosedExpr(inner.value), inner.necessaryVars);
         }
 
         @Override
@@ -363,14 +383,14 @@ public class Jml2JavaExpressionTranslator {
             var inner = n.getScope().accept(this, arg);
             return new Result(inner.statements,
                     new FieldAccessExpr(inner.getValue(), n.getTypeArguments().orElse(null),
-                            new SimpleName(n.getNameAsString())));
+                            new SimpleName(n.getNameAsString())), inner.necessaryVars);
         }
 
         @Override
         public Result visit(InstanceOfExpr n, TranslationMode arg) {
             var inner = n.getExpression().accept(this, arg);
             return new Result(inner.statements,
-                    new InstanceOfExpr(inner.value, n.getType()));
+                    new InstanceOfExpr(inner.value, n.getType()), inner.necessaryVars);
         }
 
         @Override
@@ -391,7 +411,7 @@ public class Jml2JavaExpressionTranslator {
         @Override
         public Result visit(MethodCallExpr n, TranslationMode arg) {
             if (n.getNameAsString().equals("\\old")) {
-                return new Result(new NameExpr("old_" + n.getArgument(0).hashCode()));
+                return new Result(new NameExpr("old_" + Math.abs(n.getArgument(0).hashCode())));
             }
 
             Expression scope = null;
@@ -417,6 +437,9 @@ public class Jml2JavaExpressionTranslator {
 
         @Override
         public Result visit(NameExpr n, TranslationMode arg) {
+            if(n.getName().toString().equals("\\result")) {
+                return new Result(new NameExpr(EmbeddContracts.RESULTVAR));
+            }
             return new Result(n);
         }
 
@@ -454,7 +477,7 @@ public class Jml2JavaExpressionTranslator {
         public Result visit(UnaryExpr n, TranslationMode arg) {
             var inner = n.getExpression().accept(this, arg.switchPolarity());
             return new Result(inner.statements,
-                    new UnaryExpr(inner.value, n.getOperator()));
+                    new UnaryExpr(inner.value, n.getOperator()), inner.necessaryVars);
         }
 
         @Override

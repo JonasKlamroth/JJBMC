@@ -1,6 +1,13 @@
 package utils;
 
 import cli.CLI;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.google.common.collect.ImmutableList;
 import exceptions.TranslationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,21 +60,33 @@ public class Utils {
         String classFile = "tests" + File.separator + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
-        var fnv = FunctionNameVisitor.parseFile(fileName, true);
-        List<FunctionNameVisitor.TestBehaviour> testBehaviours = fnv.getFunctionBehaviours();
-        List<String> functionNames = fnv.getFunctionNames();
-        List<String> unwinds = fnv.getUnwinds();
-        assert (functionNames.size() == testBehaviours.size());
-        assert (functionNames.size() == unwinds.size());
+        ParserConfiguration config = new ParserConfiguration();
+        config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
+        config.setProcessJml(true);
+        //TODO this should be checked if this is fine
+        config.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(tmpFile.getParent())));
+        JavaParser parser = new JavaParser(config);
 
-        for (int idx = 0; idx < functionNames.size(); ++idx) {
-            if (testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
-                String name = functionNames.get(idx);
+        List<CompilationUnit> compilationUnits = new ArrayList<>(32);
+        ParseResult<CompilationUnit> result = parser.parse(fileName);
+        if (result.isSuccessful()) {
+            compilationUnits.add(result.getResult().get());
+        } else {
+            System.out.println(fileName);
+            result.getProblems().forEach(System.out::println);
+        }
+        assert compilationUnits.size() == 1;
+        List<TestOptionsListener.TestOptions> testOptions = new ArrayList<>();
+        compilationUnits.get(0).accept(new TestOptionsListener(), testOptions);
+
+        for (TestOptionsListener.TestOptions to : testOptions) {
+            if (to.behaviour != TestBehaviour.Ignored) {
+                String name = to.functionName;
                 if (!name.contains("<init>")) {
                     int dotIdx = name.lastIndexOf(":");
                     name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
                 }
-                params.add(Arguments.of(classFile, name, unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()));
+                params.add(Arguments.of(classFile, name, to.unwinds, to.behaviour, tmpFile.getParentFile().getParent()));
             }
         }
         log.debug("Found " + params.size() + " functions.");
@@ -99,9 +118,9 @@ public class Utils {
         }
     }
 
-    public static void runTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
+    public static void runTests(String classFile, String function, String unwind, TestBehaviour behaviour, String parentFolder)
             throws IOException, InterruptedException {
-        if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
+        if (behaviour != TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 
@@ -167,8 +186,8 @@ public class Utils {
                 log.info(out);
                 log.info(errOut);
             }
-            assertFalse(out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
-            assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
+            assertFalse(out.toString().contains("FAILURE") && behaviour == TestBehaviour.Verifiable);
+            assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == TestBehaviour.Failing);
             assertTrue(out.toString().contains("VERIFICATION"));
 
         } else {

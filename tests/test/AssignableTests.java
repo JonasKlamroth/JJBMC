@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import translation.FunctionNameVisitor;
+import utils.TestBehaviour;
 import utils.Utils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -37,7 +38,7 @@ public class AssignableTests {
     @ParameterizedTest
     @MethodSource("assignableParameter")
     public void runAssignableTests(String classFile, String function, String unwind,
-                                   FunctionNameVisitor.TestBehaviour behaviour,
+                                   TestBehaviour behaviour,
                                    String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }

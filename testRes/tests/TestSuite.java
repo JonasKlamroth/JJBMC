@@ -222,49 +222,6 @@ public class TestSuite {
         }
     }
 
-    /*
-    //@ requires t2 != null;
-    //@ assignable t2.*;
-    @TestAnnotations.Verifyable
-    private void uninterpretedFunctionTest() {
-        Object o = new Object();
-        CProver.assume(CProver.uninterpreted_fresh(o));
-        assert (CProver.uninterpreted_fresh(o));
-    }*/
-
-//    @Verifyable
-//    private void blockContractTest() {
-//        int i = 0;
-//        //@ requires i == 0;
-//        //@ ensures i == 6;
-//        {
-//            i = 5;
-//            i++;
-//        }
-//    }
-//
-//    @Fails
-//    private void blockContractTest1() {
-//        int i = 0;
-//        //@ requires i == 0;
-//        //@ ensures i == 7;
-//        {
-//            i = 5;
-//            i++;
-//        }
-//    }
-//
-//    @Fails
-//    private void blockContractTest2() {
-//        int i = 0;
-//        //@ requires i == 1;
-//        //@ ensures i == 6;
-//        {
-//            i = 5;
-//            i++;
-//        }
-//    }
-
     //@ ensures \result == 5;
     @Verifyable
     private int methodInvcationTest() {
@@ -273,7 +230,6 @@ public class TestSuite {
         return i;
     }
 
-    //@ ensures \result == 5;
     @Verifyable
     private int methodInvcationTest2() {
         int i = 4;
@@ -572,37 +528,37 @@ public class TestSuite {
     private void requiresTest1(int j) {
     }
 
-    //@ requires (\forall int i; i >= 0 && i < 10; \exists int j; j >= 0 && j <= 10; j > i);
+    //@ requires (\forall int i; i >= 0 && i < 10; (\exists int j; j >= 0 && j <= 10; j > i));
     //@ ensures false;
     @Fails
     private void requiresTest3() {
     }
 
-    //@ requires (\forall int i; i >= 0 && i < 10; \exists int j; j >= 0 && j < 10; j > i);
+    //@ requires (\forall int i; i >= 0 && i < 10; (\exists int j; j >= 0 && j < 10; j > i));
     //@ ensures false;
     @Verifyable
     private void requiresTest4() {
     }
 
-    //@ requires (\exists int i; i >= 0 && i < 10; \exists int j; j >= 0 && j <= 10; j > i);
+    //@ requires (\exists int i; i >= 0 && i < 10; (\exists int j; j >= 0 && j <= 10; j > i));
     //@ ensures false;
     @Fails
     private void requiresTest5() {
     }
 
-    //@ requires (\exists int i; i >= 0 && i < 0; \exists int j; j >= 0 && j < 10; j > i);
+    //@ requires (\exists int i; i >= 0 && i < 0; (\exists int j; j >= 0 && j < 10; j > i));
     //@ ensures false;
     @Verifyable
     private void requiresTest6() {
     }
 
-    //@ requires (\forall int i; i >= 0 && i < 10; \forall int j; j >= 10 && j <= 10; j > i);
+    //@ requires (\forall int i; i >= 0 && i < 10; (\forall int j; j >= 10 && j <= 10; j > i));
     //@ ensures false;
     @Fails
     private void requiresTest7() {
     }
 
-    //@ requires (\forall int i; i >= 0 && i < 10; \forall int j; j >= 0 && j < 10; j > i);
+    //@ requires (\forall int i; i >= 0 && i < 10; (\forall int j; j >= 0 && j < 10; j > i));
     //@ ensures false;
     @Verifyable
     private void requiresTest8() {
@@ -830,45 +786,6 @@ public class TestSuite {
         this.privInt = i;
     }
 
-    /*@
-      @ private normal_behaviour
-      @ requires i >= 0 && i < 10;
-      @ ensures \result == i;
-      @ assignable \nothing;
-      @ also
-      @ private normal_behaviour
-      @ requires i < 0 && i > -10;
-      @ ensures \result == -1 * i;
-      @ assignable \nothing;
-      @*/
-    @Verifyable
-    private int abs(int i) {
-        if (i >= 0) {
-            return i;
-        } else {
-            return i * -1;
-        }
-    }
-
-    /*@
-      @ private normal_behaviour
-      @ requires i < 0 && i > -10;
-      @ ensures \result == i;
-      @ assignable \nothing;
-      @ also
-      @ private normal_behaviour
-      @ requires i >= 0 && i < 10;
-      @ ensures \result == -1 * i;
-      @ assignable \nothing;
-      @*/
-    @Fails
-    private int abs2(int i) {
-        if (i >= 0) {
-            return i;
-        } else {
-            return i * -1;
-        }
-    }
 
     //@ requires i >= 0 && i < 10;
     //@ ensures \result == i;
@@ -1029,6 +946,7 @@ public class TestSuite {
     private int loopInvModTest2() {
         int i = 0;
         //@ loop_invariant 0 <= i <= 3;
+        //@ decreases 3 - i;
         while(i < 3) {
             i++;
         }
@@ -1041,6 +959,7 @@ public class TestSuite {
     @Fails
     private void loopInvModTest31() {
         //@ loop_invariant 0 <= privInt <= 3;
+        //@ decreases 3 - privInt;
         while(privInt < 3) {
             incPrivInt();
         }
@@ -1053,6 +972,7 @@ public class TestSuite {
     private void loopInvModTest3() {
         //@ loop_invariant 0 <= privInt <= 3;
         //@ assignable privInt;
+        //@ decreases 3 - privInt;
         while(privInt < 3) {
             incPrivInt();
         }
@@ -1071,6 +991,7 @@ public class TestSuite {
     private int loopInvModTest() {
         int i = 0;
         //@ loop_invariant 0 <= i <= 3;
+        //@ decreases 3 - i;
         while(i < 3) {
             i++;
         }
@@ -1083,6 +1004,7 @@ public class TestSuite {
         int j = 0;
         //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
         //@ assignable \nothing;
+        //@ decreases j;
         while(j < 1) {
             privInt++;
         }
@@ -1094,6 +1016,7 @@ public class TestSuite {
         int j = 0;
         //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
         //@ assignable \nothing;
+        //@ decreases 5 - j;
         while(j < 0) {
             j = inc(j);
             privInt++;
@@ -1106,6 +1029,7 @@ public class TestSuite {
         int j = 0;
         //@ loop_invariant (\forall int i; 0 < i < 3; i > 0);
         //@ assignable \nothing;
+        //@ decreases 1 - j;
         while(j < 1) {
             j = inc(j);
         }
@@ -1116,6 +1040,7 @@ public class TestSuite {
     private void assForLoopTest() {
         int j = 0;
         //@ loop_invariant j <= 1;
+        //@ decreases 3 - i;
        for (int i = 0; i < 3; ++i) {
             j += 1;
         }
