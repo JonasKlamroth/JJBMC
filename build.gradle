@@ -15,6 +15,9 @@ apply plugin: 'checkstyle'
 
 sourceCompatibility = 17
 test.testLogging.showStandardStreams = true
+application {
+    mainClass = "cli.Main"
+}
 
 sourceSets {
    main {
@@ -156,4 +159,10 @@ task caseStudies(type: JavaExec) {
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
     options.deprecation = true
+}
+
+task runTmpTest(type:JavaExec) {
+    mainClass = "cli.Main"
+    classpath = sourceSets.main.runtimeClasspath
+    args = ["./testRes/CaseStudyCandidates/TmpTest.java", "-kt", "-d", "-tr"]
 }
