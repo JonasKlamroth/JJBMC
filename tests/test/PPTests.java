@@ -2,10 +2,6 @@ package test;
 
 import cli.CLI;
 import cli.CostumPrintStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,12 +9,14 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import translation.FunctionNameVisitor;
 import utils.TestBehaviour;
 import utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.stream.Stream;
+
 @Order(value = 3)
-//@Execution(ExecutionMode.CONCURRENT)
 public class PPTests {
 
     @BeforeAll
@@ -39,7 +37,6 @@ public class PPTests {
     }
 
     public static Stream<Arguments> getParameters() {
-        init();
         return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "PPTests.java");
     }
 
