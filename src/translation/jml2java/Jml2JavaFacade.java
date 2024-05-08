@@ -13,16 +13,15 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -58,6 +57,22 @@ public class Jml2JavaFacade {
         r.necessaryVars.add(assertStatement(r.value));
 
         return new BlockStmt(r.necessaryVars);
+    }
+
+    public static NodeList<JmlQuantifiedExpr> getRelevantQuantifiers(Expression expr) {
+        Node node = expr;
+        NodeList<JmlQuantifiedExpr> res = new NodeList<>();
+        node = node.getParentNode().get();
+        while (node != null) {
+            if(!(node instanceof Expression)) {
+                break;
+            } else if(node instanceof JmlQuantifiedExpr) {
+                res.add((JmlQuantifiedExpr) node);
+            }
+            node = node.getParentNode().isPresent() ? node.getParentNode().get() : null;
+        }
+        res.removeIf(v -> !isSubNode(expr, QuantifierSplitter.getVariable(v).getName()));
+        return res;
     }
 
     // Returns a list of statements that save expressions under "\old"
@@ -125,10 +140,28 @@ public class Jml2JavaFacade {
         res.clear();
 
         Type type = new VarType();
-        for(int i = 0; i < relevantQuantifiers.size(); ++i) {
-            type = new ArrayType(type);
+
+        ResolvedType resolvedType = null;
+        Type realType = null;
+        try {
+            resolvedType = expression.calculateResolvedType();
+            realType = resolvedType2Type(resolvedType);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            System.out.println(expression);
+        } catch (UnsolvedSymbolException e) {
+            e.printStackTrace();
         }
-        VariableDeclarator varDecl = new VariableDeclarator(type, "old_" + Math.abs(expression.hashCode()), null);
+
+
+        for(int i = 0; i < relevantQuantifiers.size(); ++i) {
+            type = new ArrayType(realType);
+        }
+        VariableDeclarator varDecl = new VariableDeclarator(type,
+                "old_" + Math.abs(expression.hashCode()),
+                new ArrayCreationExpr(realType,
+                        new NodeList<>(new ArrayCreationLevel(new IntegerLiteralExpr(String.valueOf(CLI.maxArraySize)))),
+                        null));
         res.add(new ExpressionStmt(new VariableDeclarationExpr(varDecl, Modifier.finalModifier())));
         Expression e = varDecl.getNameAsExpression();
         for(int i = relevantQuantifiers.size() - 1; i >= 0; --i) {
@@ -140,17 +173,20 @@ public class Jml2JavaFacade {
                     );
         }
 
+        e = new AssignExpr(e, exprCopy, AssignExpr.Operator.ASSIGN);
+        st.addStatement(new ExpressionStmt(e));
 
         for(JmlQuantifiedExpr quantifiedExpr : relevantQuantifiers) {
             Expression lowerBound = QuantifierSplitter.getLowerBound(quantifiedExpr);
-            var translatedLowerBound = Jml2JavaFacade.translate(quantifiedExpr.clone(), TranslationMode.DEMONIC);
+            var translatedLowerBound = Jml2JavaFacade.translate((Expression) lowerBound.clone().setParentNode(quantifiedExpr), TranslationMode.DEMONIC);
             lowerBound = translatedLowerBound.value;
             Expression upperBound = QuantifierSplitter.getUpperBound(quantifiedExpr);
-            var translatedUpperBound = Jml2JavaFacade.translate(quantifiedExpr.clone(), TranslationMode.DEMONIC);
-            upperBound = translatedLowerBound.value;
+            var translatedUpperBound = Jml2JavaFacade.translate((Expression) upperBound.clone().setParentNode(quantifiedExpr), TranslationMode.DEMONIC);
+            upperBound = translatedUpperBound.value;
 
             var loopVarDecl = new VariableDeclarationExpr(PrimitiveType.intType(), "__tmp__" + Jml2JavaExpressionTranslator.counter.getAndIncrement());
             var loopVar = loopVarDecl.getVariable(0).getNameAsExpression();
+            st.accept(new ReplaceVariable(QuantifierSplitter.getVariable(quantifiedExpr), loopVar.getNameAsString()), null);
             var forLoop = new ForStmt(new NodeList<>(new AssignExpr(loopVarDecl, lowerBound, AssignExpr.Operator.ASSIGN)),
                     new BinaryExpr(loopVar, upperBound, BinaryExpr.Operator.LESS_EQUALS),
                     new NodeList<Expression>(new UnaryExpr(loopVar, UnaryExpr.Operator.POSTFIX_INCREMENT)),
@@ -299,8 +335,7 @@ public class Jml2JavaFacade {
      * @param translation
      * @return
      */
-    @NotNull
-    public static String pprint(@NotNull Node translation) {
+    public static String pprint(Node translation) {
         DefaultPrettyPrinter pp = new DefaultPrettyPrinter(
                 MyPPrintVisitor::new, new DefaultPrinterConfiguration());
         return pp.print(translation);
@@ -310,7 +345,6 @@ public class Jml2JavaFacade {
         return new ImportDeclaration("org.cprover.CProver", false, false);
     }
 
-    @NotNull
     public static ClassOrInterfaceDeclaration createExceptionClass() {
         var exceptionClass = new ClassOrInterfaceDeclaration();
         //exceptionClass.addModifier(Modifier.DefaultKeyword.PUBLIC, Modifier.DefaultKeyword.STATIC);

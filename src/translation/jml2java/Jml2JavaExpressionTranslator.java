@@ -1,5 +1,6 @@
 package translation.jml2java;
 
+import cli.CLI;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
@@ -195,6 +196,7 @@ public class Jml2JavaExpressionTranslator {
                     new EnclosedExpr(n.getExpressions().get(0)),
                     new EnclosedExpr(n.getExpressions().get(1)),
                     BinaryExpr.Operator.IMPLICATION)
+                    .setParentNode(n)
                     .accept(this, arg);
             newExpr.statements.addFirst(s);
             return newExpr;
@@ -411,7 +413,15 @@ public class Jml2JavaExpressionTranslator {
         @Override
         public Result visit(MethodCallExpr n, TranslationMode arg) {
             if (n.getNameAsString().equals("\\old")) {
-                return new Result(new NameExpr("old_" + Math.abs(n.getArgument(0).hashCode())));
+                Expression expr = new NameExpr("old_" + Math.abs(n.getArgument(0).hashCode()));
+                var relevantQuantifiers = Jml2JavaFacade.getRelevantQuantifiers(n.getArgument(0));
+                for(JmlQuantifiedExpr q : relevantQuantifiers) {
+                    expr = new ArrayAccessExpr(expr,
+                            new BinaryExpr(QuantifierSplitter.getVariable(q).getNameAsExpression(),
+                                    new IntegerLiteralExpr(String.valueOf(CLI.maxArraySize)),
+                                    BinaryExpr.Operator.REMAINDER));
+                }
+                return new Result(expr);
             }
 
             Expression scope = null;

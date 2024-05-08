@@ -49,7 +49,7 @@ public class Utils {
 
     public static Stream<Arguments> prepareParameters(String fileName) {
         ArrayList<Arguments> params = new ArrayList<>();
-        createAnnotationsFolder(fileName);
+        createAnnotationsFolderOld(fileName);
         CLI.keepTranslation = keepTmpFile;
         CLI.debugMode = true;
         File tmpFile = CLI.prepareForJBMC(fileName);
@@ -64,7 +64,7 @@ public class Utils {
         config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
         config.setProcessJml(true);
         //TODO this should be checked if this is fine
-        config.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(tmpFile.getParent())));
+        config.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(new File(fileName).toPath().getParent())));
         JavaParser parser = new JavaParser(config);
 
         List<CompilationUnit> compilationUnits = new ArrayList<>(32);
@@ -91,6 +91,40 @@ public class Utils {
         }
         log.debug("Found " + params.size() + " functions.");
         return params.stream();
+    }
+
+    private static void createAnnotationsFolderOld(String fileName) {
+        File f = new File(fileName);
+        File dir = new File(f.getParent(), "tmp" + File.separator + "testannotations");
+        log.debug("Copying Annotation files to " + dir.getAbsolutePath());
+        dir.mkdirs();
+        try {
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Fails.java").toPath(),
+                    new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Verifyable.java").toPath(),
+                    new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Unwind.java").toPath(),
+                    new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw new TranslationException("Error trying to copy TestAnnotations");
+        }
+        f = new File(fileName);
+        dir = new File(f.getParent(), "tmp" + File.separator + "tests" + File.separator + "testannotations");
+        log.debug("Copying Annotation files to " + dir.getAbsolutePath());
+        dir.mkdirs();
+        try {
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Fails.java").toPath(),
+                    new File(dir, "Fails.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Verifyable.java").toPath(),
+                    new File(dir, "Verifyable.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(new File("." + File.separator + "tests" + File.separator + "testannotations" + File.separator + "Unwind.java").toPath(),
+                    new File(dir, "Unwind.java").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new TranslationException("Error trying to copy TestAnnotations");
+        }
     }
 
     private static void createAnnotationsFolder(String fileName) {
