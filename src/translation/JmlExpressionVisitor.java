@@ -109,6 +109,8 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
     private static int intVarCounter = 0;
     private static int paramVarCounter = 0;
     private static int numQuantvars = 0;
+    private static int sumVarCounter = 0;
+    private static int minMaxVarCounter = 0;
     private static int oldVarCounter = 0;
     private static List<Symbol.VarSymbol> loopLocalVars = List.nil();
     private final Maker maker;
@@ -303,13 +305,22 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 quantifierVars.remove(that.decls.get(0).sym);
                 return value;
             } else if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSUME ||
-                translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
+                    translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
+                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType,
+                        names.fromString("b_" + boolVarCounter++),
+                        currentSymbol,
+                        treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                                syms.booleanType,
+                                true));
+                neededVariableDefs = neededVariableDefs.append(boolVar);
+                // reinitialize resultVar to initialValue
+                newStatements = newStatements.append(maker.Exec(maker.Assign(maker.Ident(boolVar),
+                        treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                                syms.booleanType,
+                                true))));
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(copy.value);
-                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol,
-                    treeutils.makeLit(TranslationUtils.getCurrentPosition(), syms.booleanType, true));
-                neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = maker.Binary(Tag.AND, maker.Ident(boolVar), value);
                 JCExpression init = super.copy(re.getMin());
                 for (Map.Entry<String, String> e : variableReplacements.entrySet()) {
@@ -339,13 +350,23 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
                 throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that);
             }
         } else if (copy.op == JmlTokenKind.BSEXISTS) {
-            if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT || translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
+            if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT ||
+                    translationMode == VerifyFunctionVisitor.TranslationMode.DEMONIC) {
+                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType,
+                        names.fromString("b_" + boolVarCounter++),
+                        currentSymbol,
+                        treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                                syms.booleanType,
+                                false));
+                neededVariableDefs = neededVariableDefs.append(boolVar);
+                // reinitialize resultVar to initialValue
+                newStatements = newStatements.append(maker.Exec(maker.Assign(maker.Ident(boolVar),
+                        treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                                syms.booleanType,
+                                false))));
                 List<JCStatement> stmts = newStatements;
                 newStatements = List.nil();
                 JCExpression value = super.copy(copy.value);
-                JCVariableDecl boolVar = treeutils.makeVarDef(syms.booleanType, names.fromString("b_" + boolVarCounter++), currentSymbol,
-                    treeutils.makeLit(TranslationUtils.getCurrentPosition(), syms.booleanType, false));
-                neededVariableDefs = neededVariableDefs.append(boolVar);
                 JCBinary b = maker.Binary(Tag.OR, maker.Ident(boolVar), value);
                 JCExpression init = super.copy(re.getMin());
                 for (Map.Entry<String, String> e : variableReplacements.entrySet()) {
@@ -397,9 +418,141 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             } else {
                 throw new TranslationException("Quantified expressions may not occur in Java-mode: " + that);
             }
+        } else if (copy.op == JmlTokenKind.BSSUM) {
+            return generateSum(that, copy.value, range, re);
+        } else if (copy.op == JmlTokenKind.BSNUMOF) {
+            // Quite obviously \num_of ...; R; V is equivalent to \sum ... ; R; V ? 1 : 0
+            // Modify the value expression for num_of
+            JCExpression value = maker.Conditional(copy.value, maker.Literal(1), maker.Literal(0));
+            return generateSum(that, value, range, re);
+        } else if (copy.op == JmlTokenKind.BSMIN) {
+            return generateMinMax(that, copy.value, range, re, true);
+        } else if (copy.op == JmlTokenKind.BSMAX) {
+            return generateMinMax(that, copy.value, range, re, false);
         } else {
             throw new UnsupportedException("Unkown token type in quantified Expression: " + copy.op);
         }
+    }
+
+    private JCExpression generateMinMax(JmlQuantifiedExpr that, JCExpression value, JCExpression range,
+            RangeExtractor re, boolean isMin) {
+        // Determine the initial value and comparison operator based on whether we are calculating the minimum or maximum
+        int initialValue = isMin ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        Tag comparisonTag = isMin ? Tag.LE : Tag.GE;
+
+        // Create a variable to store the result of the min or max operation
+        JCVariableDecl resultVar = treeutils.makeVarDef(syms.intType,
+                names.fromString(
+                        (isMin ? "min_" : "max_") + minMaxVarCounter++),
+                currentSymbol,
+                treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                        syms.intType,
+                        initialValue));
+        neededVariableDefs = neededVariableDefs.append(resultVar);
+        // reinitialize resultVar to initialValue
+        newStatements = newStatements.append(maker.Exec(maker.Assign(maker.Ident(resultVar),
+                treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                        syms.intType,
+                        initialValue))));
+
+        // Create a loop to iterate over the range and process the values
+        List<JCStatement> oldStatements = newStatements;
+        newStatements = List.nil();
+        value = super.copy(value); // Global state is nice! :D Took two hours to find this bug
+        JCExpression init = super.copy(re.getMin());
+        for (Map.Entry<String, String> e : variableReplacements.entrySet()) {
+            value = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+            range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+            init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+            newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
+        }
+
+        // Create a conditional assignment to update the resultVar based on the min or max operation
+        JCConditional conditionalAssign = maker.Conditional(maker.Binary(comparisonTag, value, maker.Ident(resultVar)),
+                value,
+                maker.Ident(resultVar));
+        JCStatement updateResultVar = maker.Exec(maker.Assign(maker.Ident(resultVar), conditionalAssign));
+        newStatements = newStatements.append(updateResultVar);
+
+        // Create the for-loop with the loop body
+        String loopVarName = that.decls.get(0).getName().toString();
+        if (variableReplacements.containsKey(that.decls.get(0).getName().toString())) {
+            loopVarName = variableReplacements.get(that.decls.get(0).getName().toString());
+        }
+        JCForLoop forLoop = TranslationUtils.makeStandardLoopFromRange(range,
+                newStatements,
+                loopVarName,
+                currentSymbol,
+                init);
+        List<JCStatement> list = List.of(forLoop);
+        list = TranslationUtils.replaceVarName(that.decls.get(0).getName().toString(),
+                variableReplacements.get(that.decls.get(0).getName().toString()),
+                list);
+        oldStatements = oldStatements.appendList(list);
+
+        // Restore the previous state and remove the variable replacements and quantifier variables
+        newStatements = oldStatements;
+        variableReplacements.remove(that.decls.get(0).getName().toString());
+        quantifierVars.remove(that.decls.get(0).sym);
+
+        // Return the result variable as the result of the expression
+        JCExpression translatedExpression = maker.Ident(resultVar);
+        CLI.expressionMap.put(translatedExpression.toString(), that.toString());
+        return translatedExpression;
+    }
+
+    private JCExpression generateSum(JmlQuantifiedExpr that, JCExpression value, JCExpression range,
+            RangeExtractor re) {
+        // Create a variable to store the result of the sum or count
+        JCVariableDecl resultVar = treeutils.makeVarDef(syms.intType,
+                names.fromString("sum_" + sumVarCounter++),
+                currentSymbol,
+                treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                        syms.intType,
+                        0));
+        neededVariableDefs = neededVariableDefs.append(resultVar);
+        // reinitialize the result variable to 0
+        newStatements = newStatements.append(maker.Exec(maker.Assign(maker.Ident(resultVar),
+                treeutils.makeLit(TranslationUtils.getCurrentPosition(),
+                        syms.intType,
+                        0))));
+
+        List<JCStatement> oldStatements = newStatements;
+        newStatements = List.nil();
+        value = super.copy(value); // Global state is nice! :D Took two hours to find this bug
+        JCExpression init = super.copy(re.getMin());
+        for (Map.Entry<String, String> e : variableReplacements.entrySet()) {
+            value = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), value);
+            range = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), range);
+            init = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), init);
+            newStatements = TranslationUtils.replaceVarName(e.getKey(), e.getValue(), newStatements);
+        }
+        JCStatement addToResultVar = maker.Exec(maker.Assignop(Tag.PLUS_ASG, maker.Ident(resultVar), value)
+                .setType(syms.intType));
+        newStatements = newStatements.append(addToResultVar);
+
+        String loopVarName = that.decls.get(0).getName().toString();
+        if (variableReplacements.containsKey(that.decls.get(0).getName().toString())) {
+            loopVarName = variableReplacements.get(that.decls.get(0).getName().toString());
+        }
+        List<JCStatement> list = List.of(TranslationUtils.makeStandardLoopFromRange(range,
+                newStatements,
+                loopVarName,
+                currentSymbol,
+                init));
+        list = TranslationUtils.replaceVarName(that.decls.get(0).getName().toString(),
+                variableReplacements.get(that.decls.get(0).getName().toString()),
+                list);
+
+        // Restore the previous state and remove the variable replacements and quantifier variables
+        newStatements = oldStatements.appendList(list);
+        variableReplacements.remove(that.decls.get(0).getName().toString());
+        quantifierVars.remove(that.decls.get(0).sym);
+
+        // Return the result variable as the result of the expression
+        JCExpression translatedExpression = maker.Ident(resultVar);
+        CLI.expressionMap.put(translatedExpression.toString(), that.toString());
+        return translatedExpression;
     }
 
     @Override
@@ -668,7 +821,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             assertInitInvs = assertInitInvs.appendList(makeAssignableAssertion(e));
         }
         for (JCVariableDecl decl : currentLoopVars) {
-            assignables = assignables.append(maker.Ident(decl));
+            // assignables = assignables.append(maker.Ident(decl));
         }
         //assignables = assignables.appendList(Utils.IdentifierVisitor.getAssignLocations(that.body));
         assignables = TranslationUtils.filterAssignables(assignables);
@@ -679,6 +832,10 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         JCVariableDecl oldD = null;
         JCExpression expression = null;
         List<JCStatement> oldDecreases = List.nil();
+
+        List<JCStatement> statements = newStatements;
+        newStatements = List.nil();
+
         for (JmlStatementLoop spec : that.loopSpecs) {
             if (spec instanceof JmlStatementLoopExpr && spec.clauseType.name().equals("loop_decreases")) {
                 if (oldD != null) {
@@ -690,7 +847,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             }
         }
 
-        List<JCStatement> statements = newStatements;
+        List<JCStatement> decreaseStatements = newStatements;
         newStatements = List.nil();
         JCStatement assumefalse =
             TranslationUtils.makeAssumeStatement(treeutils.makeLit(TranslationUtils.getCurrentPosition(), syms.booleanType, false));
@@ -716,8 +873,9 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         currentAssignable = oldAssignbales;
         ifbodystatements = ifbodystatements.appendList(assertInvs);
         if (expression != null) {
-            ifbodystatements = ifbodystatements.append(
-                TranslationUtils.makeAssertStatement(makeDereasesStatement(oldD, expression)));
+            ifbodystatements = ifbodystatements.appendList(decreaseStatements);
+            ifbodystatements = ifbodystatements.append(TranslationUtils.makeAssertStatement(makeDereasesStatement(oldD,
+                    expression)));
         }
 
         List<JCStatement> prepareOldVarsSt = List.nil();
@@ -730,11 +888,12 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
         }
         JCBlock ifbody = maker.Block(0L, ifbodystatements.append(assumefalse));
         newStatements = statements.appendList(prepareOldVarsSt)
-            .appendList(assertInitInvs)
-            .appendList(oldDecreases)
-            .appendList(havocStatements)
-            .appendList(assumeInvs)
-            .append(maker.If(that.cond, ifbody, null));
+                .appendList(assertInitInvs)
+                .appendList(havocStatements)
+                .appendList(assumeInvs)
+                .appendList(decreaseStatements)
+                .appendList(oldDecreases)
+                .append(maker.If(that.cond, ifbody, null));
 
         oldInits = oldInitsOld;
         oldVars = oldVarsOld;
