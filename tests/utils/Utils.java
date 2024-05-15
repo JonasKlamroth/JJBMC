@@ -68,7 +68,13 @@ public class Utils {
         JavaParser parser = new JavaParser(config);
 
         List<CompilationUnit> compilationUnits = new ArrayList<>(32);
-        ParseResult<CompilationUnit> result = parser.parse(fileName);
+        ParseResult<CompilationUnit> result = null;
+        try {
+            result = parser.parse(new File(fileName).toPath());
+        } catch (IOException e) {
+            System.out.println("Error parsing file: " + fileName);
+            throw new RuntimeException(e);
+        }
         if (result.isSuccessful()) {
             compilationUnits.add(result.getResult().get());
         } else {
@@ -83,8 +89,10 @@ public class Utils {
             if (to.behaviour != TestBehaviour.Ignored) {
                 String name = to.functionName;
                 if (!name.contains("<init>")) {
-                    int dotIdx = name.lastIndexOf(":");
-                    name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
+                    //int dotIdx = name.lastIndexOf(":");
+                    //name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
+                    name = name + "Verification";
+
                 }
                 params.add(Arguments.of(classFile, name, to.unwinds, to.behaviour, tmpFile.getParentFile().getParent()));
             }
@@ -152,7 +160,7 @@ public class Utils {
         }
     }
 
-    public static void runTests(String classFile, String function, String unwind, TestBehaviour behaviour, String parentFolder)
+    public static void runTests(String classFile, String function, int unwind, TestBehaviour behaviour, String parentFolder)
             throws IOException, InterruptedException {
         if (behaviour != TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
@@ -174,9 +182,9 @@ public class Utils {
             commandList.add("--function");
             commandList.add(function);
 
-            if (unwind != null) {
+            if (unwind != -1) {
                 commandList.add("--unwind");
-                commandList.add(unwind);
+                commandList.add(String.valueOf(unwind));
             }
 
             String[] commands = new String[commandList.size()];

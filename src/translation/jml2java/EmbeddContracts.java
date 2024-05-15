@@ -34,9 +34,16 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
     private boolean foundReturn = false;
 
     public static Expression gatherAnd(JmlContract contract, JmlClauseKind jmlClauseKind) {
-        var all = gather(contract, jmlClauseKind);
-        return all.stream().reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND)).orElse(
-                new BooleanLiteralExpr(true));
+        List<Expression> all = gather(contract, jmlClauseKind);
+        Expression res = new BooleanLiteralExpr(true);
+        while (!all.isEmpty()) {
+            res = new BinaryExpr((Expression) all.get(0), res, BinaryExpr.Operator.AND);
+            all.removeFirst();
+        }
+        res.setParentNode(contract);
+        return res;
+        //return (Expression) all.stream().reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND)).orElse(
+         //       new BooleanLiteralExpr(true)).setParentNode(contract);
     }
 
     public static List<Expression> gather(JmlContract contract, JmlClauseKind jmlClauseKind) {
@@ -94,8 +101,12 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
                 ensures = gatherAnd(contract, JmlClauseKind.ENSURES);
                 ensures.setParentNode(contract);
                 requires = gatherAnd(contract, JmlClauseKind.REQUIRES);
+                requires.setParentNode(contract);
                 assignable = gather(contract, JmlClauseKind.ASSIGNABLE);
+                assignable.stream().forEach(a -> a.setParentNode(contract));
                 sigOnly = gather(contract, JmlClauseKind.SIGNALS_ONLY);
+                sigOnly.stream().forEach(a -> a.setParentNode(contract));
+
             }
 
             if(assignable.size() == 0) {
@@ -103,6 +114,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
             }
             contracts.clear();//delete the contract
 
+            Jml2JavaFacade.currentNode = n;
             n.setBody(constructMethodBody(n, ensures, requires, assignable, sigOnly));
             n.setName(n.getNameAsString() + "Verification");
             n.addAnnotation(Jml2JavaFacade.createGeneratedAnnotation());
@@ -197,6 +209,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
             var loopInvar = gather(contract, JmlClauseKind.LOOP_INVARIANT);
             var assignables = gather(contract, JmlClauseKind.ASSIGNABLE);
             var decreases = gather(contract, JmlClauseKind.DECREASES);
+
 
             if (decreases.size() > 1) {
                 throw new IllegalStateException("Too many decreases clauses");

@@ -38,7 +38,7 @@ public class Assignable2Tests {
 
     @ParameterizedTest
     @MethodSource("assignableParameter2")
-    public void runAssignableTests2(String classFile, String function, String unwind, TestBehaviour behaviour,
+    public void runAssignableTests2(String classFile, String function, int unwind, TestBehaviour behaviour,
                                     String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }

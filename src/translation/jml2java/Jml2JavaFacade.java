@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @version 1 (04.10.22)
  */
 public class Jml2JavaFacade {
+    public static Node currentNode;
+
     public static Statement assumeStatement(Expression e) {
         return new ExpressionStmt(new MethodCallExpr(new NameExpr("CProver"), "assume", new NodeList<>(e)));
     }
@@ -144,6 +146,7 @@ public class Jml2JavaFacade {
         ResolvedType resolvedType = null;
         Type realType = null;
         try {
+            setCurrentNode(expression);
             resolvedType = expression.calculateResolvedType();
             realType = resolvedType2Type(resolvedType);
         } catch (IllegalStateException e) {
@@ -202,6 +205,14 @@ public class Jml2JavaFacade {
         }
         res.add(st);
         return res;
+    }
+
+    private static void setCurrentNode(Node expression) {
+        while (expression.getParentNode().isPresent() && expression.getParentNode().get() != null) {
+            expression = expression.getParentNode().get();
+        }
+        expression.setParentNode(currentNode);
+
     }
 
     public static Statement havoc(Expression expression) {

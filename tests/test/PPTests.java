@@ -42,7 +42,7 @@ public class PPTests {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    public void runTestSuite(String classFile, String function, String unwind, TestBehaviour behaviour,
+    public void runTestSuite(String classFile, String function, int unwind, TestBehaviour behaviour,
                              String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
