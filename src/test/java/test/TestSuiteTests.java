@@ -1,45 +1,24 @@
 package test;
 
-import cli.CLI;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import translation.FunctionNameVisitor;
-import utils.TestBehaviour;
+import jjbmc.JBMCOptions;
+import org.junit.jupiter.api.*;
+import jjbmc.FunctionNameVisitor.TestBehaviour;
 import utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-@Order(value = 0)
-//@Execution(ExecutionMode.CONCURRENT)
 public class TestSuiteTests {
-
-    @BeforeAll
-    public static void init() {
-        //System.setErr(new CostumPrintStream(System.err));
-        //System.setOut(new CostumPrintStream(System.out));
+    @TestFactory
+    public Stream<DynamicTest> runTestSuite(String classFile, String function, int unwind, TestBehaviour behaviour,
+                                            String parentFolder) throws IOException {
+        return Utils.prepareParameters(Utils.SRC_TEST_JAVA.resolve("tests").resolve("TestSuite.java"))
+                .map((it) -> DynamicTest.dynamicTest(
+                        it.toString(),
+                        () -> {
+                            Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
+                            JBMCOptions.cleanUp();
+                        }
+                ));
     }
-
-    @AfterEach
-    public void after() {
-        CLI.cleanUp();
-    }
-
-    public static Stream<Arguments> getParameters() {
-        init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "TestSuite.java");
-    }
-
-    @ParameterizedTest
-    @MethodSource("getParameters")
-    public void runTestSuite(String classFile, String function, int unwind, TestBehaviour behaviour,
-                             String parentFolder) throws IOException, InterruptedException {
-        Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
-    }
-
 }

@@ -1,8 +1,7 @@
 package casestudy;
 
-import cli.CostumPrintStream;
-import cli.Main;
-import com.google.gson.GsonBuilder;
+import jjbmc.CostumPrintStream;
+import jjbmc.Main;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

@@ -1,9 +1,9 @@
 package traceTest;
 
-import cli.CLI;
-import cli.CostumPrintStream;
-import cli.JBMCOutput;
-import cli.TraceParser;
+import jjbmc.JBMCOptions;
+import jjbmc.CostumPrintStream;
+import jjbmc.JBMCOutput;
+import jjbmc.trace.TraceParser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.parallel.Execution;
@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TraceTests {
 
     @AfterEach
     public void after() {
-        CLI.cleanUp();
+        JBMCOptions.cleanUp();
     }
 
     public static Stream<Arguments> getParameters() {
@@ -70,16 +71,14 @@ public class TraceTests {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    public void traceTest(String inputFile, String outFile, ArrayList<String> relevantVars, String functionName) {
-        CLI.reset();
-        CLI.runWithTrace = true;
-        CLI.keepTranslation = true;
-        CLI.functionName = functionName;
-        CLI.relevantVars.addAll(relevantVars);
-        CLI.translateAndRunJBMC(inputFile);
-        int idx = inputFile.lastIndexOf(File.separator);
-        String path = inputFile.substring(0, idx) + "/tmp/xmlout.xml";
-        File f = new File(path);
+    public void traceTest(Path inputFile, String outFile, ArrayList<String> relevantVars, String functionName) {
+        JBMCOptions.reset();
+        JBMCOptions.runWithTrace = true;
+        JBMCOptions.keepTranslation = true;
+        JBMCOptions.functionName = functionName;
+        JBMCOptions.relevantVars.addAll(relevantVars);
+        JBMCOptions.translateAndRunJBMC(inputFile);
+        var f = inputFile.getParent().resolve("tmp/xmlout.xml").toFile();
         assertTrue(f.exists());
         JBMCOutput output = TraceParser.parse(f, true);
         String traces = output.printAllTraces();

@@ -1,46 +1,24 @@
 package test;
 
-import cli.CLI;
-import cli.CostumPrintStream;
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
-import translation.FunctionNameVisitor;
-import utils.TestBehaviour;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import jjbmc.FunctionNameVisitor.TestBehaviour;
 import utils.Utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.stream.Stream;
 
 @Order(value = 1)
-//@Execution(ExecutionMode.CONCURRENT)
 public class AssignableTests {
-
-    @BeforeAll
-    public static void init() {
-    //    System.setErr(new CostumPrintStream(System.err));
-    //    System.setOut(new CostumPrintStream(System.out));
-    }
-
-    @AfterEach
-    public void after() {
-        CLI.cleanUp();
-    }
-
-    public static Stream<Arguments> assignableParameter() {
-        init();
-        return Utils.prepareParameters(Utils.baseTestFolder + "tests" + File.separator + "AssignableTests.java");
+    public static Stream<Arguments> assignableParameter() throws IOException {
+        return Utils.prepareParameters(Utils.SRC_TEST_JAVA.resolve("tests").resolve("AssignableTests.java"));
     }
 
     @ParameterizedTest
     @MethodSource("assignableParameter")
-    public void runAssignableTests(String classFile, String function, int unwind,
-                                   TestBehaviour behaviour,
-                                   String parentFolder) throws IOException, InterruptedException {
+    public void runAssignableTests(String classFile, String function, int unwind, TestBehaviour behaviour, String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
 
