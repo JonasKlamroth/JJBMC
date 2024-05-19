@@ -1,13 +1,15 @@
 package test;
 
 import cli.CLI;
+import cli.CostumPrintStream;
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
+import utils.TestBehaviour;
 import utils.Utils;
 
 import java.io.File;
@@ -36,8 +38,8 @@ public class AssignableTests {
 
     @ParameterizedTest
     @MethodSource("assignableParameter")
-    public void runAssignableTests(String classFile, String function, String unwind,
-                                   FunctionNameVisitor.TestBehaviour behaviour,
+    public void runAssignableTests(String classFile, String function, int unwind,
+                                   TestBehaviour behaviour,
                                    String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }

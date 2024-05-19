@@ -13,8 +13,13 @@ apply plugin: 'application'
 apply plugin: 'idea'
 apply plugin: 'checkstyle'
 
-sourceCompatibility = 17
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
 test.testLogging.showStandardStreams = true
+application {
+    mainClass = "cli.Main"
+}
 
 checkstyle {
     toolVersion '8.45.1'    // your choice here
@@ -35,7 +40,7 @@ test {
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    //mavenLocal()
     maven {
         url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
     }
@@ -59,16 +64,17 @@ dependencies {
     implementation 'io.github.jmltoolkit:jmlparser-symbol-solver-core:3.25.1-SNAPSHOT'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.28'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testImplementation("com.google.truth:truth:1.1.3")
+    testCompileOnly 'org.projectlombok:lombok:1.18.32'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 
     testImplementation("com.google.truth:truth:1.1.3")
 
-    manifest {
-        attributes "Main-Class": "test.TestRunner"
-    }
+    //manifest {
+        //attributes "Main-Class": "test.TestRunner"
+    //}
 }
 
 task fatJar(type: Jar) {
@@ -136,4 +142,10 @@ task caseStudies(type: JavaExec) {
 tasks.withType(JavaCompile) {
     options.compilerArgs << '-Xlint:unchecked'
     options.deprecation = true
+}
+
+task runTmpTest(type:JavaExec) {
+    mainClass = "cli.Main"
+    classpath = sourceSets.main.runtimeClasspath
+    args = ["./testRes/CaseStudyCandidates/TmpTest.java", "-kt", "-d", "-tr"]
 }

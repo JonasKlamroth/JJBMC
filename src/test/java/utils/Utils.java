@@ -1,6 +1,13 @@
 package utils;
 
 import cli.CLI;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.google.common.collect.ImmutableList;
 import exceptions.TranslationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,7 +49,7 @@ public class Utils {
 
     public static Stream<Arguments> prepareParameters(String fileName) {
         ArrayList<Arguments> params = new ArrayList<>();
-        createAnnotationsFolder(fileName);
+        createAnnotationsFolderOld(fileName);
         CLI.keepTranslation = keepTmpFile;
         CLI.debugMode = true;
         File tmpFile = CLI.prepareForJBMC(fileName);
@@ -53,25 +60,70 @@ public class Utils {
         String classFile = "tests" + File.separator + tmpFile.getName().replace(".java", "");
 
         log.debug("Parsing file for functions.");
-        var fnv = FunctionNameVisitor.parseFile(fileName, true);
-        List<FunctionNameVisitor.TestBehaviour> testBehaviours = fnv.getFunctionBehaviours();
-        List<String> functionNames = fnv.getFunctionNames();
-        List<String> unwinds = fnv.getUnwinds();
-        assert (functionNames.size() == testBehaviours.size());
-        assert (functionNames.size() == unwinds.size());
+        ParserConfiguration config = new ParserConfiguration();
+        config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
+        config.setProcessJml(true);
+        //TODO this should be checked if this is fine
+        config.setSymbolResolver(new JavaSymbolSolver(new JavaParserTypeSolver(new File(fileName).toPath().getParent())));
+        JavaParser parser = new JavaParser(config);
 
-        for (int idx = 0; idx < functionNames.size(); ++idx) {
-            if (testBehaviours.get(idx) != FunctionNameVisitor.TestBehaviour.Ignored) {
-                String name = functionNames.get(idx);
+        List<CompilationUnit> compilationUnits = new ArrayList<>(32);
+        ParseResult<CompilationUnit> result = null;
+        try {
+            result = parser.parse(new File(fileName).toPath());
+        } catch (IOException e) {
+            System.out.println("Error parsing file: " + fileName);
+            throw new RuntimeException(e);
+        }
+        if (result.isSuccessful()) {
+            compilationUnits.add(result.getResult().get());
+        } else {
+            System.out.println(fileName);
+            result.getProblems().forEach(System.out::println);
+        }
+        assert compilationUnits.size() == 1;
+        List<TestOptionsListener.TestOptions> testOptions = new ArrayList<>();
+        compilationUnits.get(0).accept(new TestOptionsListener(), testOptions);
+
+        for (TestOptionsListener.TestOptions to : testOptions) {
+            if (to.behaviour != TestBehaviour.Ignored) {
+                String name = to.functionName;
                 if (!name.contains("<init>")) {
-                    int dotIdx = name.lastIndexOf(":");
-                    name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
+                    //int dotIdx = name.lastIndexOf(":");
+                    //name = name.substring(0, dotIdx) + "Verf" + name.substring(dotIdx);
+                    name = name + "Verification";
+
                 }
-                params.add(Arguments.of(classFile, name, unwinds.get(idx), testBehaviours.get(idx), tmpFile.getParentFile().getParent()));
+                params.add(Arguments.of(classFile, name, to.unwinds, to.behaviour, tmpFile.getParentFile().getParent()));
             }
         }
         log.debug("Found " + params.size() + " functions.");
         return params.stream();
+    }
+
+    private static void createAnnotationsFolderOld(String fileName) {
+        var f = Paths.get(fileName);
+        var dir = f.getParent().resolveSibling("tmp/testannotations");
+        log.debug("Copying Annotation files to " + dir.toAbsolutePath());
+        try {
+            Files.createDirectories(dir);
+            Files.copy(Paths.get("./tests/testannotations/Fails.java"),
+                    dir.resolveSibling("Fails.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(Paths.get("./tests/testannotations/Verifyable.java"),
+                    dir.resolveSibling("Verifyable.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(Paths.get("./tests/testannotations/Unwind.java"),
+                    dir.resolveSibling("Unwind.java"),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw new TranslationException("Error trying to copy TestAnnotations");
+        }
     }
 
     private static void createAnnotationsFolder(String fileName) {
@@ -99,9 +151,9 @@ public class Utils {
         }
     }
 
-    public static void runTests(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour, String parentFolder)
+    public static void runTests(String classFile, String function, int unwind, TestBehaviour behaviour, String parentFolder)
             throws IOException, InterruptedException {
-        if (behaviour != FunctionNameVisitor.TestBehaviour.Ignored) {
+        if (behaviour != TestBehaviour.Ignored) {
             log.info("Running test for function: " + function);
             //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
 
@@ -121,9 +173,9 @@ public class Utils {
             commandList.add("--function");
             commandList.add(function);
 
-            if (unwind != null) {
+            if (unwind != -1) {
                 commandList.add("--unwind");
-                commandList.add(unwind);
+                commandList.add(String.valueOf(unwind));
             }
 
             String[] commands = new String[commandList.size()];
@@ -167,8 +219,8 @@ public class Utils {
                 log.info(out);
                 log.info(errOut);
             }
-            assertFalse(out.toString().contains("FAILURE") && behaviour == FunctionNameVisitor.TestBehaviour.Verifyable);
-            assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == FunctionNameVisitor.TestBehaviour.Fails);
+            assertFalse(out.toString().contains("FAILURE") && behaviour == TestBehaviour.Verifiable);
+            assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == TestBehaviour.Failing);
             assertTrue(out.toString().contains("VERIFICATION"));
 
         } else {

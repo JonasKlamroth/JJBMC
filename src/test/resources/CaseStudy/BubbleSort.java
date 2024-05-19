@@ -7,19 +7,21 @@ package CaseStudy;
 class BubbleSort {
     /*@
       @ requires arr != null && arr.length <= 5;
-      @ ensures (\forall int v; 0 <= v && v <= \result.length - 1; (\forall int w; 0 <= w && w <= v - 1; \result[w] <= \result[v]));
+      @ ensures (\forall int v; 0 <= v && v < \result.length; (\forall int w; 0 <= w && w < v; \result[w] <= \result[v]));
       @ assignable arr[*];
       @*/
     static int[] sort(int arr[]) {
         //@ loop_invariant j <= arr.length - 1 && -1 <= j;
-        //@ loop_invariant (\forall int k; j < k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
+        //@ loop_invariant (\forall int k; j + 1  <= k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
         //@ assignable arr[*];
+        //@ decreases j + 1;
         for (int j = arr.length - 1; j >= 0; --j) {
             //Inv2: max(arr, 0, j) == max(arr, i, j)
             //@ loop_invariant 0 <= i && i <= j;
             //@ loop_invariant (\forall int m; 0 <= m && m < i; arr[m] <= arr[i]);
-            //@ loop_invariant (\forall int k; j < k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
+            //@ loop_invariant (\forall int k; j + 1 <= k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
             //@ assignable arr[0 .. j];
+            //@ decreases arr.length - i;
             for (int i = 0; i < j; ++i) {
                 if (arr[i] > arr[i + 1]) {
                     swap(arr, i, i + 1);
@@ -31,19 +33,21 @@ class BubbleSort {
 
     /*@
       @ requires arr != null && arr.length <= 5 && arr.length >= 2 && arr[0] > arr[1];
-      @ ensures (\forall int v; 0 <= v && v <= \result.length - 1; (\forall int w; 0 <= w && w <= v - 1; \result[w] < \result[v]));
+      @ ensures (\forall int v; 0 <= v && v < \result.length; (\forall int w; 0 <= w && w < v; \result[w] < \result[v]));
       @ assignable arr[*];
       @*/
     static int[] broken_sort(int arr[]) {
         //@ loop_invariant j <= arr.length - 1 && -1 <= j;
-        //@ loop_invariant (\forall int k; j < k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
-        //@ assignable arr[*];
+        //@ loop_invariant (\forall int k; j + 1 <= k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
+        //@ assignable arr[*], j;
+        //@ decreases j + 1;
         for (int j = arr.length - 1; j >= 0; --j) {
             //Inv2: max(arr, 0, j) == max(arr, i, j)
             //@ loop_invariant 0 <= i && i <= j;
             //@ loop_invariant (\forall int m; 0 <= m && m < i; arr[m] <= arr[i]);
-            //@ loop_invariant (\forall int k; j < k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
-            //@ assignable arr[0 .. j - 1];
+            //@ loop_invariant (\forall int k; j + 1 <= k && k < arr.length; (\forall int k1; 0 <= k1 && k1 < k; arr[k1] <= arr[k]));
+            //@ assignable arr[0 .. j - 1], i;
+            //@ decreases arr.length - i;
             for (int i = 0; i < j; ++i) {
                 if (arr[i] > arr[i + 1]) {
                     swap(arr, i, i + 1);

@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import translation.FunctionNameVisitor;
+import utils.TestBehaviour;
 import utils.Utils;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class FITests {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    public void runTestSuite(String classFile, String function, String unwind, FunctionNameVisitor.TestBehaviour behaviour,
+    public void runTestSuite(String classFile, String function, int unwind, TestBehaviour behaviour,
                              String parentFolder) throws IOException, InterruptedException {
         Utils.runTests(classFile, function, unwind, behaviour, parentFolder);
     }
