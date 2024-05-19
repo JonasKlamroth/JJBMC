@@ -35,15 +35,22 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
     public static Expression gatherAnd(JmlContract contract, JmlClauseKind jmlClauseKind) {
         List<Expression> all = gather(contract, jmlClauseKind);
-        Expression res = new BooleanLiteralExpr(true);
+        if (all.size() == 1) {
+            return all.getFirst();
+        }
+
+        if (all.isEmpty()) {
+            return new BooleanLiteralExpr(true);
+        }
+
+        Expression res = all.removeFirst();
         while (!all.isEmpty()) {
-            res = new BinaryExpr((Expression) all.get(0), res, BinaryExpr.Operator.AND);
-            all.removeFirst();
+            res = new BinaryExpr(res, all.removeFirst(), BinaryExpr.Operator.AND);
         }
         res.setParentNode(contract);
         return res;
-        //return (Expression) all.stream().reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND)).orElse(
-         //       new BooleanLiteralExpr(true)).setParentNode(contract);
+        // return (Expression) all.stream().reduce((a, b) -> new BinaryExpr(a, b, BinaryExpr.Operator.AND)).orElse(
+        //       new BooleanLiteralExpr(true)).setParentNode(contract);
     }
 
     public static List<Expression> gather(JmlContract contract, JmlClauseKind jmlClauseKind) {
@@ -81,19 +88,19 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
             List<Expression> assignable = new ArrayList<>();
             List<Expression> sigOnly = new ArrayList<>();
             // Only one contract currently supported
-            if(contracts.size() > 1) {
+            if (contracts.size() > 1) {
                 return n;
                 //throw new UnsupportedException("Only methods with exactly one contract supported for now. Failed for: " + n.getNameAsString());
             }
 
-            if(n.getParentNode().isPresent()) {
+            if (n.getParentNode().isPresent()) {
                 var copy = n.clone();
                 ClassOrInterfaceDeclaration parentClass = (ClassOrInterfaceDeclaration) n.getParentNode().get();
                 copy.getContracts().clear();
                 parentClass.addMember(copy);
             }
 
-            if(contracts.size() != 0) {
+            if (contracts.size() != 0) {
                 var contract = contracts.getFirst().get();
 
                 assert !containsInvalidClauses(contract);
@@ -109,7 +116,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
             }
 
-            if(assignable.size() == 0) {
+            if (assignable.size() == 0) {
                 assignable = Collections.singletonList(new NameExpr("\\everything"));
             }
             contracts.clear();//delete the contract
@@ -144,7 +151,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
         foundReturn = false;
         var body = (BlockStmt) method.getBody().get().accept(this, null);
 
-        if(!foundReturn && sigOnly.isEmpty()) {
+        if (!foundReturn && sigOnly.isEmpty()) {
             block.addStatement(body);
         } else {
             // build try-statement
@@ -153,7 +160,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
                     new NodeList<>(), null
             );
             var excBody = new BlockStmt();
-            if(foundReturn) {
+            if (foundReturn) {
                 Parameter excParam = new Parameter(RETURN_EXCEPTION_TYPE, RETURN_EXCEPTION_NAME);
                 CatchClause returnCatchClause = new CatchClause(excParam, excBody);
                 bodyTry.getCatchClauses().add(returnCatchClause);
@@ -225,7 +232,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
                                 Expression loopCondition, Statement body, List<Expression> inits, Node parent) {
         var block = new BlockStmt();
         block.setParentNode(parent);
-        for(Expression e : inits) {
+        for (Expression e : inits) {
             block.addStatement(new ExpressionStmt(e));
         }
         var oldD = "oldD" + Jml2JavaExpressionTranslator.counter.getAndIncrement();
@@ -236,7 +243,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
                                 oldD,
                                 decreases.clone())));
 
-        for(Expression loopInvar : loopInvars) {
+        for (Expression loopInvar : loopInvars) {
             block.addStatement(Jml2JavaFacade.assert_(loopInvar.clone()));
         }
         for (Expression assignable : assignables) {
@@ -247,7 +254,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
         var ifThen = new IfStmt(loopCondition.clone(), thenBlock, null);
         ifThen.setParentNode(block);
         thenBlock.addStatement((Statement) body.accept(this, null));
-        for(Expression loopInvar : loopInvars) {
+        for (Expression loopInvar : loopInvars) {
             thenBlock.addStatement(Jml2JavaFacade.assert_(loopInvar).clone());
         }
         if (decreases != null) {
@@ -259,7 +266,7 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
             ));
         }
         thenBlock.addStatement(Jml2JavaFacade.assumeStatement(new BooleanLiteralExpr(false)));
-        for(Expression loopInvar : loopInvars) {
+        for (Expression loopInvar : loopInvars) {
             block.addStatement(Jml2JavaFacade.assume(loopInvar).clone());
         }
         block.addStatement(ifThen);
@@ -279,11 +286,11 @@ public class EmbeddContracts extends ModifierVisitor<Object> {
 
     @Override
     public Visitable visit(MethodCallExpr n, Object arg) {
-        if(CLI.forceInliningMethods) {
+        if (CLI.forceInliningMethods) {
             return super.visit(n, arg);
         }
         var arguments = new ArrayList<Expression>();
-        for(Expression argument : n.getArguments()) {
+        for (Expression argument : n.getArguments()) {
             arguments.add((Expression) argument.accept(this, arg));
         }
         var contractCall = new MethodCallExpr(n.getName().toString() + "Contract", n.getArguments().toArray(Expression[]::new));
