@@ -3,6 +3,7 @@ package jjbmc.trace;
 import jjbmc.Assignment;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -11,7 +12,7 @@ import static jjbmc.trace.TraceInformation.*;
 @Getter
 public class Trace {
     private static final Object noValue = new Object();
-    private List<Assignment> filteredAssignments = new LinkedList<>();
+    private final List<Assignment> filteredAssignments = new LinkedList<>();
     private List<Assignment> allAssignments = new LinkedList<>();
     @Setter private Set<String> relevantVars = new HashSet<>();
     private final Map<String, String> objectMap = new HashMap<>();
@@ -19,7 +20,7 @@ public class Trace {
     public Map<String, Object> finalVals = new HashMap<>();
 
     private final boolean fullTraceRequested;
-    private int maxArraySize;
+    private final int maxArraySize;
 
     public Trace(List<Assignment> assignments) {
         this(assignments, false, 10);
@@ -31,7 +32,7 @@ public class Trace {
         this.maxArraySize = maxArraySize;
     }
 
-    private boolean isRelevantVar(String var) {
+    private boolean isRelevantVar(@Nullable String var) {
         if (var == null) {
             return false;
         }
@@ -359,7 +360,7 @@ public class Trace {
         reverseObjectMap.put(jbmcVarname, value);
     }
 
-    private String getObjectName(String object) {
+    private @Nullable String getObjectName(@Nullable String object) {
         if (object == null) {
             return null;
         }
@@ -397,7 +398,7 @@ public class Trace {
         return lhs;
     }
 
-    public String guessVariable(String lhs) {
+    public @Nullable String guessVariable(@Nullable String lhs) {
         if (lhs == null) {
             return null;
         }

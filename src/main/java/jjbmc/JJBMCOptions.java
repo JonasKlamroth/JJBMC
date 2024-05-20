@@ -4,10 +4,7 @@ import lombok.Data;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static picocli.CommandLine.*;
 
@@ -18,10 +15,11 @@ import static picocli.CommandLine.*;
 
 @Command(name = "openJBMC", header = "@|bold openJBMC Bounded Model checking for JML|@")
 @Data
-public class JBMCOptions {
+public class JJBMCOptions {
     public static final int jbmcMajorVer = 5;
     public static final int jbmcMinorVer = 22;
-    public static String[] apiArgs = new String[0];
+
+    public List<String> apiArgs = new ArrayList<>(10);
 
     @Option(names = {"-kt", "-keepTranslation"},
             description = "Keep the temporary file which contains the translation of the given file.")
@@ -92,10 +90,10 @@ public class JBMCOptions {
     private boolean debugMode = false;
 
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
-    private String fileName = null;
+    private Path fileName;
 
     @Parameters(index = "1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
-    public String functionName = null;
+    @Nullable public String functionName = null;
 
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
     private List<String> jbmcOptions = new ArrayList<>();

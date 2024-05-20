@@ -1,7 +1,7 @@
 package tests;
 
-import testannotations.Fails;
-import testannotations.Verifyable;
+import jjbmc.Fails;
+import jjbmc.Verifyable;
 
 class TestSuite {
     private int privInt = 0;

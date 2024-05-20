@@ -10,12 +10,12 @@ import picocli.CommandLine;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        JBMCOptions cli = new JBMCOptions();
+        JJBMCOptions cli = new JJBMCOptions();
         CommandLine cmd = new CommandLine(cli)
                 .setCaseInsensitiveEnumValuesAllowed(true)
                 .setColorScheme(CommandLine.Help.defaultColorScheme(CommandLine.Help.Ansi.AUTO));
         cmd.parseArgs(args);
         Operations ops = new Operations(cli);
-        ops.call()
+        System.exit(ops.call());
     }
 }

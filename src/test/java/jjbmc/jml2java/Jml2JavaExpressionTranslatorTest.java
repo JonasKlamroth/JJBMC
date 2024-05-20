@@ -10,6 +10,8 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuilder;
 import com.github.javaparser.utils.SourceRoot;
 import com.google.common.truth.Truth;
+import jjbmc.JBMCOutput;
+import jjbmc.JJBMCOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,9 +29,11 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 class Jml2JavaExpressionTranslatorTest {
-    private static final Path source = Paths.get("testRes/unit-tests/input").toAbsolutePath();
-    private static final Path expectedSources = Paths.get("testRes/unit-tests/expected").toAbsolutePath();
-    private static final Path actualSources = Paths.get("testRes/unit-tests/actual").toAbsolutePath();
+    private static final Path base = Paths.get("src", "test", "resources", "unit-tests");
+
+    private static final Path source = base.resolve("input").toAbsolutePath();
+    private static final Path expectedSources = base.resolve("expected").toAbsolutePath();
+    private static final Path actualSources = base.resolve("actual").toAbsolutePath();
 
     static {
         // Using an own JavaParser to configure a SymbolSolver. This is necessary, because for type resolution
@@ -45,7 +49,7 @@ class Jml2JavaExpressionTranslatorTest {
 
     public static Stream<Arguments> readExpressionTests() throws IOException {
         Yaml yaml = new Yaml();
-        try (var fw = new FileReader("testRes/unit-tests/expr-translation-tests.yml")) {
+        try (var fw = Files.newBufferedReader(base.resolve("expr-translation-tests.yml"))) {
             List<Map<String, String>> obj = yaml.load(fw);
 
             return obj.stream().map(
@@ -83,7 +87,7 @@ class Jml2JavaExpressionTranslatorTest {
         }
 
         var cu = check.getResult().get();
-        var actual = Jml2JavaFacade.translate(cu, false);
+        var actual = Jml2JavaFacade.translate(cu, new JJBMCOptions());
         System.out.println(actual);
 
         final var originalPath = cu.getStorage().get().getPath().toAbsolutePath();

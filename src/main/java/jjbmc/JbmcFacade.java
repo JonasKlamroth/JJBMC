@@ -53,18 +53,18 @@ public class JbmcFacade {
                 Pattern pattern = Pattern.compile("jbmc version (\\d*)\\.(\\d*)\\.(\\d*)? \\(", Pattern.CASE_INSENSITIVE);
                 Matcher matcher = pattern.matcher(output);
                 boolean matchFound = matcher.find();
-                if (Integer.parseInt(matcher.group(1)) < JBMCOptions.jbmcMajorVer) {
+                if (Integer.parseInt(matcher.group(1)) < JJBMCOptions.jbmcMajorVer) {
                     error("Error validating jbmc binary \"" + jbmcBin + "\"");
                     error("Found version: " + output);
-                    error("but at least version " + JBMCOptions.jbmcMajorVer + "." + JBMCOptions.jbmcMinorVer + " is required.");
+                    error("but at least version " + JJBMCOptions.jbmcMajorVer + "." + JJBMCOptions.jbmcMinorVer + " is required.");
                     error("Either install jbmc and make sure it is included in the path or provide " +
                             "a jbmc binary manually with the -jbmcBinary option");
                     error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
-                } else if (Integer.parseInt(matcher.group(2)) < JBMCOptions.jbmcMinorVer) {
+                } else if (Integer.parseInt(matcher.group(2)) < JJBMCOptions.jbmcMinorVer) {
                     error("Error validating jbmc binary \"" + jbmcBin + "\"");
                     error("Found version: " + output);
-                    error("but at least version " + JBMCOptions.jbmcMajorVer + "." + JBMCOptions.jbmcMinorVer + " is required.");
+                    error("but at least version " + JJBMCOptions.jbmcMajorVer + "." + JJBMCOptions.jbmcMinorVer + " is required.");
                     error("Either install jbmc and make sure it is included in the path or provide " +
                             "a jbmc binary manually with the -jbmcBinary option");
                     error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");

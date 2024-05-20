@@ -1,7 +1,7 @@
 package tests;
 
-import testannotations.Verifyable;
-import testannotations.Fails;
+import jjbmc.Verifyable;
+import jjbmc.Fails;
 
 public class PPTests {
 

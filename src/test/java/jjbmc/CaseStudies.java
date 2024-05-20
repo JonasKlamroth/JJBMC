@@ -1,26 +1,24 @@
-package casestudy;
+package jjbmc;
 
-import jjbmc.CostumPrintStream;
-import jjbmc.Main;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static jjbmc.ErrorLogger.info;
 
 public class CaseStudies {
     private String configString = null;
     private final Path configFilePath = new File("testRes" + File.separator + "CaseStudyConfig.json").toPath();
     private JsonObject configs = null;
-    private final Logger log = LogManager.getLogger(CaseStudies.class);
 
     public static void main(String[] args) {
         try {
@@ -33,16 +31,17 @@ public class CaseStudies {
     public void runCaseStudies() throws Exception {
         System.setErr(new CostumPrintStream(System.err));
         System.setOut(new CostumPrintStream(System.out));
-        File caseStudyFolder = new File("testRes" + File.separator + "CaseStudy");
-        for (File f : caseStudyFolder.listFiles()) {
-            if (f.isFile()) {
-                for (List<String> l : getConfigsForFile(f.getName())) {
-                    l.add(0, f.getAbsolutePath());
-                    l.add(0, "-c");
-                    String[] args = new String[l.size()];
-                    args = l.toArray(args);
-                    log.info("Running Casestudy: " + f.getName());
-                    log.info("with params: " + Arrays.toString(args));
+        try (var walk = Files.walk(Paths.get("testRes", "CaseStudy"))) {
+            var caseStudyFolder = walk
+                    .filter(Files::isRegularFile)
+                    .toList();
+            for (var f : caseStudyFolder) {
+                for (List<String> l : getConfigsForFile(f.getFileName().toString())) {
+                    l.addFirst(f.toAbsolutePath().toString());
+                    l.addFirst("-c");
+                    var args = l.toArray(new String[0]);
+                    info("Running Casestudy: %s", f.getFileName());
+                    info("with params: " + Arrays.toString(args));
                     Main.main(args);
                 }
             }

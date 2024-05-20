@@ -1,5 +1,6 @@
 package jjbmc.jml2java;
 
+import jjbmc.JJBMCOptions;
 import jjbmc.MyPPrintVisitor;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -80,7 +81,7 @@ public class Jml2JavaFacade {
     }
 
     // Returns a list of statements that save expressions under "\old"
-    public static List<Statement> storeOlds(Expression requires, boolean maxArraySize) {
+    public static List<Statement> storeOlds(Expression requires, int maxArraySize) {
         class OldVisitor extends ModifierVisitor<@Nullable Object> {
             final NodeList<JmlQuantifiedExpr> currentQuantifiers = new NodeList<>();
             final NodeList<Statement> statements = new NodeList<>();
@@ -121,7 +122,7 @@ public class Jml2JavaFacade {
         return res.get();
     }
 
-    public static NodeList<Statement> storeOld(Expression expression, List<JmlQuantifiedExpr> relevantQuantifiers, boolean maxArraySize) {
+    public static NodeList<Statement> storeOld(Expression expression, List<JmlQuantifiedExpr> relevantQuantifiers, int maxArraySize) {
         relevantQuantifiers = new NodeList<>(relevantQuantifiers);
         relevantQuantifiers.removeIf(v -> !isSubNode(expression, QuantifierSplitter.getVariable(v).getName()));
         var translatedExpression = Jml2JavaFacade.translate(expression.clone(), TranslationMode.JAVA);
@@ -277,15 +278,15 @@ public class Jml2JavaFacade {
         return blockStmt;
     }
 
-    public static CompilationUnit translate(CompilationUnit cu, boolean forceInliningMethods) {
+    public static CompilationUnit translate(CompilationUnit cu, JJBMCOptions options) {
         //Normlize all binary expressions
         cu.accept(new NormalizeBinaryExpressions(), null);
 
         //add method stubs for call to contracts
-        cu.accept(new CreateMethodContracts(), null);
+        cu.accept(new CreateMethodContracts(options), null);
 
         //rewrite methods and loops
-        var res = (CompilationUnit) cu.accept(new EmbeddContracts(forceInliningMethods),null);
+        var res = (CompilationUnit) cu.accept(new EmbeddContracts(options),null);
 
         // add exception type to the compilation unit
         cu.addType(Jml2JavaFacade.createExceptionClass());

@@ -13,7 +13,7 @@ public class ErrorLogger {
     private static void print(String fmt, Level level, Object... args) {
         if (level == Level.DEBUG && !debugOn) return;
 
-        System.out.printf("\027[%dm%05d [%s]\027[0m ", System.currentTimeMillis() - START_TIME, level);
+        System.out.printf("%05d \033[1;%dm[%s]\033[0m ", System.currentTimeMillis() - START_TIME, 32, level);
         System.out.printf(fmt, args);
         System.out.println();
     }

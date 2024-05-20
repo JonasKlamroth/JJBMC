@@ -14,6 +14,8 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import jjbmc.JJBMCOptions;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
 import static jjbmc.jml2java.EmbeddContracts.*;
@@ -22,8 +24,15 @@ import static jjbmc.jml2java.EmbeddContracts.*;
  * @author Alexander Weigl
  * @version 1 (06.05.23)
  */
+@RequiredArgsConstructor
 public class CreateMethodContracts extends VoidVisitorAdapter<@Nullable Object> {
     @Nullable TypeDeclaration<?> last;
+    private final int maxArraySize;
+
+    public CreateMethodContracts(JJBMCOptions options) {
+        this(options.getMaxArraySize());
+    }
+
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Object arg) {
@@ -32,12 +41,12 @@ public class CreateMethodContracts extends VoidVisitorAdapter<@Nullable Object> 
         // Make a copy to avoid concurrent modification exception as new methods are created
         //var seq = new ArrayList<>(n.getMembers());
         NodeList<BodyDeclaration<?>> newMembers = new NodeList<>();
-        for(BodyDeclaration bd : n.getMembers()) {
+        for (BodyDeclaration bd : n.getMembers()) {
             newMembers.add(bd.clone());
         }
         n.setMembers(newMembers);
         //seq.forEach((p) -> {
-            //p.accept(this, arg);
+        //p.accept(this, arg);
         //});
     }
 
@@ -45,7 +54,7 @@ public class CreateMethodContracts extends VoidVisitorAdapter<@Nullable Object> 
     public void visit(MethodDeclaration n, Object arg) {
         var contracts = n.getContracts();
         // Only one contract currently supported
-        if (contracts.size() == 0) {
+        if (contracts.isEmpty()) {
             return;
         }
         if (contracts.getFirst().isEmpty() || contracts.size() != 1) {
@@ -77,7 +86,7 @@ public class CreateMethodContracts extends VoidVisitorAdapter<@Nullable Object> 
             body.addStatement(Jml2JavaFacade.havoc(returnVarExpr.asVariableDeclarationExpr()));
         }
         // save references to old variables
-        Jml2JavaFacade.storeOlds(ensures).forEach(o -> body.addStatement(o));
+        Jml2JavaFacade.storeOlds(ensures, maxArraySize).forEach(body::addStatement);
 
         for (Expression expression : assignable) {
             body.addStatement(Jml2JavaFacade.havoc(expression));

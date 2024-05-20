@@ -1,8 +1,8 @@
 package tests;
 
-import testannotations.Fails;
-import testannotations.Unwind;
-import testannotations.Verifyable;
+import jjbmc.Fails;
+import jjbmc.Unwind;
+import jjbmc.Verifyable;
 
 /**
  * Created by jklamroth on 1/11/19.

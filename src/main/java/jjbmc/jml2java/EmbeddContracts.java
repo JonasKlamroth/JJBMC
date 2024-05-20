@@ -14,6 +14,8 @@ import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
+import jjbmc.JJBMCOptions;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -25,16 +27,19 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (06.05.23)
  */
+@RequiredArgsConstructor
 public class EmbeddContracts extends ModifierVisitor<@Nullable Object> {
 
     public static final String RESULTVAR = "__RESULT__";
     private static final Type RETURN_EXCEPTION_TYPE = new ClassOrInterfaceType().setName("ReturnException");
     private static final String RETURN_EXCEPTION_NAME = "returnExc";
     private boolean foundReturn = false;
-    private final boolean forceInliningMethods;
 
-    public EmbeddContracts(boolean forceInliningMethods) {
-        this.forceInliningMethods = forceInliningMethods;
+    private final boolean forceInliningMethods;
+    private final int maxArraySize;
+
+    public EmbeddContracts(JJBMCOptions options) {
+        this(options.forceInliningMethods, options.getMaxArraySize());
     }
 
 
@@ -153,7 +158,7 @@ public class EmbeddContracts extends ModifierVisitor<@Nullable Object> {
         block.addStatement(Jml2JavaFacade.assume(requires));
 
         // save references to old variables
-        Jml2JavaFacade.storeOlds(ensures).forEach(block::addStatement);
+        Jml2JavaFacade.storeOlds(ensures, maxArraySize).forEach(block::addStatement);
 
         foundReturn = false;
         var body = (BlockStmt) method.getBody().get().accept(this, null);
