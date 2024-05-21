@@ -24,14 +24,14 @@ public class AssignableTests2 {
     TestSuite[] objects;
 
     //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[0] != null;
-    //@ assignable t2.objects[0..1].t2;
+    //@ assignable t2.objects[0 .. 1].t2;
     @Verifyable
     private void assignableTest14() {
         t2.objects[0].t2 = new TestSuite();
     }
 
     //@ requires t2 != null && t2.objects != null && t2.objects.length >= 1 && t2.objects[2] != null;
-    //@ assignable t2.objects[0..1].t2;
+    //@ assignable t2.objects[0 .. 1].t2;
     @Fails
     private void assignableTest15() {
         t2.objects[2].t2 = new TestSuite();

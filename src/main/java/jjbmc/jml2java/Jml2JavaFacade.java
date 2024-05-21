@@ -1,7 +1,5 @@
 package jjbmc.jml2java;
 
-import jjbmc.JJBMCOptions;
-import jjbmc.MyPPrintVisitor;
 import com.github.javaparser.ast.*;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -19,6 +17,8 @@ import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedType;
+import jjbmc.JJBMCOptions;
+import jjbmc.MyPPrintVisitor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -38,7 +38,8 @@ import static com.github.javaparser.resolution.types.ResolvedPrimitiveType.*;
  * @version 1 (04.10.22)
  */
 public class Jml2JavaFacade {
-    @Nullable public static Node currentNode;
+    @Nullable
+    public static Node currentNode;
 
     public static Statement assumeStatement(Expression e) {
         return new ExpressionStmt(new MethodCallExpr(new NameExpr("CProver"), "assume", new NodeList<>(e)));
@@ -69,9 +70,9 @@ public class Jml2JavaFacade {
         NodeList<JmlQuantifiedExpr> res = new NodeList<>();
         node = node.getParentNode().get();
         while (node != null) {
-            if(!(node instanceof Expression)) {
+            if (!(node instanceof Expression)) {
                 break;
-            } else if(node instanceof JmlQuantifiedExpr) {
+            } else if (node instanceof JmlQuantifiedExpr) {
                 res.add((JmlQuantifiedExpr) node);
             }
             node = node.getParentNode().isPresent() ? node.getParentNode().get() : null;
@@ -82,33 +83,7 @@ public class Jml2JavaFacade {
 
     // Returns a list of statements that save expressions under "\old"
     public static List<Statement> storeOlds(Expression requires, int maxArraySize) {
-        class OldVisitor extends ModifierVisitor<@Nullable Object> {
-            final NodeList<JmlQuantifiedExpr> currentQuantifiers = new NodeList<>();
-            final NodeList<Statement> statements = new NodeList<>();
-
-            public static NodeList<Statement> run(Expression expr) {
-                OldVisitor v = new OldVisitor();
-                expr.accept(v, null);
-                return v.statements;
-            }
-
-            @Override
-            public Visitable visit(JmlQuantifiedExpr jmlQuantifiedExpr, Object arg) {
-                currentQuantifiers.add(jmlQuantifiedExpr);
-                Visitable res = super.visit(jmlQuantifiedExpr, arg);
-                currentQuantifiers.remove(jmlQuantifiedExpr);
-                return res;
-            }
-
-            @Override
-            public Visitable visit(MethodCallExpr n, Object arg) {
-                if (n.getNameAsString().equals("\\old")) {
-                    statements.addAll(storeOld(n.getArgument(0), currentQuantifiers, maxArraySize));
-                }
-                return super.visit(n, arg);
-            }
-        }
-        return OldVisitor.run(requires);
+        return new OldVisitor(maxArraySize).run(requires);
     }
 
     public static boolean isSubNode(Node parent, Node child) {
@@ -132,7 +107,7 @@ public class Jml2JavaFacade {
         res.addAll(translatedExpression.necessaryVars);
         res.addAll(translatedExpression.statements);
 
-        if(relevantQuantifiers.isEmpty()) {
+        if (relevantQuantifiers.isEmpty()) {
             // save references to old variables
             var decl = new VariableDeclarator(new VarType(), "old_" + Math.abs(expression.hashCode()), exprCopy);
             res.add(new ExpressionStmt(new VariableDeclarationExpr(decl, Modifier.finalModifier())));
@@ -159,7 +134,7 @@ public class Jml2JavaFacade {
         }
 
 
-        for(int i = 0; i < relevantQuantifiers.size(); ++i) {
+        for (int i = 0; i < relevantQuantifiers.size(); ++i) {
             type = new ArrayType(realType);
         }
         VariableDeclarator varDecl = new VariableDeclarator(type,
@@ -169,19 +144,19 @@ public class Jml2JavaFacade {
                         null));
         res.add(new ExpressionStmt(new VariableDeclarationExpr(varDecl, Modifier.finalModifier())));
         Expression e = varDecl.getNameAsExpression();
-        for(int i = relevantQuantifiers.size() - 1; i >= 0; --i) {
+        for (int i = relevantQuantifiers.size() - 1; i >= 0; --i) {
             e = new ArrayAccessExpr(e,
                     new BinaryExpr(
                             QuantifierSplitter.getVariable(relevantQuantifiers.get(i)).getNameAsExpression(),
                             new IntegerLiteralExpr(String.valueOf(maxArraySize)),
                             BinaryExpr.Operator.REMAINDER)
-                    );
+            );
         }
 
         e = new AssignExpr(e, exprCopy, AssignExpr.Operator.ASSIGN);
         st.addStatement(new ExpressionStmt(e));
 
-        for(JmlQuantifiedExpr quantifiedExpr : relevantQuantifiers) {
+        for (JmlQuantifiedExpr quantifiedExpr : relevantQuantifiers) {
             Expression lowerBound = QuantifierSplitter.getLowerBound(quantifiedExpr);
             var translatedLowerBound = Jml2JavaFacade.translate((Expression) lowerBound.clone().setParentNode(quantifiedExpr), TranslationMode.DEMONIC);
             lowerBound = translatedLowerBound.value;
@@ -223,7 +198,7 @@ public class Jml2JavaFacade {
     }
 
     public static Statement havoc(Expression expression, boolean allowNull) {
-        if(expression.toString().equals("\\nothing")) {
+        if (expression.toString().equals("\\nothing")) {
             return new BlockStmt();
         }
         ResolvedType type = expression.calculateResolvedType();
@@ -233,25 +208,31 @@ public class Jml2JavaFacade {
                 return havocArray(arrayAccessExpr);
             }
         }
-        switch (type) {
-            case INT -> functionName = "nondetInt";
-            case CHAR -> functionName = "nondetChar";
-            case BOOLEAN -> functionName = "nondetBoolean";
-            case SHORT -> functionName = "nondetShort";
-            case BYTE -> functionName = "nondetByte";
-            case LONG -> functionName = "nondetLong";
-            case FLOAT -> functionName = "nondetFloat";
-            case DOUBLE -> functionName = "nondetDouble";
-            default -> {
-                if (allowNull) {
-                    functionName = "nondetWithNull";
-                } else {
-                    functionName = "nondetWithoutNull";
-                }
+        if (type.equals(INT)) {
+            functionName = "nondetInt";
+        } else if (type.equals(CHAR)) {
+            functionName = "nondetChar";
+        } else if (type.equals(BOOLEAN)) {
+            functionName = "nondetBoolean";
+        } else if (type.equals(SHORT)) {
+            functionName = "nondetShort";
+        } else if (type.equals(BYTE)) {
+            functionName = "nondetByte";
+        } else if (type.equals(LONG)) {
+            functionName = "nondetLong";
+        } else if (type.equals(FLOAT)) {
+            functionName = "nondetFloat";
+        } else if (type.equals(DOUBLE)) {
+            functionName = "nondetDouble";
+        } else {
+            if (allowNull) {
+                functionName = "nondetWithNull";
+            } else {
+                functionName = "nondetWithoutNull";
             }
         }
         MethodCallExpr nondetFunction = new MethodCallExpr(new NameExpr("CProver"), functionName, new NodeList<>());
-        if(expression instanceof VariableDeclarationExpr variableDeclarationExpr) {
+        if (expression instanceof VariableDeclarationExpr variableDeclarationExpr) {
             expression = variableDeclarationExpr.getVariable(0).getNameAsExpression();
         }
         return new ExpressionStmt(new AssignExpr(expression, nondetFunction, AssignExpr.Operator.ASSIGN));
@@ -273,7 +254,7 @@ public class Jml2JavaFacade {
                 new BlockStmt());
         blockStmt.addStatement(forLoop);
         var havocElement = havoc(element);
-        ((BlockStmt)(forLoop.getBody())).addStatement(havocElement);
+        ((BlockStmt) (forLoop.getBody())).addStatement(havocElement);
 
         return blockStmt;
     }
@@ -286,7 +267,7 @@ public class Jml2JavaFacade {
         cu.accept(new CreateMethodContracts(options), null);
 
         //rewrite methods and loops
-        var res = (CompilationUnit) cu.accept(new EmbeddContracts(options),null);
+        var res = (CompilationUnit) cu.accept(new EmbeddContracts(options), null);
 
         // add exception type to the compilation unit
         cu.addType(Jml2JavaFacade.createExceptionClass());
@@ -394,13 +375,13 @@ public class Jml2JavaFacade {
             }
 
             if (e instanceof NameExpr ne) {
-                if(ne.getNameAsString().startsWith("\\")) {
+                if (ne.getNameAsString().startsWith("\\")) {
                     return true;
                 }
             }
 
             if (e instanceof MethodCallExpr methodCallExpr) {
-                if(methodCallExpr.getNameAsString().startsWith("\\")) {
+                if (methodCallExpr.getNameAsString().startsWith("\\")) {
                     return true;
                 }
             }
@@ -482,5 +463,39 @@ public class Jml2JavaFacade {
         }
 
         throw new RuntimeException("Unsupported type");
+    }
+
+    private static class OldVisitor extends ModifierVisitor<@Nullable Object> {
+        final NodeList<JmlQuantifiedExpr> currentQuantifiers;
+        final NodeList<Statement> statements;
+        private final int maxArraySize;
+
+        OldVisitor(int maxArraySize) {
+            this.maxArraySize = maxArraySize;
+            currentQuantifiers = new NodeList<>();
+            statements = new NodeList<>();
+        }
+
+        public NodeList<Statement> run(Expression expr) {
+            OldVisitor v = new OldVisitor(maxArraySize);
+            expr.accept(v, null);
+            return v.statements;
+        }
+
+        @Override
+        public Visitable visit(JmlQuantifiedExpr jmlQuantifiedExpr, Object arg) {
+            currentQuantifiers.add(jmlQuantifiedExpr);
+            Visitable res = super.visit(jmlQuantifiedExpr, arg);
+            currentQuantifiers.remove(jmlQuantifiedExpr);
+            return res;
+        }
+
+        @Override
+        public Visitable visit(MethodCallExpr n, Object arg) {
+            if (n.getNameAsString().equals("\\old")) {
+                statements.addAll(storeOld(n.getArgument(0), currentQuantifiers, maxArraySize));
+            }
+            return super.visit(n, arg);
+        }
     }
 }

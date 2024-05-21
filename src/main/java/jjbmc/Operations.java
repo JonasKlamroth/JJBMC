@@ -4,10 +4,9 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
-import com.github.javaparser.printer.DefaultPrettyPrinter;
-import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuilder;
 import com.google.common.collect.ImmutableList;
 import jjbmc.jml2java.Jml2JavaFacade;
 import jjbmc.trace.TraceParser;
@@ -15,13 +14,20 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.ToolProvider;
 import java.io.*;
-import java.nio.file.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.*;
 
 import static jjbmc.ErrorLogger.*;
-import static jjbmc.ErrorLogger.setDebugOn;
 
 @RequiredArgsConstructor
 @Getter
@@ -35,161 +41,197 @@ public class Operations implements Callable<Integer> {
         return translate(options, file.toPath());
     }
 
-    public static CompilationUnit translate(JJBMCOptions options, Path... fileNames) throws Exception {
+    @Getter
+    private boolean didCleanUp = false;
+
+    public static CompilationUnit translate(JJBMCOptions options, Path fileName) throws Exception {
         ParserConfiguration config = new ParserConfiguration();
         config.setJmlKeys(ImmutableList.of(ImmutableList.of("openjml")));
         config.setProcessJml(true);
+        config.setSymbolResolver(new JavaSymbolSolver(
+                new TypeSolverBuilder()
+                        .withSourceCode(options.getTmpFolder())
+                        .withCurrentJRE()
+                        .build()));
         JavaParser parser = new JavaParser(config);
 
         List<CompilationUnit> compilationUnits = new ArrayList<>(32);
-        for (var arg : fileNames) {
-            ParseResult<CompilationUnit> result = parser.parse(arg);
-            if (result.isSuccessful()) {
-                compilationUnits.add(result.getResult().get());
-            } else {
-                System.out.println(arg);
-                result.getProblems().forEach(System.out::println);
-            }
+        ParseResult<CompilationUnit> result = parser.parse(fileName);
+        if (result.isSuccessful()) {
+            var compilationUnit = result.getResult().get();
+            return rewriteAssert(compilationUnit, options);
+        } else {
+            result.getProblems().forEach(System.out::println);
+            final var first = result.getProblems().get(0);
+            throw new RuntimeException(first.getVerboseMessage(), first.getCause().orElse(null));
         }
+    }
 
-        for (var it : compilationUnits) {
-            try {
-                return rewriteAssert(it, options);
-                //return api.prettyPrint(t);
-            } catch (UnsupportedException e) {
-                error(e.getMessage());
-                return null;
-            } catch (TranslationException e) {
-                error(e.getMessage());
-                return null;
-            }
+    private static void copySubjectOfVerification(Path fileName, Path tmpFile) throws IOException {
+        Files.copy(fileName, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    private static void createCProverFolder(Path folder) throws IOException {
+        var dir = folder.resolve("org/cprover");
+        debug("Copying CProver.java to %s", dir.toAbsolutePath());
+        Files.createDirectories(dir);
+        try (InputStream is = JJBMCOptions.class.getResourceAsStream("/cli/CProver.java")) {
+            Files.copy(Objects.requireNonNull(is), dir.resolve("CProver.java"));
         }
-        return null;
     }
 
     public void translateAndRunJBMC(Path file, String functionName) throws Exception {
         options.functionName = functionName;
         options.setFileName(file);
-        translateAndRunJBMC(file);
+        translateAndRunJBMC();
     }
 
-    public Path prepareForJBMC(Path fileName) throws Exception {
-        options.setDidCleanUp(false);
+    public void prepareSource() throws Exception {
+        didCleanUp = false;
 
-        if (options.unwinds < 0) {
-            info("No unwind argument found. Default to 7.");
-            options.unwinds = 7;
-        }
-        if (options.getMaxArraySize() < 0) {
-            info("No maxArraySize argument found. Default to " + (options.unwinds - 2) + ".");
-            options.setMaxArraySize(Math.max(options.unwinds - 2, 0));
-        }
-        if (options.getMaxArraySize() > options.unwinds - 2) {
+        if (options.getMaxArraySize() > options.getUnwinds() - 2) {
             warn("Unwinds is set to less than maxArraySize + 2. This may lead to unsound behaviour.");
         }
 
-        Path tmpFile = options.getTmpFile();
-        try {
-            if (!Files.exists(fileName)) {
-                throw new FileNotFoundException("Could not find file " + fileName);
-            }
 
-            options.setTmpFolder(fileName.resolveSibling("tmp"));
+        final var file = options.getFileName();
+        if (!Files.exists(file)) {
+            throw new FileNotFoundException("Could not find file " + file);
+        }
+
+        var tmpFile = options.getTmpFile();
+
+        try {
             deleteFolder(options.getTmpFolder(), true);
             Files.createDirectories(options.getTmpFolder());
 
-            options.setTmpFile(options.getTmpFolder().resolve(fileName.getFileName()));
-            var tmpClassFile = options.getTmpFolder().resolve(
-                    fileName.getFileName().toString()
+            /*var tmpClassFile = options.getTmpFolder().resolve(
+                    file.getFileName().toString()
                             .replace(".java", ".class"));
 
             Files.deleteIfExists(tmpFile);
             Files.deleteIfExists(tmpClassFile);
+             */
 
-            Files.copy(fileName, tmpFile, StandardCopyOption.REPLACE_EXISTING);
-            for (String s : options.libFiles) {
-                var tmpF = fileName.resolveSibling(s);
-                if (!Files.exists(tmpF)) {
-                    throw new FileNotFoundException("Could not find libFile: " + tmpF);
-                } else {
-                    Files.copy(tmpF,
-                            options.getTmpFolder().resolve(tmpF.getFileName()),
-                            StandardCopyOption.REPLACE_EXISTING);
-                }
-            }
+            copyLibraryFiles(options.getTmpFolder());
+            createCProverFolder(options.getTmpFolder());
+            copySubjectOfVerification(file, tmpFile);
 
-            createCProverFolder(options.getTmpFolder().toAbsolutePath());
             long start = System.currentTimeMillis();
             var translation = translate(options, tmpFile);
             long finish = System.currentTimeMillis();
             debug("Translation.Translation took: " + (finish - start) + "ms");
 
-            if (translation != null) {
-                String packageName = translation.getPackageDeclaration()
-                        .map(NodeWithName::getNameAsString).orElse("");
-                Files.deleteIfExists(tmpFile);
-                packageName = packageName.replace(".", "/");
-                var packageFolder = options.getTmpFolder().resolve(packageName);
-                Files.createDirectories(packageFolder);
-                options.setTmpFile(packageFolder.resolve(tmpFile.getFileName()));
-                var content = pprint(translation);
-                Files.writeString(tmpFile, content, StandardOpenOption.CREATE);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
+            String packageName = translation.getPackageDeclaration()
+                    .map(NodeWithName::getNameAsString).orElse("");
+            Files.deleteIfExists(tmpFile);
+            packageName = packageName.replace(".", "/");
+            var packageFolder = options.getTmpFolder().resolve(packageName);
+            Files.createDirectories(packageFolder);
+            options.setTmpFile(packageFolder.resolve(tmpFile.getFileName()));
+            var content = Jml2JavaFacade.pprint(translation);
+            Files.writeString(options.getTmpFile(), content, StandardOpenOption.CREATE);
+        } finally {
             options.keepTranslation = true;
             cleanUp();
-            debug(e);
-            throw e;
         }
+    }
 
-        try {
-            var commands = new LinkedList<String>();
-            commands.add(options.javacBin);
-            commands.add("-g");
-            commands.add(tmpFile.toAbsolutePath().toString());
-            commands.addAll(options.apiArgs);
+    public void compile() throws Exception {
+        if (!compileWithApi()) {
+            compileWithJavac();
+        }
+    }
 
-            debug("Compiling translated file: " + commands);
-            ProcessBuilder pb = new ProcessBuilder().command(commands)
-                    .redirectOutput(options.getTmpFolder().resolve("compilationErrors.txt").toFile())
-                    .redirectErrorStream(true)
-                    .directory(options.getTmpFolder().toFile());
-            Process proc = pb.start();
+    private boolean compileWithApi() throws IOException {
+        var javac = ToolProvider.getSystemJavaCompiler();
+        if (javac == null) return false;
 
-            proc.waitFor();
-            if (proc.exitValue() != 0) {
-                options.keepTranslation = true;
-                error("Compilation failed. See compilationErrors.txt for javac output.");
-                return null;
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        var fileManager = javac.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+
+        //StringWriter output = new StringWriter();
+        //List<String> classes = new ArrayList<>();
+        try (var s = Files.walk(options.getTmpFolder())) {
+            var files = s.filter(f -> !Files.isDirectory(f))
+                    .filter(f -> f.getFileName().toString().endsWith(".java"))
+                    .toList();
+
+            Iterable<? extends JavaFileObject> compilationUnits =
+                    fileManager.getJavaFileObjects(files.toArray(new Path[0]));
+
+            JavaCompiler.CompilationTask task = javac.getTask(new PrintWriter(System.out),
+                    fileManager, diagnostics, List.of("-g"), List.of(), compilationUnits);
+
+            long start = System.currentTimeMillis();
+            var b = task.call();
+            long stop = System.currentTimeMillis();
+
+            info("Compilation took %d ms using the internal API", stop - start);
+
+            for (var diagnostic : diagnostics.getDiagnostics()) {
+                info("%s", diagnostic);
             }
-        } catch (IOException | InterruptedException e) {
+        }
+        return true;
+    }
+
+    private void compileWithJavac() throws Exception {
+        var tmpFile = options.getTmpFile();
+        var commands = new ArrayList<>(List.of(options.getJavacBinary().toString(), "-g",
+                options.getTmpFolder().relativize(tmpFile).toString()));
+        commands.addAll(options.apiArgs);
+
+        debug("Compiling translated file: " + commands);
+        var out = ProcessBuilder.Redirect.to(options.getTmpFolder().resolve("compilationErrors.txt").toFile());
+        ProcessBuilder pb = new ProcessBuilder(commands)
+                .redirectOutput(out)
+                .redirectError(out)
+                .directory(options.getTmpFolder().toFile());
+
+        Process proc = pb.start();
+        proc.waitFor();
+        if (proc.exitValue() != 0) {
             options.keepTranslation = true;
-            error("Error during preparation.", e);
-            throw e;
+            throw new Exception("Compilation failed. See compilationErrors.txt for javac output.");
         }
 
         debug("Compilation successful.");
+
         if (!JbmcFacade.verifyJBMCVersion(options.jbmcBin, options.isWindows())) {
             throw new Exception("Unverified JBMC version");
         }
-        return tmpFile;
     }
 
-    private static String pprint(Node translation) {
-        DefaultPrettyPrinter pp = new DefaultPrettyPrinter(
-                MyPPrintVisitor::new, new DefaultPrinterConfiguration());
-        return pp.print(translation);
+    private void copyLibraryFiles(Path fileName) throws IOException {
+        for (String s : options.libFiles) {
+            var tmpF = fileName.resolveSibling(s);
+            if (!Files.exists(tmpF)) {
+                throw new FileNotFoundException("Could not find libFile: " + tmpF);
+            } else {
+                copySubjectOfVerification(tmpF, options.getTmpFolder().resolve(tmpF.getFileName()));
+            }
+        }
     }
 
-    public void translateAndRunJBMC(Path fileName) throws Exception {
-        var tmpFile = prepareForJBMC(fileName);
-        //TODO FunctionNameVisitor.parseFile(tmpFile.getAbsolutePath());
-        List<String> functionNames = null;//FunctionNameVisitor.getFunctionNames();
-        Map<String, List<String>> paramMap = null;// FunctionNameVisitor.getParamMap();
+    private static List<String> prepareJBMCOptions(List<String> options) {
+        List<String> res = new ArrayList<>();
+        for (String s : options) {
+            res.addAll(Arrays.asList(s.split(" ")));
+        }
+        return res;
+    }
+
+    public void translateAndRunJBMC() throws Exception {
+        prepareSource();
+        compile();
+
+        var fnv = FunctionNameVisitor.parseFile(options.getTmpFile(), true);
+        var functionNames = fnv.getFunctionNames();
+        var paramMap = fnv.getParamMap();
 
         List<String> allFunctionNames = new ArrayList<>(functionNames);
+
         if (options.functionName != null) {
             if (!options.functionName.endsWith("Verf")) {
                 options.functionName = options.functionName + "Verf";
@@ -210,37 +252,67 @@ public class Operations implements Callable<Integer> {
                 }
                 functionName = "\"" + functionName + "\"";
             }
-            ExecutorService executerService = Executors.newSingleThreadExecutor();
-            String finalFunctionName = functionName;
-            Runnable worker = () -> runJBMC(tmpFile, finalFunctionName, paramMap);
 
-            final Future<?> handler = executerService.submit(worker);
-            try {
+            try (ExecutorService executerService = Executors.newFixedThreadPool(1)) {
+                String finalFunctionName = functionName;
+                Runnable worker = () -> runJBMC(finalFunctionName, paramMap);
+                final Future<?> handler = executerService.submit(worker);
                 handler.get(options.timeout, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
-                handler.cancel(true);
-                jbmcProcess.destroyForcibly();
+                if (jbmcProcess != null) {
+                    jbmcProcess.destroyForcibly();
+                }
                 info(YELLOW_BOLD + "JBMC call for function " + functionName + " timed out." + RESET + "\n");
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-            executerService.shutdownNow();
         }
     }
 
-    private static List<String> prepareJBMCOptions(List<String> options) {
-        List<String> res = new ArrayList<>();
-        for (String s : options) {
-            res.addAll(Arrays.asList(s.split(" ")));
+    public void printOutput(@Nullable JBMCOutput output, long time, String functionName) {
+        if (output == null) {
+            options.keepTranslation = true;
+            error("Error parsing xml-output of JBMC.");
+            return;
         }
-        return res;
+        if (options.doSanityCheck) {
+            if (output.printStatus().contains("SUCC")) {
+                warn("Sanity check failed for: " + functionName);
+            } else {
+                info("Sanity check ok for function: " + functionName);
+            }
+            return;
+        }
+        info("Result for function " + functionName + ":");
+        if (options.timed) {
+            info("JBMC took " + time + "ms.");
+        }
+
+
+        if (output.getErrors().isEmpty()) {
+            if (options.runWithTrace) {
+                String traces = output.printAllTraces();
+                if (!traces.isEmpty()) {
+                    info(traces);
+                }
+            }
+            //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
+            String status = output.printStatus();
+            if (status.contains("SUCC")) {
+                info(GREEN_BOLD + status + RESET);
+            } else {
+                info(RED_BOLD + status + RESET);
+            }
+        } else {
+            options.keepTranslation = true;
+            error(output.printErrors());
+        }
     }
 
-    public void runJBMC(Path tmpFile, String functionName, Map<String, List<String>> paramMap) {
+    public void runJBMC(String functionName, Map<String, List<String>> paramMap) {
         try {
             debug("Running jbmc for function: " + functionName);
-            //commands = new String[] {"jbmc", tmpFile.getAbsolutePath().replace(".java", ".class")};
-            String classFile = tmpFile.getFileName().toString().replace(".java", "");
+            String classFile = options.getTmpFile().getFileName().toString().replace(".java", "");
             classFile = classFile.substring(classFile.lastIndexOf(File.separator + "tmp") + 5);
             //classFile = "." + classFile;
 
@@ -255,7 +327,7 @@ public class Operations implements Callable<Integer> {
             tmp.add("--function");
             tmp.add(functionName);
             tmp.add("--unwind");
-            tmp.add(String.valueOf(options.unwinds));
+            tmp.add(String.valueOf(options.getUnwinds()));
             tmp.add("--max-nondet-array-length");
             tmp.add(String.valueOf(options.getMaxArraySize()));
 
@@ -343,57 +415,8 @@ public class Operations implements Callable<Integer> {
         }
     }
 
-    public void printOutput(@Nullable JBMCOutput output, long time, String functionName) {
-        if (output == null) {
-            options.keepTranslation = true;
-            error("Error parsing xml-output of JBMC.");
-            return;
-        }
-        if (options.doSanityCheck) {
-            if (output.printStatus().contains("SUCC")) {
-                warn("Sanity check failed for: " + functionName);
-            } else {
-                info("Sanity check ok for function: " + functionName);
-            }
-            return;
-        }
-        info("Result for function " + functionName + ":");
-        if (options.timed) {
-            info("JBMC took " + time + "ms.");
-        }
-
-
-        if (output.getErrors().isEmpty()) {
-            if (options.runWithTrace) {
-                String traces = output.printAllTraces();
-                if (!traces.isEmpty()) {
-                    info(traces);
-                }
-            }
-            //Arrays.stream(traces.split("\n")).forEach(s -> log.info(s));
-            String status = output.printStatus();
-            if (status.contains("SUCC")) {
-                info(GREEN_BOLD + status + RESET);
-            } else {
-                info(RED_BOLD + status + RESET);
-            }
-        } else {
-            options.keepTranslation = true;
-            error(output.printErrors());
-        }
-    }
-
-    private static void createCProverFolder(Path fileName) throws IOException {
-        var dir = fileName.resolve("org/cprover");
-        debug("Copying CProver.java to {}", dir.toAbsolutePath());
-        Files.createDirectories(dir);
-        try (InputStream is = JJBMCOptions.class.getResourceAsStream("/cli/CProver.java")) {
-            Files.copy(Objects.requireNonNull(is), dir.resolve("CProver.java"));
-        }
-    }
-
     public void cleanUp() throws IOException {
-        if (!options.isDidCleanUp() && !options.keepTranslation) {
+        if (!didCleanUp && !options.keepTranslation) {
             deleteFolder(options.getTmpFolder(), false);
             if (!options.keepTranslation) {
                 try {
@@ -403,7 +426,7 @@ public class Operations implements Callable<Integer> {
                 }
             }
         }
-        options.setDidCleanUp(true);
+        didCleanUp = true;
     }
 
     public static void deleteFolder(Path folder, boolean all) throws IOException {
@@ -473,10 +496,10 @@ public class Operations implements Callable<Integer> {
         }
 
         var f = options.getFileName();
-        translateAndRunJBMC(f);
+        translateAndRunJBMC();
         if (options.doSanityCheck) {
             options.doSanityCheck = false;
-            translateAndRunJBMC(f);
+            translateAndRunJBMC();
         }
         return 0;
     }

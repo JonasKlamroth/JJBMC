@@ -3,9 +3,13 @@ package jjbmc;
 import lombok.Data;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
+import static jjbmc.ErrorLogger.info;
 import static picocli.CommandLine.*;
 
 
@@ -49,10 +53,9 @@ public class JJBMCOptions {
             arity = "0..1")
     public int timeout = 10000;
 
-    @Option(names = {"-u", "-unwind"},
-            description = "Number of times loops are unwound. (default 5)",
-            arity = "0..1")
-    public int unwinds = -1;
+    @Parameters(index = "1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
+    @Nullable
+    public String functionName = null;
 
     @Option(names = {"-tr", "-trace"},
             description = "Prints out traces for failing pvcs.")
@@ -91,9 +94,10 @@ public class JJBMCOptions {
 
     @Parameters(index = "0", arity = "1", description = "The file containing methods to be verified.")
     private Path fileName;
-
-    @Parameters(index = "1", arity = "0..1", description = "The method to be verified. If not provided -va is automatically added.")
-    @Nullable public String functionName = null;
+    @Option(names = {"-u", "-unwind"},
+            description = "Number of times loops are unwound. (default 5)",
+            arity = "0..1")
+    private int unwinds = -1;
 
     @Option(names = {"-j", "-jbmcOptions"}, description = "Options to be passed to jbmc.")
     private List<String> jbmcOptions = new ArrayList<>();
@@ -113,12 +117,9 @@ public class JJBMCOptions {
     @Option(names = {"-pp", "-proofPreconditions"}, description = "Adds additional assertions proving the preconditions " +
             "of called methods while still inlining them. (implies -fim option)")
     public boolean proofPreconditions = false;
+    private @Nullable Path tmpFolder;
+    private @Nullable Path tmpFile;
 
-    @Nullable private Path tmpFolder;
-    @Nullable private Path tmpFile;
-    @Nullable private Process jbmcProcess = null;
-
-    private boolean didCleanUp = false;
     private final boolean isWindows = System.getProperty("os.name")
             .toLowerCase().startsWith("windows");
     private Map<String, String> expressionMap = new HashMap<>();
@@ -142,4 +143,48 @@ public class JJBMCOptions {
         relevantVars = new ArrayList<>();
     }
 
+    public Path getTmpFile() {
+        if (tmpFile == null) {
+            var p = getTmpFolder().resolve(fileName.getFileName());
+            setTmpFile(p);
+            return p;
+        }
+        return tmpFile;
+    }
+
+    public Path getTmpFolder() {
+        if (tmpFolder == null) {
+            var p = fileName.resolveSibling("tmp");
+            setTmpFolder(p);
+            return p;
+        }
+        return tmpFolder;
+    }
+
+    public int getUnwinds() {
+        if (unwinds < 0) {
+            info("No unwind argument found. Default to 7.");
+            unwinds = 7;
+        }
+        return unwinds;
+    }
+
+
+    public int getMaxArraySize() {
+        if (maxArraySize < 0) {
+            info("No maxArraySize argument found. Default to " + (unwinds - 2) + ".");
+            setMaxArraySize(Math.max(unwinds - 2, 0));
+        }
+        return maxArraySize;
+    }
+
+    public Path getJavacBinary() {
+        return Arrays.stream(System.getenv("PATH").split(File.pathSeparator))
+                .map(it -> Paths.get(it, javacBin))
+                //.peek(System.out::println)
+                .filter(Files::exists)
+                .findFirst()
+                .map(Path::toAbsolutePath)
+                .orElseThrow();
+    }
 }

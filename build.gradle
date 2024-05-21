@@ -28,7 +28,7 @@ dependencies {
     implementation("org.jspecify:jspecify:0.3.0")
     implementation "info.picocli:picocli:4.7.3"
 
-    implementation 'io.github.jmltoolkit:jmlparser-symbol-solver-core:3.25.10-b3-SNAPSHOT'
+    implementation 'io.github.jmltoolkit:jmlparser-symbol-solver-core:3.25.10-b5-SNAPSHOT'
 
     compileOnly 'org.projectlombok:lombok:1.18.32'
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
@@ -43,14 +43,13 @@ tasks.withType(JavaCompile).configureEach {
     options.deprecation = true
 }
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
 
 
 application {
-    mainClass = "cli.Main"
+    mainClass = "jjbmc.Main"
 }
 
 checkstyle {
@@ -73,11 +72,11 @@ tasks.register('harshCheckstyle', Checkstyle) {
 
 tasks.register('caseStudies', JavaExec) {
     classpath sourceSets.test.runtimeClasspath
-    mainClass = "casestudy.CaseStudies"
+    mainClass = "jjbmc.CaseStudies"
 }
 
 tasks.register('runTmpTest', JavaExec) {
-    mainClass = "cli.Main"
+    mainClass = "jjbmc.Main"
     classpath = sourceSets.main.runtimeClasspath
     args = ["./testRes/CaseStudyCandidates/TmpTest.java", "-kt", "-d", "-tr"]
 }

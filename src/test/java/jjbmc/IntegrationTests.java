@@ -1,9 +1,9 @@
 package jjbmc;
 
+import jjbmc.utils.Utils;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestFactory;
-import jjbmc.utils.Utils;
 
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -42,7 +42,7 @@ public class IntegrationTests {
     }
 
     private static Stream<DynamicTest> getTestStream(String filename, Consumer<JJBMCOptions> configure) throws Exception {
-        return Utils.prepareParameters(Utils.SRC_TEST_JAVA.resolve("tests").resolve(filename))
+        return Utils.prepareParameters(Utils.SRC_TEST_RESOURCES.resolve("tests").resolve(filename))
                 .map(it -> {
                     JJBMCOptions o = it.op().getOptions();
                     String displayName = o.getFileName().getFileName() + "::" + o.functionName;

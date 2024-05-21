@@ -12,20 +12,22 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuilder;
+import lombok.Getter;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jjbmc.ErrorLogger.*;
+import static jjbmc.ErrorLogger.warn;
 
+@Getter
 public class FunctionNameVisitor {
     private final List<String> unwinds = new ArrayList<>();
     private final List<String> functionNames = new ArrayList<>();
-    private boolean getAll = false;
+    private final boolean getAll;
     private final HashMap<String, List<String>> paramMap = new HashMap<>();
     private final List<TestBehaviour> functionBehaviours = new LinkedList<>();
 
@@ -38,13 +40,13 @@ public class FunctionNameVisitor {
         }
     }
 
-    public static FunctionNameVisitor parseFile(String fileName, boolean getAll) {
+    public static FunctionNameVisitor parseFile(Path fileName, boolean getAll) {
         try {
             var config = new ParserConfiguration();
             config.setProcessJml(true);
             TypeSolver typeSolver = new TypeSolverBuilder().withCurrentJRE().build();
             config.setSymbolResolver(new JavaSymbolSolver(typeSolver));
-            var cu = new JavaParser(config).parse(Paths.get(fileName));
+            var cu = new JavaParser(config).parse(fileName);
             if (!cu.isSuccessful()) {
                 cu.getProblems().forEach(System.out::println);
                 throw new RuntimeException();

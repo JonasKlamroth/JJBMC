@@ -1,23 +1,22 @@
 package jjbmc.trace;
 
+import jjbmc.ErrorLogger;
 import jjbmc.JBMCOutput;
 import jjbmc.JJBMCOptions;
 import jjbmc.Operations;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -27,30 +26,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Execution(ExecutionMode.SAME_THREAD)
 public class TraceTests {
+    @BeforeAll
+    public static void run() {
+        ErrorLogger.setDebugOn();
+    }
+
     public static Stream<Arguments> getParameters() {
         return Stream.of(
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut.txt",
+                        "TmpTestOut.txt",
                         List.of("k", "tt", "table"),
                         "test"),
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut2.txt",
+                        "TmpTestOut2.txt",
                         List.of(),
                         "test2"),
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut3.txt",
+                        "TmpTestOut3.txt",
                         List.of("iotable"),
                         "test3"),
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut4.txt",
+                        "TmpTestOut4.txt",
                         List.of(),
                         "test4"),
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut5.txt",
+                        "TmpTestOut5.txt",
                         List.of(),
                         "test5"),
                 Arguments.of("src/test/resources/traceTest/TraceTestCases.java",
-                        "src/test/resources/traceTest/TmpTestOut6.txt",
+                        "TmpTestOut6.txt",
                         List.of(),
                         "test6"));
     }
@@ -65,12 +69,13 @@ public class TraceTests {
         options.keepTranslation = true;
         options.functionName = functionName;
         options.getRelevantVars().addAll(relevantVars);
-        options.setTmpFile(Paths.get("tmp"));
+        options.setTmpFolder(Paths.get("tmp").resolve("TraceTests").resolve(functionName).toAbsolutePath());
+        options.setFileName(inputFile);
 
         Operations operations = new Operations(options);
-        operations.translateAndRunJBMC(inputFile);
+        operations.translateAndRunJBMC();
 
-        var f = inputFile.getParent().resolve("tmp/xmlout.xml").toFile();
+        var f = options.getTmpFile().resolve("xmlout.xml").toFile();
         assertTrue(f.exists());
         JBMCOutput output = TraceParser.parse(f, true);
         String traces = output.printAllTraces();

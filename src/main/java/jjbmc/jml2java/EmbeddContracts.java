@@ -233,7 +233,8 @@ public class EmbeddContracts extends ModifierVisitor<@Nullable Object> {
             if (decreases.size() > 1) {
                 throw new IllegalStateException("Too many decreases clauses");
             }
-            var res = handleLoop(loopInvar, assignables, decreases.get(0), n.getCompare().orElse(new BooleanLiteralExpr(true)), body, n.getInitialization(), n);
+            var res = handleLoop(loopInvar, assignables, decreases.get(0),
+                    n.getCompare().orElse(new BooleanLiteralExpr(true)), body, n.getInitialization(), n);
             res.setParentNode(n);
             return res;
         }
