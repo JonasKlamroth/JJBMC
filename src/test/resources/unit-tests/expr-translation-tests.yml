@@ -1,0 +1,90 @@
+- input: x
+  expected: |
+    {
+    }
+    x
+
+- input: (\forall int i; 0 <= i && i < arr.length; arr[i])
+  expected: |
+    {
+      int i = CProver.nondetInt();
+      if ((0 <= i && i < arr.length)) {
+      }
+    }
+    !(0 <= i && i < arr.length) || (arr[i])
+
+- input: (\forall int i; 0 <= i && i < arr.length; arr[i])
+  expected: |
+    boolean b0 = true; 
+    { 
+      for (int i1 = 0; i1 < arr.length; ++i1) { 
+        b0 = (b0 && arr[i1]); 
+      } 
+    } 
+    b0
+  mode: ASSUME
+
+- input: (\forall int i; 0 <= i && i < arr.length; f(i*2) == i)
+  expected: |
+    boolean b0 = true; 
+    { 
+      for (int i1 = 0; i1 < arr.length; ++i1) { 
+        b0 = (b0 && f(i1 * 2) == i1); 
+      } 
+    } 
+    b0
+  mode: ASSUME
+
+- input: (\exists int i; 0 <= i && i < arr.length; arr[i])
+  expected: |
+    boolean b0 = false; 
+    { 
+      for (int i1 = 0; i1 < arr.length; ++i1) { 
+        b0 = (b0 || arr[i1]); } 
+    } 
+    b0
+
+- input: (\let int myvar = 2; myvar)
+  expected: |
+    { 
+      int _gen_1;
+      { 
+        int myvar = 2; 
+        _gen_1 = myvar; 
+      }        
+    } 
+    _gen_1
+
+- input: true && false
+  expected: |
+    {
+    }
+    true && false
+
+- input: f() && true
+  expected: |
+    {
+    }
+    f() && true
+
+- input: "22"
+  expected: |
+    {
+    }
+    22
+
+- input: "22.25"
+  expected: "{ } 22.25"
+
+- input: "true"
+  expected: |
+    {
+    }
+    true
+
+- input: "'c'"
+  expected: "{ } 'c'"
+
+- input: "\"c\""
+  expected: "{ } \"c\""
+
