@@ -7,7 +7,7 @@
 - input: (\forall int i; 0 <= i && i < arr.length; arr[i])
   expected: |
     {
-      int i = nondet_int();
+      int i = CProver.nondetInt();
       if ((0 <= i && i < arr.length)) {
       }
     }
@@ -15,10 +15,10 @@
 
 - input: (\forall int i; 0 <= i && i < arr.length; arr[i])
   expected: |
+    boolean b0 = true; 
     { 
-      boolean b0 = true; 
       for (int i1 = 0; i1 < arr.length; ++i1) { 
-        b0 = (b0 && arr[i]); 
+        b0 = (b0 && arr[i1]); 
       } 
     } 
     b0
@@ -26,10 +26,10 @@
 
 - input: (\forall int i; 0 <= i && i < arr.length; f(i*2) == i)
   expected: |
+    boolean b0 = true; 
     { 
-      boolean b0 = true; 
       for (int i1 = 0; i1 < arr.length; ++i1) { 
-        b0 = (b0 && f(i * 2) == i); 
+        b0 = (b0 && f(i1 * 2) == i1); 
       } 
     } 
     b0
@@ -37,10 +37,10 @@
 
 - input: (\exists int i; 0 <= i && i < arr.length; arr[i])
   expected: |
+    boolean b0 = false; 
     { 
-      boolean b0 = false; 
       for (int i1 = 0; i1 < arr.length; ++i1) { 
-        b0 = (b0 || arr[i]); } 
+        b0 = (b0 || arr[i1]); } 
     } 
     b0
 

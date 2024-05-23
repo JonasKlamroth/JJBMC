@@ -10,7 +10,6 @@ import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.TypeSolverBuilder;
 import com.github.javaparser.utils.SourceRoot;
 import com.google.common.truth.Truth;
-import jjbmc.JBMCOutput;
 import jjbmc.JJBMCOptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +17,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,11 +24,12 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Jml2JavaExpressionTranslatorTest {
     private static final Path base = Paths.get("src", "test", "resources", "unit-tests");
-
     private static final Path source = base.resolve("input").toAbsolutePath();
     private static final Path expectedSources = base.resolve("expected").toAbsolutePath();
     private static final Path actualSources = base.resolve("actual").toAbsolutePath();
@@ -109,8 +108,9 @@ class Jml2JavaExpressionTranslatorTest {
     void testTranslation(String expr, String expected, TranslationMode mode) {
         var e = StaticJavaParser.parseJmlExpression(expr);
         parent.addAndGetStatement(e);
+        Jml2JavaExpressionTranslator.counter.set(0);
         var r = Jml2JavaFacade.translate(e, mode);
-        var actual = new BlockStmt(r.statements) + "\n" + r.value;
+        var actual = r.necessaryVars.stream().map(Objects::toString).collect(Collectors.joining("\n")) + "\n" + new BlockStmt(r.statements) + "\n" + r.value;
         Truth.assertThat(actual.replaceAll("\\s+", " ").trim())
                 .isEqualTo(expected.replaceAll("\\s+", " ").trim());
     }

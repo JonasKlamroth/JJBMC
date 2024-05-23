@@ -6,7 +6,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.TypeSolver;
@@ -35,8 +35,8 @@ public class FunctionNameVisitor {
         this.getAll = getAll;
         if (cu.getPrimaryType().isPresent()) {
             cu.getPrimaryType().get().getMembers().stream()
-                    .filter(BodyDeclaration::isMethodDeclaration)
-                    .forEach(it -> this.visit(it.asMethodDeclaration()));
+                    .filter(BodyDeclaration::isCallableDeclaration)
+                    .forEach(it -> this.visit(it.asCallableDeclaration()));
         }
     }
 
@@ -63,18 +63,19 @@ public class FunctionNameVisitor {
         Ignored
     }
 
-    public void visit(MethodDeclaration that) {
-        var rm = that.resolve();
+    public void visit(CallableDeclaration<?> that) {
+        //var rm = that.resolve();
         //not interested in methods of inner classes
         if (that.getName().toString().contains("$")) {
             return;
         }
-        String f = rm.getQualifiedName();
-        String rtString = typeToString(that.getType());
+        //String f = rm.getQualifiedName();
+        var f = that.getNameAsString();
+        //String rtString = typeToString(that.getType());
         String paramString =
                 that.getDeclarationAsString(false, false, false);
-        if (f.endsWith("Verf") || f.endsWith("<init>") || getAll) {
-            functionNames.add(f + ":" + paramString + rtString);
+        if (f.endsWith("Verification") || f.endsWith("<init>") || getAll) {
+            functionNames.add(paramString);
         }
         for (var p : that.getParameters()) {
             String name = f;
@@ -122,47 +123,6 @@ public class FunctionNameVisitor {
     }
 
     private String typeToString(Type type) {
-        return type.resolve().toDescriptor();
-        /*if (type instanceof JCTree.JCPrimitiveTypeTree) {
-            if (type.toString().equals("void")) {
-                return "V";
-            }
-            if (type.toString().equals("int")) {
-                return "I";
-            }
-            if (type.toString().equals("float")) {
-                return "F";
-            }
-            if (type.toString().equals("double")) {
-                return "D";
-            }
-            if (type.toString().equals("char")) {
-                return "C";
-            }
-            if (type.toString().equals("long")) {
-                return "J";
-            }
-            if (type.toString().equals("boolean")) {
-                return "Z";
-            }
-            if (type.toString().equals("byte")) {
-                return "B";
-            }
-            if (type.toString().equals("short")) {
-                return "S";
-            }
-            throw new UnsupportedException("Unkown type " + type + ". Cannot call JBMC.");
-        } else if (type instanceof JCTree.JCArrayTypeTree) {
-            return "[" + typeToString(((JCTree.JCArrayTypeTree) type).elemtype);
-        } else if (type != null) {
-            if (type instanceof JCTree.JCIdent) {
-                return "L" + ((JCTree.JCIdent) type).sym.flatName().toString().replace(".", "/") + ";";
-            } else if (type instanceof JCTree.JCFieldAccess) {
-                return "L" + ((JCTree.JCFieldAccess) type).sym.toString().replace(".", "/") + ";";
-            } else {
-                throw new UnsupportedException("Unkown type " + type + ". Cannot call JBMC.");
-            }
-        }
-        return "V";*/
+        return type.toDescriptor();
     }
 }

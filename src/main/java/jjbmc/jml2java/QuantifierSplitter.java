@@ -54,17 +54,21 @@ public class QuantifierSplitter {
         }
 
         if(e.getOperator().equals(BinaryExpr.Operator.LESS) && e.getLeft().equals(variable)) {
-            return new BinaryExpr(e.getRight(), new IntegerLiteralExpr("1"), BinaryExpr.Operator.PLUS);
-        }
-        if(e.getOperator().equals(BinaryExpr.Operator.LESS_EQUALS) && e.getLeft().equals(variable)) {
             return e.getRight();
         }
+
+        if (e.getOperator().equals(BinaryExpr.Operator.LESS_EQUALS) && e.getLeft().equals(variable)) {
+            return new BinaryExpr(e.getRight(), new IntegerLiteralExpr("1"), BinaryExpr.Operator.PLUS);
+        }
+
         if(e.getOperator().equals(BinaryExpr.Operator.GREATER) && e.getRight().equals(variable)) {
             return new BinaryExpr(e.getLeft(), new IntegerLiteralExpr("1"), BinaryExpr.Operator.PLUS);
         }
+
         if(e.getOperator().equals(BinaryExpr.Operator.GREATER_EQUALS) && e.getRight().equals(variable)) {
             return e.getLeft();
         }
+
         return null;
     }
 

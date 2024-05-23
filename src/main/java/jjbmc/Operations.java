@@ -233,8 +233,8 @@ public class Operations implements Callable<Integer> {
         List<String> allFunctionNames = new ArrayList<>(functionNames);
 
         if (options.functionName != null) {
-            if (!options.functionName.endsWith("Verf")) {
-                options.functionName = options.functionName + "Verf";
+            if (!options.functionName.endsWith("Verification")) {
+                options.functionName = options.functionName + "Verification";
             }
             functionNames = functionNames.stream().filter(f -> f.contains("." + options.functionName + ":")).toList();
             if (functionNames.isEmpty()) {

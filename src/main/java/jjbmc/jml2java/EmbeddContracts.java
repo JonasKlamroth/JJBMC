@@ -230,7 +230,7 @@ public class EmbeddContracts extends ModifierVisitor<@Nullable Object> {
             var decreases = gather(contract, JmlClauseKind.DECREASES);
 
 
-            if (decreases.size() > 1) {
+            if (decreases.size() != 1) {
                 throw new IllegalStateException("Too many decreases clauses");
             }
             var res = handleLoop(loopInvar, assignables, decreases.get(0),

@@ -179,12 +179,20 @@ public class JJBMCOptions {
     }
 
     public Path getJavacBinary() {
+        return Objects.requireNonNull(getPath(javacBin), "Could not find javac on $PATH");
+    }
+
+    private @Nullable Path getPath(String fileName) {
         return Arrays.stream(System.getenv("PATH").split(File.pathSeparator))
-                .map(it -> Paths.get(it, javacBin))
+                .map(it -> Paths.get(it, fileName))
                 //.peek(System.out::println)
                 .filter(Files::exists)
                 .findFirst()
                 .map(Path::toAbsolutePath)
-                .orElseThrow();
+                .orElse(null);
+    }
+
+    public Path getJbmcBinary() {
+        return Objects.requireNonNull(getPath(jbmcBin), "Could not find jbmc on $PATH");
     }
 }

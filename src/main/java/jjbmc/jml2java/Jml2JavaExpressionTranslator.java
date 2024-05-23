@@ -1,6 +1,7 @@
 package jjbmc.jml2java;
 
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -10,8 +11,13 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.Visitable;
 import jjbmc.jml2java.Jml2JavaFacade.Result;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static jjbmc.jml2java.Jml2JavaFacade.resolvedType2Type;
@@ -65,12 +71,24 @@ public class Jml2JavaExpressionTranslator {
 
     }
 
+    private static <T extends Node> T rename(T forBody, Map<String, String> replaceStack) {
+        return (T) forBody.accept(new ModifierVisitor<@Nullable Void>() {
+            @Override
+            public Visitable visit(NameExpr n, Void arg) {
+                if (replaceStack.containsKey(n.getNameAsString())) {
+                    return new NameExpr(replaceStack.get(n.getNameAsString()));
+                }
+                return n;
+            }
+        }, null);
+    }
+
     private final class Jml2JavaVisitor extends GenericVisitorAdapter<Result, TranslationMode> {
         QuantifierSplitter quantifierSplitter = new QuantifierSplitter();
+        private final Map<String, String> replaceStack = new TreeMap<>();
 
         @Override
         public Result visit(ConditionalExpr n, TranslationMode arg) {
-
             return super.visit(n, arg);
         }
 
@@ -91,11 +109,14 @@ public class Jml2JavaExpressionTranslator {
             final var b = new BlockStmt();
             b.setParentNode(n.getParentNodeForChildren());
             final var boolVar = "b" + counter.getAndIncrement();
-            //final var loopVar = "i" + counter.getAndIncrement();
-            final var loopVar = n.getVariables().get(0).getNameAsString();
+            final var loopVar = "i" + counter.getAndIncrement();
+            //final var loopVar = n.getVariables().get(0).getNameAsString();
 
-            var lowerBoundRes = quantifierSplitter.getLowerBound(n).accept(this, arg);
-            var upperBoundRes = quantifierSplitter.getUpperBound(n).accept(this, arg);
+            final var boundedVar = n.getVariables().get(0).getNameAsString();
+            replaceStack.put(boundedVar, loopVar);
+
+            var lowerBoundRes = QuantifierSplitter.getLowerBound(n).accept(this, arg);
+            var upperBoundRes = QuantifierSplitter.getUpperBound(n).accept(this, arg);
             var lowerBound = lowerBoundRes.value;
             var upperBound = upperBoundRes.value;
             b.getStatements().addAll(lowerBoundRes.getStatements());
@@ -131,11 +152,12 @@ public class Jml2JavaExpressionTranslator {
                                     new BinaryExpr(new NameExpr(boolVar), res.value, BinaryExpr.Operator.AND)),
                             AssignExpr.Operator.ASSIGN));
 
+            forBody = rename(forBody, replaceStack);
+            replaceStack.remove(boundedVar);
 
             b.addStatement(new ForStmt(new NodeList<>(init), compare, new NodeList<>(update), forBody));
             return new Result(b.getStatements(), new NameExpr(boolVar), varDefs);
         }
-
 
         /**
          * Translate a universal quantification into a for loop over the range
@@ -146,8 +168,8 @@ public class Jml2JavaExpressionTranslator {
             final var boolVar = "b" + counter.getAndIncrement();
             final var loopVar = "i" + counter.getAndIncrement();
 
-            var lowerBound = quantifierSplitter.getLowerBound(n);
-            var upperBound = quantifierSplitter.getUpperBound(n);
+            var lowerBound = QuantifierSplitter.getLowerBound(n);
+            var upperBound = QuantifierSplitter.getUpperBound(n);
 
 
             // add: boolean bN = false
@@ -190,7 +212,7 @@ public class Jml2JavaExpressionTranslator {
 
         private Result visitForall(JmlQuantifiedExpr n, TranslationMode arg) {
             n = n.clone();
-            var para = quantifierSplitter.getVariable(n);
+            var para = QuantifierSplitter.getVariable(n);
             var s = assignNondet(para);
             var newExpr = new BinaryExpr(
                     new EnclosedExpr(n.getExpressions().get(0)),
@@ -207,7 +229,7 @@ public class Jml2JavaExpressionTranslator {
         }
 
         private Result visitExists(JmlQuantifiedExpr n, TranslationMode arg) {
-            var para = quantifierSplitter.getVariable(n);
+            var para = QuantifierSplitter.getVariable(n);
             //var lowerBoundO = quantifierSplitter.getLowerBound(n);
             //var upperBoundO= quantifierSplitter.getUpperBound(n);
             var s = assignNondet(para);
@@ -542,6 +564,4 @@ public class Jml2JavaExpressionTranslator {
             throw new IllegalStateException("not allowed");
         }
     }
-
-
 }

@@ -10,9 +10,9 @@ import com.google.common.collect.ImmutableList;
 import jjbmc.FunctionNameVisitor.TestBehaviour;
 import jjbmc.JJBMCOptions;
 import jjbmc.Operations;
+import org.junit.jupiter.api.Assumptions;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -118,7 +117,7 @@ public class Utils {
 
         if (topts.behaviour() == TestBehaviour.Ignored) {
             warn("Function: %s ignored due to missing annotation.", function);
-            return;
+            Assumptions.abort();
         }
 
         info("Running test for function: %s", function);
@@ -134,7 +133,7 @@ public class Utils {
             commandList.add("/c");
         }
 
-        commandList.add("jbmc");
+        commandList.add(opts.getJbmcBinary().toString());
         commandList.add(classFile.toAbsolutePath().toString());
         commandList.add("--function");
         commandList.add(function);
@@ -144,18 +143,13 @@ public class Utils {
             commandList.add(String.valueOf(unwind));
         }
 
-        String[] commands = new String[commandList.size()];
-        commands = commandList.toArray(commands);
+        info("Run jbmc with commands: %s", commandList);
 
-        info("Run jbmc with commands: " + Arrays.toString(commands));
+        var parentDir = opts.getTmpFolder();
 
-        Runtime rt = Runtime.getRuntime();
-        File parentDir = new File("." + File.separator + "testRes" + File.separator + "tests" + File.separator + "tmp");
-        if (!Files.exists(new File(parentDir, classFile + ".class").toPath())) {
-            System.out.println("Classfile not found: " + new File(parentDir, classFile + ".class").toPath());
-        }
-        System.out.println(parentDir);
-        Process proc = new ProcessBuilder(commandList).directory(parentDir).start();
+        Process proc = new ProcessBuilder(commandList)
+                .directory(parentDir.toFile())
+                .start();
 
 
         BufferedReader stdInput = new BufferedReader(new
@@ -163,33 +157,26 @@ public class Utils {
 
         BufferedReader stdError = new BufferedReader(new
                 InputStreamReader(proc.getErrorStream()));
-
-        String s = stdInput.readLine();
-        String error = stdError.readLine();
-        StringBuilder out = new StringBuilder();
-        StringBuilder errOut = new StringBuilder();
-        out.append("JBMC Output for file: ").append(classFile).append(" with function ").append(function).append("\n");
-        while (s != null) {
-            if (!filterOutput || (s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))) {
-                out.append(s).append("\n");
-            }
-            s = stdInput.readLine();
-        }
-        while (error != null) {
-            errOut.append(error).append("\n");
-            error = stdError.readLine();
-        }
-
         proc.waitFor();
-        if (!filterOutput) {
+
+        var out = stdInput.lines().toList();
+        var errors = stdError.lines().toList();
+
+        System.out.format("JBMC Output for file: %s with function %s%n", classFile, function);
+        out.stream()
+                .filter(s -> !filterOutput || s.contains("**") || s.contains("FAILURE") || s.contains("VERIFICATION"))
+                .forEach(System.out::println);
+        errors.forEach(System.out::println);
+
+        /*
+                if (!filterOutput) {
             info(out);
             info(errOut);
-        }
+        }*/
+
         TestBehaviour behaviour = topts.behaviour();
-
-        assertFalse(out.toString().contains("FAILURE") && behaviour == TestBehaviour.Verifyable);
-        assertFalse(out.toString().contains("SUCCESSFUL") && behaviour == TestBehaviour.Fails);
-        assertTrue(out.toString().contains("VERIFICATION"));
-
+        assertFalse(out.contains("FAILURE") && behaviour == TestBehaviour.Verifyable);
+        assertFalse(out.contains("SUCCESSFUL") && behaviour == TestBehaviour.Fails);
+        assertTrue(out.contains("VERIFICATION"));
     }
 }
