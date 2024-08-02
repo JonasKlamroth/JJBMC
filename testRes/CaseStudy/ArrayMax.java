@@ -45,4 +45,18 @@ public class ArrayMax {
 	return max;
     }
 
+	//This was a challenge for VerifyThis in 2011
+	/*@ requires a != null && a.length >= 1;
+      @ ensures (\forall int j; j >= 0 && j < a.length;
+      @                         a[\result] >= a[j]);
+	  @*/
+	public static int max2(int[] a) {
+		int x = 0;
+		int y = a.length-1;
+		while (x != y) {
+			if (a[x] <= a[y]) x++;
+			else y--;
+		}
+		return x;
+	}
 }
