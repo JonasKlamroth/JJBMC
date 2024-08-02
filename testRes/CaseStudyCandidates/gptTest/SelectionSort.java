@@ -35,8 +35,8 @@ public class SelectionSort {
 
     /*@  normal_behavior
         requires 0 <= start && start < a.length;
-        ensures (\forall int i; start <= i && i < a.length; a[\result] <= a[i]);
         ensures start <= \result && \result < a.length;
+        ensures (\forall int i; start <= i && i < a.length; a[\result] <= a[i]);
         assignable \nothing;
     */
     public int min(int[] a, int start) {

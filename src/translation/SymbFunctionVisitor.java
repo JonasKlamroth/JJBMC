@@ -69,7 +69,8 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
     private Symbol returnVar = null;
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
-    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<JCExpression, JCVariableDecl> quantifiedOldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private List<JCExpression> currentAssignable = List.nil();
     private Symbol currentSymbol = null;
@@ -108,10 +109,11 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor =
-            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVar, currentMethod);
+            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, quantifiedOldVars, returnVar, currentMethod);
         if (that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(ASSUME);
             translationMode = ASSUME;
+            JmlExpressionVisitor.usePrestateParameters = true;
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(VerifyFunctionVisitor.TranslationMode.ASSERT);
             translationMode = VerifyFunctionVisitor.TranslationMode.ASSERT;
@@ -123,8 +125,10 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         newStatements = expressionVisitor.getNewStatements();
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         oldVars = expressionVisitor.getOldVars();
+        quantifiedOldVars = expressionVisitor.getQuantifiedOldVars();
         oldInits = expressionVisitor.getOldInits();
         if (translationMode == ASSUME) {
+            JmlExpressionVisitor.usePrestateParameters = false;
             newStatements = newStatements.append(TranslationUtils.makeAssumeStatement(copy));
             combinedNewEnsStatements = combinedNewEnsStatements.appendList(newStatements);
         } else if (translationMode == VerifyFunctionVisitor.TranslationMode.ASSERT) {
@@ -225,6 +229,9 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
 
         List<JCStatement> bodyStats = List.nil();
         for (JCVariableDecl variableDecl : oldVars.values()) {
+            bodyStats = bodyStats.append(variableDecl);
+        }
+        for (JCVariableDecl variableDecl : quantifiedOldVars.values()) {
             bodyStats = bodyStats.append(variableDecl);
         }
 

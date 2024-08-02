@@ -14,7 +14,7 @@ public class Grover {
    */
 
   public static int grover2(/*@ non_null */
-      int[] database, int val) {
+          int[] database, int val) {
     if (val < 0 || val > 3) {
       return -1;
     }
@@ -22,10 +22,6 @@ public class Grover {
     final float[][] oracle2 = new float[][]{new float[]{val == database[0] ? 1.0F : -1.0F, 0.0F, 0.0F, 0.0F}, new float[]{0.0F, val == database[1] ? 1.0F : -1.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, val == database[2] ? 1.0F : -1.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F, val == database[3] ? 1.0F : -1.0F}};
     float[] q0 = new float[]{1.0F, 0.0F, 0.0F, 0.0F};
     float[] q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
-    q0 = new float[]{0.70710677F, 0.0F, 0.70710677F, 0.0F};
-    q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
-    q0 = new float[]{0.49999997F, 0.49999997F, 0.49999997F, 0.49999997F};
-    q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
     q0 = new float[]{0.49999997F * oracle2[0][0] + 0.49999997F * oracle2[0][1] + 0.49999997F * oracle2[0][2] + 0.49999997F * oracle2[0][3], 0.49999997F * oracle2[1][0] + 0.49999997F * oracle2[1][1] + 0.49999997F * oracle2[1][2] + 0.49999997F * oracle2[1][3], 0.49999997F * oracle2[2][0] + 0.49999997F * oracle2[2][1] + 0.49999997F * oracle2[2][2] + 0.49999997F * oracle2[2][3], 0.49999997F * oracle2[3][0] + 0.49999997F * oracle2[3][1] + 0.49999997F * oracle2[3][2] + 0.49999997F * oracle2[3][3]};
     q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
     q0 = new float[]{0.70710677F * q0[0] + 0.70710677F * q0[2], 0.70710677F * q0[1] + 0.70710677F * q0[3], 0.70710677F * q0[0] + -0.70710677F * q0[2], 0.70710677F * q0[1] + -0.70710677F * q0[3]};
@@ -75,18 +71,16 @@ public class Grover {
    */
 
   public static int grover2broken(/*@ non_null */
-      int[] database, int val) {
+          int[] database, int val) {
     if (val < 0 || val > 3) {
-      return -1;
+      {
+        return -1;
+      }
     }
     /*@ non_null */
     final float[][] oracle2 = new float[][]{new float[]{val == database[0] ? 1.0F : -1.0F, 0.0F, 0.0F, 0.0F}, new float[]{0.0F, val == database[1] ? 1.0F : -1.0F, 0.0F, 0.0F}, new float[]{0.0F, 0.0F, val == database[2] ? 1.0F : -1.0F, 0.0F}, new float[]{0.0F, 0.0F, 0.0F, val == database[3] ? 1.0F : -1.0F}};
     float[] q0 = new float[]{1.0F, 0.0F, 0.0F, 0.0F};
     float[] q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
-    q0 = new float[]{0.70710677F, 0.0F, 0.70710677F, 0.0F};
-    q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
-    q0 = new float[]{0.49999997F, 0.49999997F, 0.49999997F, 0.49999997F};
-    q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
     q0 = new float[]{0.49999997F * oracle2[0][0] + 0.49999997F * oracle2[0][1], 0.49999997F * oracle2[0][0] + 0.49999997F * oracle2[0][1], 0.49999997F * oracle2[1][0] + 0.49999997F * oracle2[1][1], 0.49999997F * oracle2[1][0] + 0.49999997F * oracle2[1][1]};
     q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F};
     q0 = new float[]{0.70710677F * q0[0] + 0.70710677F * q0[2], 0.70710677F * q0[1] + 0.70710677F * q0[3], 0.70710677F * q0[0] + -0.70710677F * q0[2], 0.70710677F * q0[1] + -0.70710677F * q0[3]};

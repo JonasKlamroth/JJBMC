@@ -71,7 +71,8 @@ public class VerifyFunctionVisitor extends FilterVisitor {
     private boolean hasReturn = false;
     private VerifyFunctionVisitor.TranslationMode translationMode = VerifyFunctionVisitor.TranslationMode.JAVA;
     //Has to perserve order (e.g. LinkedHashMap)
-    private LinkedHashMap<JCExpression, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<String, JCVariableDecl> oldVars = new LinkedHashMap<>();
+    private LinkedHashMap<JCExpression, JCVariableDecl> quantifiedOldVars = new LinkedHashMap<>();
     private List<JCStatement> oldInits = List.nil();
     private List<JCExpression> currentAssignable = null;
 
@@ -92,12 +93,13 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         TranslationUtils.setCurrentASTNode(that);
         //JmlMethodClauseExpr copy = (JmlMethodClauseExpr)super.visitJmlMethodClauseExpr(that, p);
         JmlExpressionVisitor expressionVisitor =
-            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, returnVarSym, currentMethod);
+            new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, quantifiedOldVars, returnVarSym, currentMethod);
 
         if (that.clauseKind.name().equals("ensures")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSERT);
             TranslationUtils.setCurrentEnsures(that);
             translationMode = TranslationMode.ASSERT;
+            JmlExpressionVisitor.usePrestateParameters = true;
         } else if (that.clauseKind.name().equals("requires")) {
             expressionVisitor.setTranslationMode(TranslationMode.ASSUME);
             translationMode = TranslationMode.ASSUME;
@@ -111,10 +113,12 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         JCExpression copy = expressionVisitor.copy(normalized);
         newStatements = expressionVisitor.getNewStatements();
         oldVars.putAll(expressionVisitor.getOldVars());
+        quantifiedOldVars.putAll(expressionVisitor.getQuantifiedOldVars());
         oldInits = oldInits.appendList(expressionVisitor.getOldInits());
         newStatements = newStatements.prependList(expressionVisitor.getNeededVariableDefs());
         newStatements = newStatements.append(TranslationUtils.makeAssumeOrAssertStatement(copy, translationMode));
         if (translationMode == TranslationMode.ASSERT) {
+            JmlExpressionVisitor.usePrestateParameters = false;
             JCBlock b = maker.Block(0L, newStatements);
             combinedNewEnsStatements = combinedNewEnsStatements.append(b);
         } else if (translationMode == TranslationMode.ASSUME) {
@@ -204,18 +208,21 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         }
 
         oldVars = new LinkedHashMap<>();
+        quantifiedOldVars = new LinkedHashMap<>();
         oldInits = List.nil();
         currentMethod = (JmlMethodDecl) visitJmlMethodDeclBugfix(that, p);
         currentMethod.sym = that.sym;
         List<JCStatement> invariantAssert = List.nil();
         List<JCStatement> oldInitsInv = List.nil();
-        LinkedHashMap<JCExpression, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
+        LinkedHashMap<String, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
+        LinkedHashMap<JCExpression, JCVariableDecl> quantifiedOldVarsInv = new LinkedHashMap<>();
         for (JCExpression expression : baseVisitor.getInvariants()) {
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
-                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVarSym, currentMethod);
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, quantifiedOldVars, this.returnVarSym, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVars.putAll(ev.getOldVars());
+            quantifiedOldVars.putAll(ev.getQuantifiedOldVars());
             oldInits = oldInits.appendList(ev.getOldInits());
             oldInitsInv = oldInitsInv.appendList(ev.getOldInits());
             invariantAssert = invariantAssert.prependList(ev.getNeededVariableDefs());
@@ -226,9 +233,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         for (JCExpression expression : baseVisitor.getInvariants()) {
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
-                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVarSym, currentMethod);
+                new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, quantifiedOldVars, this.returnVarSym, currentMethod);
             JCExpression invCopy = ev.copy(expression);
             oldVarsInv.putAll(ev.getOldVars());
+            quantifiedOldVarsInv.putAll(ev.getQuantifiedOldVars());
             oldInitsInv = oldInitsInv.appendList(ev.getOldInits());
             invariantAssume = invariantAssume.prependList(ev.getNeededVariableDefs());
             invariantAssume = invariantAssume.appendList(ev.getNewStatements());
@@ -243,6 +251,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             return null;
         }
         oldVars.putAll(oldVarsInv);
+        quantifiedOldVars.putAll(quantifiedOldVarsInv);
         oldInits = oldInits.appendList(oldInitsInv);
 
         JCVariableDecl catchVarb =
@@ -300,6 +309,13 @@ public class VerifyFunctionVisitor extends FilterVisitor {
 
         //adding the variable for old clauses
         for (JCVariableDecl variableDecl : oldVars.values()) {
+            l = l.append(variableDecl);
+        }
+        for (JCVariableDecl variableDecl : quantifiedOldVarsInv.values()) {
+            l = l.append(variableDecl);
+        }
+
+        for (JCVariableDecl variableDecl : quantifiedOldVars.values()) {
             l = l.append(variableDecl);
         }
 
@@ -363,7 +379,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         for (JCStatement st : bodyList) {
             if (!st.toString().equals("super();")) {
                 JmlExpressionVisitor ev =
-                    new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, this.returnVarSym, currentMethod);
+                    new JmlExpressionVisitor(context, maker, baseVisitor, translationMode, oldVars, quantifiedOldVars, this.returnVarSym, currentMethod);
                 ev.setCurrentAssignable(currentAssignable);
                 TranslationUtils.setCurrentASTNode(st);
                 JCStatement copy = ev.copy(st);

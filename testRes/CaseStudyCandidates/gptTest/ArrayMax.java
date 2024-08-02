@@ -1,62 +1,57 @@
-// This file is part of KeY - Integrated Deductive Software Design
-//
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
-// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
-//
-// The KeY system is protected by the GNU General
-// Public License. See LICENSE.TXT for details.
-//
-
-
-
 public class ArrayMax {
 
     /*@
-      @ requires a != null;
-      @ requires a.length < 5;
-      @ ensures (\forall int j; j >= 0 && j < a.length;
-      @                         \result >= a[j]);
-      @ ensures a.length > 0 ==>
-      @         (\exists int j; j >= 0 && j < a.length;
-      @                         \result == a[j]);
-      @*/
-    public int max(int[] a) {
-	if ( a.length == 0 ) return 0;
-	int max = a[0], i = 1;
-	/* @
-	  @ loop_invariant
-	  @ 	 a.length < 5 && 0 <= i &&
-	  @      i <= a.length
-	  @      &&
-	  @      (\forall int j; j >= 0 && j < i; max >= a[j])
-	  @      &&
-	  @      (\exists int j; j >= 0 && j < i; max == a[j]);
-	  @ loop_modifies \nothing;
-	  @ decreases a.length - i + 2;
-	  @*/
-	while ( i < a.length ) {
-	    if ( a[i] > max ) max = a[i];
-	    ++i;
-	}
-	return max;
-    }
 
-	//This was a challenge for VerifyThis in 2011
-	/*@ requires a != null && a.length >= 1;
-      @ ensures (\forall int j; j >= 0 && j < a.length;
-      @                         a[\result] >= a[j]);
-	  @*/
-	public static int max2(int[] a) {
-		int x = 0;
-		int y = a.length-1;
-		while (x != y) {
-			if (a[x] <= a[y]) x++;
-			else y--;
+        @ requires a != null;
+
+        @ requires a.length < 5;
+
+        @ ensures (\forall int j; j >= 0 && j < a.length; \result >= a[j]);
+
+        @ ensures a.length > 0 ==>
+
+        @    (\exists int j; j >= 0 && j < a.length; \result == a[j]);
+
+        @ assignable \nothing;
+
+    @*/
+
+	public int max(int[] a) {
+
+		if (a.length == 0) return 0;
+
+
+
+		int max = a[0], i = 1;
+
+
+
+        /*@
+
+            @ maintaining i >= 1 && i <= a.length;
+
+            @ maintaining (\forall int k; 0 <= k && k < i; max >= a[k]);
+
+            @ maintaining (\exists int j; 0 <= j && j < i; max == a[j]);
+
+            @ decreases a.length - i;
+
+            @ assignable \nothing;
+
+        @*/
+
+		while (i < a.length) {
+
+			if (a[i] > max) max = a[i];
+
+			++i;
+
 		}
-		return x;
+
+
+
+		return max;
+
 	}
+
 }
