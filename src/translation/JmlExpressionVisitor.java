@@ -1099,6 +1099,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
 
     public JCExpression editAssignable(JCArrayAccess e) {
         List<JmlStoreRefArrayRange> pot = List.from(currentAssignable.stream().filter(as -> as instanceof JmlStoreRefArrayRange)
+            .filter(as -> as.type.equals(e.type))
             .map(arr -> ((JmlStoreRefArrayRange) arr))
             .collect(Collectors.toList()));
         JCExpression expr = editAssignable(e.indexed);
@@ -1213,7 +1214,7 @@ public class JmlExpressionVisitor extends JmlTreeCopier {
             .collect(Collectors.toList()));
         List<JCIdent> pot1 = List.from(currentAssignable.stream().filter(as -> as instanceof JCIdent)
             .map(arr -> ((JCIdent) arr))
-            //.filter(i -> !i.type.isPrimitive())
+            .filter(i -> i.type.isPrimitive() == f.type.isPrimitive())
             .collect(Collectors.toList()));
 
         JCExpression expr = null;

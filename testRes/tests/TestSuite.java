@@ -15,6 +15,7 @@ public class TestSuite {
     TestSuite t2;
     TestSuite t3;
     int[] arr;
+    int[] indizes;
     TestSuite[] objects;
 
     //@ requires b1 == false;
@@ -79,6 +80,17 @@ public class TestSuite {
     @Verifyable
     public void quantTest() {
         //this is basically a lemma
+    }
+
+    //@ requires indizes != null && indizes.length > 0 && indizes[0] == 0;
+    //@ requires privInt == 0;
+    //@ assignable arr[*], privInt;
+    @Fails
+    private void test2DArray() {
+        //@ loop_invariant true;
+        while(true) {
+            this.arr[indizes[privInt]] = 100;
+        }
     }
 
     //@ ensures \result == 12;

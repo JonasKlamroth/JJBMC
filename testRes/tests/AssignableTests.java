@@ -27,6 +27,7 @@ public class AssignableTests {
     TestSuite t3;
     int[] arr;
     TestSuite[] objects;
+    public float[] ftable;
     Object o;
     A a;
     B b;
@@ -638,5 +639,10 @@ public class AssignableTests {
        for (int i = 0; i < 3; ++i) {
             privInt = i;
         }
+    }
+
+    //@ assignable arr[*], ftable[*];
+    void assignableTestArrayTypes() {
+        arr[0] = 5;
     }
 }
