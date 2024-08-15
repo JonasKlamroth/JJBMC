@@ -409,6 +409,10 @@ public class Trace {
     }
 
     public String guessVariable(String lhs) {
+        return guessVariable(lhs, false);
+    }
+
+    public String guessVariable(String lhs, boolean getAll) {
         if (lhs == null) {
             return null;
         }
@@ -430,12 +434,25 @@ public class Trace {
         if (object != null) {
             res = "";
             for (Map.Entry<String, String> k : reverseObjectMap.entrySet()) {
-                if (k.getValue().equals(object) && relevantVars.contains(k.getKey())) {
+                if (k.getValue().equals(object) &&
+                        (relevantVars.contains(k.getKey()) || relevantVars.stream().anyMatch(s -> k.getKey().endsWith("." + s))) || getAll) {
                     res += k.getKey() + " = ";
                 }
             }
             if (!res.isEmpty()) {
                 tmpRes = res.substring(0, res.length() - 3);
+                if(tmpRes.contains(".")) {
+                    String[] s = tmpRes.split("\\.");
+                    String r = applyObjectMap(s[0]);
+                    String oldR = null;
+                    while (!r.equals(oldR)) {
+                        oldR = r;
+                        r = applyObjectMap(r);
+                    }
+                    if(r != null) {
+                        tmpRes = r + "." + s[1];
+                    }
+                }
             } else {
                 return null;
             }
