@@ -203,6 +203,7 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         List<JCStatement> oldInitsInv = List.nil();
         LinkedHashMap<JCExpression, JCVariableDecl> oldVarsInv = new LinkedHashMap<>();
         for (JCExpression expression : baseVisitor.getInvariants()) {
+            TranslationUtils.setCurrentASTNode(expression);
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
                 new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSERT, oldVars, this.returnVarSym, currentMethod);
@@ -212,10 +213,11 @@ public class VerifyFunctionVisitor extends FilterVisitor {
             oldInitsInv = oldInitsInv.appendList(ev.getOldInits());
             invariantAssert = invariantAssert.prependList(ev.getNeededVariableDefs());
             invariantAssert = invariantAssert.appendList(ev.getNewStatements());
-            invariantAssert = invariantAssert.append(TranslationUtils.makeAssumeOrAssertStatement(invCopy, TranslationMode.ASSERT));
+            invariantAssert = invariantAssert.append(TranslationUtils.makeAssertStatement(invCopy, "invariant " + expression.toString()));
         }
         List<JCStatement> invariantAssume = List.nil();
         for (JCExpression expression : baseVisitor.getInvariants()) {
+            TranslationUtils.setCurrentASTNode(expression);
             expression = NormalizeVisitor.normalize(expression, context, maker);
             JmlExpressionVisitor ev =
                 new JmlExpressionVisitor(context, maker, baseVisitor, TranslationMode.ASSUME, oldVars, this.returnVarSym, currentMethod);

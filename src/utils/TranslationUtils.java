@@ -124,8 +124,8 @@ public class TranslationUtils {
                 JCBinary binary = (JCBinary) expr;
                 if (binary.opcode == Tag.AND) {
                     List<JCStatement> l = List.nil();
-                    l = l.appendList(makeAssertStatementList(binary.lhs));
-                    l = l.appendList(makeAssertStatementList(binary.rhs));
+                    l = l.appendList(makeAssertStatementList(binary.lhs, info));
+                    l = l.appendList(makeAssertStatementList(binary.rhs, info));
                     return l;
                 }
             }

@@ -79,7 +79,11 @@ public class CostumPrettyPrinter extends JmlPretty {
         if (tree.detail == null && assertMap.containsKey(tree) && assertMap.get(tree) != null) {
             TraceInformation.addAssert(currentLine, assertMap.get(tree).toString());
         } else {
-            TraceInformation.addAssert(currentLine, tree.toString());
+            if(tree.detail != null) {
+                TraceInformation.addAssert(currentLine, tree.detail.toString());
+            } else {
+                TraceInformation.addAssert(currentLine, tree.toString());
+            }
         }
         assertVars = new HashSet<>();
     }
