@@ -441,7 +441,7 @@ public class Trace {
             }
             if (!res.isEmpty()) {
                 tmpRes = res.substring(0, res.length() - 3);
-                if(tmpRes.contains(".")) {
+                if (tmpRes.contains(".")) {
                     String[] s = tmpRes.split("\\.");
                     String r = applyObjectMap(s[0]);
                     String oldR = null;
@@ -449,7 +449,7 @@ public class Trace {
                         oldR = r;
                         r = applyObjectMap(r);
                     }
-                    if(r != null) {
+                    if (r != null) {
                         tmpRes = r + "." + s[1];
                     }
                 }

@@ -396,7 +396,7 @@ public class CLI implements Runnable {
                         "a jbmc binary manually with the -jbmcBinary option");
                     log.error("To install jbmc (as part of cbmc) head to https://github.com/diffblue/cbmc/releases/ ");
                     return false;
-                } else if (Integer.parseInt(matcher.group(2)) < jbmcMinorVer) {
+                } else if (Integer.parseInt(matcher.group(2)) < jbmcMinorVer && Integer.parseInt(matcher.group(1)) == jbmcMajorVer) {
                     log.error("Error validating jbmc binary \"" + jbmcBin + "\"");
                     log.error("Found version: " + output);
                     log.error("but at least version " + jbmcMajorVer + "." + jbmcMinorVer + " is required.");
