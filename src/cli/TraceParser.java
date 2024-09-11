@@ -122,7 +122,11 @@ public class TraceParser {
                                     "Try to increase the unwinding parameter.", null);
                                 return res;
                             } else {
-                                throw new Exception("location was null.");
+                                res.addProperty("Error property.",
+                                        new Trace(new ArrayList<>()),
+                                        -1,
+                                        "Unkown", null);
+                                return res;
                             }
                         } else {
                             lineNumber = Integer.parseInt(location.getAttribute("line"));
@@ -159,14 +163,14 @@ public class TraceParser {
                             }
                         }
                         trace = extractTrace(assignments);
-                        if (reason.contains("assertion")) {
+                        if (reason.contains("assertion") && !reason.contains("unwinding")) {
                             trace.relevantVars = TraceInformation.getAssertVarsForLine(lineNumber);
                         }
                     }
                     if (lineNumber < 0) {
                         res.addProperty(propertyElemnt.getAttribute("property"), null, lineNumber, null, null);
                     } else {
-                        if (reason.contains("assertion")) {
+                        if (reason.contains("assertion") && !reason.contains("unwinding")) {
                             res.addProperty(propertyElemnt.getAttribute("property"),
                                 trace,
                                 TraceInformation.getOriginalLine(lineNumber),
