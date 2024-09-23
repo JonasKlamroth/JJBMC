@@ -8,6 +8,11 @@ public class Shor2 {
     public Shor2() {
         super();
     }
+    /*@
+      requires 0 <= min < max;
+      ensures min <= \result < max;
+      assignable \nothing;
+   */
 
     public static int rand(int min, int max) {
         int i = new Random().nextInt(0);
@@ -18,7 +23,22 @@ public class Shor2 {
     }
     /*@
       requires 2 <= n <= 15;
-      ensures \result != -1 ==> n % \result == 0;
+      ensures n % \result == 0 && \result != 1 && \result != n;
+   */
+
+    public static int shor(int n) {
+        int res = factorize(n);
+        //@ loop_invariant res != 0;
+        //@ loop_invariant res == -1 || n % res == 0 && res != 1 && res != n;
+        while (res == -1) {
+            res = factorize(n);
+        }
+        return res;
+    }
+    /*@
+      requires 2 <= n <= 15;
+      ensures \result != 0;
+      ensures \result != -1 ==> (n % \result == 0 && \result != 1 && \result != n);
       assignable \nothing;
    */
 
@@ -70,6 +90,18 @@ public class Shor2 {
         double PI = 3.141592653;
         float[] q0 = new float[]{1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
         float[] q1 = new float[]{0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F};
+        {
+            {
+            }
+        }
+        {
+            {
+            }
+        }
+        {
+            {
+            }
+        }
         int res = 0;
         {
             {
@@ -127,8 +159,9 @@ public class Shor2 {
         return res;
     }
     /*@
-      requires n >= 2 && n <= 15 && 0 < a < n;
-      ensures ((0 < \result < n) && pow(a, \result) % n == 1) || (\result == -1);
+      requires 2 <= n <= 15 && 0 < a < n;
+      ensures -1 <= \result < n;
+      ensures \result != 1 && (pow(a, \result) % n == 1 || \result == -1);
       assignable \nothing;
    */
 
