@@ -174,6 +174,10 @@ public class VerifyFunctionVisitor extends FilterVisitor {
         if (currentMethod.mods.getFlags().contains(Modifier.ABSTRACT)) {
             return currentMethod;
         }
+        if (currentMethod.mods.annotations.stream().anyMatch(a -> a.annotationType.toString().equals("org.jmlspecs.annotation.Helper")) ||
+            currentMethod.cases == null) {
+            return null;
+        }
         hasReturn = false;
         JCVariableDecl returnVar = null;
         Type t = that.sym.getReturnType();

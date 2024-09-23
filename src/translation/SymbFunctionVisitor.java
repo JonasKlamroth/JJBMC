@@ -159,7 +159,7 @@ public class SymbFunctionVisitor extends JmlTreeCopier {
         currentMethod = (JmlMethodDecl) that.clone();
         hasReturn = false;
 
-        if (that.cases == null && !TranslationUtils.isPure(that)) {
+        if (that.cases == null) {
             JmlMethodDecl copy = (JmlMethodDecl) visitJmlMethodDeclBugfix(that, p);
             copy.name = maker.Name(copy.name.toString() + "Symb");
             copy.mods.annotations = List.nil();
