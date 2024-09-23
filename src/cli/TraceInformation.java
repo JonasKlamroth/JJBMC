@@ -136,7 +136,7 @@ public class TraceInformation {
                 return new Pair<>(begin, line);
             }
         }
-        return null;
+        return new Pair<>(lineIn, lineIn + 1);
     }
 
     public static boolean isActualNewLine(int oldLine, int newLine) {
