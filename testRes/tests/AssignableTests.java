@@ -194,6 +194,7 @@ public class AssignableTests {
 
 
 
+    //@ assignable \everything;
     @Verifyable
     private void assignalbeTest8() {
         int i = 5;
@@ -203,6 +204,7 @@ public class AssignableTests {
         }
     }
 
+    //@ assignable \everything;
     @Verifyable
     private void assignalbeTest9() {
         if (privInt > 10) {
@@ -338,6 +340,7 @@ public class AssignableTests {
         t.t2 = new TestSuite();
     }
 
+    //@ assignable \everything;
     @Verifyable
     private void assignableTest18() {
         this.t2 = new TestSuite();
@@ -578,6 +581,7 @@ public class AssignableTests {
     }
 
 
+    //@ assignable \everything;
     @Fails
     public int[] testIllegalAssignment() {
         int[] arr = new int[]{0, 0, 0};
@@ -596,6 +600,7 @@ public class AssignableTests {
     }
 
 
+    //@ assignable \everything;
     @Verifyable
     public void loopLocalVarTest() {
         //@ loop_modifies \nothing;
@@ -605,6 +610,7 @@ public class AssignableTests {
         }
     }
 
+    //@ assignable \everything;
     @Verifyable
     void testLoopModifiesWithInvariant() {
         int[] array = new int[1];
@@ -633,6 +639,7 @@ public class AssignableTests {
         privInt -= 5;
     }
 
+    //@ assignable \everything;
     @Verifyable
     void testLoopModField() {
         //@ loop_invariant true;

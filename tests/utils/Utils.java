@@ -133,6 +133,8 @@ public class Utils {
             if (unwind != null) {
                 commandList.add("--unwind");
                 commandList.add(unwind);
+                commandList.add("--max-nondet-array-length");
+                commandList.add(Integer.parseInt(unwind) - 2 + "");
             }
 
             String[] commands = new String[commandList.size()];

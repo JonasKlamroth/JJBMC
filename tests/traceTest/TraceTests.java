@@ -81,7 +81,7 @@ public class TraceTests {
         int idx = inputFile.lastIndexOf(File.separator);
         String path = inputFile.substring(0, idx) + File.separator + "tmp" + File.separator + "xmlout.xml";
         File f = new File(path) ;
-        assertTrue(f.exists());
+        assertTrue(f.exists(), "The file " + path + " does not exist. The translation did not work correctly.");
         JBMCOutput output = TraceParser.parse(f, true);
         String traces = output.printAllTraces();
         String[] traceSplits = traces.split("\n");

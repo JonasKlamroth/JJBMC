@@ -127,7 +127,7 @@ public class BaseVisitor extends FilterVisitor {
                 if (copy != null) {
                     newDefs = newDefs.append(copy);
                 }
-                if (!((JmlMethodDecl) def).name.toString().equals("<init>")) {
+                if (!((JmlMethodDecl) def).name.toString().equals("<init>") || copy == null) {
                     newDefs = newDefs.append(def);
                 }
             } else if (def instanceof JmlClassDecl) {

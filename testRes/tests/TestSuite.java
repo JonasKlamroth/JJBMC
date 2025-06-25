@@ -25,6 +25,7 @@ public class TestSuite {
 
     }
 
+    //@ requires true;
     @Verifyable
     public TestSuite() {
         this.finalVar = 0;
@@ -125,6 +126,7 @@ public class TestSuite {
     }
 
 
+    //@ requires true;
     @Unwind(number = 11)
     @Verifyable
     public void loopTest2() {
@@ -141,6 +143,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Verifyable
     public void loopTest1() {
@@ -156,6 +159,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Verifyable
     public void loopTest3() {
@@ -169,6 +173,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Fails
     public void decreasesTest1() {
@@ -182,6 +187,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Fails
     public void decreasesTest6() {
@@ -195,6 +201,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Fails
     public void decreasesTest4() {
@@ -208,6 +215,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Verifyable
     public void decreasesTest3() {
@@ -221,6 +229,7 @@ public class TestSuite {
         }
     }
 
+    //@ requires true;
     @Unwind(number = 11)
     @Fails
     public void decreasesTest5() {
@@ -320,6 +329,7 @@ public class TestSuite {
         return 0;
     }
 
+    //@ requires true;
     @Fails
     private void objectHavocTest() {
         t2 = null;
@@ -327,16 +337,19 @@ public class TestSuite {
         assert t2 == null;
     }
 
+    //@ requires true;
     @Fails
     public void havocTest() {
         assert pubInt == 0;
     }
 
+    //@ requires true;
     @Fails
     public void havocTest1() {
         assert t2 == null;
     }
 
+    //@ requires true;
     @Fails
     public void havocTest2() {
         assert arr.length == 0;
@@ -431,31 +444,37 @@ public class TestSuite {
 
 
 
+    //@ requires true;
     @Fails
     private void assertTest() {
         //@ assert (0 > 1);
     }
 
+    //@ requires true;
     @Fails
     private void assertTest2() {
         //@ assert (\forall int i; i > 0 && i < 10; i > 2);
     }
 
+    //@ requires true;
     @Verifyable
     private void assertTest3() {
         //@ assert (\forall int i; i > 0 && i < 10; i > 0);
     }
 
+    //@ requires true;
     @Verifyable
     private void assertTest4() {
         //@ assert (\exists int i; i > 0 && i < 10; i > 5);
     }
 
+    //@ requires true;
     @Fails
     private void assertTest5() {
         //@ assert (\exists int i; i > 0 && i < 10; i > 11);
     }
 
+    //@ requires true;
     @Verifyable
     private void assumeTest1() {
         int i = 0;
@@ -463,6 +482,7 @@ public class TestSuite {
         //@ assert i > -1;
     }
 
+    //@ requires true;
     @Verifyable
     private void assumeTest2() {
         int[] arr = new int[2];
@@ -470,6 +490,7 @@ public class TestSuite {
         //@ assert (\exists int i; i >= 0 && i < 2; arr[i] == 2);
     }
 
+    //@ requires true;
     @Fails
     private void assumeTest4() {
         int[] arr = new int[2];
@@ -484,6 +505,7 @@ public class TestSuite {
         return f;
     }
 
+    //@ requires true;
     @Verifyable
     private void trivialTest() {
         int i = 0;
@@ -698,12 +720,14 @@ public class TestSuite {
         return 1;
     }
 
+    //@ requires true;
     @Verifyable
     private void classMethodCallTest() {
         int res = this.calledMethod1();
         assert res == 1;
     }
 
+    //@ requires true;
     @Verifyable
     private void typeTranslationTest(short s, byte b, double d, float f, long[] l, char[][] c) {}
 
@@ -996,6 +1020,7 @@ public class TestSuite {
         return true;
     }
 
+    //@ requires true;
     @Verifyable
     public boolean shortcutTest4() {
         if (true && boolFunct(0)) {
@@ -1124,6 +1149,7 @@ public class TestSuite {
     }
 
 
+    //@ requires true;
     @Fails
     private void assForLoopTest() {
         int j = 0;
@@ -1134,6 +1160,7 @@ public class TestSuite {
     }
 
 
+    //@ requires true;
     @Fails
     private /*@ pure */ void pureMethod() {
         privInt = 1;
