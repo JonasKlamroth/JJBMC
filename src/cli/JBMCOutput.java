@@ -1,11 +1,7 @@
 package cli;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JBMCOutput {
@@ -37,15 +33,18 @@ public class JBMCOutput {
             return "";
         }
 
+        sb.append("-----------------START TRACE-----------------\n");
         sb.append("Trace for PVC: " + property + " in line " + lineNumbers.get(idx) + "\n");
         trace.filterAssignments();
         trace.getFinalVals();
         if (printGuesses) {
+            sb.append("------------FILTERED ASSIGNMENTS-------------\n");
             for (Assignment a : trace.filteredAssignments) {
                 if (a.guess != null) {
                     sb.append(a + "\n");
                 }
             }
+            sb.append("---------------------------------------------\n");
         }
         if (asserts.get(idx) != null) {
             String assertion = asserts.get(idx);
@@ -54,17 +53,21 @@ public class JBMCOutput {
             }
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + assertion + " (" + reasons.get(idx) + ")\n");
             sb.append("with concrete values: " + "\n");
+            sb.append("---------------------------------------------\n");
             sb.append(printFinalVals(traces.get(idx)));
         } else {
             sb.append("Fail in line " + lineNumbers.get(idx) + ": " + reasons.get(idx) + "\n");
+            sb.append("with concrete values: " + "\n");
+            sb.append("---------------------------------------------\n");
+            sb.append(printFinalVals(traces.get(idx)));
         }
-        sb.append("\n");
+        sb.append("------------------END TRACE------------------\n\n");
         return sb.toString();
     }
 
     private String printFinalVals(Trace trace) {
         StringBuilder sb = new StringBuilder();
-        for (String k : trace.finalVals.keySet()) {
+        for (String k : trace.finalVals.keySet().stream().sorted().collect(Collectors.toList())) {
             sb.append(TraceInformation.applyExpressionMap(k) + " = " + trace.finalVals.get(k));
             sb.append("\n");
         }
@@ -102,7 +105,6 @@ public class JBMCOutput {
         return sb.toString();
     }
 
-
     private String cutArrayString(String s, int size) {
         int pos = s.indexOf(",");
         while (--size > 0 && pos != -1) {
@@ -110,6 +112,5 @@ public class JBMCOutput {
         }
         return s.substring(0, pos - 1) + "}";
     }
-
 
 }
